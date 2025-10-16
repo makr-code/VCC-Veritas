@@ -1,0 +1,60 @@
+{{- if .Values.worker.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "veritas.fullname" . }}-worker
+  labels:
+    {{- include "veritas.labels" . | nindent 4 }}
+    app.kubernetes.io/component: worker
+spec:
+  {{- if not .Values.worker.autoscaling.enabled }}
+  replicas: {{ .Values.worker.replicaCount }}
+  {{- end }}
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      {{- include "veritas.worker.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+      labels:
+        {{- include "veritas.worker.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- include "veritas.imagePullSecrets" . | nindent 6 }}
+      serviceAccountName: {{ include "veritas.serviceAccountName" . }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        fsGroup: 1001
+      containers:
+      - name: worker
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        image: "{{ .Values.global.imageRegistry }}{{ .Values.worker.image.repository }}:{{ .Values.worker.image.tag }}"
+        imagePullPolicy: {{ .Values.worker.image.pullPolicy }}
+        envFrom:
+        - configMapRef:
+            name: {{ include "veritas.fullname" . }}-config
+        - secretRef:
+            name: {{ include "veritas.fullname" . }}-secrets
+        resources:
+          {{- toYaml .Values.worker.resources | nindent 12 }}
+        volumeMounts:
+        - name: logs
+          mountPath: /app/logs
+        {{- if .Values.persistence.data.enabled }}
+        - name: data
+          mountPath: /app/data
+        {{- end }}
+      volumes:
+      - name: logs
+        emptyDir: {}
+      {{- if .Values.persistence.data.enabled }}
+      - name: data
+        persistentVolumeClaim:
+          claimName: {{ include "veritas.fullname" . }}-data-pvc
+      {{- end }}
+{{- end }}

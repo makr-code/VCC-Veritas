@@ -1,0 +1,1593 @@
+[
+  {
+    "test_id": "Q1",
+    "query": "Welche rechtlichen Voraussetzungen, Fristen und Kosten sind bei der Beantragung einer Baugenehmigung für einen Wohnhaus-Neubau in Baden-Württemberg zu beachten? Bitte erläutere auch mögliche Ausnahmen und vereinfachte Verfahren.",
+    "model": "all-minilm:latest",
+    "success": false,
+    "metrics": {
+      "answer_length": 627,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.0
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/3 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/2 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/3 erwartet",
+      "⚠️ Unzureichende Aspekt-Abdeckung: 0/5 (0%)",
+      "   Fehlende Aspekte: ['Rechtliche Voraussetzungen (§§ LBO BW)', 'Fristen (Bearbeitungsdauer)', 'Kosten (Gebühren)', 'Ausnahmen (Genehmigungsfreistellung)', 'Vereinfachtes Verfahren']",
+      "⚠️ Antwort unstrukturiert (keine erkennbaren Sections)"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 627 Zeichen",
+      "✅ Ausreichend Quellen: 16"
+    ],
+    "quotes": [],
+    "rating": "NEEDS IMPROVEMENT",
+    "duration": 16.98095679283142
+  },
+  {
+    "test_id": "Q2",
+    "query": "Erkläre detailliert den Unterschied zwischen Baugenehmigungsverfahren, vereinfachtem Genehmigungsverfahren und Genehmigungsfreistellung nach der Landesbauordnung Baden-Württemberg. Welche Bauvorhaben fallen jeweils darunter und welche Unterlagen sind erforderlich?",
+    "model": "all-minilm:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 1245,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.8
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/4 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/3 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/4 erwartet"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 1245 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Gute Aspekt-Abdeckung: 4/5 (80%)",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 27.8433039188385
+  },
+  {
+    "test_id": "Q3",
+    "query": "Was regelt § 58 LBO BW konkret? Wie unterscheidet sich die Regelung von anderen Bundesländern? Welche Änderungen gab es in den letzten Jahren und welche praktischen Auswirkungen haben diese für Bauherren?",
+    "model": "all-minilm:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 1195,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.0
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/3 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/2 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/4 erwartet",
+      "⚠️ Unzureichende Aspekt-Abdeckung: 0/5 (0%)",
+      "   Fehlende Aspekte: ['§ 58 LBO BW Inhalt', 'Bundesländer-Vergleich', 'Historische Änderungen', 'Praktische Auswirkungen', 'Bauherren-Perspektive']"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 1195 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 27.639395713806152
+  },
+  {
+    "test_id": "Q4",
+    "query": "Welche Anforderungen gelten für den Brandschutz bei Wohngebäuden in Baden-Württemberg? Berücksichtige dabei Gebäudeklassen, Rettungswege, Baustoffe und besondere Anforderungen für Mehrfamilienhäuser. Nenne auch relevante DIN-Normen.",
+    "model": "all-minilm:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 1449,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.5
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/4 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/3 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/4 erwartet",
+      "⚠️ Unzureichende Aspekt-Abdeckung: 3/6 (50%)",
+      "   Fehlende Aspekte: ['Brandschutz-Anforderungen', 'Baustoffe/Brandschutzklassen', 'DIN-Normen']"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 1449 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 29.177035808563232
+  },
+  {
+    "test_id": "Q5",
+    "query": "Wie ist der Ablauf eines Baugenehmigungsverfahrens in Baden-Württemberg vom Antrag bis zur Genehmigung? Welche Behörden sind beteiligt, welche Fristen gelten, was passiert bei Ablehnung und welche Rechtsmittel stehen dem Bauherrn zur Verfügung?",
+    "model": "all-minilm:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 1026,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 2,
+      "quotes_with_source": 0,
+      "quote_length_avg": 311.0,
+      "quote_source_ratio": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.0
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/4 erwartet",
+      "⚠️ Viele Zitate ohne Quellenangabe: 0/2",
+      "⚠️ Zu wenig Vorschläge: 0/5 erwartet",
+      "⚠️ Unzureichende Aspekt-Abdeckung: 0/5 (0%)",
+      "   Fehlende Aspekte: ['Verfahrensablauf (Schritte)', 'Beteiligte Behörden', 'Gesetzliche Fristen', 'Ablehnungsgründe', 'Rechtsmittel (Widerspruch, Klage)']"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 1026 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Direkte Zitate vorhanden: 2",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [
+      "ll need to submit your building permit application to the competent building authority (Baugerichtshof or Baurechtsamt).\n2. **Provide necessary documents**: Make sure you have all the required documents ready, including:\n\t* Building plans and designs\n\t* Site plan with property boundaries\n\t* Structural calculations\n\t* Description of the building project\n3. **Wait for processing**: The building authority will review your application and may request additional information or clarification.\n4. **Receive a decision**: Once processed, you",
+      "s a direct and helpful response:\n\nTo get a building permit in Baden-Württemberg, you"
+    ],
+    "rating": "GOOD",
+    "duration": 24.5704026222229
+  },
+  {
+    "test_id": "Q1",
+    "query": "Welche rechtlichen Voraussetzungen, Fristen und Kosten sind bei der Beantragung einer Baugenehmigung für einen Wohnhaus-Neubau in Baden-Württemberg zu beachten? Bitte erläutere auch mögliche Ausnahmen und vereinfachte Verfahren.",
+    "model": "codellama:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 689,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.4
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/3 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/2 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/3 erwartet",
+      "⚠️ Unzureichende Aspekt-Abdeckung: 2/5 (40%)",
+      "   Fehlende Aspekte: ['Kosten (Gebühren)', 'Ausnahmen (Genehmigungsfreistellung)', 'Vereinfachtes Verfahren']"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 689 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 16.950055599212646
+  },
+  {
+    "test_id": "Q2",
+    "query": "Erkläre detailliert den Unterschied zwischen Baugenehmigungsverfahren, vereinfachtem Genehmigungsverfahren und Genehmigungsfreistellung nach der Landesbauordnung Baden-Württemberg. Welche Bauvorhaben fallen jeweils darunter und welche Unterlagen sind erforderlich?",
+    "model": "codellama:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 1589,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.8
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/4 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/3 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/4 erwartet"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 1589 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Gute Aspekt-Abdeckung: 4/5 (80%)",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 22.9094295501709
+  },
+  {
+    "test_id": "Q3",
+    "query": "Was regelt § 58 LBO BW konkret? Wie unterscheidet sich die Regelung von anderen Bundesländern? Welche Änderungen gab es in den letzten Jahren und welche praktischen Auswirkungen haben diese für Bauherren?",
+    "model": "codellama:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 805,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.0
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/3 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/2 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/4 erwartet",
+      "⚠️ Unzureichende Aspekt-Abdeckung: 0/5 (0%)",
+      "   Fehlende Aspekte: ['§ 58 LBO BW Inhalt', 'Bundesländer-Vergleich', 'Historische Änderungen', 'Praktische Auswirkungen', 'Bauherren-Perspektive']"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 805 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 17.758617401123047
+  },
+  {
+    "test_id": "Q4",
+    "query": "Welche Anforderungen gelten für den Brandschutz bei Wohngebäuden in Baden-Württemberg? Berücksichtige dabei Gebäudeklassen, Rettungswege, Baustoffe und besondere Anforderungen für Mehrfamilienhäuser. Nenne auch relevante DIN-Normen.",
+    "model": "codellama:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 1271,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.5
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/4 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/3 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/4 erwartet",
+      "⚠️ Unzureichende Aspekt-Abdeckung: 3/6 (50%)",
+      "   Fehlende Aspekte: ['Brandschutz-Anforderungen', 'Baustoffe/Brandschutzklassen', 'DIN-Normen']"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 1271 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 22.61927890777588
+  },
+  {
+    "test_id": "Q5",
+    "query": "Wie ist der Ablauf eines Baugenehmigungsverfahrens in Baden-Württemberg vom Antrag bis zur Genehmigung? Welche Behörden sind beteiligt, welche Fristen gelten, was passiert bei Ablehnung und welche Rechtsmittel stehen dem Bauherrn zur Verfügung?",
+    "model": "codellama:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 1298,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.4
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/4 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/2 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/5 erwartet",
+      "⚠️ Unzureichende Aspekt-Abdeckung: 2/5 (40%)",
+      "   Fehlende Aspekte: ['Verfahrensablauf (Schritte)', 'Ablehnungsgründe', 'Rechtsmittel (Widerspruch, Klage)']"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 1298 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 20.7726092338562
+  },
+  {
+    "test_id": "Q1",
+    "query": "Welche rechtlichen Voraussetzungen, Fristen und Kosten sind bei der Beantragung einer Baugenehmigung für einen Wohnhaus-Neubau in Baden-Württemberg zu beachten? Bitte erläutere auch mögliche Ausnahmen und vereinfachte Verfahren.",
+    "model": "gemma3:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 781,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.0
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/3 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/2 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/3 erwartet",
+      "⚠️ Unzureichende Aspekt-Abdeckung: 0/5 (0%)",
+      "   Fehlende Aspekte: ['Rechtliche Voraussetzungen (§§ LBO BW)', 'Fristen (Bearbeitungsdauer)', 'Kosten (Gebühren)', 'Ausnahmen (Genehmigungsfreistellung)', 'Vereinfachtes Verfahren']"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 781 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 18.028576135635376
+  },
+  {
+    "test_id": "Q2",
+    "query": "Erkläre detailliert den Unterschied zwischen Baugenehmigungsverfahren, vereinfachtem Genehmigungsverfahren und Genehmigungsfreistellung nach der Landesbauordnung Baden-Württemberg. Welche Bauvorhaben fallen jeweils darunter und welche Unterlagen sind erforderlich?",
+    "model": "gemma3:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 1303,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.8
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/4 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/3 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/4 erwartet"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 1303 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Gute Aspekt-Abdeckung: 4/5 (80%)",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 22.397119998931885
+  },
+  {
+    "test_id": "Q3",
+    "query": "Was regelt § 58 LBO BW konkret? Wie unterscheidet sich die Regelung von anderen Bundesländern? Welche Änderungen gab es in den letzten Jahren und welche praktischen Auswirkungen haben diese für Bauherren?",
+    "model": "gemma3:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 731,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.0
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/3 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/2 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/4 erwartet",
+      "⚠️ Unzureichende Aspekt-Abdeckung: 0/5 (0%)",
+      "   Fehlende Aspekte: ['§ 58 LBO BW Inhalt', 'Bundesländer-Vergleich', 'Historische Änderungen', 'Praktische Auswirkungen', 'Bauherren-Perspektive']"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 731 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 17.240314960479736
+  },
+  {
+    "test_id": "Q4",
+    "query": "Welche Anforderungen gelten für den Brandschutz bei Wohngebäuden in Baden-Württemberg? Berücksichtige dabei Gebäudeklassen, Rettungswege, Baustoffe und besondere Anforderungen für Mehrfamilienhäuser. Nenne auch relevante DIN-Normen.",
+    "model": "gemma3:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 1617,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.6666666666666666
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/4 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/3 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/4 erwartet"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 1617 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Gute Aspekt-Abdeckung: 4/6 (67%)",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 23.88100814819336
+  },
+  {
+    "test_id": "Q5",
+    "query": "Wie ist der Ablauf eines Baugenehmigungsverfahrens in Baden-Württemberg vom Antrag bis zur Genehmigung? Welche Behörden sind beteiligt, welche Fristen gelten, was passiert bei Ablehnung und welche Rechtsmittel stehen dem Bauherrn zur Verfügung?",
+    "model": "gemma3:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 1246,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.2
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/4 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/2 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/5 erwartet",
+      "⚠️ Unzureichende Aspekt-Abdeckung: 1/5 (20%)",
+      "   Fehlende Aspekte: ['Verfahrensablauf (Schritte)', 'Gesetzliche Fristen', 'Ablehnungsgründe', 'Rechtsmittel (Widerspruch, Klage)']"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 1246 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 20.9065945148468
+  },
+  {
+    "test_id": "Q1",
+    "query": "Welche rechtlichen Voraussetzungen, Fristen und Kosten sind bei der Beantragung einer Baugenehmigung für einen Wohnhaus-Neubau in Baden-Württemberg zu beachten? Bitte erläutere auch mögliche Ausnahmen und vereinfachte Verfahren.",
+    "model": "gpt-oss:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 934,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.0
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/3 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/2 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/3 erwartet",
+      "⚠️ Unzureichende Aspekt-Abdeckung: 0/5 (0%)",
+      "   Fehlende Aspekte: ['Rechtliche Voraussetzungen (§§ LBO BW)', 'Fristen (Bearbeitungsdauer)', 'Kosten (Gebühren)', 'Ausnahmen (Genehmigungsfreistellung)', 'Vereinfachtes Verfahren']"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 934 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 18.29886269569397
+  },
+  {
+    "test_id": "Q2",
+    "query": "Erkläre detailliert den Unterschied zwischen Baugenehmigungsverfahren, vereinfachtem Genehmigungsverfahren und Genehmigungsfreistellung nach der Landesbauordnung Baden-Württemberg. Welche Bauvorhaben fallen jeweils darunter und welche Unterlagen sind erforderlich?",
+    "model": "gpt-oss:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 937,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.8
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/4 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/3 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/4 erwartet"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 937 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Gute Aspekt-Abdeckung: 4/5 (80%)",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 19.2207989692688
+  },
+  {
+    "test_id": "Q3",
+    "query": "Was regelt § 58 LBO BW konkret? Wie unterscheidet sich die Regelung von anderen Bundesländern? Welche Änderungen gab es in den letzten Jahren und welche praktischen Auswirkungen haben diese für Bauherren?",
+    "model": "gpt-oss:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 669,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.0
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/3 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/2 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/4 erwartet",
+      "⚠️ Unzureichende Aspekt-Abdeckung: 0/5 (0%)",
+      "   Fehlende Aspekte: ['§ 58 LBO BW Inhalt', 'Bundesländer-Vergleich', 'Historische Änderungen', 'Praktische Auswirkungen', 'Bauherren-Perspektive']"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 669 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 16.53060531616211
+  },
+  {
+    "test_id": "Q4",
+    "query": "Welche Anforderungen gelten für den Brandschutz bei Wohngebäuden in Baden-Württemberg? Berücksichtige dabei Gebäudeklassen, Rettungswege, Baustoffe und besondere Anforderungen für Mehrfamilienhäuser. Nenne auch relevante DIN-Normen.",
+    "model": "gpt-oss:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 1051,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.6666666666666666
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/4 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/3 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/4 erwartet"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 1051 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Gute Aspekt-Abdeckung: 4/6 (67%)",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 21.086761474609375
+  },
+  {
+    "test_id": "Q5",
+    "query": "Wie ist der Ablauf eines Baugenehmigungsverfahrens in Baden-Württemberg vom Antrag bis zur Genehmigung? Welche Behörden sind beteiligt, welche Fristen gelten, was passiert bei Ablehnung und welche Rechtsmittel stehen dem Bauherrn zur Verfügung?",
+    "model": "gpt-oss:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 1424,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.0
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/4 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/2 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/5 erwartet",
+      "⚠️ Unzureichende Aspekt-Abdeckung: 0/5 (0%)",
+      "   Fehlende Aspekte: ['Verfahrensablauf (Schritte)', 'Beteiligte Behörden', 'Gesetzliche Fristen', 'Ablehnungsgründe', 'Rechtsmittel (Widerspruch, Klage)']"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 1424 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 23.17177152633667
+  },
+  {
+    "test_id": "Q1",
+    "query": "Welche rechtlichen Voraussetzungen, Fristen und Kosten sind bei der Beantragung einer Baugenehmigung für einen Wohnhaus-Neubau in Baden-Württemberg zu beachten? Bitte erläutere auch mögliche Ausnahmen und vereinfachte Verfahren.",
+    "model": "llama3.2:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 1048,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.0
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/3 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/2 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/3 erwartet",
+      "⚠️ Unzureichende Aspekt-Abdeckung: 0/5 (0%)",
+      "   Fehlende Aspekte: ['Rechtliche Voraussetzungen (§§ LBO BW)', 'Fristen (Bearbeitungsdauer)', 'Kosten (Gebühren)', 'Ausnahmen (Genehmigungsfreistellung)', 'Vereinfachtes Verfahren']"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 1048 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 20.123444080352783
+  },
+  {
+    "test_id": "Q2",
+    "query": "Erkläre detailliert den Unterschied zwischen Baugenehmigungsverfahren, vereinfachtem Genehmigungsverfahren und Genehmigungsfreistellung nach der Landesbauordnung Baden-Württemberg. Welche Bauvorhaben fallen jeweils darunter und welche Unterlagen sind erforderlich?",
+    "model": "llama3.2:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 1692,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.8
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/4 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/3 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/4 erwartet"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 1692 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Gute Aspekt-Abdeckung: 4/5 (80%)",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 23.745527505874634
+  },
+  {
+    "test_id": "Q3",
+    "query": "Was regelt § 58 LBO BW konkret? Wie unterscheidet sich die Regelung von anderen Bundesländern? Welche Änderungen gab es in den letzten Jahren und welche praktischen Auswirkungen haben diese für Bauherren?",
+    "model": "llama3.2:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 918,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.0
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/3 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/2 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/4 erwartet",
+      "⚠️ Unzureichende Aspekt-Abdeckung: 0/5 (0%)",
+      "   Fehlende Aspekte: ['§ 58 LBO BW Inhalt', 'Bundesländer-Vergleich', 'Historische Änderungen', 'Praktische Auswirkungen', 'Bauherren-Perspektive']"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 918 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 18.459286212921143
+  },
+  {
+    "test_id": "Q4",
+    "query": "Welche Anforderungen gelten für den Brandschutz bei Wohngebäuden in Baden-Württemberg? Berücksichtige dabei Gebäudeklassen, Rettungswege, Baustoffe und besondere Anforderungen für Mehrfamilienhäuser. Nenne auch relevante DIN-Normen.",
+    "model": "llama3.2:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 1083,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.6666666666666666
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/4 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/3 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/4 erwartet"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 1083 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Gute Aspekt-Abdeckung: 4/6 (67%)",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 20.065963745117188
+  },
+  {
+    "test_id": "Q5",
+    "query": "Wie ist der Ablauf eines Baugenehmigungsverfahrens in Baden-Württemberg vom Antrag bis zur Genehmigung? Welche Behörden sind beteiligt, welche Fristen gelten, was passiert bei Ablehnung und welche Rechtsmittel stehen dem Bauherrn zur Verfügung?",
+    "model": "llama3.2:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 856,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.0
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/4 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/2 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/5 erwartet",
+      "⚠️ Unzureichende Aspekt-Abdeckung: 0/5 (0%)",
+      "   Fehlende Aspekte: ['Verfahrensablauf (Schritte)', 'Beteiligte Behörden', 'Gesetzliche Fristen', 'Ablehnungsgründe', 'Rechtsmittel (Widerspruch, Klage)']"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 856 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 19.361936330795288
+  },
+  {
+    "test_id": "Q1",
+    "query": "Welche rechtlichen Voraussetzungen, Fristen und Kosten sind bei der Beantragung einer Baugenehmigung für einen Wohnhaus-Neubau in Baden-Württemberg zu beachten? Bitte erläutere auch mögliche Ausnahmen und vereinfachte Verfahren.",
+    "model": "llama3:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 755,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.2
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/3 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/2 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/3 erwartet",
+      "⚠️ Unzureichende Aspekt-Abdeckung: 1/5 (20%)",
+      "   Fehlende Aspekte: ['Rechtliche Voraussetzungen (§§ LBO BW)', 'Kosten (Gebühren)', 'Ausnahmen (Genehmigungsfreistellung)', 'Vereinfachtes Verfahren']"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 755 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 17.320921897888184
+  },
+  {
+    "test_id": "Q2",
+    "query": "Erkläre detailliert den Unterschied zwischen Baugenehmigungsverfahren, vereinfachtem Genehmigungsverfahren und Genehmigungsfreistellung nach der Landesbauordnung Baden-Württemberg. Welche Bauvorhaben fallen jeweils darunter und welche Unterlagen sind erforderlich?",
+    "model": "llama3:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 945,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.8
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/4 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/3 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/4 erwartet"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 945 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Gute Aspekt-Abdeckung: 4/5 (80%)",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 19.104129552841187
+  },
+  {
+    "test_id": "Q3",
+    "query": "Was regelt § 58 LBO BW konkret? Wie unterscheidet sich die Regelung von anderen Bundesländern? Welche Änderungen gab es in den letzten Jahren und welche praktischen Auswirkungen haben diese für Bauherren?",
+    "model": "llama3:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 1339,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.0
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/3 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/2 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/4 erwartet",
+      "⚠️ Unzureichende Aspekt-Abdeckung: 0/5 (0%)",
+      "   Fehlende Aspekte: ['§ 58 LBO BW Inhalt', 'Bundesländer-Vergleich', 'Historische Änderungen', 'Praktische Auswirkungen', 'Bauherren-Perspektive']"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 1339 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 21.933124542236328
+  },
+  {
+    "test_id": "Q4",
+    "query": "Welche Anforderungen gelten für den Brandschutz bei Wohngebäuden in Baden-Württemberg? Berücksichtige dabei Gebäudeklassen, Rettungswege, Baustoffe und besondere Anforderungen für Mehrfamilienhäuser. Nenne auch relevante DIN-Normen.",
+    "model": "llama3:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 1040,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.3333333333333333
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/4 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/3 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/4 erwartet",
+      "⚠️ Unzureichende Aspekt-Abdeckung: 2/6 (33%)",
+      "   Fehlende Aspekte: ['Brandschutz-Anforderungen', 'Gebäudeklassen', 'Baustoffe/Brandschutzklassen', 'DIN-Normen']"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 1040 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 20.006406545639038
+  },
+  {
+    "test_id": "Q5",
+    "query": "Wie ist der Ablauf eines Baugenehmigungsverfahrens in Baden-Württemberg vom Antrag bis zur Genehmigung? Welche Behörden sind beteiligt, welche Fristen gelten, was passiert bei Ablehnung und welche Rechtsmittel stehen dem Bauherrn zur Verfügung?",
+    "model": "llama3:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 967,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.2
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/4 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/2 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/5 erwartet",
+      "⚠️ Unzureichende Aspekt-Abdeckung: 1/5 (20%)",
+      "   Fehlende Aspekte: ['Verfahrensablauf (Schritte)', 'Beteiligte Behörden', 'Ablehnungsgründe', 'Rechtsmittel (Widerspruch, Klage)']"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 967 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 18.802990436553955
+  },
+  {
+    "test_id": "Q1",
+    "query": "Welche rechtlichen Voraussetzungen, Fristen und Kosten sind bei der Beantragung einer Baugenehmigung für einen Wohnhaus-Neubau in Baden-Württemberg zu beachten? Bitte erläutere auch mögliche Ausnahmen und vereinfachte Verfahren.",
+    "model": "mixtral:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 1046,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.4
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/3 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/2 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/3 erwartet",
+      "⚠️ Unzureichende Aspekt-Abdeckung: 2/5 (40%)",
+      "   Fehlende Aspekte: ['Kosten (Gebühren)', 'Ausnahmen (Genehmigungsfreistellung)', 'Vereinfachtes Verfahren']"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 1046 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 20.237609148025513
+  },
+  {
+    "test_id": "Q2",
+    "query": "Erkläre detailliert den Unterschied zwischen Baugenehmigungsverfahren, vereinfachtem Genehmigungsverfahren und Genehmigungsfreistellung nach der Landesbauordnung Baden-Württemberg. Welche Bauvorhaben fallen jeweils darunter und welche Unterlagen sind erforderlich?",
+    "model": "mixtral:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 1054,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.8
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/4 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/3 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/4 erwartet"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 1054 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Gute Aspekt-Abdeckung: 4/5 (80%)",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 20.732791900634766
+  },
+  {
+    "test_id": "Q3",
+    "query": "Was regelt § 58 LBO BW konkret? Wie unterscheidet sich die Regelung von anderen Bundesländern? Welche Änderungen gab es in den letzten Jahren und welche praktischen Auswirkungen haben diese für Bauherren?",
+    "model": "mixtral:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 672,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.0
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/3 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/2 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/4 erwartet",
+      "⚠️ Unzureichende Aspekt-Abdeckung: 0/5 (0%)",
+      "   Fehlende Aspekte: ['§ 58 LBO BW Inhalt', 'Bundesländer-Vergleich', 'Historische Änderungen', 'Praktische Auswirkungen', 'Bauherren-Perspektive']"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 672 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 16.703899145126343
+  },
+  {
+    "test_id": "Q4",
+    "query": "Welche Anforderungen gelten für den Brandschutz bei Wohngebäuden in Baden-Württemberg? Berücksichtige dabei Gebäudeklassen, Rettungswege, Baustoffe und besondere Anforderungen für Mehrfamilienhäuser. Nenne auch relevante DIN-Normen.",
+    "model": "mixtral:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 1170,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.5
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/4 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/3 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/4 erwartet",
+      "⚠️ Unzureichende Aspekt-Abdeckung: 3/6 (50%)",
+      "   Fehlende Aspekte: ['Brandschutz-Anforderungen', 'Gebäudeklassen', 'Baustoffe/Brandschutzklassen']"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 1170 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 20.934106588363647
+  },
+  {
+    "test_id": "Q5",
+    "query": "Wie ist der Ablauf eines Baugenehmigungsverfahrens in Baden-Württemberg vom Antrag bis zur Genehmigung? Welche Behörden sind beteiligt, welche Fristen gelten, was passiert bei Ablehnung und welche Rechtsmittel stehen dem Bauherrn zur Verfügung?",
+    "model": "mixtral:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 1069,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.0
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/4 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/2 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/5 erwartet",
+      "⚠️ Unzureichende Aspekt-Abdeckung: 0/5 (0%)",
+      "   Fehlende Aspekte: ['Verfahrensablauf (Schritte)', 'Beteiligte Behörden', 'Gesetzliche Fristen', 'Ablehnungsgründe', 'Rechtsmittel (Widerspruch, Klage)']"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 1069 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 19.257845163345337
+  },
+  {
+    "test_id": "Q1",
+    "query": "Welche rechtlichen Voraussetzungen, Fristen und Kosten sind bei der Beantragung einer Baugenehmigung für einen Wohnhaus-Neubau in Baden-Württemberg zu beachten? Bitte erläutere auch mögliche Ausnahmen und vereinfachte Verfahren.",
+    "model": "nomic-embed-text:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 684,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.0
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/3 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/2 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/3 erwartet",
+      "⚠️ Unzureichende Aspekt-Abdeckung: 0/5 (0%)",
+      "   Fehlende Aspekte: ['Rechtliche Voraussetzungen (§§ LBO BW)', 'Fristen (Bearbeitungsdauer)', 'Kosten (Gebühren)', 'Ausnahmen (Genehmigungsfreistellung)', 'Vereinfachtes Verfahren']"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 684 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 17.239500522613525
+  },
+  {
+    "test_id": "Q2",
+    "query": "Erkläre detailliert den Unterschied zwischen Baugenehmigungsverfahren, vereinfachtem Genehmigungsverfahren und Genehmigungsfreistellung nach der Landesbauordnung Baden-Württemberg. Welche Bauvorhaben fallen jeweils darunter und welche Unterlagen sind erforderlich?",
+    "model": "nomic-embed-text:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 932,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.8
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/4 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/3 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/4 erwartet"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 932 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Gute Aspekt-Abdeckung: 4/5 (80%)",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 20.11396861076355
+  },
+  {
+    "test_id": "Q3",
+    "query": "Was regelt § 58 LBO BW konkret? Wie unterscheidet sich die Regelung von anderen Bundesländern? Welche Änderungen gab es in den letzten Jahren und welche praktischen Auswirkungen haben diese für Bauherren?",
+    "model": "nomic-embed-text:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 881,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.0
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/3 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/2 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/4 erwartet",
+      "⚠️ Unzureichende Aspekt-Abdeckung: 0/5 (0%)",
+      "   Fehlende Aspekte: ['§ 58 LBO BW Inhalt', 'Bundesländer-Vergleich', 'Historische Änderungen', 'Praktische Auswirkungen', 'Bauherren-Perspektive']"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 881 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 18.952461004257202
+  },
+  {
+    "test_id": "Q4",
+    "query": "Welche Anforderungen gelten für den Brandschutz bei Wohngebäuden in Baden-Württemberg? Berücksichtige dabei Gebäudeklassen, Rettungswege, Baustoffe und besondere Anforderungen für Mehrfamilienhäuser. Nenne auch relevante DIN-Normen.",
+    "model": "nomic-embed-text:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 1024,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.6666666666666666
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/4 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/3 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/4 erwartet",
+      "⚠️ Antwort unstrukturiert (keine erkennbaren Sections)"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 1024 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Gute Aspekt-Abdeckung: 4/6 (67%)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 19.148280143737793
+  },
+  {
+    "test_id": "Q5",
+    "query": "Wie ist der Ablauf eines Baugenehmigungsverfahrens in Baden-Württemberg vom Antrag bis zur Genehmigung? Welche Behörden sind beteiligt, welche Fristen gelten, was passiert bei Ablehnung und welche Rechtsmittel stehen dem Bauherrn zur Verfügung?",
+    "model": "nomic-embed-text:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 1185,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.2
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/4 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/2 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/5 erwartet",
+      "⚠️ Unzureichende Aspekt-Abdeckung: 1/5 (20%)",
+      "   Fehlende Aspekte: ['Verfahrensablauf (Schritte)', 'Beteiligte Behörden', 'Ablehnungsgründe', 'Rechtsmittel (Widerspruch, Klage)']"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 1185 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 20.46580147743225
+  },
+  {
+    "test_id": "Q1",
+    "query": "Welche rechtlichen Voraussetzungen, Fristen und Kosten sind bei der Beantragung einer Baugenehmigung für einen Wohnhaus-Neubau in Baden-Württemberg zu beachten? Bitte erläutere auch mögliche Ausnahmen und vereinfachte Verfahren.",
+    "model": "phi3:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 961,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.0
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/3 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/2 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/3 erwartet",
+      "⚠️ Unzureichende Aspekt-Abdeckung: 0/5 (0%)",
+      "   Fehlende Aspekte: ['Rechtliche Voraussetzungen (§§ LBO BW)', 'Fristen (Bearbeitungsdauer)', 'Kosten (Gebühren)', 'Ausnahmen (Genehmigungsfreistellung)', 'Vereinfachtes Verfahren']"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 961 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 19.800883531570435
+  },
+  {
+    "test_id": "Q2",
+    "query": "Erkläre detailliert den Unterschied zwischen Baugenehmigungsverfahren, vereinfachtem Genehmigungsverfahren und Genehmigungsfreistellung nach der Landesbauordnung Baden-Württemberg. Welche Bauvorhaben fallen jeweils darunter und welche Unterlagen sind erforderlich?",
+    "model": "phi3:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 1087,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.8
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/4 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/3 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/4 erwartet"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 1087 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Gute Aspekt-Abdeckung: 4/5 (80%)",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 19.121347188949585
+  },
+  {
+    "test_id": "Q3",
+    "query": "Was regelt § 58 LBO BW konkret? Wie unterscheidet sich die Regelung von anderen Bundesländern? Welche Änderungen gab es in den letzten Jahren und welche praktischen Auswirkungen haben diese für Bauherren?",
+    "model": "phi3:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 620,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.0
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/3 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/2 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/4 erwartet",
+      "⚠️ Unzureichende Aspekt-Abdeckung: 0/5 (0%)",
+      "   Fehlende Aspekte: ['§ 58 LBO BW Inhalt', 'Bundesländer-Vergleich', 'Historische Änderungen', 'Praktische Auswirkungen', 'Bauherren-Perspektive']"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 620 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 16.97210931777954
+  },
+  {
+    "test_id": "Q4",
+    "query": "Welche Anforderungen gelten für den Brandschutz bei Wohngebäuden in Baden-Württemberg? Berücksichtige dabei Gebäudeklassen, Rettungswege, Baustoffe und besondere Anforderungen für Mehrfamilienhäuser. Nenne auch relevante DIN-Normen.",
+    "model": "phi3:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 1574,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.5
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/4 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/3 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/4 erwartet",
+      "⚠️ Unzureichende Aspekt-Abdeckung: 3/6 (50%)",
+      "   Fehlende Aspekte: ['Brandschutz-Anforderungen', 'Baustoffe/Brandschutzklassen', 'DIN-Normen']"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 1574 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 23.54999041557312
+  },
+  {
+    "test_id": "Q5",
+    "query": "Wie ist der Ablauf eines Baugenehmigungsverfahrens in Baden-Württemberg vom Antrag bis zur Genehmigung? Welche Behörden sind beteiligt, welche Fristen gelten, was passiert bei Ablehnung und welche Rechtsmittel stehen dem Bauherrn zur Verfügung?",
+    "model": "phi3:latest",
+    "success": true,
+    "metrics": {
+      "answer_length": 1377,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.2
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/4 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/2 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/5 erwartet",
+      "⚠️ Unzureichende Aspekt-Abdeckung: 1/5 (20%)",
+      "   Fehlende Aspekte: ['Verfahrensablauf (Schritte)', 'Gesetzliche Fristen', 'Ablehnungsgründe', 'Rechtsmittel (Widerspruch, Klage)']"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 1377 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 21.839659452438354
+  },
+  {
+    "test_id": "Q1",
+    "query": "Welche rechtlichen Voraussetzungen, Fristen und Kosten sind bei der Beantragung einer Baugenehmigung für einen Wohnhaus-Neubau in Baden-Württemberg zu beachten? Bitte erläutere auch mögliche Ausnahmen und vereinfachte Verfahren.",
+    "model": "qwen2.5-coder:1.5b-base",
+    "success": true,
+    "metrics": {
+      "answer_length": 677,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.0
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/3 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/2 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/3 erwartet",
+      "⚠️ Unzureichende Aspekt-Abdeckung: 0/5 (0%)",
+      "   Fehlende Aspekte: ['Rechtliche Voraussetzungen (§§ LBO BW)', 'Fristen (Bearbeitungsdauer)', 'Kosten (Gebühren)', 'Ausnahmen (Genehmigungsfreistellung)', 'Vereinfachtes Verfahren']"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 677 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 17.514336109161377
+  },
+  {
+    "test_id": "Q2",
+    "query": "Erkläre detailliert den Unterschied zwischen Baugenehmigungsverfahren, vereinfachtem Genehmigungsverfahren und Genehmigungsfreistellung nach der Landesbauordnung Baden-Württemberg. Welche Bauvorhaben fallen jeweils darunter und welche Unterlagen sind erforderlich?",
+    "model": "qwen2.5-coder:1.5b-base",
+    "success": true,
+    "metrics": {
+      "answer_length": 1167,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.8
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/4 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/3 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/4 erwartet"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 1167 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Gute Aspekt-Abdeckung: 4/5 (80%)",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 20.869077444076538
+  },
+  {
+    "test_id": "Q3",
+    "query": "Was regelt § 58 LBO BW konkret? Wie unterscheidet sich die Regelung von anderen Bundesländern? Welche Änderungen gab es in den letzten Jahren und welche praktischen Auswirkungen haben diese für Bauherren?",
+    "model": "qwen2.5-coder:1.5b-base",
+    "success": true,
+    "metrics": {
+      "answer_length": 858,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.0
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/3 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/2 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/4 erwartet",
+      "⚠️ Unzureichende Aspekt-Abdeckung: 0/5 (0%)",
+      "   Fehlende Aspekte: ['§ 58 LBO BW Inhalt', 'Bundesländer-Vergleich', 'Historische Änderungen', 'Praktische Auswirkungen', 'Bauherren-Perspektive']"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 858 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 18.603440523147583
+  },
+  {
+    "test_id": "Q4",
+    "query": "Welche Anforderungen gelten für den Brandschutz bei Wohngebäuden in Baden-Württemberg? Berücksichtige dabei Gebäudeklassen, Rettungswege, Baustoffe und besondere Anforderungen für Mehrfamilienhäuser. Nenne auch relevante DIN-Normen.",
+    "model": "qwen2.5-coder:1.5b-base",
+    "success": true,
+    "metrics": {
+      "answer_length": 1774,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.5
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/4 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/3 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/4 erwartet",
+      "⚠️ Unzureichende Aspekt-Abdeckung: 3/6 (50%)",
+      "   Fehlende Aspekte: ['Brandschutz-Anforderungen', 'Baustoffe/Brandschutzklassen', 'DIN-Normen']"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 1774 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 25.877772092819214
+  },
+  {
+    "test_id": "Q5",
+    "query": "Wie ist der Ablauf eines Baugenehmigungsverfahrens in Baden-Württemberg vom Antrag bis zur Genehmigung? Welche Behörden sind beteiligt, welche Fristen gelten, was passiert bei Ablehnung und welche Rechtsmittel stehen dem Bauherrn zur Verfügung?",
+    "model": "qwen2.5-coder:1.5b-base",
+    "success": true,
+    "metrics": {
+      "answer_length": 860,
+      "citation_count": 0,
+      "unique_citations": 0,
+      "sources_count": 16,
+      "direct_quotes_count": 0,
+      "quotes_with_source": 0,
+      "quote_length_avg": 0.0,
+      "suggestions_count": 0,
+      "aspect_coverage": 0.2
+    },
+    "issues": [
+      "⚠️ Zu wenig Zitationen: 0/4 erwartet",
+      "⚠️ Zu wenig direkte Zitate: 0/2 erwartet",
+      "⚠️ Zu wenig Vorschläge: 0/5 erwartet",
+      "⚠️ Unzureichende Aspekt-Abdeckung: 1/5 (20%)",
+      "   Fehlende Aspekte: ['Verfahrensablauf (Schritte)', 'Beteiligte Behörden', 'Ablehnungsgründe', 'Rechtsmittel (Widerspruch, Klage)']"
+    ],
+    "strengths": [
+      "✅ Ausführliche Antwort: 860 Zeichen",
+      "✅ Ausreichend Quellen: 16",
+      "✅ Strukturierte Antwort (mit Sections/Markdown)"
+    ],
+    "quotes": [],
+    "rating": "GOOD",
+    "duration": 18.55040431022644
+  }
+]

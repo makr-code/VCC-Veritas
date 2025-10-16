@@ -1,0 +1,33 @@
+{
+  "checkpoint_id": "264d5dba-7c3f-4aee-a3ab-e21a1e5f9131",
+  "plan_id": "test_plan_001",
+  "step_index": 1,
+  "completed_steps": [
+    "step_1",
+    "step_2"
+  ],
+  "plan_state": {
+    "plan_id": "test_plan_001",
+    "query": "Test orchestration",
+    "steps": [
+      {
+        "step_id": "step_1",
+        "action": "search"
+      },
+      {
+        "step_id": "step_2",
+        "action": "analyze"
+      },
+      {
+        "step_id": "step_3",
+        "action": "synthesize"
+      }
+    ]
+  },
+  "context": {
+    "orchestration_state": "paused",
+    "failed_steps": [],
+    "skipped_steps": []
+  },
+  "timestamp": "2025-10-08T17:37:10.843778"
+}

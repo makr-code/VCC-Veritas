@@ -1,0 +1,6 @@
+{
+  "query": "Was ist Künstliche Intelligenz?",
+  "enable_streaming": true,
+  "enable_intermediate_results": true,
+  "enable_llm_thinking": true
+}

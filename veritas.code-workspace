@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../PKI"
+		},
+		{
+			"path": "../uds3"
+		},
+		{
+			"path": "../user"
+		}
+	],
+	"settings": {
+		"powershell.cwd": "veritas"
+	}
+}

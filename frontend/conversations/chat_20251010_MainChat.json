@@ -1,0 +1,1062 @@
+[
+  {
+    "role": "system",
+    "content": "Willkommen bei Veritas v3.15.0! 🚀\nBackend-API: http://127.0.0.1:5000\nDrücken Sie \"➕ Neuer Chat\" um weitere Fenster zu öffnen.",
+    "timestamp": "2025-10-10T13:22:48.856625"
+  },
+  {
+    "role": "user",
+    "content": "Nach welchen rechtlichen Maßgaben muss ich die Errichtrung einer Windkraftanlage genehmigen lassen?",
+    "timestamp": "2025-10-10T13:23:30.851066"
+  },
+  {
+    "role": "assistant",
+    "content": "**Direkte Antwort:**\nUm die Errichtung einer Windkraftanlage genehmigungspflichtig zu machen, müssen Sie sich an die zuständigen Behörden wenden und die erforderlichen Unterlagen einreichen. Hier sind die wichtigsten Punkte:\n\n• Genehmigung von Bauvorhaben: Erstellen Sie einen Antrag auf Errichtung einer Windkraftanlage und reichen ihn bei der zuständigen Behörde (z.B. dem Landesamt für Umwelt, Naturschutz und Gewässerschutz) ein.\n• Umweltverträglichkeitsprüfung: Führen Sie eine Umweltverträglichkeitsprüfung durch, um die Auswirkungen der Windkraftanlage auf die Umgebung zu beurteilen.\n• Genehmigung von Störungen: Erstellen Sie einen Plan für mögliche Störungen und reichen ihn bei den zuständigen Behörden ein.\n\n**Details:**\nDie genaue Vorgehensweise kann je nach Bundesland variieren. Es ist ratsam, sich an die zuständigen Behörden zu wenden, um weitere Informationen zu erhalten.\n\n**Nächste Schritte:**\n• Erstellen Sie einen Antrag auf Errichtung einer Windkraftanlage und reichen ihn bei der zuständigen Behörde ein.\n• Führen Sie eine Umweltverträglichkeitsprüfung durch, um die Auswirkungen der Windkraftanlage auf die Umgebung zu beurteilen.\n• Erstellen Sie einen Plan für mögliche Störungen und reichen ihn bei den zuständigen Behörden ein.\n\n💡 🎯 Confidence: 88.8% | 📚 12 Quellen | ⚡ 25.67s | 🤖 8 Agents\n\n🔍 **Vorschläge:**\n• Benötigen Sie weitere Details zu einem bestimmten Aspekt?\n• Möchten Sie ähnliche Anfragen in anderen Bereichen stellen?\n• Soll ich Ihnen konkrete Handlungsschritte aufzeigen?",
+    "timestamp": "2025-10-10T13:23:56.561186",
+    "sources": [
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "query_preprocessor",
+        "relevance": 0.75
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "geo_context",
+        "relevance": 0.75
+      },
+      {
+        "title": "Umweltbundesamt",
+        "type": "agent_source",
+        "agent": "environmental",
+        "relevance": 0.82
+      },
+      {
+        "title": "Luftreinhaltepläne",
+        "type": "agent_source",
+        "agent": "environmental",
+        "relevance": 0.82
+      },
+      {
+        "title": "Verwaltungsportal",
+        "type": "agent_source",
+        "agent": "document_retrieval",
+        "relevance": 0.85
+      },
+      {
+        "title": "Formulardatenbank",
+        "type": "agent_source",
+        "agent": "document_retrieval",
+        "relevance": 0.85
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "response_aggregator",
+        "relevance": 0.75
+      },
+      {
+        "title": "BauGB",
+        "type": "agent_source",
+        "agent": "legal_framework",
+        "relevance": 0.9
+      },
+      {
+        "title": "VwVfG",
+        "type": "agent_source",
+        "agent": "legal_framework",
+        "relevance": 0.9
+      },
+      {
+        "title": "API-Services",
+        "type": "agent_source",
+        "agent": "external_api",
+        "relevance": 0.78
+      },
+      {
+        "title": "Open-Data-Portale",
+        "type": "agent_source",
+        "agent": "external_api"
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "quality_assessor"
+      }
+    ],
+    "worker_results": {
+      "query_preprocessor": {
+        "agent_type": "query_preprocessor",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "query_preprocessor Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte query_preprocessor Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 1.5,
+        "execution_stage": "parallel"
+      },
+      "geo_context": {
+        "agent_type": "geo_context",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "geo_context Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte geo_context Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 1.5,
+        "execution_stage": "parallel"
+      },
+      "environmental": {
+        "agent_type": "environmental",
+        "status": "completed",
+        "confidence_score": 0.82,
+        "summary": "Umweltaspekte bewertet",
+        "sources": [
+          "Umweltbundesamt",
+          "Luftreinhaltepläne"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte environmental Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 1.5,
+        "execution_stage": "parallel"
+      },
+      "document_retrieval": {
+        "agent_type": "document_retrieval",
+        "status": "completed",
+        "confidence_score": 0.85,
+        "summary": "Relevante Dokumente gefunden",
+        "sources": [
+          "Verwaltungsportal",
+          "Formulardatenbank"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte document_retrieval Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 1.5,
+        "execution_stage": "sequential"
+      },
+      "response_aggregator": {
+        "agent_type": "response_aggregator",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "response_aggregator Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte response_aggregator Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 1.5,
+        "execution_stage": "sequential"
+      },
+      "legal_framework": {
+        "agent_type": "legal_framework",
+        "status": "completed",
+        "confidence_score": 0.9,
+        "summary": "Rechtliche Bestimmungen analysiert",
+        "sources": [
+          "BauGB",
+          "VwVfG"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte legal_framework Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 1.4,
+        "execution_stage": "sequential"
+      },
+      "external_api": {
+        "agent_type": "external_api",
+        "status": "completed",
+        "confidence_score": 0.78,
+        "summary": "Externe Daten abgerufen",
+        "sources": [
+          "API-Services",
+          "Open-Data-Portale"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte external_api Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 1.2,
+        "execution_stage": "sequential"
+      },
+      "quality_assessor": {
+        "agent_type": "quality_assessor",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "quality_assessor Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte quality_assessor Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 0.2,
+        "execution_stage": "sequential"
+      }
+    },
+    "metadata": {
+      "query_id": "query_72b4046d",
+      "complexity": "intelligent",
+      "processing_time": 25.667148113250732,
+      "agent_count": 8,
+      "successful_agents": 8,
+      "system_mode": "intelligent_pipeline_production",
+      "streaming_available": true,
+      "ollama_available": true,
+      "timestamp": "2025-10-10T13:23:56.559511",
+      "suggestions": [
+        "Benötigen Sie weitere Details zu einem bestimmten Aspekt?",
+        "Möchten Sie ähnliche Anfragen in anderen Bereichen stellen?",
+        "Soll ich Ihnen konkrete Handlungsschritte aufzeigen?",
+        "Möchten Sie die rechtlichen Grundlagen genauer erklärt bekommen?",
+        "Interessieren Sie sich für aktuelle Umweltdaten?"
+      ]
+    },
+    "confidence_score": 0.888
+  },
+  {
+    "role": "user",
+    "content": "Nach welchen rechtlichen Maßgaben muss ich die Errichtrung einer Windkraftanlage genehmigen lassen?",
+    "timestamp": "2025-10-10T13:24:14.005527"
+  },
+  {
+    "role": "assistant",
+    "content": "**Direkte Antwort:**\nFür die Errichtung einer Windkraftanlage benötigen Sie nachfolgende rechtliche Maßgaben:\n\n• Genehmigung nach dem Bundesimmissionsschutzgesetz (BImSchG)\n• Genehmigung nach dem Energiewirtschaftsgesetz (EnWG)\n\n**Details:**\n\n* Bauvorhabenmeldungen an das zuständige Umweltministerium\n* Einreichung von Unterlagen, wie zum Beispiel:\n\t+ Projektbeschreibung\n\t+ Lageplan\n\t+ Technische Unterlagen (z.B. Schnitte, Ansichten)\n\t+ Statische Berechnungen\n* Genehmigung durch das zuständige Umweltministerium\n\n**Quellen:**\nBImSchG, EnWG, Verordnungen und Richtlinien der Bundesregierung\n\n**Nächste Schritte:**\n• Überprüfen Sie die einschlägigen Gesetze und Vorschriften in Ihrem Bundesland.\n• Stellen Sie eine Bauvoranfrage an das zuständige Umweltministerium.\n• Erstellen Sie ein detailliertes Konzept für Ihre Windkraftanlage.\n\n💡 🎯 Confidence: 88.8% | 📚 12 Quellen | ⚡ 13.18s | 🤖 8 Agents\n\n🔍 **Vorschläge:**\n• Benötigen Sie weitere Details zu einem bestimmten Aspekt?\n• Möchten Sie ähnliche Anfragen in anderen Bereichen stellen?\n• Soll ich Ihnen konkrete Handlungsschritte aufzeigen?",
+    "timestamp": "2025-10-10T13:24:27.207406",
+    "sources": [
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "query_preprocessor",
+        "relevance": 0.75
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "geo_context",
+        "relevance": 0.75
+      },
+      {
+        "title": "Umweltbundesamt",
+        "type": "agent_source",
+        "agent": "environmental",
+        "relevance": 0.82
+      },
+      {
+        "title": "Luftreinhaltepläne",
+        "type": "agent_source",
+        "agent": "environmental",
+        "relevance": 0.82
+      },
+      {
+        "title": "Verwaltungsportal",
+        "type": "agent_source",
+        "agent": "document_retrieval",
+        "relevance": 0.85
+      },
+      {
+        "title": "Formulardatenbank",
+        "type": "agent_source",
+        "agent": "document_retrieval",
+        "relevance": 0.85
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "response_aggregator",
+        "relevance": 0.75
+      },
+      {
+        "title": "BauGB",
+        "type": "agent_source",
+        "agent": "legal_framework",
+        "relevance": 0.9
+      },
+      {
+        "title": "VwVfG",
+        "type": "agent_source",
+        "agent": "legal_framework",
+        "relevance": 0.9
+      },
+      {
+        "title": "API-Services",
+        "type": "agent_source",
+        "agent": "external_api",
+        "relevance": 0.78
+      },
+      {
+        "title": "Open-Data-Portale",
+        "type": "agent_source",
+        "agent": "external_api"
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "quality_assessor"
+      }
+    ],
+    "worker_results": {
+      "query_preprocessor": {
+        "agent_type": "query_preprocessor",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "query_preprocessor Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte query_preprocessor Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 1.5,
+        "execution_stage": "parallel"
+      },
+      "geo_context": {
+        "agent_type": "geo_context",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "geo_context Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte geo_context Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 1.5,
+        "execution_stage": "parallel"
+      },
+      "environmental": {
+        "agent_type": "environmental",
+        "status": "completed",
+        "confidence_score": 0.82,
+        "summary": "Umweltaspekte bewertet",
+        "sources": [
+          "Umweltbundesamt",
+          "Luftreinhaltepläne"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte environmental Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 1.5,
+        "execution_stage": "parallel"
+      },
+      "document_retrieval": {
+        "agent_type": "document_retrieval",
+        "status": "completed",
+        "confidence_score": 0.85,
+        "summary": "Relevante Dokumente gefunden",
+        "sources": [
+          "Verwaltungsportal",
+          "Formulardatenbank"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte document_retrieval Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 1.5,
+        "execution_stage": "sequential"
+      },
+      "response_aggregator": {
+        "agent_type": "response_aggregator",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "response_aggregator Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte response_aggregator Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 1.5,
+        "execution_stage": "sequential"
+      },
+      "legal_framework": {
+        "agent_type": "legal_framework",
+        "status": "completed",
+        "confidence_score": 0.9,
+        "summary": "Rechtliche Bestimmungen analysiert",
+        "sources": [
+          "BauGB",
+          "VwVfG"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte legal_framework Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 1.4,
+        "execution_stage": "sequential"
+      },
+      "external_api": {
+        "agent_type": "external_api",
+        "status": "completed",
+        "confidence_score": 0.78,
+        "summary": "Externe Daten abgerufen",
+        "sources": [
+          "API-Services",
+          "Open-Data-Portale"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte external_api Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 1.2,
+        "execution_stage": "sequential"
+      },
+      "quality_assessor": {
+        "agent_type": "quality_assessor",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "quality_assessor Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte quality_assessor Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 0.2,
+        "execution_stage": "sequential"
+      }
+    },
+    "metadata": {
+      "query_id": "query_3c2fd413",
+      "complexity": "intelligent",
+      "processing_time": 13.177303314208984,
+      "agent_count": 8,
+      "successful_agents": 8,
+      "system_mode": "intelligent_pipeline_production",
+      "streaming_available": true,
+      "ollama_available": true,
+      "timestamp": "2025-10-10T13:24:27.205867",
+      "suggestions": [
+        "Benötigen Sie weitere Details zu einem bestimmten Aspekt?",
+        "Möchten Sie ähnliche Anfragen in anderen Bereichen stellen?",
+        "Soll ich Ihnen konkrete Handlungsschritte aufzeigen?",
+        "Möchten Sie die rechtlichen Grundlagen genauer erklärt bekommen?",
+        "Interessieren Sie sich für aktuelle Umweltdaten?"
+      ]
+    },
+    "confidence_score": 0.888
+  },
+  {
+    "role": "user",
+    "content": "Nach welchen rechtlichen Maßgaben muss ich die Errichtrung einer Windkraftanlage genehmigen lassen?",
+    "timestamp": "2025-10-10T13:26:05.477088"
+  },
+  {
+    "role": "assistant",
+    "content": "**Direkte Antwort:**\nUm die Errichtung einer Windkraftanlage genehmigen zu lassen, müssen Sie folgende rechtlichen Maßgaben beachten:\n\n* Bauordnung (BauGB)\n* Verwaltungsvorschriften für das Bauwesen (VwVfG)\n\n**Details:**\n\n• Die Bauordnung regelt die Errichtung von Windkraftanlagen auf dem Gebiet des Bundeslands. Es müssen bestimmte Voraussetzungen erfüllt werden, wie z.B. die Einhaltung von Höhen- und Abstandsgrenzen.\n• Die Verwaltungsvorschriften für das Bauwesen regeln die Zulassung von Windkraftanlagen in Bezug auf den Umweltschutz und die Beeinträchtigung von Landschaft und Natur.\n\n**Quellen:**\n\n* BauGB (Bauordnung)\n* VwVfG (Verwaltungsvorschriften für das Bauwesen)\n\n**Nächste Schritte:**\n• Überprüfen Sie, ob Ihre Windkraftanlage den Anforderungen der Bauordnung und Verwaltungsvorschriften entspricht.\n• Erstellen Sie einen detaillierten Plan für die Errichtung und den Betrieb Ihrer Windkraftanlage.\n• Stellen Sie bei Fragen: eine Voranfrage an das zuständige Bauamt ein.\n\n💡 🎯 Confidence: 88.8% | 📚 12 Quellen | ⚡ 14.36s | 🤖 8 Agents\n\n🔍 **Vorschläge:**\n• Benötigen Sie weitere Details zu einem bestimmten Aspekt?\n• Möchten Sie ähnliche Anfragen in anderen Bereichen stellen?\n• Soll ich Ihnen konkrete Handlungsschritte aufzeigen?",
+    "timestamp": "2025-10-10T13:26:19.893711",
+    "sources": [
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "query_preprocessor",
+        "relevance": 0.75
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "geo_context",
+        "relevance": 0.75
+      },
+      {
+        "title": "Umweltbundesamt",
+        "type": "agent_source",
+        "agent": "environmental",
+        "relevance": 0.82
+      },
+      {
+        "title": "Luftreinhaltepläne",
+        "type": "agent_source",
+        "agent": "environmental",
+        "relevance": 0.82
+      },
+      {
+        "title": "Verwaltungsportal",
+        "type": "agent_source",
+        "agent": "document_retrieval",
+        "relevance": 0.85
+      },
+      {
+        "title": "Formulardatenbank",
+        "type": "agent_source",
+        "agent": "document_retrieval",
+        "relevance": 0.85
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "response_aggregator",
+        "relevance": 0.75
+      },
+      {
+        "title": "BauGB",
+        "type": "agent_source",
+        "agent": "legal_framework",
+        "relevance": 0.9
+      },
+      {
+        "title": "VwVfG",
+        "type": "agent_source",
+        "agent": "legal_framework",
+        "relevance": 0.9
+      },
+      {
+        "title": "API-Services",
+        "type": "agent_source",
+        "agent": "external_api",
+        "relevance": 0.78
+      },
+      {
+        "title": "Open-Data-Portale",
+        "type": "agent_source",
+        "agent": "external_api"
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "quality_assessor"
+      }
+    ],
+    "worker_results": {
+      "query_preprocessor": {
+        "agent_type": "query_preprocessor",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "query_preprocessor Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte query_preprocessor Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 1.5,
+        "execution_stage": "parallel"
+      },
+      "geo_context": {
+        "agent_type": "geo_context",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "geo_context Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte geo_context Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 1.5,
+        "execution_stage": "parallel"
+      },
+      "environmental": {
+        "agent_type": "environmental",
+        "status": "completed",
+        "confidence_score": 0.82,
+        "summary": "Umweltaspekte bewertet",
+        "sources": [
+          "Umweltbundesamt",
+          "Luftreinhaltepläne"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte environmental Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 1.5,
+        "execution_stage": "parallel"
+      },
+      "document_retrieval": {
+        "agent_type": "document_retrieval",
+        "status": "completed",
+        "confidence_score": 0.85,
+        "summary": "Relevante Dokumente gefunden",
+        "sources": [
+          "Verwaltungsportal",
+          "Formulardatenbank"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte document_retrieval Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 1.5,
+        "execution_stage": "sequential"
+      },
+      "response_aggregator": {
+        "agent_type": "response_aggregator",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "response_aggregator Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte response_aggregator Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 1.5,
+        "execution_stage": "sequential"
+      },
+      "legal_framework": {
+        "agent_type": "legal_framework",
+        "status": "completed",
+        "confidence_score": 0.9,
+        "summary": "Rechtliche Bestimmungen analysiert",
+        "sources": [
+          "BauGB",
+          "VwVfG"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte legal_framework Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 1.4,
+        "execution_stage": "sequential"
+      },
+      "external_api": {
+        "agent_type": "external_api",
+        "status": "completed",
+        "confidence_score": 0.78,
+        "summary": "Externe Daten abgerufen",
+        "sources": [
+          "API-Services",
+          "Open-Data-Portale"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte external_api Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 1.2,
+        "execution_stage": "sequential"
+      },
+      "quality_assessor": {
+        "agent_type": "quality_assessor",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "quality_assessor Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte quality_assessor Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 0.2,
+        "execution_stage": "sequential"
+      }
+    },
+    "metadata": {
+      "query_id": "query_ffd0e2d8",
+      "complexity": "intelligent",
+      "processing_time": 14.364749670028687,
+      "agent_count": 8,
+      "successful_agents": 8,
+      "system_mode": "intelligent_pipeline_production",
+      "streaming_available": true,
+      "ollama_available": true,
+      "timestamp": "2025-10-10T13:26:19.891824",
+      "suggestions": [
+        "Benötigen Sie weitere Details zu einem bestimmten Aspekt?",
+        "Möchten Sie ähnliche Anfragen in anderen Bereichen stellen?",
+        "Soll ich Ihnen konkrete Handlungsschritte aufzeigen?",
+        "Möchten Sie die rechtlichen Grundlagen genauer erklärt bekommen?",
+        "Interessieren Sie sich für aktuelle Umweltdaten?"
+      ]
+    },
+    "confidence_score": 0.888
+  },
+  {
+    "role": "user",
+    "content": "Nach welchen rechtlichen Maßgaben muss ich die Errichtrung einer Windkraftanlage genehmigen lassen?",
+    "timestamp": "2025-10-10T13:26:44.684678"
+  },
+  {
+    "role": "assistant",
+    "content": "**Direkte Antwort:**\nFür die Errichtung einer Windkraftanlage müssen Sie nach folgenden rechtlichen Maßgaben vorgehen:\n\n• Baugesetz (BauGB) und Verordnungen zum Schutz der Umwelt\n• Verteilnetzgesetz (VwVfG)\n• Umweltschutzgesetze (insbesondere die Luftreinhaltung)\n\n**Details:**\nDie Errichtung einer Windkraftanlage unterliegt den Bestimmungen des Baugesetzes und der Verordnungen zum Schutz der Umwelt. Hierbei sind insbesondere die Verteilnetzgesetz und die Umweltschutzgesetze, insbesondere die Luftreinhaltung, zu beachten.\n\n**Quellen:**\nBauGB, VwVfG, Umweltschutzgesetze\n\n**Nächste Schritte:**\n• Überprüfen Sie die einschlägigen Gesetze und Verordnungen\n• Erstellen Sie einen detaillierten Plan für die Errichtung der Windkraftanlage\n• Kontaktieren Sie das zuständige Bauamt oder Umweltamt für weitere Informationen\n\n💡 🎯 Confidence: 88.8% | 📚 12 Quellen | ⚡ 13.09s | 🤖 8 Agents\n\n🔍 **Vorschläge:**\n• Benötigen Sie weitere Details zu einem bestimmten Aspekt?\n• Möchten Sie ähnliche Anfragen in anderen Bereichen stellen?\n• Soll ich Ihnen konkrete Handlungsschritte aufzeigen?",
+    "timestamp": "2025-10-10T13:26:57.823652",
+    "sources": [
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "query_preprocessor",
+        "relevance": 0.75
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "geo_context",
+        "relevance": 0.75
+      },
+      {
+        "title": "Umweltbundesamt",
+        "type": "agent_source",
+        "agent": "environmental",
+        "relevance": 0.82
+      },
+      {
+        "title": "Luftreinhaltepläne",
+        "type": "agent_source",
+        "agent": "environmental",
+        "relevance": 0.82
+      },
+      {
+        "title": "Verwaltungsportal",
+        "type": "agent_source",
+        "agent": "document_retrieval",
+        "relevance": 0.85
+      },
+      {
+        "title": "Formulardatenbank",
+        "type": "agent_source",
+        "agent": "document_retrieval",
+        "relevance": 0.85
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "response_aggregator",
+        "relevance": 0.75
+      },
+      {
+        "title": "BauGB",
+        "type": "agent_source",
+        "agent": "legal_framework",
+        "relevance": 0.9
+      },
+      {
+        "title": "VwVfG",
+        "type": "agent_source",
+        "agent": "legal_framework",
+        "relevance": 0.9
+      },
+      {
+        "title": "API-Services",
+        "type": "agent_source",
+        "agent": "external_api",
+        "relevance": 0.78
+      },
+      {
+        "title": "Open-Data-Portale",
+        "type": "agent_source",
+        "agent": "external_api"
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "quality_assessor"
+      }
+    ],
+    "worker_results": {
+      "query_preprocessor": {
+        "agent_type": "query_preprocessor",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "query_preprocessor Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte query_preprocessor Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 1.5,
+        "execution_stage": "parallel"
+      },
+      "geo_context": {
+        "agent_type": "geo_context",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "geo_context Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte geo_context Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 1.5,
+        "execution_stage": "parallel"
+      },
+      "environmental": {
+        "agent_type": "environmental",
+        "status": "completed",
+        "confidence_score": 0.82,
+        "summary": "Umweltaspekte bewertet",
+        "sources": [
+          "Umweltbundesamt",
+          "Luftreinhaltepläne"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte environmental Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 1.5,
+        "execution_stage": "parallel"
+      },
+      "document_retrieval": {
+        "agent_type": "document_retrieval",
+        "status": "completed",
+        "confidence_score": 0.85,
+        "summary": "Relevante Dokumente gefunden",
+        "sources": [
+          "Verwaltungsportal",
+          "Formulardatenbank"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte document_retrieval Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 1.5,
+        "execution_stage": "sequential"
+      },
+      "response_aggregator": {
+        "agent_type": "response_aggregator",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "response_aggregator Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte response_aggregator Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 1.5,
+        "execution_stage": "sequential"
+      },
+      "legal_framework": {
+        "agent_type": "legal_framework",
+        "status": "completed",
+        "confidence_score": 0.9,
+        "summary": "Rechtliche Bestimmungen analysiert",
+        "sources": [
+          "BauGB",
+          "VwVfG"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte legal_framework Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 1.4,
+        "execution_stage": "sequential"
+      },
+      "external_api": {
+        "agent_type": "external_api",
+        "status": "completed",
+        "confidence_score": 0.78,
+        "summary": "Externe Daten abgerufen",
+        "sources": [
+          "API-Services",
+          "Open-Data-Portale"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte external_api Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 1.2,
+        "execution_stage": "sequential"
+      },
+      "quality_assessor": {
+        "agent_type": "quality_assessor",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "quality_assessor Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte quality_assessor Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 0.2,
+        "execution_stage": "sequential"
+      }
+    },
+    "metadata": {
+      "query_id": "query_dec184a2",
+      "complexity": "intelligent",
+      "processing_time": 13.092785835266113,
+      "agent_count": 8,
+      "successful_agents": 8,
+      "system_mode": "intelligent_pipeline_production",
+      "streaming_available": true,
+      "ollama_available": true,
+      "timestamp": "2025-10-10T13:26:57.821567",
+      "suggestions": [
+        "Benötigen Sie weitere Details zu einem bestimmten Aspekt?",
+        "Möchten Sie ähnliche Anfragen in anderen Bereichen stellen?",
+        "Soll ich Ihnen konkrete Handlungsschritte aufzeigen?",
+        "Möchten Sie die rechtlichen Grundlagen genauer erklärt bekommen?",
+        "Interessieren Sie sich für aktuelle Umweltdaten?"
+      ]
+    },
+    "confidence_score": 0.888
+  },
+  {
+    "role": "user",
+    "content": "Nach welchen rechtlichen Maßgaben muss ich die Errichtrung einer Windkraftanlage genehmigen lassen?",
+    "timestamp": "2025-10-10T13:28:04.621244"
+  },
+  {
+    "role": "assistant",
+    "content": "**Direkte Antwort:**\nUm die Errichtung einer Windkraftanlage genehmigen zu lassen, benötigen Sie folgende rechtlichen Maßgaben:\n\n* Genehmigung nach dem Bundes-Immissionsschutzgesetz (BImSchG)\n* Genehmigung nach dem Gesetz über die Verteilung von Strom aus Erneuerbaren Energien (Erneuerbare-Energien-Wärme-Gesetz, EEWärmeG)\n\n**Details:**\n\n• BImSchG: Die Errichtung einer Windkraftanlage muss den Anforderungen des Bundes-Immissionsschutzgesetzes entsprechen. Dazu gehören die Einhaltung von Schall- und Vibrationsgrenzwerten, die Vermeidung von Beeinträchtigungen für Mensch und Umwelt.\n• EEWärmeG: Die Errichtung einer Windkraftanlage muss den Anforderungen des Gesetzes über die Verteilung von Strom aus Erneuerbaren Energien entsprechen. Dazu gehören die Einhaltung von Emissionsgrenzwerten, die Vermeidung von Beeinträchtigungen für Mensch und Umwelt.\n\n**Nächste Schritte:**\n• Überprüfen Sie die einschlägigen Vorschriften und Anforderungen im Bundes-Immissionsschutzgesetz (BImSchG) und Gesetz über die Verteilung von Strom aus Erneuerbaren Energien (EEWärmeG).\n• Stellen Sie sicher, dass Ihre Windkraftanlage den Anforderungen entspricht.\n• Bevor Sie die Errichtung genehmigen lassen, sollten Sie eine Umweltverträglichkeitsstudie durchführen, um mögliche Auswirkungen auf Mensch und Umwelt zu beurteilen.\n\n💡 🎯 Confidence: 88.8% | 📚 12 Quellen | ⚡ 16.37s | 🤖 8 Agents\n\n🔍 **Vorschläge:**\n• Benötigen Sie weitere Details zu einem bestimmten Aspekt?\n• Möchten Sie ähnliche Anfragen in anderen Bereichen stellen?\n• Soll ich Ihnen konkrete Handlungsschritte aufzeigen?",
+    "timestamp": "2025-10-10T13:28:21.033814",
+    "sources": [
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "query_preprocessor",
+        "relevance": 0.75
+      },
+      {
+        "title": "Umweltbundesamt",
+        "type": "agent_source",
+        "agent": "environmental",
+        "relevance": 0.82
+      },
+      {
+        "title": "Luftreinhaltepläne",
+        "type": "agent_source",
+        "agent": "environmental",
+        "relevance": 0.82
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "geo_context",
+        "relevance": 0.75
+      },
+      {
+        "title": "Verwaltungsportal",
+        "type": "agent_source",
+        "agent": "document_retrieval",
+        "relevance": 0.85
+      },
+      {
+        "title": "Formulardatenbank",
+        "type": "agent_source",
+        "agent": "document_retrieval",
+        "relevance": 0.85
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "response_aggregator",
+        "relevance": 0.75
+      },
+      {
+        "title": "BauGB",
+        "type": "agent_source",
+        "agent": "legal_framework",
+        "relevance": 0.9
+      },
+      {
+        "title": "VwVfG",
+        "type": "agent_source",
+        "agent": "legal_framework",
+        "relevance": 0.9
+      },
+      {
+        "title": "API-Services",
+        "type": "agent_source",
+        "agent": "external_api",
+        "relevance": 0.78
+      },
+      {
+        "title": "Open-Data-Portale",
+        "type": "agent_source",
+        "agent": "external_api"
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "quality_assessor"
+      }
+    ],
+    "worker_results": {
+      "query_preprocessor": {
+        "agent_type": "query_preprocessor",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "query_preprocessor Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte query_preprocessor Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 1.5,
+        "execution_stage": "parallel"
+      },
+      "environmental": {
+        "agent_type": "environmental",
+        "status": "completed",
+        "confidence_score": 0.82,
+        "summary": "Umweltaspekte bewertet",
+        "sources": [
+          "Umweltbundesamt",
+          "Luftreinhaltepläne"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte environmental Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 1.5,
+        "execution_stage": "parallel"
+      },
+      "geo_context": {
+        "agent_type": "geo_context",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "geo_context Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte geo_context Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 1.5,
+        "execution_stage": "parallel"
+      },
+      "document_retrieval": {
+        "agent_type": "document_retrieval",
+        "status": "completed",
+        "confidence_score": 0.85,
+        "summary": "Relevante Dokumente gefunden",
+        "sources": [
+          "Verwaltungsportal",
+          "Formulardatenbank"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte document_retrieval Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 1.5,
+        "execution_stage": "sequential"
+      },
+      "response_aggregator": {
+        "agent_type": "response_aggregator",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "response_aggregator Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte response_aggregator Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 1.5,
+        "execution_stage": "sequential"
+      },
+      "legal_framework": {
+        "agent_type": "legal_framework",
+        "status": "completed",
+        "confidence_score": 0.9,
+        "summary": "Rechtliche Bestimmungen analysiert",
+        "sources": [
+          "BauGB",
+          "VwVfG"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte legal_framework Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 1.4,
+        "execution_stage": "sequential"
+      },
+      "external_api": {
+        "agent_type": "external_api",
+        "status": "completed",
+        "confidence_score": 0.78,
+        "summary": "Externe Daten abgerufen",
+        "sources": [
+          "API-Services",
+          "Open-Data-Portale"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte external_api Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 1.2,
+        "execution_stage": "sequential"
+      },
+      "quality_assessor": {
+        "agent_type": "quality_assessor",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "quality_assessor Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte quality_assessor Analyse für: Nach welchen rechtlichen Maßgaben muss ich die Err...",
+        "priority_score": 0.2,
+        "execution_stage": "sequential"
+      }
+    },
+    "metadata": {
+      "query_id": "query_b32500c6",
+      "complexity": "intelligent",
+      "processing_time": 16.37003445625305,
+      "agent_count": 8,
+      "successful_agents": 8,
+      "system_mode": "intelligent_pipeline_production",
+      "streaming_available": true,
+      "ollama_available": true,
+      "timestamp": "2025-10-10T13:28:21.031912",
+      "suggestions": [
+        "Benötigen Sie weitere Details zu einem bestimmten Aspekt?",
+        "Möchten Sie ähnliche Anfragen in anderen Bereichen stellen?",
+        "Soll ich Ihnen konkrete Handlungsschritte aufzeigen?",
+        "Möchten Sie die rechtlichen Grundlagen genauer erklärt bekommen?",
+        "Interessieren Sie sich für aktuelle Umweltdaten?"
+      ]
+    },
+    "confidence_score": 0.888
+  }
+]

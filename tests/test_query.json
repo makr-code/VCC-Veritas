@@ -1,0 +1,9 @@
+{
+  "query": "Was ist VERITAS?",
+  "session_id": "test_session_123",
+  "model": "llama3.1:latest",
+  "temperature": 0.7,
+  "max_tokens": 500,
+  "mode": "veritas",
+  "enable_streaming": false
+}

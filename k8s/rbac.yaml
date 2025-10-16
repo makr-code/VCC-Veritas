@@ -1,0 +1,123 @@
+# ======================================================================
+# VERITAS Framework - Service Account & RBAC
+# Identity and permissions for pods
+# ======================================================================
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: veritas-api
+  namespace: veritas-production
+  labels:
+    app: veritas
+    component: api
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: veritas-worker
+  namespace: veritas-production
+  labels:
+    app: veritas
+    component: worker
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: veritas-api-role
+  namespace: veritas-production
+  labels:
+    app: veritas
+rules:
+- apiGroups: [""]
+  resources: ["configmaps", "secrets"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: veritas-api-rolebinding
+  namespace: veritas-production
+  labels:
+    app: veritas
+subjects:
+- kind: ServiceAccount
+  name: veritas-api
+  namespace: veritas-production
+roleRef:
+  kind: Role
+  name: veritas-api-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: veritas-worker-role
+  namespace: veritas-production
+  labels:
+    app: veritas
+rules:
+- apiGroups: [""]
+  resources: ["configmaps", "secrets"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: veritas-worker-rolebinding
+  namespace: veritas-production
+  labels:
+    app: veritas
+subjects:
+- kind: ServiceAccount
+  name: veritas-worker
+  namespace: veritas-production
+roleRef:
+  kind: Role
+  name: veritas-worker-role
+  apiGroup: rbac.authorization.k8s.io
+---
+# Staging RBAC
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: veritas-api
+  namespace: veritas-staging
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: veritas-worker
+  namespace: veritas-staging
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: veritas-api-role
+  namespace: veritas-staging
+rules:
+- apiGroups: [""]
+  resources: ["configmaps", "secrets"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: veritas-api-rolebinding
+  namespace: veritas-staging
+subjects:
+- kind: ServiceAccount
+  name: veritas-api
+  namespace: veritas-staging
+roleRef:
+  kind: Role
+  name: veritas-api-role
+  apiGroup: rbac.authorization.k8s.io

@@ -1,0 +1,233 @@
+{
+  "phase_id": "hypothesis",
+  "phase_name": "Hypothesengenerierung",
+  "version": "1.0.0",
+  
+  "system_prompt": {
+    "role": "Du bist ein wissenschaftlicher Assistent für Verwaltungsfragen.",
+    "task": "Basierend auf der Nutzer-Frage und den RAG-Ergebnissen, erstelle eine erste wissenschaftliche Hypothese.",
+    "methodology": "Befolge die Prinzipien wissenschaftlichen Arbeitens: evidenzbasiert, transparent, strukturiert, präzise, handlungsorientiert."
+  },
+  
+  "instructions": [
+    {
+      "step": 1,
+      "action": "Formuliere eine Hypothese",
+      "description": "Was ist deine erste Vermutung zur Beantwortung der Frage?",
+      "requirements": [
+        "1-2 Sätze",
+        "Konkret und überprüfbar",
+        "Basiert auf RAG-Kontext",
+        "Keine vagen Formulierungen"
+      ],
+      "examples": {
+        "good": [
+          "✅ Ein Carport unter 30m² ohne Aufenthaltsräume ist in Baden-Württemberg gemäß LBO BW § 50 Abs. 1 verfahrensfrei.",
+          "✅ Für den geplanten Anbau ist eine Baugenehmigung erforderlich, da er dauerhaft mit dem Hauptgebäude verbunden wird."
+        ],
+        "bad": [
+          "❌ Carports sind in der Regel genehmigungspflichtig.",
+          "❌ Es kommt darauf an, wie groß der Carport ist.",
+          "❌ Meistens braucht man eine Genehmigung."
+        ]
+      }
+    },
+    {
+      "step": 2,
+      "action": "Identifiziere Prüfkriterien",
+      "description": "Welche konkreten Kriterien müssen geprüft werden, um die Frage zu beantworten?",
+      "requirements": [
+        "Mindestens 1, maximal 10 Kriterien",
+        "Konkret benennbar (keine vagen Formulierungen)",
+        "Prüfbar gegen Evidenzen",
+        "Priorisiert nach Wichtigkeit"
+      ],
+      "examples": {
+        "good": [
+          "✅ Bundesland-spezifische Landesbauordnung (LBO BW § 50)",
+          "✅ Carport-Größe in m² (Schwelle: 30m²)",
+          "✅ Vorhandensein von Aufenthaltsräumen (ja/nein)",
+          "✅ Abstandsflächen zu Nachbargrundstücken (LBO BW § 5)"
+        ],
+        "bad": [
+          "❌ Rechtliche Rahmenbedingungen",
+          "❌ Bauvorschriften",
+          "❌ Lokale Bestimmungen",
+          "❌ Verschiedene Faktoren"
+        ]
+      }
+    },
+    {
+      "step": 3,
+      "action": "Erkenne fehlende Informationen",
+      "description": "Was fehlt noch, um die Frage vollständig zu beantworten?",
+      "categories": [
+        "user_input: Informationen, die der Nutzer liefern muss (z.B. Bundesland, Größe)",
+        "data: Fehlende Daten in RAG (z.B. aktuelle Rechtsprechung)",
+        "context: Unklarer Kontext (z.B. gewerbliche vs. private Nutzung)",
+        "expertise: Expertenwissen erforderlich (z.B. statische Berechnung)"
+      ],
+      "examples": [
+        "Bundesland nicht angegeben (Nutzer-Input erforderlich)",
+        "Carport-Größe unbekannt (Nutzer-Input erforderlich)",
+        "Aktuelle Rechtsprechung zu Carports in RAG nicht vorhanden (Daten-Lücke)",
+        "Gewerbliche vs. private Nutzung unklar (Kontext-Lücke)"
+      ]
+    },
+    {
+      "step": 4,
+      "action": "Schätze Confidence",
+      "description": "Wie sicher bist du basierend auf den verfügbaren Informationen?",
+      "scale": {
+        "very_high": {
+          "range": [0.9, 1.0],
+          "criteria": "Klare gesetzliche Basis + keine Widersprüche + alle Infos vorhanden",
+          "example": "0.95: LBO BW § 50 eindeutig, keine widersprüchlichen Quellen, alle Parameter bekannt"
+        },
+        "high": {
+          "range": [0.75, 0.9],
+          "criteria": "Gesetzliche Basis + wenige Widersprüche + meiste Infos vorhanden",
+          "example": "0.80: LBO vorhanden, ein Widerspruch in Kommentierung, Bundesland bekannt aber Größe unbekannt"
+        },
+        "medium": {
+          "range": [0.5, 0.75],
+          "criteria": "Teilweise Evidenz + einige Widersprüche + einige Infos fehlen",
+          "example": "0.65: Merkblatt vorhanden, aber veraltet, mehrere Widersprüche, wichtige Infos fehlen"
+        },
+        "low": {
+          "range": [0.3, 0.5],
+          "criteria": "Schwache Evidenz + viele Widersprüche + viele Infos fehlen",
+          "example": "0.40: Nur allgemeine Informationen, keine spezifischen Quellen, viele Parameter unbekannt"
+        },
+        "very_low": {
+          "range": [0.0, 0.3],
+          "criteria": "Keine Evidenz + unauflösbare Widersprüche + kritische Infos fehlen",
+          "example": "0.20: Keine relevanten RAG-Ergebnisse, Bundesland unbekannt, keine Rechtsbasis"
+        }
+      }
+    },
+    {
+      "step": 5,
+      "action": "Begründe deine Hypothese",
+      "description": "Warum kommst du zu dieser Vermutung? Welche RAG-Ergebnisse unterstützen sie?",
+      "requirements": [
+        "Mindestens 50 Zeichen",
+        "Referenziere konkrete RAG-Ergebnisse (Quellen)",
+        "Erkläre den Reasoning-Prozess",
+        "Erwähne Unsicherheiten explizit"
+      ],
+      "example": "Die RAG-Suche liefert LBO BW § 50 Abs. 1, wonach Gebäude ohne Aufenthaltsräume bis 30m² verfahrensfrei sind. Ein Carport fällt typischerweise in diese Kategorie (siehe VGH Mannheim 3 S 2543/19: 'Carport = Gebäude ohne Aufenthaltsraum'). Allerdings fehlt die konkrete Größenangabe des geplanten Carports (missing_information), weshalb die Confidence bei 0.65 liegt."
+    }
+  ],
+  
+  "output_format": {
+    "type": "json",
+    "schema_reference": "default_method.json > phases[0] > output_schema",
+    "required_fields": ["hypothesis", "required_criteria", "missing_information", "confidence", "reasoning"],
+    "instructions": [
+      "Antworte AUSSCHLIESSLICH mit validen JSON",
+      "Nutze Code-Block: ```json ... ```",
+      "Alle required fields müssen vorhanden sein",
+      "Bei Unsicherheit: Setze confidence niedrig + erkläre in reasoning"
+    ]
+  },
+  
+  "quality_guidelines": {
+    "hypothesis": {
+      "min_length": 20,
+      "max_length": 500,
+      "avoid": ["vage Formulierungen", "Allgemeinplätze", "Spekulationen ohne Evidenz"]
+    },
+    "required_criteria": {
+      "min_items": 1,
+      "max_items": 10,
+      "best_practice": "3-5 konkrete, prüfbare Kriterien",
+      "avoid": ["zu allgemeine Kriterien", "nicht-prüfbare Kriterien", "redundante Kriterien"]
+    },
+    "confidence": {
+      "calibration": "Sei konservativ! Lieber zu niedrig als zu hoch einschätzen.",
+      "avoid": ["Confidence > 0.9 ohne klare gesetzliche Basis", "Confidence < 0.3 wenn RAG-Ergebnisse vorhanden"]
+    },
+    "reasoning": {
+      "min_length": 50,
+      "must_include": ["konkrete Quellenreferenzen", "Begründung für Confidence-Level"],
+      "avoid": ["vage Aussagen", "fehlende Quellenangaben"]
+    }
+  },
+  
+  "example_outputs": [
+    {
+      "scenario": "Carport-Frage mit vollem Kontext",
+      "user_query": "Brauche ich eine Baugenehmigung für einen 25m² Carport in Baden-Württemberg?",
+      "rag_summary": "LBO BW § 50 vorhanden, VGH-Urteil vorhanden, Merkblatt vorhanden",
+      "output": {
+        "hypothesis": "Ein Carport mit 25m² ohne Aufenthaltsräume ist in Baden-Württemberg gemäß LBO BW § 50 Abs. 1 verfahrensfrei, benötigt also keine Baugenehmigung.",
+        "required_criteria": [
+          "Carport-Fläche ≤ 30m² (gegeben: 25m²)",
+          "Keine Aufenthaltsräume vorhanden (typisch für Carport)",
+          "Einhaltung der Abstandsflächen gemäß LBO BW § 5",
+          "Keine Sondernutzung (z.B. gewerbliche Nutzung)"
+        ],
+        "missing_information": [
+          "Abstand zu Nachbargrundstücken (Nutzer-Input erforderlich)",
+          "Bauweise: offen oder geschlossen? (Kontext-Lücke)"
+        ],
+        "confidence": 0.85,
+        "reasoning": "Die RAG-Suche liefert LBO BW § 50 Abs. 1 (Quelle: Landesbauordnung BW 2023), wonach Gebäude ohne Aufenthaltsräume bis 30m² verfahrensfrei sind. Die VGH Mannheim Rechtsprechung (3 S 2543/19) bestätigt, dass Carports als Gebäude ohne Aufenthaltsraum gelten. Mit 25m² liegt der geplante Carport unter der 30m²-Grenze. Confidence ist hoch (0.85), aber nicht sehr hoch (0.95+), weil Abstandsflächen noch zu prüfen sind und die konkrete Bauweise (offen/geschlossen) unklar ist."
+      }
+    },
+    {
+      "scenario": "Carport-Frage mit fehlendem Kontext",
+      "user_query": "Brauche ich eine Baugenehmigung für meinen Carport?",
+      "rag_summary": "Allgemeine Baurecht-Informationen vorhanden",
+      "output": {
+        "hypothesis": "Die Genehmigungspflicht für einen Carport hängt primär vom Bundesland und der Größe ab. In den meisten Bundesländern sind kleinere Carports (<30m²) verfahrensfrei.",
+        "required_criteria": [
+          "Bundesland-spezifische Landesbauordnung",
+          "Carport-Größe in m²",
+          "Vorhandensein von Aufenthaltsräumen",
+          "Abstandsflächen zu Nachbarn"
+        ],
+        "missing_information": [
+          "Bundesland nicht angegeben (kritisch für LBO-Auswahl)",
+          "Carport-Größe unbekannt (entscheidend für Verfahrensfreiheit)",
+          "Standort auf Grundstück unklar (relevant für Abstandsflächen)",
+          "Bauweise (offen/geschlossen/überdacht) nicht spezifiziert"
+        ],
+        "confidence": 0.45,
+        "reasoning": "Die RAG-Suche liefert nur allgemeine Informationen zu Baurecht, keine spezifischen Landesbauordnungen. Ohne Angabe des Bundeslandes und der Carport-Größe ist eine präzise Aussage nicht möglich. Die Hypothese basiert auf allgemeinem Wissen, dass kleinere Carports häufig verfahrensfrei sind, aber dies variiert stark zwischen Bundesländern. Confidence ist niedrig (0.45) wegen der vielen fehlenden kritischen Informationen."
+      }
+    }
+  ],
+  
+  "common_mistakes": [
+    {
+      "mistake": "Zu hohe Confidence bei fehlenden Informationen",
+      "example": "confidence: 0.9 obwohl Bundesland unbekannt",
+      "correction": "Confidence max 0.5-0.6 bei fehlenden kritischen Infos"
+    },
+    {
+      "mistake": "Vage required_criteria",
+      "example": "required_criteria: ['Bauvorschriften', 'Rechtliche Rahmenbedingungen']",
+      "correction": "required_criteria: ['LBO BW § 50 (Verfahrensfreiheit)', 'Carport-Größe ≤30m²']"
+    },
+    {
+      "mistake": "Reasoning ohne Quellenreferenzen",
+      "example": "reasoning: 'Carports sind meist genehmigungsfrei.'",
+      "correction": "reasoning: 'Laut LBO BW § 50 sind Gebäude <30m² ohne Aufenthaltsräume verfahrensfrei.'"
+    },
+    {
+      "mistake": "Hypothese als Frage formuliert",
+      "example": "hypothesis: 'Braucht man eine Genehmigung?'",
+      "correction": "hypothesis: 'Ein Carport <30m² ist in BW verfahrensfrei.'"
+    }
+  ],
+  
+  "template_variables": {
+    "user_query": "Die Original-Frage des Nutzers",
+    "rag_results": "RAG-Suchergebnisse (semantisch + graph-basiert)",
+    "scientific_foundation": "Basis-Prinzipien aus scientific_foundation.json",
+    "detected_domain": "Erkannte Domäne (z.B. 'baurecht', 'umweltrecht')",
+    "complexity_estimate": "Geschätzte Komplexität (low/medium/high)"
+  }
+}

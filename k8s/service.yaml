@@ -1,0 +1,69 @@
+# ======================================================================
+# VERITAS Framework - Services
+# Network exposure for API and workers
+# ======================================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: veritas-api
+  namespace: veritas-production
+  labels:
+    app: veritas
+    component: api
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8000"
+    prometheus.io/path: "/api/v1/metrics"
+spec:
+  type: ClusterIP
+  selector:
+    app: veritas
+    component: api
+  ports:
+  - name: http
+    port: 8000
+    targetPort: 8000
+    protocol: TCP
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800  # 3 hours for WebSocket connections
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: veritas-api-headless
+  namespace: veritas-production
+  labels:
+    app: veritas
+    component: api
+spec:
+  type: ClusterIP
+  clusterIP: None
+  selector:
+    app: veritas
+    component: api
+  ports:
+  - name: http
+    port: 8000
+    targetPort: 8000
+    protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: veritas-api
+  namespace: veritas-staging
+  labels:
+    app: veritas
+    component: api
+spec:
+  type: ClusterIP
+  selector:
+    app: veritas
+    component: api
+  ports:
+  - name: http
+    port: 8000
+    targetPort: 8000
+    protocol: TCP

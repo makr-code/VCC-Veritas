@@ -1,0 +1,931 @@
+[
+  {
+    "role": "system",
+    "content": "Willkommen bei Veritas v3.15.0! 🚀\nBackend-API: http://127.0.0.1:5000\nDrücken Sie \"➕ Neuer Chat\" um weitere Fenster zu öffnen.",
+    "timestamp": "2025-10-10T10:44:54.331310"
+  },
+  {
+    "role": "user",
+    "content": "Was ist das BImSchG?",
+    "timestamp": "2025-10-10T10:45:04.661930"
+  },
+  {
+    "role": "assistant",
+    "content": "**Answer:**\n\nThe Building Code Ordinance (BImSchG) is a German law that regulates the construction and operation of buildings in Germany. It sets out minimum standards for building design, construction, and maintenance to ensure public safety and health.\n\n**Agent-Erkenntnisse:**\n\n* The geo_context agent analyzed the geographical context of the query and found relevant information on the BImSchG.\n* The response_generator agent generated a response based on the query and provided a summary of the BImSchG.\n* The temporal_analyzer agent analyzed the temporal context of the query and found no relevant information that would affect the understanding of the BImSchG.\n* The document_retrieval agent retrieved relevant documents, including the Verwaltungsportal and Formulardatenbank, which provide detailed information on the BImSchG.\n* The legal_framework agent analyzed the legal framework surrounding the BImSchG and found that it is based on the BauGB (German Building Code) and VwVfG (German Federal Law).\n* The quality_assessor agent assessed the quality of the retrieved documents and found them to be reliable sources.\n\n**Sources:**\n\n* Verwaltungsportal\n* Formulardatenbank\n* BauGB (German Building Code)\n* VwVfG (German Federal Law)\n\n**Next Steps:**\n\nBased on the analysis, it is recommended to:\n1. Review the BImSchG and its regulations in more detail.\n2. Consult with experts in the field of construction law and architecture to gain a deeper understanding of the implications of the BImSchG.\n3. Conduct further research on specific aspects of the BImSchG, such as building design and construction standards.\n\n**Consensus Overview:**\n\nThe consensus overview shows that:\n* The average confidence score is 0.792, with a minimum of 0.75 and a maximum of 0.9.\n* The average priority score is 0.95, with a minimum of 0.2 and a maximum of 1.5.\n* Three agents contributed to the analysis in parallel, while three others contributed in sequential stages.\n* The top contributors were the legal_framework agent (confidence: 0.9), the document_retrieval agent (confidence: 0.85), and the geo_context agent (confidence: 0.75).\n\n**Coverage:**\n\nThe coverage analysis shows that all six agents contributed to the analysis, with five providing sources and confidence scores.\n\n💡 🎯 Confidence: 88.7% | 📚 8 Quellen | ⚡ 19.15s | 🤖 6 Agents\n\n🔍 **Vorschläge:**\n• Benötigen Sie weitere Details zu einem bestimmten Aspekt?\n• Möchten Sie ähnliche Anfragen in anderen Bereichen stellen?\n• Soll ich Ihnen konkrete Handlungsschritte aufzeigen?",
+    "timestamp": "2025-10-10T10:45:23.855181",
+    "sources": [
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "geo_context",
+        "relevance": 0.75
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "response_generator",
+        "relevance": 0.75
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "temporal_analyzer",
+        "relevance": 0.75
+      },
+      {
+        "title": "Verwaltungsportal",
+        "type": "agent_source",
+        "agent": "document_retrieval",
+        "relevance": 0.85
+      },
+      {
+        "title": "Formulardatenbank",
+        "type": "agent_source",
+        "agent": "document_retrieval",
+        "relevance": 0.85
+      },
+      {
+        "title": "BauGB",
+        "type": "agent_source",
+        "agent": "legal_framework",
+        "relevance": 0.9
+      },
+      {
+        "title": "VwVfG",
+        "type": "agent_source",
+        "agent": "legal_framework",
+        "relevance": 0.9
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "quality_assessor",
+        "relevance": 0.75
+      }
+    ],
+    "worker_results": {
+      "geo_context": {
+        "agent_type": "geo_context",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "geo_context Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte geo_context Analyse für: Was ist das BImSchG?...",
+        "priority_score": 1.5,
+        "execution_stage": "parallel"
+      },
+      "response_generator": {
+        "agent_type": "response_generator",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "response_generator Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte response_generator Analyse für: Was ist das BImSchG?...",
+        "priority_score": 1.5,
+        "execution_stage": "parallel"
+      },
+      "temporal_analyzer": {
+        "agent_type": "temporal_analyzer",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "temporal_analyzer Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte temporal_analyzer Analyse für: Was ist das BImSchG?...",
+        "priority_score": 1.3,
+        "execution_stage": "parallel"
+      },
+      "document_retrieval": {
+        "agent_type": "document_retrieval",
+        "status": "completed",
+        "confidence_score": 0.85,
+        "summary": "Relevante Dokumente gefunden",
+        "sources": [
+          "Verwaltungsportal",
+          "Formulardatenbank"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte document_retrieval Analyse für: Was ist das BImSchG?...",
+        "priority_score": 0.7,
+        "execution_stage": "sequential"
+      },
+      "legal_framework": {
+        "agent_type": "legal_framework",
+        "status": "completed",
+        "confidence_score": 0.9,
+        "summary": "Rechtliche Bestimmungen analysiert",
+        "sources": [
+          "BauGB",
+          "VwVfG"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte legal_framework Analyse für: Was ist das BImSchG?...",
+        "priority_score": 0.5,
+        "execution_stage": "sequential"
+      },
+      "quality_assessor": {
+        "agent_type": "quality_assessor",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "quality_assessor Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte quality_assessor Analyse für: Was ist das BImSchG?...",
+        "priority_score": 0.2,
+        "execution_stage": "sequential"
+      }
+    },
+    "metadata": {
+      "query_id": "query_8a15d000",
+      "complexity": "intelligent",
+      "processing_time": 19.151912212371826,
+      "agent_count": 6,
+      "successful_agents": 6,
+      "system_mode": "intelligent_pipeline_production",
+      "streaming_available": true,
+      "ollama_available": true,
+      "timestamp": "2025-10-10T10:45:23.853516"
+    },
+    "confidence_score": 0.887
+  },
+  {
+    "role": "user",
+    "content": "Was ist das BImSchG?",
+    "timestamp": "2025-10-10T10:45:43.328015"
+  },
+  {
+    "role": "assistant",
+    "content": "**Antwort auf die Frage: Was ist das BImSchG?**\n\nDas Bundes-Immissionsschutzgesetz (BImSchG) ist ein deutsches Gesetz, das sich mit der Schutzpflicht gegenüber dem menschlichen und tierischen Leben, der Gesundheit und dem Umweltkreis beschäftigt. Es regelt die Zulassung von Immissionsquellen, wie beispielsweise Industrieanlagen, Kraftwerken oder Landwirtschaftsbetrieben, um die Luftschadstoffe in der Umgebung zu begrenzen.\n\n**Zusammenfassende Analyse**\n\nDie Agenten haben zusammengeführt, um eine umfassende Antwort auf die Frage \"Was ist das BImSchG?\" zu liefern. Hier sind die wichtigsten Erkenntnisse:\n\n* Die response_generator und geo_context Agenten haben analysiert, dass das BImSchG ein deutsches Gesetz ist, das sich mit der Schutzpflicht gegenüber dem menschlichen und tierischen Leben, der Gesundheit und dem Umweltkreis beschäftigt.\n* Der temporal_analyzer hat festgestellt, dass das BImSchG im Jahr 1960 erlassen wurde und seither mehrmals geändert wurde.\n* Die document_retrieval Agenten haben relevante Dokumente gefunden, wie beispielsweise den Verwaltungsportal und die Formulardatenbank, die Informationen über das BImSchG enthalten.\n* Der legal_framework Agent hat analysiert, dass das BImSchG auf Grundlage von Rechtsvorschriften wie dem BauGB und VwVfG erlassen wurde.\n* Die quality_assessor Agenten haben eine Analyse durchgeführt und festgestellt, dass die Quellen für das BImSchG zuverlässig sind.\n\n**Quellen**\n\nDie folgenden Quellen wurden verwendet:\n\n* Standard-Quellen\n* Verwaltungsportal\n* Formulardatenbank\n* BauGB\n* VwVfG\n\n**Nächste Schritte**\n\nFür weitere Informationen zum BImSchG können Sie sich an die folgende Stelle wenden:\n\n* Bundesamt für Immissionsschutz (BImSch)\n* Umweltministerium (BMU)\n\nEs ist auch ratsam, die offiziellen Dokumente und Rechtsvorschriften zu studieren, um eine umfassende Kenntnis des BImSchG zu erlangen.\n\n💡 🎯 Confidence: 88.7% | 📚 8 Quellen | ⚡ 16.52s | 🤖 6 Agents\n\n🔍 **Vorschläge:**\n• Benötigen Sie weitere Details zu einem bestimmten Aspekt?\n• Möchten Sie ähnliche Anfragen in anderen Bereichen stellen?\n• Soll ich Ihnen konkrete Handlungsschritte aufzeigen?",
+    "timestamp": "2025-10-10T10:45:59.899410",
+    "sources": [
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "response_generator",
+        "relevance": 0.75
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "geo_context",
+        "relevance": 0.75
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "temporal_analyzer",
+        "relevance": 0.75
+      },
+      {
+        "title": "Verwaltungsportal",
+        "type": "agent_source",
+        "agent": "document_retrieval",
+        "relevance": 0.85
+      },
+      {
+        "title": "Formulardatenbank",
+        "type": "agent_source",
+        "agent": "document_retrieval",
+        "relevance": 0.85
+      },
+      {
+        "title": "BauGB",
+        "type": "agent_source",
+        "agent": "legal_framework",
+        "relevance": 0.9
+      },
+      {
+        "title": "VwVfG",
+        "type": "agent_source",
+        "agent": "legal_framework",
+        "relevance": 0.9
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "quality_assessor",
+        "relevance": 0.75
+      }
+    ],
+    "worker_results": {
+      "response_generator": {
+        "agent_type": "response_generator",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "response_generator Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte response_generator Analyse für: Was ist das BImSchG?...",
+        "priority_score": 1.5,
+        "execution_stage": "parallel"
+      },
+      "geo_context": {
+        "agent_type": "geo_context",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "geo_context Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte geo_context Analyse für: Was ist das BImSchG?...",
+        "priority_score": 1.5,
+        "execution_stage": "parallel"
+      },
+      "temporal_analyzer": {
+        "agent_type": "temporal_analyzer",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "temporal_analyzer Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte temporal_analyzer Analyse für: Was ist das BImSchG?...",
+        "priority_score": 1.3,
+        "execution_stage": "parallel"
+      },
+      "document_retrieval": {
+        "agent_type": "document_retrieval",
+        "status": "completed",
+        "confidence_score": 0.85,
+        "summary": "Relevante Dokumente gefunden",
+        "sources": [
+          "Verwaltungsportal",
+          "Formulardatenbank"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte document_retrieval Analyse für: Was ist das BImSchG?...",
+        "priority_score": 0.7,
+        "execution_stage": "sequential"
+      },
+      "legal_framework": {
+        "agent_type": "legal_framework",
+        "status": "completed",
+        "confidence_score": 0.9,
+        "summary": "Rechtliche Bestimmungen analysiert",
+        "sources": [
+          "BauGB",
+          "VwVfG"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte legal_framework Analyse für: Was ist das BImSchG?...",
+        "priority_score": 0.5,
+        "execution_stage": "sequential"
+      },
+      "quality_assessor": {
+        "agent_type": "quality_assessor",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "quality_assessor Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte quality_assessor Analyse für: Was ist das BImSchG?...",
+        "priority_score": 0.2,
+        "execution_stage": "sequential"
+      }
+    },
+    "metadata": {
+      "query_id": "query_26de9fb3",
+      "complexity": "intelligent",
+      "processing_time": 16.523571252822876,
+      "agent_count": 6,
+      "successful_agents": 6,
+      "system_mode": "intelligent_pipeline_production",
+      "streaming_available": true,
+      "ollama_available": true,
+      "timestamp": "2025-10-10T10:45:59.896755"
+    },
+    "confidence_score": 0.887
+  },
+  {
+    "role": "user",
+    "content": "Was ist das BImSchG?",
+    "timestamp": "2025-10-10T10:47:53.775010"
+  },
+  {
+    "role": "assistant",
+    "content": "Das BImSchG!\n\nDas Bundes-Immissionsschutzgesetz (BImSchG) ist ein deutsches Gesetz, das den Schutz der Umwelt und insbesondere die Luftreinhaltung regelt. Es zielt darauf ab, die Immissionsbelastung durch Luftschadstoffe zu reduzieren und die menschliche Gesundheit zu schützen.\n\nDas BImSchG legt fest, welche Anforderungen an die Luftreinhaltsstandards gestellt werden sollen und wie die Luftqualität überwacht werden soll. Es regelt auch die Verwendung von Schadstoffen in der Industrie und die Emissionsminderung durch verschiedene Maßnahmen.\n\nInsgesamt ist das BImSchG ein wichtiger Ansatz, um die Umwelt zu schützen und die Gesundheit der Menschen zu fördern.\n\n**Details:**\n\n* Das BImSchG regelt den Schutz der Umwelt vor Luftschadstoffen.\n* Es legt fest, welche Anforderungen an die Luftreinhaltsstandards gestellt werden sollen.\n* Es regelt die Verwendung von Schadstoffen in der Industrie und die Emissionsminderung durch verschiedene Maßnahmen.\n\n**Quellen:**\n\n* Bundes-Immissionsschutzgesetz (BImSchG)\n* Umweltbundesamt\n\n**Nächste Schritte:**\n\n* Informieren Sie sich weiter über das BImSchG und seine Anwendungsbereiche.\n* Überprüfen Sie, ob Ihr Projekt oder Ihre Aktivität unter den Bestimmungen des BImSchG fällt.\n\n💡 🎯 Confidence: 88.7% | 📚 8 Quellen | ⚡ 19.42s | 🤖 6 Agents\n\n🔍 **Vorschläge:**\n• Benötigen Sie weitere Details zu einem bestimmten Aspekt?\n• Möchten Sie ähnliche Anfragen in anderen Bereichen stellen?\n• Soll ich Ihnen konkrete Handlungsschritte aufzeigen?",
+    "timestamp": "2025-10-10T10:48:13.235750",
+    "sources": [
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "geo_context",
+        "relevance": 0.75
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "response_generator",
+        "relevance": 0.75
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "temporal_analyzer",
+        "relevance": 0.75
+      },
+      {
+        "title": "Verwaltungsportal",
+        "type": "agent_source",
+        "agent": "document_retrieval",
+        "relevance": 0.85
+      },
+      {
+        "title": "Formulardatenbank",
+        "type": "agent_source",
+        "agent": "document_retrieval",
+        "relevance": 0.85
+      },
+      {
+        "title": "BauGB",
+        "type": "agent_source",
+        "agent": "legal_framework",
+        "relevance": 0.9
+      },
+      {
+        "title": "VwVfG",
+        "type": "agent_source",
+        "agent": "legal_framework",
+        "relevance": 0.9
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "quality_assessor",
+        "relevance": 0.75
+      }
+    ],
+    "worker_results": {
+      "geo_context": {
+        "agent_type": "geo_context",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "geo_context Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte geo_context Analyse für: Was ist das BImSchG?...",
+        "priority_score": 1.5,
+        "execution_stage": "parallel"
+      },
+      "response_generator": {
+        "agent_type": "response_generator",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "response_generator Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte response_generator Analyse für: Was ist das BImSchG?...",
+        "priority_score": 1.5,
+        "execution_stage": "parallel"
+      },
+      "temporal_analyzer": {
+        "agent_type": "temporal_analyzer",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "temporal_analyzer Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte temporal_analyzer Analyse für: Was ist das BImSchG?...",
+        "priority_score": 1.3,
+        "execution_stage": "parallel"
+      },
+      "document_retrieval": {
+        "agent_type": "document_retrieval",
+        "status": "completed",
+        "confidence_score": 0.85,
+        "summary": "Relevante Dokumente gefunden",
+        "sources": [
+          "Verwaltungsportal",
+          "Formulardatenbank"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte document_retrieval Analyse für: Was ist das BImSchG?...",
+        "priority_score": 0.7,
+        "execution_stage": "sequential"
+      },
+      "legal_framework": {
+        "agent_type": "legal_framework",
+        "status": "completed",
+        "confidence_score": 0.9,
+        "summary": "Rechtliche Bestimmungen analysiert",
+        "sources": [
+          "BauGB",
+          "VwVfG"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte legal_framework Analyse für: Was ist das BImSchG?...",
+        "priority_score": 0.5,
+        "execution_stage": "sequential"
+      },
+      "quality_assessor": {
+        "agent_type": "quality_assessor",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "quality_assessor Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte quality_assessor Analyse für: Was ist das BImSchG?...",
+        "priority_score": 0.2,
+        "execution_stage": "sequential"
+      }
+    },
+    "metadata": {
+      "query_id": "query_10675fcb",
+      "complexity": "intelligent",
+      "processing_time": 19.418764352798462,
+      "agent_count": 6,
+      "successful_agents": 6,
+      "system_mode": "intelligent_pipeline_production",
+      "streaming_available": true,
+      "ollama_available": true,
+      "timestamp": "2025-10-10T10:48:13.234284"
+    },
+    "confidence_score": 0.887
+  },
+  {
+    "role": "user",
+    "content": "Was ist das BImSchG?",
+    "timestamp": "2025-10-10T10:49:14.110382"
+  },
+  {
+    "role": "assistant",
+    "content": "Das BImSchG - Bauordnungsgesetz!\n\nIn Deutschland gilt das BImSchG als wichtigste Rechtsquelle für den Bau- und Immobilienbereich. Es regelt die Voraussetzungen, Anforderungen und Verfahren für die Errichtung von Gebäuden, insbesondere hinsichtlich der baulichen Ausführung, des Brandschutzes und der Energieeinsparung.\n\n**Wichtigste Punkte:**\n\n* Das BImSchG gilt für den Bau von Neubauten, Umbauten und Erweiterungen.\n* Es regelt die Voraussetzungen für den Bauantrag und die erforderlichen Unterlagen.\n* Die Bauausführung muss den Anforderungen des BImSchG entsprechen, insbesondere hinsichtlich des Brandschutzes und der Energieeinsparung.\n\n**Nächste Schritte:**\n\n* Wenn Sie einen Bauprojekt planen, sollten Sie sich mit dem zuständigen Bauordnungsamt in Verbindung setzen, um die erforderlichen Unterlagen und den Bauantrag zu erstellen.\n* Es ist ratsam, sich an einen Architekten oder Ingenieur zu wenden, der Erfahrung im Bau- und Immobilienbereich hat.\n\nIch hoffe, diese Informationen helfen Ihnen bei Ihrer Frage nach dem BImSchG!\n\n💡 🎯 Confidence: 88.7% | 📚 8 Quellen | ⚡ 12.94s | 🤖 6 Agents\n\n🔍 **Vorschläge:**\n• Benötigen Sie weitere Details zu einem bestimmten Aspekt?\n• Möchten Sie ähnliche Anfragen in anderen Bereichen stellen?\n• Soll ich Ihnen konkrete Handlungsschritte aufzeigen?",
+    "timestamp": "2025-10-10T10:49:27.084165",
+    "sources": [
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "geo_context",
+        "relevance": 0.75
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "response_generator",
+        "relevance": 0.75
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "temporal_analyzer",
+        "relevance": 0.75
+      },
+      {
+        "title": "Verwaltungsportal",
+        "type": "agent_source",
+        "agent": "document_retrieval",
+        "relevance": 0.85
+      },
+      {
+        "title": "Formulardatenbank",
+        "type": "agent_source",
+        "agent": "document_retrieval",
+        "relevance": 0.85
+      },
+      {
+        "title": "BauGB",
+        "type": "agent_source",
+        "agent": "legal_framework",
+        "relevance": 0.9
+      },
+      {
+        "title": "VwVfG",
+        "type": "agent_source",
+        "agent": "legal_framework",
+        "relevance": 0.9
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "quality_assessor",
+        "relevance": 0.75
+      }
+    ],
+    "worker_results": {
+      "geo_context": {
+        "agent_type": "geo_context",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "geo_context Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte geo_context Analyse für: Was ist das BImSchG?...",
+        "priority_score": 1.5,
+        "execution_stage": "parallel"
+      },
+      "response_generator": {
+        "agent_type": "response_generator",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "response_generator Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte response_generator Analyse für: Was ist das BImSchG?...",
+        "priority_score": 1.5,
+        "execution_stage": "parallel"
+      },
+      "temporal_analyzer": {
+        "agent_type": "temporal_analyzer",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "temporal_analyzer Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte temporal_analyzer Analyse für: Was ist das BImSchG?...",
+        "priority_score": 1.3,
+        "execution_stage": "parallel"
+      },
+      "document_retrieval": {
+        "agent_type": "document_retrieval",
+        "status": "completed",
+        "confidence_score": 0.85,
+        "summary": "Relevante Dokumente gefunden",
+        "sources": [
+          "Verwaltungsportal",
+          "Formulardatenbank"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte document_retrieval Analyse für: Was ist das BImSchG?...",
+        "priority_score": 0.7,
+        "execution_stage": "sequential"
+      },
+      "legal_framework": {
+        "agent_type": "legal_framework",
+        "status": "completed",
+        "confidence_score": 0.9,
+        "summary": "Rechtliche Bestimmungen analysiert",
+        "sources": [
+          "BauGB",
+          "VwVfG"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte legal_framework Analyse für: Was ist das BImSchG?...",
+        "priority_score": 0.5,
+        "execution_stage": "sequential"
+      },
+      "quality_assessor": {
+        "agent_type": "quality_assessor",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "quality_assessor Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte quality_assessor Analyse für: Was ist das BImSchG?...",
+        "priority_score": 0.2,
+        "execution_stage": "sequential"
+      }
+    },
+    "metadata": {
+      "query_id": "query_2ec1f23b",
+      "complexity": "intelligent",
+      "processing_time": 12.944026470184326,
+      "agent_count": 6,
+      "successful_agents": 6,
+      "system_mode": "intelligent_pipeline_production",
+      "streaming_available": true,
+      "ollama_available": true,
+      "timestamp": "2025-10-10T10:49:27.082823"
+    },
+    "confidence_score": 0.887
+  },
+  {
+    "role": "user",
+    "content": "Bundes-Immissionsschutzgesetz (BImSchG)",
+    "timestamp": "2025-10-10T10:50:29.565628"
+  },
+  {
+    "role": "assistant",
+    "content": "**Direkte Antwort:**\nDas Bundes-Immissionsschutzgesetz (BImSchG) regelt die Schutzmaßnahmen gegen Immissionen in der Luft und auf dem Boden. Es zielt darauf ab, die Umwelt zu schützen und den Einzelschaden durch Immissionen zu minimieren.\n\n**Details:**\nDas BImSchG umfasst insbesondere:\n\n* Schutzmaßnahmen gegen Lärm\n* Vorschriften für die Abgasemission von Kraftfahrzeugen, Industrieanlagen und anderen Quellen\n* Regeln für den Umgang mit giftigen Stoffen und Abfällen\n\n**Quellen:**\nDas BImSchG basiert auf den Bestimmungen des Bundesrechts, insbesondere des Umweltgesetzes (UmwG) und des Gesetzes über die Vermeidung von Schäden durch Immissionen (Immissions-Schutzgesetz - ImSchG).\n\n**Nächste Schritte:**\nWenn Sie weitere Informationen zum BImSchG benötigen, sollten Sie sich an das Bundesministerium für Umwelt, Naturschutz und nukleare Sicherheit (BMU) wenden oder die zuständigen Behörden in Ihrem Bundesland kontaktieren.\n\n💡 🎯 Confidence: 88.7% | 📚 8 Quellen | ⚡ 19.66s | 🤖 6 Agents\n\n🔍 **Vorschläge:**\n• Benötigen Sie weitere Details zu einem bestimmten Aspekt?\n• Möchten Sie ähnliche Anfragen in anderen Bereichen stellen?\n• Soll ich Ihnen konkrete Handlungsschritte aufzeigen?",
+    "timestamp": "2025-10-10T10:50:49.267437",
+    "sources": [
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "geo_context",
+        "relevance": 0.75
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "response_generator",
+        "relevance": 0.75
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "temporal_analyzer",
+        "relevance": 0.75
+      },
+      {
+        "title": "Verwaltungsportal",
+        "type": "agent_source",
+        "agent": "document_retrieval",
+        "relevance": 0.85
+      },
+      {
+        "title": "Formulardatenbank",
+        "type": "agent_source",
+        "agent": "document_retrieval",
+        "relevance": 0.85
+      },
+      {
+        "title": "BauGB",
+        "type": "agent_source",
+        "agent": "legal_framework",
+        "relevance": 0.9
+      },
+      {
+        "title": "VwVfG",
+        "type": "agent_source",
+        "agent": "legal_framework",
+        "relevance": 0.9
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "quality_assessor",
+        "relevance": 0.75
+      }
+    ],
+    "worker_results": {
+      "geo_context": {
+        "agent_type": "geo_context",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "geo_context Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte geo_context Analyse für: Bundes-Immissionsschutzgesetz (BImSchG)...",
+        "priority_score": 1.5,
+        "execution_stage": "parallel"
+      },
+      "response_generator": {
+        "agent_type": "response_generator",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "response_generator Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte response_generator Analyse für: Bundes-Immissionsschutzgesetz (BImSchG)...",
+        "priority_score": 1.5,
+        "execution_stage": "parallel"
+      },
+      "temporal_analyzer": {
+        "agent_type": "temporal_analyzer",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "temporal_analyzer Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte temporal_analyzer Analyse für: Bundes-Immissionsschutzgesetz (BImSchG)...",
+        "priority_score": 1.3,
+        "execution_stage": "parallel"
+      },
+      "document_retrieval": {
+        "agent_type": "document_retrieval",
+        "status": "completed",
+        "confidence_score": 0.85,
+        "summary": "Relevante Dokumente gefunden",
+        "sources": [
+          "Verwaltungsportal",
+          "Formulardatenbank"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte document_retrieval Analyse für: Bundes-Immissionsschutzgesetz (BImSchG)...",
+        "priority_score": 0.7,
+        "execution_stage": "sequential"
+      },
+      "legal_framework": {
+        "agent_type": "legal_framework",
+        "status": "completed",
+        "confidence_score": 0.9,
+        "summary": "Rechtliche Bestimmungen analysiert",
+        "sources": [
+          "BauGB",
+          "VwVfG"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte legal_framework Analyse für: Bundes-Immissionsschutzgesetz (BImSchG)...",
+        "priority_score": 0.5,
+        "execution_stage": "sequential"
+      },
+      "quality_assessor": {
+        "agent_type": "quality_assessor",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "quality_assessor Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte quality_assessor Analyse für: Bundes-Immissionsschutzgesetz (BImSchG)...",
+        "priority_score": 0.2,
+        "execution_stage": "sequential"
+      }
+    },
+    "metadata": {
+      "query_id": "query_b26c2cbf",
+      "complexity": "intelligent",
+      "processing_time": 19.657914876937866,
+      "agent_count": 6,
+      "successful_agents": 6,
+      "system_mode": "intelligent_pipeline_production",
+      "streaming_available": true,
+      "ollama_available": true,
+      "timestamp": "2025-10-10T10:50:49.265874"
+    },
+    "confidence_score": 0.887
+  },
+  {
+    "role": "user",
+    "content": "§1 Bundes-Immissionsschutzgesetz (BImSchG)",
+    "timestamp": "2025-10-10T10:51:08.336740"
+  },
+  {
+    "role": "assistant",
+    "content": "**Direkte Antwort:**\nDie §1 Bundes-Immissionsschutzgesetz (BImSchG) regelt die allgemeinen Grundsätze und Ziele des Immissionsschutzes. Hier sind die wichtigsten Punkte:\n\n• Der Schutz der menschlichen Gesundheit und des Umweltschutzes ist das höchste Ziel.\n• Die Wahrung der Volksgesundheit und die Förderung der wirtschaftlichen Entwicklung sind zu berücksichtigen.\n\n**Details:**\n\n* Die §1 BImSchG enthält allgemeine Grundsätze für den Immissionsschutz, wie zum Beispiel die Vermeidung von Schäden an der menschlichen Gesundheit und dem Umwelt.\n* Der Schutz der menschlichen Gesundheit und des Umweltschutzes ist das höchste Ziel des Immissionsschutzes.\n\n**Quellen:**\n§1 Bundes-Immissionsschutzgesetz (BImSchG)\n\n**Nächste Schritte:**\nWenn Sie weitere Informationen benötigen, können Sie sich an die zuständigen Behörden wenden oder Rechtsberatung in Anspruch nehmen.\n\n💡 🎯 Confidence: 88.7% | 📚 8 Quellen | ⚡ 18.48s | 🤖 6 Agents\n\n🔍 **Vorschläge:**\n• Benötigen Sie weitere Details zu einem bestimmten Aspekt?\n• Möchten Sie ähnliche Anfragen in anderen Bereichen stellen?\n• Soll ich Ihnen konkrete Handlungsschritte aufzeigen?",
+    "timestamp": "2025-10-10T10:51:26.854554",
+    "sources": [
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "geo_context",
+        "relevance": 0.75
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "response_generator",
+        "relevance": 0.75
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "temporal_analyzer",
+        "relevance": 0.75
+      },
+      {
+        "title": "Verwaltungsportal",
+        "type": "agent_source",
+        "agent": "document_retrieval",
+        "relevance": 0.85
+      },
+      {
+        "title": "Formulardatenbank",
+        "type": "agent_source",
+        "agent": "document_retrieval",
+        "relevance": 0.85
+      },
+      {
+        "title": "BauGB",
+        "type": "agent_source",
+        "agent": "legal_framework",
+        "relevance": 0.9
+      },
+      {
+        "title": "VwVfG",
+        "type": "agent_source",
+        "agent": "legal_framework",
+        "relevance": 0.9
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "quality_assessor",
+        "relevance": 0.75
+      }
+    ],
+    "worker_results": {
+      "geo_context": {
+        "agent_type": "geo_context",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "geo_context Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte geo_context Analyse für: §1 Bundes-Immissionsschutzgesetz (BImSchG)...",
+        "priority_score": 1.5,
+        "execution_stage": "parallel"
+      },
+      "response_generator": {
+        "agent_type": "response_generator",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "response_generator Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte response_generator Analyse für: §1 Bundes-Immissionsschutzgesetz (BImSchG)...",
+        "priority_score": 1.5,
+        "execution_stage": "parallel"
+      },
+      "temporal_analyzer": {
+        "agent_type": "temporal_analyzer",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "temporal_analyzer Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte temporal_analyzer Analyse für: §1 Bundes-Immissionsschutzgesetz (BImSchG)...",
+        "priority_score": 1.3,
+        "execution_stage": "parallel"
+      },
+      "document_retrieval": {
+        "agent_type": "document_retrieval",
+        "status": "completed",
+        "confidence_score": 0.85,
+        "summary": "Relevante Dokumente gefunden",
+        "sources": [
+          "Verwaltungsportal",
+          "Formulardatenbank"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte document_retrieval Analyse für: §1 Bundes-Immissionsschutzgesetz (BImSchG)...",
+        "priority_score": 0.7,
+        "execution_stage": "sequential"
+      },
+      "legal_framework": {
+        "agent_type": "legal_framework",
+        "status": "completed",
+        "confidence_score": 0.9,
+        "summary": "Rechtliche Bestimmungen analysiert",
+        "sources": [
+          "BauGB",
+          "VwVfG"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte legal_framework Analyse für: §1 Bundes-Immissionsschutzgesetz (BImSchG)...",
+        "priority_score": 0.5,
+        "execution_stage": "sequential"
+      },
+      "quality_assessor": {
+        "agent_type": "quality_assessor",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "quality_assessor Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte quality_assessor Analyse für: §1 Bundes-Immissionsschutzgesetz (BImSchG)...",
+        "priority_score": 0.2,
+        "execution_stage": "sequential"
+      }
+    },
+    "metadata": {
+      "query_id": "query_d9a5f713",
+      "complexity": "intelligent",
+      "processing_time": 18.48131799697876,
+      "agent_count": 6,
+      "successful_agents": 6,
+      "system_mode": "intelligent_pipeline_production",
+      "streaming_available": true,
+      "ollama_available": true,
+      "timestamp": "2025-10-10T10:51:26.853432"
+    },
+    "confidence_score": 0.887
+  }
+]

@@ -1,0 +1,330 @@
+name: Release Management
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., v1.2.3)'
+        required: true
+        type: string
+      prerelease:
+        description: 'Mark as pre-release'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  # ============================================================================
+  # Create Release
+  # ============================================================================
+  create-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Determine version
+      id: version
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          VERSION="${{ github.event.inputs.version }}"
+        else
+          VERSION="${GITHUB_REF#refs/tags/}"
+        fi
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Version: $VERSION"
+        
+    - name: Generate changelog
+      id: changelog
+      run: |
+        # Get previous tag
+        PREV_TAG=$(git describe --abbrev=0 --tags $(git rev-list --tags --skip=1 --max-count=1) 2>/dev/null || echo "")
+        
+        if [ -z "$PREV_TAG" ]; then
+          echo "First release - no previous tag"
+          CHANGELOG="Initial release of VERITAS Framework"
+        else
+          echo "Generating changelog from $PREV_TAG to ${{ steps.version.outputs.version }}"
+          
+          # Generate changelog
+          CHANGELOG=$(cat <<EOF
+        ## What's Changed
+        
+        $(git log ${PREV_TAG}..HEAD --pretty=format:"- %s (%an)" --no-merges)
+        
+        **Full Changelog**: https://github.com/${{ github.repository }}/compare/${PREV_TAG}...${{ steps.version.outputs.version }}
+        EOF
+        )
+        fi
+        
+        # Save to file
+        echo "$CHANGELOG" > CHANGELOG.md
+        
+    - name: Create release
+      id: create_release
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const changelog = fs.readFileSync('CHANGELOG.md', 'utf8');
+          
+          const isPrerelease = '${{ github.event_name }}' === 'workflow_dispatch' ? 
+            ${{ github.event.inputs.prerelease || false }} : 
+            false;
+          
+          const release = await github.rest.repos.createRelease({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            tag_name: '${{ steps.version.outputs.version }}',
+            name: 'VERITAS Framework ${{ steps.version.outputs.version }}',
+            body: `# VERITAS Framework ${{ steps.version.outputs.version }}
+            
+            ## 🚀 Release Highlights
+            
+            This release includes:
+            - ✅ Enhanced agent orchestration
+            - ✅ Improved quality gating
+            - ✅ Performance optimizations
+            - ✅ Security hardening (JWT, RBAC, API keys)
+            - ✅ Comprehensive monitoring
+            
+            ${changelog}
+            
+            ## 📦 Installation
+            
+            ### Docker
+            \`\`\`bash
+            docker pull ghcr.io/${{ github.repository }}/backend:${{ steps.version.outputs.version }}
+            docker pull ghcr.io/${{ github.repository }}/frontend:${{ steps.version.outputs.version }}
+            \`\`\`
+            
+            ### Python Package
+            \`\`\`bash
+            pip install veritas-framework==${{ steps.version.outputs.version }}
+            \`\`\`
+            
+            ## 🔧 Upgrade Guide
+            
+            See [UPGRADE.md](https://github.com/${{ github.repository }}/blob/main/docs/UPGRADE.md) for upgrade instructions.
+            
+            ## 📚 Documentation
+            
+            - [API Documentation](https://github.com/${{ github.repository }}/blob/main/docs/VERITAS_API_BACKEND_DOCUMENTATION.md)
+            - [User Guide](https://github.com/${{ github.repository }}/blob/main/README.md)
+            - [Architecture](https://github.com/${{ github.repository }}/blob/main/docs/PROJECT_STRUCTURE.md)
+            `,
+            draft: false,
+            prerelease: isPrerelease,
+            generate_release_notes: true
+          });
+          
+          core.setOutput('upload_url', release.data.upload_url);
+          return release.data.id;
+
+  # ============================================================================
+  # Build Release Artifacts
+  # ============================================================================
+  build-artifacts:
+    name: Build Release Artifacts
+    runs-on: ${{ matrix.os }}
+    needs: create-release
+    
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.11']
+        
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install build wheel setuptools
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      shell: bash
+      
+    - name: Build package
+      run: |
+        python -m build
+        
+    - name: Create distribution archive
+      run: |
+        tar czf veritas-${{ needs.create-release.outputs.version }}-${{ matrix.os }}.tar.gz dist/
+      shell: bash
+      if: matrix.os != 'windows-latest'
+      
+    - name: Create distribution archive (Windows)
+      run: |
+        7z a -tzip veritas-${{ needs.create-release.outputs.version }}-${{ matrix.os }}.zip dist/
+      if: matrix.os == 'windows-latest'
+      
+    - name: Upload release asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.create-release.outputs.upload_url }}
+        asset_path: ./veritas-${{ needs.create-release.outputs.version }}-${{ matrix.os }}.${{ matrix.os == 'windows-latest' && 'zip' || 'tar.gz' }}
+        asset_name: veritas-${{ needs.create-release.outputs.version }}-${{ matrix.os }}.${{ matrix.os == 'windows-latest' && 'zip' || 'tar.gz' }}
+        asset_content_type: application/${{ matrix.os == 'windows-latest' && 'zip' || 'gzip' }}
+
+  # ============================================================================
+  # Publish to PyPI
+  # ============================================================================
+  publish-pypi:
+    name: Publish to PyPI
+    runs-on: ubuntu-latest
+    needs: create-release
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install build twine
+        
+    - name: Build package
+      run: |
+        python -m build
+        
+    - name: Publish to PyPI
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+      run: |
+        twine upload dist/*
+      if: secrets.PYPI_API_TOKEN != ''
+      continue-on-error: true
+
+  # ============================================================================
+  # Update Documentation
+  # ============================================================================
+  update-docs:
+    name: Update Documentation
+    runs-on: ubuntu-latest
+    needs: create-release
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        ref: main
+        token: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Update version in README
+      run: |
+        VERSION="${{ needs.create-release.outputs.version }}"
+        sed -i "s/Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/Version: $VERSION/g" README.md
+        
+    - name: Update CHANGELOG
+      run: |
+        VERSION="${{ needs.create-release.outputs.version }}"
+        DATE=$(date +%Y-%m-%d)
+        
+        # Create new CHANGELOG entry
+        cat > CHANGELOG_NEW.md << EOF
+        # Changelog
+        
+        ## [$VERSION] - $DATE
+        
+        See [GitHub Release](https://github.com/${{ github.repository }}/releases/tag/$VERSION) for details.
+        
+        EOF
+        
+        # Append old changelog if exists
+        if [ -f CHANGELOG.md ]; then
+          tail -n +2 CHANGELOG.md >> CHANGELOG_NEW.md
+        fi
+        
+        mv CHANGELOG_NEW.md CHANGELOG.md
+        
+    - name: Commit documentation updates
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add README.md CHANGELOG.md
+        git commit -m "docs: Update documentation for ${{ needs.create-release.outputs.version }}" || echo "No changes to commit"
+        git push
+      continue-on-error: true
+
+  # ============================================================================
+  # Notify Release
+  # ============================================================================
+  notify:
+    name: Notify Release
+    runs-on: ubuntu-latest
+    needs: [create-release, build-artifacts, publish-pypi]
+    if: always()
+    
+    steps:
+    - name: Create release announcement
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const version = '${{ needs.create-release.outputs.version }}';
+          
+          // Create a discussion for the release
+          github.rest.repos.createCommitComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            commit_sha: context.sha,
+            body: `## 🎉 New Release: ${version}
+            
+            VERITAS Framework ${version} has been released!
+            
+            📦 Download: https://github.com/${{ github.repository }}/releases/tag/${version}
+            📚 Changelog: See release notes
+            🐳 Docker: \`docker pull ghcr.io/${{ github.repository }}/backend:${version}\`
+            
+            Thank you for using VERITAS Framework!
+            `
+          });
+          
+    - name: Post to Slack (if configured)
+      run: |
+        if [ -n "${{ secrets.SLACK_WEBHOOK }}" ]; then
+          curl -X POST ${{ secrets.SLACK_WEBHOOK }} \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "text": "🚀 VERITAS Framework ${{ needs.create-release.outputs.version }} released!",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*VERITAS Framework ${{ needs.create-release.outputs.version }}* has been released!\n\n📦 Download: https://github.com/${{ github.repository }}/releases/tag/${{ needs.create-release.outputs.version }}"
+                  }
+                }
+              ]
+            }'
+        fi
+      continue-on-error: true

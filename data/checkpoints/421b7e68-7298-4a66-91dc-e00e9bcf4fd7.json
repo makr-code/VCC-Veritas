@@ -1,0 +1,32 @@
+{
+  "checkpoint_id": "421b7e68-7298-4a66-91dc-e00e9bcf4fd7",
+  "plan_id": "test_pause_001",
+  "step_index": 0,
+  "completed_steps": [
+    "step_1"
+  ],
+  "plan_state": {
+    "plan_id": "test_pause_001",
+    "query": "Test pause",
+    "steps": [
+      {
+        "step_id": "step_1",
+        "action": "search"
+      },
+      {
+        "step_id": "step_2",
+        "action": "analyze"
+      },
+      {
+        "step_id": "step_3",
+        "action": "synthesize"
+      }
+    ]
+  },
+  "context": {
+    "orchestration_state": "running",
+    "failed_steps": [],
+    "skipped_steps": []
+  },
+  "timestamp": "2025-10-08T17:41:23.589599"
+}

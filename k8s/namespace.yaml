@@ -1,0 +1,18 @@
+# ======================================================================
+# VERITAS Framework - Kubernetes Namespace
+# ======================================================================
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: veritas-production
+  labels:
+    name: veritas-production
+    environment: production
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: veritas-staging
+  labels:
+    name: veritas-staging
+    environment: staging

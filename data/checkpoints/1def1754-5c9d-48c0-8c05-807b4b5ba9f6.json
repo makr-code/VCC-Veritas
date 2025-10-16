@@ -1,0 +1,36 @@
+{
+  "checkpoint_id": "1def1754-5c9d-48c0-8c05-807b4b5ba9f6",
+  "plan_id": "test_cancel_001",
+  "step_index": 0,
+  "completed_steps": [
+    "step_1"
+  ],
+  "plan_state": {
+    "plan_id": "test_cancel_001",
+    "query": "Test cancellation",
+    "steps": [
+      {
+        "step_id": "step_1",
+        "action": "search"
+      },
+      {
+        "step_id": "step_2",
+        "action": "analyze"
+      },
+      {
+        "step_id": "step_3",
+        "action": "synthesize"
+      },
+      {
+        "step_id": "step_4",
+        "action": "validate"
+      }
+    ]
+  },
+  "context": {
+    "orchestration_state": "running",
+    "failed_steps": [],
+    "skipped_steps": []
+  },
+  "timestamp": "2025-10-08T17:45:26.801832"
+}

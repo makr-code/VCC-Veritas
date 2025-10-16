@@ -1,0 +1,83 @@
+{
+  "query_enrichment": [
+    {
+      "query": "Was brauche ich für eine Baugenehmigung?",
+      "domain": "building",
+      "keywords_found": [
+        "Was",
+        "brauche",
+        "ich",
+        "für",
+        "eine"
+      ],
+      "search_terms_count": 7,
+      "keywords_match": false,
+      "sufficient_search_terms": true,
+      "test_passed": false
+    },
+    {
+      "query": "Welche Emissionsgrenzwerte gelten für Industrieanlagen?",
+      "domain": "environmental",
+      "keywords_found": [
+        "Welche",
+        "Emissionsgrenzwerte",
+        "gelten",
+        "für",
+        "Industrieanlagen?"
+      ],
+      "search_terms_count": 6,
+      "keywords_match": true,
+      "sufficient_search_terms": true,
+      "test_passed": true
+    },
+    {
+      "query": "Wo kann ich in der Innenstadt parken?",
+      "domain": "transport",
+      "keywords_found": [
+        "Wo",
+        "kann",
+        "ich",
+        "in",
+        "der"
+      ],
+      "search_terms_count": 8,
+      "keywords_match": false,
+      "sufficient_search_terms": true,
+      "test_passed": false
+    }
+  ],
+  "user_responses": [
+    {
+      "query": "Was brauche ich für eine Baugenehmigung?",
+      "response_length": 541,
+      "forbidden_found": [],
+      "sufficient_length": true,
+      "has_structure": true,
+      "test_passed": true,
+      "response_preview": "**Für eine Baugenehmigung benötigen Sie:**\n\n• Bauantrag (amtliches Formular)\n• Lageplan mit Grundstücksgrenzen\n• Bauvorlagen (Grundrisse, Schnitte, Ansichten)\n• Statische Berechnungen\n• Baubeschreibun..."
+    },
+    {
+      "query": "Welche Emissionsgrenzwerte gelten für Industrieanlagen?",
+      "response_length": 560,
+      "forbidden_found": [],
+      "sufficient_length": true,
+      "has_structure": true,
+      "test_passed": true,
+      "response_preview": "Für Industrieanlagen gelten bestimmte Emissionsgrenzwerte, um die Umwelt zu schützen. Hier sind die wichtigsten Grenzwerte:\n\n• Immissionsschutzgesetz (BImSchG): Dieses Gesetz regelt die Emissionsgrenz..."
+    },
+    {
+      "query": "Wo kann ich in der Innenstadt parken?",
+      "response_length": 720,
+      "forbidden_found": [],
+      "sufficient_length": true,
+      "has_structure": true,
+      "test_passed": true,
+      "response_preview": "**Innenstadt-Parken**\n\nIn der Innenstadt gibt es verschiedene Parkmöglichkeiten. Hier sind einige Optionen:\n\n• **Parkplätze**: Es gibt mehrere öffentliche Parkplätze in der Innenstadt, wie z.B. das Pa..."
+    }
+  ],
+  "validation": {
+    "total_tests": 6,
+    "passed_tests": 4,
+    "failed_tests": 2
+  }
+}

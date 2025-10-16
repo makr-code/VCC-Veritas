@@ -1,0 +1,304 @@
+{
+  "phase_id": "synthesis",
+  "phase_name": "Evidenz-Synthese",
+  "version": "1.0.0",
+  
+  "system_prompt": {
+    "role": "Du bist ein wissenschaftlicher Assistent für systematische Evidenz-Aggregation.",
+    "task": "Aggregiere die RAG-Ergebnisse zu thematischen Evidenz-Clustern und identifiziere Verbindungen zwischen Quellen.",
+    "methodology": "Befolge die Prinzipien: evidenzbasiert, transparent, strukturiert, präzise."
+  },
+  
+  "instructions": [
+    {
+      "step": 1,
+      "action": "Erstelle Evidence Clusters",
+      "description": "Gruppiere RAG-Ergebnisse nach thematischen Schwerpunkten",
+      "requirements": [
+        "Mindestens 1 Cluster",
+        "Jedes Cluster hat ein klares Thema",
+        "Cluster enthalten verwandte Quellen",
+        "Keine Überlappung zwischen Clustern"
+      ],
+      "cluster_types": [
+        {
+          "type": "legal_framework",
+          "description": "Gesetzliche Grundlagen (z.B. 'Verfahrensfreiheit BW')",
+          "example": "LBO BW § 50 + Verwaltungsvorschrift + Merkblatt"
+        },
+        {
+          "type": "case_law",
+          "description": "Rechtsprechung (z.B. 'VGH-Urteile zu Carports')",
+          "example": "VGH Mannheim 3 S 2543/19 + VGH Stuttgart 8 S 1234/18"
+        },
+        {
+          "type": "procedural",
+          "description": "Verfahrensablauf (z.B. 'Antragsstellung')",
+          "example": "Bauantrag-Formular + Checkliste + Fristen"
+        },
+        {
+          "type": "technical",
+          "description": "Technische Anforderungen (z.B. 'Abstandsflächen')",
+          "example": "LBO BW § 5 + DIN-Normen + Planungsrichtlinien"
+        }
+      ],
+      "examples": {
+        "good": [
+          {
+            "theme": "Verfahrensfreiheit Baden-Württemberg",
+            "sources": [
+              {"source": "LBO BW § 50 Abs. 1", "content": "Gebäude ohne Aufenthaltsräume bis 30m² sind verfahrensfrei"},
+              {"source": "VGH Mannheim 3 S 2543/19", "content": "Carport gilt als Gebäude ohne Aufenthaltsraum"}
+            ],
+            "synthesis": "In BW sind Carports <30m² ohne Aufenthaltsräume verfahrensfrei."
+          }
+        ],
+        "bad": [
+          {
+            "theme": "Baurecht",
+            "sources": ["verschiedene Quellen"],
+            "synthesis": "Es gibt Regeln für Carports."
+          }
+        ]
+      }
+    },
+    {
+      "step": 2,
+      "action": "Bewerte jede Quelle im Cluster",
+      "description": "Für jede Quelle: Inhalt, Confidence, Beziehungen zu anderen Quellen",
+      "source_properties": {
+        "source": {
+          "description": "Präzise Quellenangabe",
+          "format": "Gesetz § X, VGH Ort Az., Merkblatt Titel",
+          "examples": ["LBO BW § 50 Abs. 1", "VGH Mannheim 3 S 2543/19", "Merkblatt Verfahrensfreie Bauvorhaben (2023)"]
+        },
+        "content": {
+          "description": "Relevanter Inhalt der Quelle (1-2 Sätze)",
+          "requirements": ["Konkret", "Zitierbar", "Relevant für Hypothese"]
+        },
+        "confidence": {
+          "description": "Quellenqualität gemäß Hierarchie",
+          "scale": {
+            "gesetz": {"range": [0.95, 1.0], "example": "LBO BW § 50: 0.98"},
+            "rechtsprechung": {"range": [0.85, 0.95], "example": "VGH-Urteil: 0.90"},
+            "verwaltungsvorschrift": {"range": [0.75, 0.85], "example": "VwV: 0.80"},
+            "merkblatt": {"range": [0.6, 0.75], "example": "Merkblatt: 0.65"},
+            "unbekannt": {"range": [0.4, 0.6], "example": "Forum-Post: 0.45"}
+          }
+        },
+        "contradicts": {
+          "description": "Liste von Quellen, die dieser Quelle widersprechen",
+          "format": ["source_id1", "source_id2"]
+        },
+        "supports": {
+          "description": "Liste von Quellen, die diese Quelle unterstützen",
+          "format": ["source_id3", "source_id4"]
+        }
+      }
+    },
+    {
+      "step": 3,
+      "action": "Synthetisiere jedes Cluster",
+      "description": "Fasse die Kernaussage des Clusters zusammen",
+      "requirements": [
+        "1-2 Sätze pro Cluster",
+        "Konkrete Aussage (keine Allgemeinplätze)",
+        "Referenziert die stärksten Quellen",
+        "Erwähnt Widersprüche (falls vorhanden)"
+      ],
+      "examples": {
+        "good": [
+          "✅ In Baden-Württemberg sind Carports bis 30m² ohne Aufenthaltsräume gemäß LBO BW § 50 Abs. 1 verfahrensfrei, bestätigt durch VGH Mannheim 3 S 2543/19.",
+          "✅ Die Abstandsflächen betragen mindestens 2,5m zur Nachbargrenze (LBO BW § 5 Abs. 1), können aber bei Zustimmung des Nachbarn unterschritten werden (§ 5 Abs. 7)."
+        ],
+        "bad": [
+          "❌ Es gibt verschiedene Regelungen zu Carports.",
+          "❌ Baurecht ist komplex und bundeslandspezifisch.",
+          "❌ Mehrere Quellen behandeln das Thema."
+        ]
+      }
+    },
+    {
+      "step": 4,
+      "action": "Bewerte Cluster-Stärke",
+      "description": "Wie stark ist die Evidenz-Basis dieses Clusters?",
+      "calculation": {
+        "method": "Weighted average of source confidences",
+        "formula": "strength = (sum(source.confidence * source.weight)) / sum(source.weight)",
+        "weights": {
+          "gesetz": 1.0,
+          "rechtsprechung": 0.9,
+          "verwaltungsvorschrift": 0.7,
+          "merkblatt": 0.5,
+          "unbekannt": 0.3
+        }
+      },
+      "thresholds": {
+        "very_strong": {"range": [0.9, 1.0], "description": "Mehrere hochwertige Quellen, keine Widersprüche"},
+        "strong": {"range": [0.75, 0.9], "description": "Gute Quellen, wenige Widersprüche"},
+        "moderate": {"range": [0.5, 0.75], "description": "Gemischte Quellen, einige Widersprüche"},
+        "weak": {"range": [0.3, 0.5], "description": "Niedrigwertige Quellen, viele Widersprüche"},
+        "very_weak": {"range": [0.0, 0.3], "description": "Sehr schwache/widersprüchliche Evidenz"}
+      }
+    },
+    {
+      "step": 5,
+      "action": "Identifiziere Cross-References",
+      "description": "Welche Cluster beziehen sich aufeinander?",
+      "relationship_types": [
+        {
+          "type": "supports",
+          "description": "Cluster B unterstützt/erweitert Cluster A",
+          "example": "Cluster 'Abstandsflächen' unterstützt Cluster 'Verfahrensfreiheit' (beides muss erfüllt sein)"
+        },
+        {
+          "type": "contradicts",
+          "description": "Cluster B widerspricht Cluster A",
+          "example": "Cluster 'Gewerbliche Nutzung' widerspricht Cluster 'Verfahrensfreiheit' (unterschiedliche Regeln)"
+        },
+        {
+          "type": "extends",
+          "description": "Cluster B erweitert Cluster A um Details",
+          "example": "Cluster 'Sonderregelungen Denkmalschutz' erweitert Cluster 'Baugenehmigung' (zusätzliche Anforderungen)"
+        },
+        {
+          "type": "prerequisite",
+          "description": "Cluster A ist Voraussetzung für Cluster B",
+          "example": "Cluster 'Verfahrensfreiheit' ist Voraussetzung für Cluster 'Bauanzeige' (statt Bauantrag)"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": "Erstelle Synthesis Summary",
+      "description": "Gesamtzusammenfassung aller Evidenzen",
+      "requirements": [
+        "2-3 Sätze",
+        "Überblick über alle Cluster",
+        "Erwähnung der stärksten Evidenzen",
+        "Hinweis auf kritische Widersprüche (falls vorhanden)"
+      ],
+      "example": "Die Evidenz-Basis zeigt, dass Carports in Baden-Württemberg unter bestimmten Voraussetzungen verfahrensfrei sind (Cluster 'Verfahrensfreiheit', Stärke 0.92). Zusätzlich müssen jedoch Abstandsflächen eingehalten werden (Cluster 'Abstandsflächen', Stärke 0.88). Es gibt keine widersprüchlichen Quellen; die Rechtslage ist eindeutig."
+    }
+  ],
+  
+  "output_format": {
+    "type": "json",
+    "schema_reference": "default_method.json > phases[1] > output_schema",
+    "required_fields": ["evidence_clusters", "cross_references", "synthesis_summary"]
+  },
+  
+  "quality_guidelines": {
+    "evidence_clusters": {
+      "min_items": 1,
+      "max_items": 10,
+      "best_practice": "3-5 Cluster (zu viele = zu granular, zu wenige = zu grob)",
+      "avoid": ["Cluster mit nur 1 Quelle (außer sehr stark)", "Überlappende Cluster", "Cluster ohne klares Thema"]
+    },
+    "sources": {
+      "min_per_cluster": 1,
+      "best_practice": "2-5 Quellen pro Cluster",
+      "confidence_calibration": "Nutze source_quality_hierarchy aus scientific_foundation.json"
+    },
+    "synthesis": {
+      "min_length": 20,
+      "max_length": 200,
+      "must_reference": "Stärkste Quelle im Cluster"
+    },
+    "cluster_strength": {
+      "calculation": "Gewichteter Durchschnitt der Source Confidences",
+      "avoid": ["strength > 0.9 ohne hochwertige Quellen", "strength < 0.3 bei vorhandenen Gesetzen"]
+    }
+  },
+  
+  "example_output": {
+    "evidence_clusters": [
+      {
+        "theme": "Verfahrensfreiheit Baden-Württemberg",
+        "sources": [
+          {
+            "source": "LBO BW § 50 Abs. 1",
+            "content": "Gebäude ohne Aufenthaltsräume bis 30m² Brutto-Grundfläche sind verfahrensfrei",
+            "confidence": 0.98,
+            "contradicts": [],
+            "supports": ["VGH Mannheim 3 S 2543/19"]
+          },
+          {
+            "source": "VGH Mannheim 3 S 2543/19",
+            "content": "Carport ohne Aufenthaltsraum fällt unter § 50 LBO BW",
+            "confidence": 0.90,
+            "contradicts": [],
+            "supports": ["LBO BW § 50 Abs. 1"]
+          },
+          {
+            "source": "Merkblatt Verfahrensfreie Bauvorhaben (2023)",
+            "content": "Übersicht verfahrensfreier Vorhaben inkl. Carports <30m²",
+            "confidence": 0.65,
+            "contradicts": [],
+            "supports": ["LBO BW § 50 Abs. 1"]
+          }
+        ],
+        "synthesis": "In Baden-Württemberg sind Carports bis 30m² ohne Aufenthaltsräume gemäß LBO BW § 50 Abs. 1 verfahrensfrei, bestätigt durch VGH Mannheim 3 S 2543/19.",
+        "strength": 0.92
+      },
+      {
+        "theme": "Abstandsflächen",
+        "sources": [
+          {
+            "source": "LBO BW § 5 Abs. 1",
+            "content": "Mindestabstand zur Nachbargrenze: 2,5m (bei Wandhöhe <3m)",
+            "confidence": 0.98,
+            "contradicts": [],
+            "supports": []
+          },
+          {
+            "source": "LBO BW § 5 Abs. 7",
+            "content": "Abweichungen mit Zustimmung des Nachbarn möglich",
+            "confidence": 0.98,
+            "contradicts": [],
+            "supports": ["LBO BW § 5 Abs. 1"]
+          }
+        ],
+        "synthesis": "Carports müssen mindestens 2,5m Abstand zur Nachbargrenze einhalten (LBO BW § 5), Unterschreitung mit Nachbarzustimmung möglich.",
+        "strength": 0.98
+      }
+    ],
+    "cross_references": [
+      {
+        "cluster1": "Verfahrensfreiheit Baden-Württemberg",
+        "cluster2": "Abstandsflächen",
+        "relationship": "prerequisite: Verfahrensfreiheit gilt nur bei Einhaltung der Abstandsflächen"
+      }
+    ],
+    "synthesis_summary": "Die Evidenz-Basis zeigt eine klare Rechtslage: Carports bis 30m² ohne Aufenthaltsräume sind in Baden-Württemberg verfahrensfrei (LBO BW § 50, Stärke 0.92), müssen aber Abstandsflächen von 2,5m einhalten (LBO BW § 5, Stärke 0.98). Keine widersprüchlichen Quellen identifiziert."
+  },
+  
+  "common_mistakes": [
+    {
+      "mistake": "Cluster ohne klares Thema",
+      "example": "theme: 'Verschiedene Regelungen'",
+      "correction": "theme: 'Verfahrensfreiheit Baden-Württemberg'"
+    },
+    {
+      "mistake": "Zu viele Cluster (Über-Granularität)",
+      "example": "10 Cluster mit je 1 Quelle",
+      "correction": "3-5 Cluster mit je 2-5 Quellen"
+    },
+    {
+      "mistake": "Confidence nicht gemäß Hierarchie",
+      "example": "Merkblatt: confidence 0.95",
+      "correction": "Merkblatt: confidence 0.60-0.75 (gemäß source_quality_hierarchy)"
+    },
+    {
+      "mistake": "Synthesis ohne Quellenreferenz",
+      "example": "synthesis: 'Carports sind meist genehmigungsfrei'",
+      "correction": "synthesis: 'In BW sind Carports <30m² gemäß LBO BW § 50 verfahrensfrei'"
+    }
+  ],
+  
+  "template_variables": {
+    "hypothesis": "Output von Phase 1 (Hypothesengenerierung)",
+    "rag_results": "RAG-Suchergebnisse (15-50 Dokumente)",
+    "scientific_foundation": "source_quality_hierarchy aus scientific_foundation.json"
+  }
+}

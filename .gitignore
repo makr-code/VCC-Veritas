@@ -1,0 +1,9 @@
+
+# ========================================
+# PKI Storage (removed - using external C:\VCC\PKI service)
+# Added: 20251014_065107
+# ========================================
+ca_storage/
+pki_storage/
+temp_ca.pem
+backups/pki-cleanup-*/

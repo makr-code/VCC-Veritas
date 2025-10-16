@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "veritas.fullname" . }}-config
+  labels:
+    {{- include "veritas.labels" . | nindent 4 }}
+data:
+  # Application settings
+  VERITAS_ENV: {{ .Values.config.veritas.env | quote }}
+  LOG_LEVEL: {{ .Values.config.veritas.logLevel | quote }}
+  LOG_FORMAT: {{ .Values.config.veritas.logFormat | quote }}
+  
+  # API settings
+  API_VERSION: {{ .Values.config.api.version | quote }}
+  API_PREFIX: {{ .Values.config.api.prefix | quote }}
+  ENABLE_CORS: {{ .Values.config.api.enableCors | quote }}
+  CORS_ORIGINS: {{ .Values.config.api.corsOrigins | quote }}
+  
+  # Worker settings
+  WORKER_CONCURRENCY: {{ .Values.config.worker.concurrency | quote }}
+  WORKER_PREFETCH_MULTIPLIER: {{ .Values.config.worker.prefetchMultiplier | quote }}
+  WORKER_MAX_TASKS_PER_CHILD: {{ .Values.config.worker.maxTasksPerChild | quote }}
+  
+  # Database settings
+  DB_POOL_SIZE: {{ .Values.config.database.poolSize | quote }}
+  DB_MAX_OVERFLOW: {{ .Values.config.database.maxOverflow | quote }}
+  DB_POOL_TIMEOUT: {{ .Values.config.database.poolTimeout | quote }}
+  DB_POOL_RECYCLE: {{ .Values.config.database.poolRecycle | quote }}
+  
+  # Redis settings
+  REDIS_MAX_CONNECTIONS: {{ .Values.config.redis.maxConnections | quote }}
+  REDIS_SOCKET_TIMEOUT: {{ .Values.config.redis.socketTimeout | quote }}
+  REDIS_SOCKET_CONNECT_TIMEOUT: {{ .Values.config.redis.socketConnectTimeout | quote }}
+  
+  # Rate limiting
+  RATE_LIMIT_ENABLED: {{ .Values.config.rateLimit.enabled | quote }}
+  RATE_LIMIT_DEFAULT: {{ .Values.config.rateLimit.default | quote }}
+  RATE_LIMIT_AUTH: {{ .Values.config.rateLimit.auth | quote }}
+  
+  # Session settings
+  SESSION_LIFETIME: {{ .Values.config.session.lifetime | quote }}
+  SESSION_REFRESH_LIFETIME: {{ .Values.config.session.refreshLifetime | quote }}
+  
+  # File upload
+  MAX_UPLOAD_SIZE: {{ .Values.config.upload.maxSize | quote }}
+  ALLOWED_EXTENSIONS: {{ .Values.config.upload.allowedExtensions | quote }}
+  
+  # Agent execution
+  AGENT_TIMEOUT: {{ .Values.config.agent.timeout | quote }}
+  MAX_CONCURRENT_AGENTS: {{ .Values.config.agent.maxConcurrent | quote }}
+  
+  # Quality settings
+  QUALITY_THRESHOLD: {{ .Values.config.quality.threshold | quote }}
+  ENABLE_AUTO_REVIEW: {{ .Values.config.quality.enableAutoReview | quote }}
+  
+  # Monitoring
+  METRICS_ENABLED: {{ .Values.config.monitoring.metricsEnabled | quote }}
+  TRACING_ENABLED: {{ .Values.config.monitoring.tracingEnabled | quote }}
+  TRACING_SAMPLE_RATE: {{ .Values.config.monitoring.tracingSampleRate | quote }}

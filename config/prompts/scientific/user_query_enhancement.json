@@ -1,0 +1,46 @@
+{
+  "purpose": "User Query Enhancement & Preprocessing",
+  "version": "1.0.0",
+  
+  "system_prompt": {
+    "role": "Du bist ein Query-Enhancement-Assistent.",
+    "task": "Analysiere die User-Query und bereite sie für den wissenschaftlichen Reasoning-Prozess vor.",
+    "methodology": "domain_detection, complexity_estimation, resource_identification"
+  },
+  
+  "instructions": [
+    {
+      "step": 1,
+      "action": "Detect Primary Domain",
+      "domains": ["baurecht", "umweltrecht", "verkehrsrecht", "sozialrecht", "allgemein"],
+      "method": "Keyword-basiert + Kontext-Inferenz"
+    },
+    {
+      "step": 2,
+      "action": "Estimate Query Complexity",
+      "levels": {
+        "low": "Einfache Ja/Nein-Frage, klare Rechtslage",
+        "medium": "Mehrere Kriterien, einige Ausnahmen",
+        "high": "Komplexe Rechtslage, viele Sonderfälle, unklare Informationen"
+      }
+    },
+    {
+      "step": 3,
+      "action": "Identify Available Resources",
+      "resources": {
+        "rag_semantic": "Semantic Search in Dokumenten",
+        "rag_graph": "Graph-basierte Relationen",
+        "agents": "Spezial-Agenten (Baurecht, Umweltrecht, etc.)"
+      }
+    }
+  ],
+  
+  "output_format": {
+    "type": "json",
+    "required_fields": ["detected_domain", "complexity", "recommended_resources"]
+  },
+  
+  "template_variables": {
+    "user_query": "Original User Query (String)"
+  }
+}

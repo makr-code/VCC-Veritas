@@ -1,0 +1,270 @@
+{
+  "phase_id": "validation",
+  "phase_name": "Hypothesen-Validierung",
+  "version": "1.0.0",
+  
+  "system_prompt": {
+    "role": "Du bist ein wissenschaftlicher Assistent für systematische Hypothesen-Validierung.",
+    "task": "Teste die initiale Hypothese gegen die gesammelten und analysierten Evidenzen.",
+    "methodology": "Befolge die Prinzipien: evidenzbasiert, transparent, strukturiert, präzise."
+  },
+  
+  "instructions": [
+    {
+      "step": 1,
+      "action": "Bestimme Validation Status",
+      "description": "Wie gut wird die Hypothese durch die Evidenzen gestützt?",
+      "status_levels": [
+        {
+          "status": "confirmed",
+          "description": "Hypothese wird durch starke Evidenzen vollständig bestätigt",
+          "criteria": [
+            "Mindestens 3 hochwertige Quellen (confidence ≥ 0.85) unterstützen die Hypothese",
+            "Keine widersprüchlichen Evidenzen",
+            "Alle required_criteria aus Phase 1 sind erfüllt"
+          ],
+          "example": "Hypothese 'Carport <30m² ist verfahrensfrei' bestätigt durch LBO BW § 50 (0.98) + VGH-Urteil (0.90) + VwV (0.80)"
+        },
+        {
+          "status": "partially_confirmed",
+          "description": "Hypothese wird teilweise bestätigt, mit Einschränkungen",
+          "criteria": [
+            "Einige gute Quellen (confidence ≥ 0.70) unterstützen die Hypothese",
+            "Wenige widersprüchliche Evidenzen (severity ≤ minor)",
+            "Die meisten required_criteria sind erfüllt"
+          ],
+          "example": "Hypothese 'Carport ist verfahrensfrei' teilweise bestätigt, aber Abstandsflächen müssen noch geprüft werden"
+        },
+        {
+          "status": "rejected",
+          "description": "Hypothese wird durch starke Evidenzen widerlegt",
+          "criteria": [
+            "Hochwertige Quellen widersprechen der Hypothese direkt",
+            "Widersprüchliche Evidenzen überwiegen unterstützende Evidenzen",
+            "Kritische required_criteria können nicht erfüllt werden"
+          ],
+          "example": "Hypothese 'Carport ist verfahrensfrei' widerlegt durch Denkmalschutzgesetz (Sonderfall)"
+        },
+        {
+          "status": "inconclusive",
+          "description": "Evidenz-Lage ist unklar oder widersprüchlich",
+          "criteria": [
+            "Gleichstarke widersprüchliche Evidenzen",
+            "Zu wenige Evidenzen vorhanden",
+            "Kritische Informationen fehlen"
+          ],
+          "example": "Hypothese 'Carport ist verfahrensfrei' unklar, da Bundesland unbekannt und keine spezifischen Quellen vorhanden"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": "Sammle unterstützende Evidenzen",
+      "description": "Liste alle Evidenzen, die die Hypothese unterstützen",
+      "requirements": [
+        "Mindestens 1 Evidenz (falls vorhanden)",
+        "Sortiert nach Stärke (höchste Confidence zuerst)",
+        "Konkrete Quellenangabe + Inhalt",
+        "Strength-Bewertung (0.0-1.0)"
+      ],
+      "evidence_structure": {
+        "source": "Präzise Quellenangabe (z.B. 'LBO BW § 50 Abs. 1')",
+        "evidence": "Konkrete Aussage, die die Hypothese unterstützt (1-2 Sätze)",
+        "strength": "Evidenz-Stärke (0.0-1.0, basierend auf source_quality_hierarchy)"
+      },
+      "example": {
+        "source": "LBO BW § 50 Abs. 1",
+        "evidence": "Gebäude ohne Aufenthaltsräume bis 30m² Brutto-Grundfläche sind verfahrensfrei",
+        "strength": 0.98
+      }
+    },
+    {
+      "step": 3,
+      "action": "Sammle widersprüchliche Evidenzen",
+      "description": "Liste alle Evidenzen, die der Hypothese widersprechen",
+      "requirements": [
+        "Alle widersprüchlichen Evidenzen auflisten (auch scheinbare)",
+        "Sortiert nach Severity (critical zuerst)",
+        "Konkrete Quellenangabe + Widerspruch",
+        "Severity-Bewertung (critical/major/minor)"
+      ],
+      "evidence_structure": {
+        "source": "Präzise Quellenangabe",
+        "evidence": "Konkrete Aussage, die der Hypothese widerspricht",
+        "severity": "critical | major | minor"
+      },
+      "severity_definitions": {
+        "critical": "Fundamentaler Widerspruch, der die Hypothese vollständig widerlegt",
+        "major": "Wichtiger Widerspruch, der die Hypothese stark einschränkt",
+        "minor": "Kleinerer Widerspruch, der die Hypothese leicht modifiziert"
+      },
+      "example": {
+        "source": "Denkmalschutzgesetz BW § 8",
+        "evidence": "In Denkmalschutzgebieten ist auch für verfahrensfreie Vorhaben eine Genehmigung erforderlich",
+        "severity": "major"
+      }
+    },
+    {
+      "step": 4,
+      "action": "Passe Hypothese an (falls nötig)",
+      "description": "Wenn die Hypothese teilweise widerlegt wurde: Formuliere angepasste Hypothese",
+      "adjustment_triggers": [
+        "validation_status = 'partially_confirmed' oder 'rejected'",
+        "Widersprüchliche Evidenzen mit severity ≥ major",
+        "Wichtige required_criteria können nicht erfüllt werden"
+      ],
+      "adjustment_process": {
+        "step_1": "Identifiziere den Kern-Widerspruch",
+        "step_2": "Formuliere angepasste Hypothese, die den Widerspruch adressiert",
+        "step_3": "Begründe die Anpassung (welche Evidenz führte dazu?)",
+        "step_4": "Bewerte, ob angepasste Hypothese alle Evidenzen vereinbart"
+      },
+      "examples": {
+        "original_hypothesis": "Ein Carport ist in Baden-Württemberg verfahrensfrei.",
+        "contradicting_evidence": "Denkmalschutzgesetz BW § 8: In Denkmalschutzgebieten genehmigungspflichtig",
+        "adjusted_hypothesis": "Ein Carport ist in Baden-Württemberg verfahrensfrei, außer in Denkmalschutzgebieten.",
+        "adjustment_reason": "Denkmalschutzgesetz BW § 8 schränkt die allgemeine Verfahrensfreiheit ein (Spezialgesetz geht vor)"
+      }
+    },
+    {
+      "step": 5,
+      "action": "Bewerte Validation Confidence",
+      "description": "Wie sicher ist die Validierung?",
+      "calculation": {
+        "method": "Gewichteter Score basierend auf Evidenz-Balance",
+        "factors": [
+          "Anzahl + Stärke unterstützender Evidenzen (positive)",
+          "Anzahl + Severity widersprüchlicher Evidenzen (negative)",
+          "Vollständigkeit der required_criteria (positive)",
+          "Anzahl fehlender Informationen (negative)"
+        ],
+        "formula": "confidence = (support_score - contradiction_penalty + criteria_score - missing_info_penalty) / 4"
+      },
+      "thresholds": {
+        "very_high": {
+          "range": [0.9, 1.0],
+          "criteria": "Status = confirmed, keine Widersprüche, alle Kriterien erfüllt"
+        },
+        "high": {
+          "range": [0.75, 0.9],
+          "criteria": "Status = confirmed oder partially_confirmed, wenige minor Widersprüche"
+        },
+        "medium": {
+          "range": [0.5, 0.75],
+          "criteria": "Status = partially_confirmed, einige major Widersprüche aufgelöst"
+        },
+        "low": {
+          "range": [0.3, 0.5],
+          "criteria": "Status = inconclusive, viele Widersprüche oder fehlende Infos"
+        },
+        "very_low": {
+          "range": [0.0, 0.3],
+          "criteria": "Status = rejected oder inconclusive mit kritischen Widersprüchen"
+        }
+      }
+    }
+  ],
+  
+  "output_format": {
+    "type": "json",
+    "schema_reference": "default_method.json > phases[3] > output_schema",
+    "required_fields": ["validation_status", "supporting_evidence", "contradicting_evidence", "hypothesis_adjustment", "validation_confidence"]
+  },
+  
+  "quality_guidelines": {
+    "validation_status": {
+      "calibration": "Sei streng! confirmed nur wenn wirklich alle Kriterien erfüllt",
+      "avoid": ["confirmed bei vorhandenen major Widersprüchen", "rejected bei auflösbaren Widersprüchen"]
+    },
+    "supporting_evidence": {
+      "min_items": 0,
+      "best_practice": "Top 3-5 stärkste Evidenzen auflisten (nicht alle)",
+      "sort_order": "Nach strength absteigend sortieren"
+    },
+    "contradicting_evidence": {
+      "completeness": "ALLE widersprüchlichen Evidenzen auflisten (auch minor)",
+      "severity_calibration": "critical nur wenn wirklich fundamentaler Widerspruch"
+    },
+    "hypothesis_adjustment": {
+      "when_required": "Nur bei validation_status = partially_confirmed oder rejected",
+      "adjustment_type": "Spezifizierung (nicht Abschwächung!)",
+      "examples": {
+        "good": "'... verfahrensfrei, außer in Denkmalschutzgebieten' (konkrete Ausnahme)",
+        "bad": "'... könnte verfahrensfrei sein' (vage Abschwächung)"
+      }
+    },
+    "validation_confidence": {
+      "alignment": "Muss zu validation_status passen (confirmed → high confidence)",
+      "conservative": "Lieber zu niedrig als zu hoch"
+    }
+  },
+  
+  "example_output": {
+    "validation_status": "partially_confirmed",
+    "supporting_evidence": [
+      {
+        "source": "LBO BW § 50 Abs. 1",
+        "evidence": "Gebäude ohne Aufenthaltsräume bis 30m² Brutto-Grundfläche sind verfahrensfrei",
+        "strength": 0.98
+      },
+      {
+        "source": "VGH Mannheim 3 S 2543/19",
+        "evidence": "Carport ohne Aufenthaltsraum fällt unter § 50 LBO BW und ist damit verfahrensfrei",
+        "strength": 0.90
+      },
+      {
+        "source": "VwV zu § 50 LBO BW",
+        "evidence": "Überdachte Stellplätze (Carports) bis 30m² gelten als verfahrensfrei",
+        "strength": 0.80
+      }
+    ],
+    "contradicting_evidence": [
+      {
+        "source": "Denkmalschutzgesetz BW § 8",
+        "evidence": "In Denkmalschutzgebieten ist auch für nach LBO verfahrensfreie Vorhaben eine denkmalschutzrechtliche Genehmigung erforderlich",
+        "severity": "major"
+      },
+      {
+        "source": "LBO BW § 5 Abs. 1",
+        "evidence": "Abstandsflächen von mindestens 2,5m sind einzuhalten (kann Verfahrensfreiheit praktisch einschränken)",
+        "severity": "minor"
+      }
+    ],
+    "hypothesis_adjustment": {
+      "original_hypothesis": "Ein Carport unter 30m² ohne Aufenthaltsräume ist in Baden-Württemberg verfahrensfrei.",
+      "adjusted_hypothesis": "Ein Carport unter 30m² ohne Aufenthaltsräume ist in Baden-Württemberg gemäß LBO BW § 50 verfahrensfrei, außer in Denkmalschutzgebieten (Denkmalschutzgesetz BW § 8) und sofern Abstandsflächen eingehalten werden (LBO BW § 5).",
+      "adjustment_reason": "Die ursprüngliche Hypothese wurde durch starke Evidenzen (LBO BW § 50, VGH-Urteil) grundsätzlich bestätigt, aber das Denkmalschutzgesetz BW § 8 bildet eine wichtige Ausnahme (Spezialgesetz geht vor). Zudem sind Abstandsflächen gemäß LBO BW § 5 Voraussetzung für die Verfahrensfreiheit."
+    },
+    "validation_confidence": 0.78
+  },
+  
+  "common_mistakes": [
+    {
+      "mistake": "validation_status = 'confirmed' trotz major Widersprüchen",
+      "example": "status: 'confirmed' obwohl Denkmalschutzgesetz widerspricht",
+      "correction": "status: 'partially_confirmed' + hypothesis_adjustment mit Ausnahme"
+    },
+    {
+      "mistake": "Nur wenige supporting_evidence auflisten",
+      "example": "supporting_evidence: [1 Quelle]",
+      "correction": "Top 3-5 stärkste Evidenzen auflisten (LBO + VGH + VwV)"
+    },
+    {
+      "mistake": "Hypothesis Adjustment ohne konkrete Anpassung",
+      "example": "adjusted_hypothesis: 'Hypothese bleibt gleich'",
+      "correction": "adjusted_hypothesis: '... außer in Denkmalschutzgebieten' (konkret)"
+    },
+    {
+      "mistake": "validation_confidence nicht aligned mit status",
+      "example": "status: 'rejected', confidence: 0.85",
+      "correction": "status: 'rejected' → confidence: 0.2-0.4 (niedrig)"
+    }
+  ],
+  
+  "template_variables": {
+    "hypothesis": "Output von Phase 1 (original hypothesis)",
+    "analysis_result": "Output von Phase 3 (patterns + contradictions + resolutions)",
+    "synthesis_result": "Output von Phase 2 (evidence_clusters)",
+    "scientific_foundation": "source_quality_hierarchy für strength-Bewertung"
+  }
+}

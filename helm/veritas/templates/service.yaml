@@ -1,0 +1,26 @@
+{{- if .Values.api.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "veritas.fullname" . }}-api
+  labels:
+    {{- include "veritas.labels" . | nindent 4 }}
+    app.kubernetes.io/component: api
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "{{ .Values.api.service.port }}"
+    prometheus.io/path: "/api/v1/metrics"
+spec:
+  type: {{ .Values.api.service.type }}
+  selector:
+    {{- include "veritas.api.selectorLabels" . | nindent 4 }}
+  ports:
+  - name: http
+    port: {{ .Values.api.service.port }}
+    targetPort: {{ .Values.api.service.targetPort }}
+    protocol: TCP
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
+{{- end }}

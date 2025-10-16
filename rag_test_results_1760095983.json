@@ -1,0 +1,57 @@
+[
+  {
+    "test_id": "Q1",
+    "query": "Welche rechtlichen Voraussetzungen, Fristen und Kosten sind bei der Beantragung einer Baugenehmigung für einen Wohnhaus-Neubau in Baden-Württemberg zu beachten? Bitte erläutere auch mögliche Ausnahmen und vereinfachte Verfahren.",
+    "success": false,
+    "metrics": {},
+    "issues": [
+      "❌ Backend-Fehler: 404 Client Error: Not Found for url: http://localhost:5000/api/rag/query"
+    ],
+    "strengths": [],
+    "duration": 2.0875415802001953
+  },
+  {
+    "test_id": "Q2",
+    "query": "Erkläre detailliert den Unterschied zwischen Baugenehmigungsverfahren, vereinfachtem Genehmigungsverfahren und Genehmigungsfreistellung nach der Landesbauordnung Baden-Württemberg. Welche Bauvorhaben fallen jeweils darunter und welche Unterlagen sind erforderlich?",
+    "success": false,
+    "metrics": {},
+    "issues": [
+      "❌ Backend-Fehler: 404 Client Error: Not Found for url: http://localhost:5000/api/rag/query"
+    ],
+    "strengths": [],
+    "duration": 2.0501458644866943
+  },
+  {
+    "test_id": "Q3",
+    "query": "Was regelt § 58 LBO BW konkret? Wie unterscheidet sich die Regelung von anderen Bundesländern? Welche Änderungen gab es in den letzten Jahren und welche praktischen Auswirkungen haben diese für Bauherren?",
+    "success": false,
+    "metrics": {},
+    "issues": [
+      "❌ Backend-Fehler: 404 Client Error: Not Found for url: http://localhost:5000/api/rag/query"
+    ],
+    "strengths": [],
+    "duration": 2.060316324234009
+  },
+  {
+    "test_id": "Q4",
+    "query": "Welche Anforderungen gelten für den Brandschutz bei Wohngebäuden in Baden-Württemberg? Berücksichtige dabei Gebäudeklassen, Rettungswege, Baustoffe und besondere Anforderungen für Mehrfamilienhäuser. Nenne auch relevante DIN-Normen.",
+    "success": false,
+    "metrics": {},
+    "issues": [
+      "❌ Backend-Fehler: 404 Client Error: Not Found for url: http://localhost:5000/api/rag/query"
+    ],
+    "strengths": [],
+    "duration": 2.061164379119873
+  },
+  {
+    "test_id": "Q5",
+    "query": "Wie ist der Ablauf eines Baugenehmigungsverfahrens in Baden-Württemberg vom Antrag bis zur Genehmigung? Welche Behörden sind beteiligt, welche Fristen gelten, was passiert bei Ablehnung und welche Rechtsmittel stehen dem Bauherrn zur Verfügung?",
+    "success": false,
+    "metrics": {},
+    "issues": [
+      "❌ Backend-Fehler: 404 Client Error: Not Found for url: http://localhost:5000/api/rag/query"
+    ],
+    "strengths": [],
+    "duration": 2.0641114711761475
+  }
+]

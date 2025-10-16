@@ -1,0 +1,948 @@
+{
+  "method_id": "default_scientific_method",
+  "version": "2.0.0",
+  "name": "Standard Wissenschaftliche Methodik mit Supervisor",
+  "description": "8-Phasen wissenschaftliche Methodik mit intelligenter Agent-Auswahl für Verwaltungsfragen",
+  "last_updated": "2025-10-12T03:45:00Z",
+  
+  "supervisor_enabled": false,
+  
+  "_metadata": {
+    "author": "VERITAS System",
+    "use_case": "Administrative queries requiring systematic, evidence-based reasoning with external data sources",
+    "performance_profile": {
+      "avg_execution_time": "50-65s",
+      "phases": 8,
+      "llm_calls": 8,
+      "avg_tokens_per_phase": 800,
+      "supervisor_phases": 3,
+      "agent_execution": "parallel"
+    }
+  },
+  
+  "phases": [
+    {
+      "phase_id": "hypothesis",
+      "phase_number": 1,
+      "name": "Hypothesengenerierung",
+      "description": "Erste wissenschaftliche Vermutung basierend auf RAG-Kontext",
+      
+      "prompt_template": "scientific/phase1_hypothesis.json",
+      
+      "dependencies": {
+        "required_steps": ["rag_semantic", "rag_graph"],
+        "optional_steps": ["nlp_analysis"],
+        "wait_for_completion": true
+      },
+      
+      "execution": {
+        "model": "llama3.2:latest",
+        "temperature": 0.3,
+        "max_tokens": 800,
+        "timeout_seconds": 30,
+        "stream": false
+      },
+      
+      "output_schema": {
+        "type": "object",
+        "required": ["hypothesis", "required_criteria", "missing_information", "confidence", "reasoning"],
+        "properties": {
+          "hypothesis": {
+            "type": "string",
+            "description": "1-2 Sätze: Erste Vermutung zur Beantwortung der Frage",
+            "minLength": 20,
+            "maxLength": 500
+          },
+          "required_criteria": {
+            "type": "array",
+            "description": "Konkrete Kriterien, die geprüft werden müssen",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "maxItems": 10
+          },
+          "missing_information": {
+            "type": "array",
+            "description": "Fehlende Informationen (Nutzer-Input, Daten, Kontext)",
+            "items": {
+              "type": "string"
+            }
+          },
+          "confidence": {
+            "type": "number",
+            "description": "Confidence-Level (0.0-1.0)",
+            "minimum": 0.0,
+            "maximum": 1.0
+          },
+          "reasoning": {
+            "type": "string",
+            "description": "Begründung: Warum diese Hypothese? Welche RAG-Ergebnisse unterstützen sie?",
+            "minLength": 50
+          }
+        }
+      },
+      
+      "retry_policy": {
+        "max_retries": 3,
+        "retry_delay_seconds": 2,
+        "validation_rules": ["json_valid", "schema_valid", "confidence_valid"],
+        "temperature_adjustment": 0.8,
+        "fallback_behavior": "use_conservative_hypothesis"
+      },
+      
+      "quality_checks": {
+        "min_confidence": 0.0,
+        "max_confidence": 1.0,
+        "required_fields": ["hypothesis", "required_criteria", "confidence"],
+        "vague_criteria_threshold": 0.3
+      }
+    },
+    
+    {
+      "phase_id": "supervisor_agent_selection",
+      "phase_number": 1.5,
+      "name": "Intelligente Agent-Auswahl",
+      "description": "LLM-basierte Auswahl von Spezial-Agents basierend auf missing_information aus Hypothesis-Phase",
+      
+      "dependencies": {
+        "required_steps": ["hypothesis"],
+        "optional_steps": [],
+        "wait_for_completion": true
+      },
+      
+      "execution": {
+        "executor": "supervisor",
+        "method": "select_agents",
+        "timeout_seconds": 10,
+        "stream": false
+      },
+      
+      "input_mapping": {
+        "query": "user_query",
+        "missing_information": "phases.hypothesis.output.missing_information",
+        "rag_results": "rag_results",
+        "user_context": "metadata.user_context",
+        "hypothesis": "phases.hypothesis.output.hypothesis"
+      },
+      
+      "output_schema": {
+        "type": "object",
+        "required": ["subqueries", "agent_plan", "selected_agents"],
+        "properties": {
+          "subqueries": {
+            "type": "array",
+            "description": "Atomare Teilfragen für Agent-Execution",
+            "items": {
+              "type": "object",
+              "required": ["id", "query_text", "query_type", "priority"],
+              "properties": {
+                "id": {"type": "string"},
+                "query_text": {"type": "string"},
+                "query_type": {"type": "string"},
+                "priority": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+                "required_capabilities": {"type": "array", "items": {"type": "string"}}
+              }
+            }
+          },
+          "agent_plan": {
+            "type": "object",
+            "description": "Execution-Plan mit parallel/sequential agents",
+            "required": ["parallel_agents", "sequential_agents"],
+            "properties": {
+              "parallel_agents": {
+                "type": "array",
+                "description": "Agents die parallel ausgeführt werden können",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "subquery_id": {"type": "string"},
+                    "agent_type": {"type": "string"},
+                    "confidence_score": {"type": "number"},
+                    "reason": {"type": "string"}
+                  }
+                }
+              },
+              "sequential_agents": {
+                "type": "array",
+                "description": "Agents die sequenziell ausgeführt werden müssen",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "subquery_id": {"type": "string"},
+                    "agent_type": {"type": "string"},
+                    "confidence_score": {"type": "number"},
+                    "reason": {"type": "string"}
+                  }
+                }
+              }
+            }
+          },
+          "selected_agents": {
+            "type": "array",
+            "description": "Liste ausgewählter Agents mit Reasoning",
+            "items": {
+              "type": "object",
+              "required": ["agent_type", "confidence_score", "reason"],
+              "properties": {
+                "agent_type": {"type": "string"},
+                "confidence_score": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+                "reason": {"type": "string"},
+                "matching_capabilities": {"type": "array", "items": {"type": "string"}}
+              }
+            }
+          },
+          "selection_reasoning": {
+            "type": "string",
+            "description": "LLM-Begründung für Agent-Auswahl"
+          }
+        }
+      },
+      
+      "retry_policy": {
+        "max_retries": 2,
+        "retry_delay_seconds": 1,
+        "validation_rules": ["json_valid", "schema_valid"],
+        "fallback_behavior": "use_document_retrieval_only"
+      },
+      
+      "quality_checks": {
+        "max_agents": 5,
+        "min_confidence_per_agent": 0.3
+      }
+    },
+    
+    {
+      "phase_id": "agent_execution",
+      "phase_number": 1.6,
+      "name": "Parallel Agent-Execution",
+      "description": "Führt ausgewählte Spezial-Agents parallel aus um externe Datenquellen zu nutzen",
+      
+      "dependencies": {
+        "required_steps": ["supervisor_agent_selection"],
+        "optional_steps": [],
+        "wait_for_completion": true
+      },
+      
+      "execution": {
+        "executor": "agent_coordinator",
+        "method": "execute_agents",
+        "max_parallel": 5,
+        "timeout_seconds": 30,
+        "stream": false
+      },
+      
+      "input_mapping": {
+        "agent_plan": "phases.supervisor_agent_selection.output.agent_plan",
+        "subqueries": "phases.supervisor_agent_selection.output.subqueries",
+        "rag_results": "rag_results",
+        "user_query": "user_query"
+      },
+      
+      "output_schema": {
+        "type": "object",
+        "required": ["agent_results", "execution_metadata"],
+        "properties": {
+          "agent_results": {
+            "type": "object",
+            "description": "Results per agent type",
+            "additionalProperties": {
+              "type": "object",
+              "required": ["summary", "confidence_score"],
+              "properties": {
+                "summary": {"type": "string", "description": "Agent result summary"},
+                "confidence_score": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+                "processing_time": {"type": "number"},
+                "sources": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "source": {"type": "string"},
+                      "content": {"type": "string"},
+                      "confidence": {"type": "number"}
+                    }
+                  }
+                },
+                "data": {"type": "object", "description": "Agent-specific data"}
+              }
+            }
+          },
+          "execution_metadata": {
+            "type": "object",
+            "required": ["total_agents_executed", "successful_agents", "failed_agents"],
+            "properties": {
+              "total_agents_executed": {"type": "integer"},
+              "successful_agents": {"type": "integer"},
+              "failed_agents": {"type": "integer"},
+              "total_execution_time": {"type": "number"},
+              "agent_execution_order": {"type": "array", "items": {"type": "string"}}
+            }
+          }
+        }
+      },
+      
+      "retry_policy": {
+        "max_retries": 1,
+        "retry_delay_seconds": 2,
+        "validation_rules": ["json_valid", "schema_valid"],
+        "fallback_behavior": "continue_with_partial_results"
+      },
+      
+      "quality_checks": {
+        "min_successful_agents": 1
+      }
+    },
+    
+    {
+      "phase_id": "synthesis",
+      "phase_number": 2,
+      "name": "Evidenz-Synthese",
+      "description": "Aggregation von Evidenzen aus RAG-Ergebnissen zu thematischen Clustern",
+      
+      "prompt_template": "scientific/phase2_synthesis.json",
+      
+      "dependencies": {
+        "required_steps": ["hypothesis"],
+        "optional_steps": [],
+        "wait_for_completion": true
+      },
+      
+      "execution": {
+        "model": "llama3.2:latest",
+        "temperature": 0.2,
+        "max_tokens": 1200,
+        "timeout_seconds": 45,
+        "stream": false
+      },
+      
+      "output_schema": {
+        "type": "object",
+        "required": ["evidence_clusters", "cross_references", "synthesis_summary"],
+        "properties": {
+          "evidence_clusters": {
+            "type": "array",
+            "description": "Thematische Cluster von Evidenzen",
+            "items": {
+              "type": "object",
+              "required": ["theme", "sources", "synthesis", "strength"],
+              "properties": {
+                "theme": {
+                  "type": "string",
+                  "description": "Thema des Clusters (z.B. 'Verfahrensfreiheit BW')"
+                },
+                "sources": {
+                  "type": "array",
+                  "description": "Quellen im Cluster",
+                  "items": {
+                    "type": "object",
+                    "required": ["source", "content", "confidence"],
+                    "properties": {
+                      "source": {"type": "string"},
+                      "content": {"type": "string"},
+                      "confidence": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+                      "contradicts": {"type": "array", "items": {"type": "string"}},
+                      "supports": {"type": "array", "items": {"type": "string"}}
+                    }
+                  }
+                },
+                "synthesis": {
+                  "type": "string",
+                  "description": "Zusammenfassung des Clusters (1-2 Sätze)"
+                },
+                "strength": {
+                  "type": "number",
+                  "description": "Evidenz-Stärke (0.0-1.0)",
+                  "minimum": 0.0,
+                  "maximum": 1.0
+                }
+              }
+            },
+            "minItems": 1
+          },
+          "cross_references": {
+            "type": "array",
+            "description": "Verbindungen zwischen Clustern",
+            "items": {
+              "type": "object",
+              "properties": {
+                "cluster1": {"type": "string"},
+                "cluster2": {"type": "string"},
+                "relationship": {"type": "string"}
+              }
+            }
+          },
+          "synthesis_summary": {
+            "type": "string",
+            "description": "Gesamtzusammenfassung aller Evidenzen (2-3 Sätze)"
+          }
+        }
+      },
+      
+      "retry_policy": {
+        "max_retries": 3,
+        "retry_delay_seconds": 2,
+        "validation_rules": ["json_valid", "schema_valid", "min_clusters"],
+        "temperature_adjustment": 0.8,
+        "fallback_behavior": "use_raw_rag_results"
+      },
+      
+      "quality_checks": {
+        "min_evidence_clusters": 1,
+        "min_sources_per_cluster": 1,
+        "min_cluster_strength": 0.0
+      }
+    },
+    
+    {
+      "phase_id": "analysis",
+      "phase_number": 3,
+      "name": "Mustererkennung & Widerspruchsanalyse",
+      "description": "Identifikation von Mustern, Widersprüchen und Konfliktauflösung",
+      
+      "prompt_template": "scientific/phase3_analysis.json",
+      
+      "dependencies": {
+        "required_steps": ["synthesis"],
+        "optional_steps": [],
+        "wait_for_completion": true
+      },
+      
+      "execution": {
+        "model": "llama3.2:latest",
+        "temperature": 0.25,
+        "max_tokens": 1000,
+        "timeout_seconds": 40,
+        "stream": false
+      },
+      
+      "output_schema": {
+        "type": "object",
+        "required": ["patterns", "contradictions", "conflict_resolution", "analysis_summary"],
+        "properties": {
+          "patterns": {
+            "type": "array",
+            "description": "Erkannte Muster in den Evidenzen",
+            "items": {
+              "type": "object",
+              "required": ["pattern_type", "description", "examples"],
+              "properties": {
+                "pattern_type": {
+                  "type": "string",
+                  "enum": ["legal_framework", "jurisdictional", "temporal", "procedural", "exception"]
+                },
+                "description": {"type": "string"},
+                "examples": {"type": "array", "items": {"type": "string"}},
+                "strength": {"type": "number", "minimum": 0.0, "maximum": 1.0}
+              }
+            }
+          },
+          "contradictions": {
+            "type": "array",
+            "description": "Identifizierte Widersprüche",
+            "items": {
+              "type": "object",
+              "required": ["source1", "source2", "contradiction_type", "severity"],
+              "properties": {
+                "source1": {"type": "string"},
+                "source2": {"type": "string"},
+                "contradiction_type": {"type": "string"},
+                "severity": {
+                  "type": "string",
+                  "enum": ["critical", "major", "minor", "apparent"]
+                },
+                "description": {"type": "string"}
+              }
+            }
+          },
+          "conflict_resolution": {
+            "type": "array",
+            "description": "Aufgelöste Konflikte basierend auf Quellenqualität-Hierarchie",
+            "items": {
+              "type": "object",
+              "properties": {
+                "conflict_id": {"type": "string"},
+                "resolution": {"type": "string"},
+                "reasoning": {"type": "string"},
+                "winning_source": {"type": "string"}
+              }
+            }
+          },
+          "analysis_summary": {
+            "type": "string",
+            "description": "Zusammenfassung der Analyse (2-3 Sätze)"
+          }
+        }
+      },
+      
+      "retry_policy": {
+        "max_retries": 3,
+        "retry_delay_seconds": 2,
+        "validation_rules": ["json_valid", "schema_valid"],
+        "temperature_adjustment": 0.8,
+        "fallback_behavior": "skip_conflict_resolution"
+      },
+      
+      "quality_checks": {
+        "max_unresolved_contradictions": 5
+      }
+    },
+    
+    {
+      "phase_id": "validation",
+      "phase_number": 4,
+      "name": "Hypothesen-Validierung",
+      "description": "Testen der initialen Hypothese gegen gesammelte Evidenzen",
+      
+      "prompt_template": "scientific/phase4_validation.json",
+      
+      "dependencies": {
+        "required_steps": ["hypothesis", "analysis"],
+        "optional_steps": [],
+        "wait_for_completion": true
+      },
+      
+      "execution": {
+        "model": "llama3.2:latest",
+        "temperature": 0.2,
+        "max_tokens": 900,
+        "timeout_seconds": 35,
+        "stream": false
+      },
+      
+      "output_schema": {
+        "type": "object",
+        "required": ["validation_status", "supporting_evidence", "contradicting_evidence", "hypothesis_adjustment", "validation_confidence"],
+        "properties": {
+          "validation_status": {
+            "type": "string",
+            "enum": ["confirmed", "partially_confirmed", "rejected", "inconclusive"],
+            "description": "Status der Hypothesen-Validierung"
+          },
+          "supporting_evidence": {
+            "type": "array",
+            "description": "Evidenzen, die die Hypothese unterstützen",
+            "items": {
+              "type": "object",
+              "properties": {
+                "source": {"type": "string"},
+                "evidence": {"type": "string"},
+                "strength": {"type": "number", "minimum": 0.0, "maximum": 1.0}
+              }
+            }
+          },
+          "contradicting_evidence": {
+            "type": "array",
+            "description": "Evidenzen, die der Hypothese widersprechen",
+            "items": {
+              "type": "object",
+              "properties": {
+                "source": {"type": "string"},
+                "evidence": {"type": "string"},
+                "severity": {"type": "string", "enum": ["critical", "major", "minor"]}
+              }
+            }
+          },
+          "hypothesis_adjustment": {
+            "type": "object",
+            "description": "Anpassung der Hypothese basierend auf Validierung",
+            "properties": {
+              "original_hypothesis": {"type": "string"},
+              "adjusted_hypothesis": {"type": "string"},
+              "adjustment_reason": {"type": "string"}
+            }
+          },
+          "validation_confidence": {
+            "type": "number",
+            "description": "Confidence der Validierung (0.0-1.0)",
+            "minimum": 0.0,
+            "maximum": 1.0
+          }
+        }
+      },
+      
+      "retry_policy": {
+        "max_retries": 3,
+        "retry_delay_seconds": 2,
+        "validation_rules": ["json_valid", "schema_valid", "validation_status_valid"],
+        "temperature_adjustment": 0.8,
+        "fallback_behavior": "mark_inconclusive"
+      },
+      
+      "quality_checks": {
+        "min_supporting_evidence": 0,
+        "critical_contradiction_threshold": 1
+      }
+    },
+    
+    {
+      "phase_id": "conclusion",
+      "phase_number": 5,
+      "name": "Finale Synthese & Schlussfolgerung",
+      "description": "Finale evidenzbasierte Antwort mit Handlungsempfehlungen",
+      
+      "prompt_template": "scientific/phase5_conclusion.json",
+      
+      "dependencies": {
+        "required_steps": ["validation", "analysis"],
+        "optional_steps": [],
+        "wait_for_completion": true
+      },
+      
+      "execution": {
+        "model": "llama3.2:latest",
+        "temperature": 0.15,
+        "max_tokens": 1000,
+        "timeout_seconds": 40,
+        "stream": false
+      },
+      
+      "output_schema": {
+        "type": "object",
+        "required": ["main_answer", "action_recommendations", "confidence", "evidence_summary", "limitations"],
+        "properties": {
+          "main_answer": {
+            "type": "string",
+            "description": "Finale Antwort auf die User-Frage (2-4 Sätze)",
+            "minLength": 50
+          },
+          "action_recommendations": {
+            "type": "array",
+            "description": "Konkrete Handlungsempfehlungen",
+            "items": {
+              "type": "object",
+              "required": ["action", "priority", "reasoning"],
+              "properties": {
+                "action": {"type": "string"},
+                "priority": {"type": "string", "enum": ["high", "medium", "low"]},
+                "reasoning": {"type": "string"},
+                "prerequisites": {"type": "array", "items": {"type": "string"}}
+              }
+            },
+            "minItems": 1
+          },
+          "confidence": {
+            "type": "number",
+            "description": "Finale Confidence (0.0-1.0)",
+            "minimum": 0.0,
+            "maximum": 1.0
+          },
+          "evidence_summary": {
+            "type": "object",
+            "description": "Zusammenfassung der verwendeten Evidenzen",
+            "properties": {
+              "primary_sources": {"type": "array", "items": {"type": "string"}},
+              "secondary_sources": {"type": "array", "items": {"type": "string"}},
+              "total_sources": {"type": "number"}
+            }
+          },
+          "limitations": {
+            "type": "array",
+            "description": "Einschränkungen der Antwort",
+            "items": {"type": "string"}
+          },
+          "next_steps": {
+            "type": "array",
+            "description": "Empfohlene nächste Schritte",
+            "items": {"type": "string"}
+          }
+        }
+      },
+      
+      "retry_policy": {
+        "max_retries": 3,
+        "retry_delay_seconds": 2,
+        "validation_rules": ["json_valid", "schema_valid", "min_answer_length"],
+        "temperature_adjustment": 0.8,
+        "fallback_behavior": "use_hypothesis_as_answer"
+      },
+      
+      "quality_checks": {
+        "min_answer_length": 50,
+        "min_action_recommendations": 1,
+        "min_confidence": 0.0
+      }
+    },
+    
+    {
+      "phase_id": "metacognition",
+      "phase_number": 6,
+      "name": "Metakognitive Selbstbewertung",
+      "description": "Selbstbewertung des gesamten Reasoning-Prozesses",
+      
+      "prompt_template": "scientific/phase6_metacognition.json",
+      
+      "dependencies": {
+        "required_steps": ["conclusion"],
+        "optional_steps": [],
+        "wait_for_completion": true
+      },
+      
+      "execution": {
+        "model": "llama3.2:latest",
+        "temperature": 0.3,
+        "max_tokens": 800,
+        "timeout_seconds": 30,
+        "stream": false
+      },
+      
+      "output_schema": {
+        "type": "object",
+        "required": ["metacognitive_assessment", "information_gaps", "process_quality", "improvement_suggestions"],
+        "properties": {
+          "metacognitive_assessment": {
+            "type": "object",
+            "description": "Selbstbewertung des Reasoning-Prozesses",
+            "required": ["reasoning_quality", "evidence_quality", "confidence_justification"],
+            "properties": {
+              "reasoning_quality": {
+                "type": "string",
+                "enum": ["excellent", "good", "adequate", "poor"],
+                "description": "Qualität des Reasoning-Prozesses"
+              },
+              "evidence_quality": {
+                "type": "string",
+                "enum": ["excellent", "good", "adequate", "poor"],
+                "description": "Qualität der verwendeten Evidenzen"
+              },
+              "confidence_justification": {
+                "type": "string",
+                "description": "Begründung für das finale Confidence-Level"
+              },
+              "improvement_suggestions": {
+                "type": "array",
+                "description": "Vorschläge zur Verbesserung des Prompts/Prozesses",
+                "items": {"type": "string"}
+              }
+            }
+          },
+          "information_gaps": {
+            "type": "array",
+            "description": "Identifizierte Informationslücken",
+            "items": {
+              "type": "object",
+              "properties": {
+                "gap_type": {"type": "string", "enum": ["user_input", "data", "context", "expertise"]},
+                "description": {"type": "string"},
+                "impact": {"type": "string", "enum": ["high", "medium", "low"]},
+                "resolution": {"type": "string"}
+              }
+            }
+          },
+          "process_quality": {
+            "type": "object",
+            "description": "Qualitäts-Metriken des Prozesses",
+            "properties": {
+              "hypothesis_accuracy": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+              "evidence_coverage": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+              "contradiction_resolution_rate": {"type": "number", "minimum": 0.0, "maximum": 1.0}
+            }
+          },
+          "improvement_suggestions": {
+            "type": "array",
+            "description": "Konkrete Vorschläge für Prompt-Improvement",
+            "items": {"type": "string"},
+            "minItems": 0,
+            "maxItems": 10
+          }
+        }
+      },
+      
+      "retry_policy": {
+        "max_retries": 2,
+        "retry_delay_seconds": 2,
+        "validation_rules": ["json_valid", "schema_valid"],
+        "temperature_adjustment": 0.9,
+        "fallback_behavior": "skip_metacognition"
+      },
+      
+      "quality_checks": {
+        "max_improvement_suggestions": 10
+      }
+    },
+    
+    {
+      "phase_id": "agent_result_synthesis",
+      "phase_number": 6.5,
+      "name": "Agent Result Synthesis",
+      "description": "Merge scientific process + agent results zu umfassender finaler Antwort mit externen Datenquellen",
+      
+      "dependencies": {
+        "required_steps": ["metacognition", "agent_execution"],
+        "optional_steps": [],
+        "wait_for_completion": true
+      },
+      
+      "execution": {
+        "executor": "supervisor",
+        "method": "synthesize_results",
+        "timeout_seconds": 15,
+        "stream": false
+      },
+      
+      "input_mapping": {
+        "query": "user_query",
+        "scientific_conclusion": "phases.conclusion.output.final_answer",
+        "scientific_confidence": "phases.conclusion.output.confidence",
+        "agent_results": "phases.agent_execution.output.agent_results",
+        "rag_results": "rag_results",
+        "metacognition": "phases.metacognition.output"
+      },
+      
+      "output_schema": {
+        "type": "object",
+        "required": ["final_answer", "confidence_score", "sources", "synthesis_method"],
+        "properties": {
+          "final_answer": {
+            "type": "string",
+            "description": "Finale Antwort mit allen Quellen (scientific + agents)",
+            "minLength": 50
+          },
+          "confidence_score": {
+            "type": "number",
+            "description": "Blended confidence aus scientific process + agent results",
+            "minimum": 0.0,
+            "maximum": 1.0
+          },
+          "sources": {
+            "type": "array",
+            "description": "Alle Quellen (RAG + Agents + LLM Reasoning)",
+            "items": {
+              "type": "object",
+              "required": ["source_type", "source_name", "confidence"],
+              "properties": {
+                "source_type": {
+                  "type": "string",
+                  "enum": ["rag_vector", "rag_graph", "agent", "llm_reasoning"]
+                },
+                "source_name": {"type": "string"},
+                "content": {"type": "string"},
+                "confidence": {"type": "number", "minimum": 0.0, "maximum": 1.0}
+              }
+            }
+          },
+          "synthesis_method": {
+            "type": "string",
+            "description": "Wie wurden Ergebnisse aggregiert",
+            "enum": ["llm_narrative_generation", "weighted_average", "consensus_based"]
+          },
+          "conflicts_detected": {
+            "type": "array",
+            "description": "Erkannte Konflikte zwischen scientific process und agent results",
+            "items": {
+              "type": "object",
+              "properties": {
+                "conflict_type": {"type": "string"},
+                "description": {"type": "string"},
+                "resolution": {"type": "string"}
+              }
+            }
+          },
+          "subquery_coverage": {
+            "type": "object",
+            "description": "Coverage-Score pro Subquery",
+            "additionalProperties": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 1.0
+            }
+          },
+          "agent_contribution_summary": {
+            "type": "string",
+            "description": "Zusammenfassung: Was haben die Agents beigetragen?"
+          }
+        }
+      },
+      
+      "retry_policy": {
+        "max_retries": 2,
+        "retry_delay_seconds": 2,
+        "validation_rules": ["json_valid", "schema_valid"],
+        "fallback_behavior": "use_scientific_conclusion_only"
+      },
+      
+      "quality_checks": {
+        "min_confidence": 0.0,
+        "max_conflicts": 5
+      }
+    }
+  ],
+  
+  "orchestration_config": {
+    "execution_mode": "sequential_with_supervisor",
+    "description": "Phasen werden sequenziell ausgeführt (1 → 1.5 → 1.6 → 2 → 3 → 4 → 5 → 6 → 6.5) mit Supervisor-Schichten",
+    
+    "phase_execution": {
+      "allow_phase_skip": true,
+      "description": "Supervisor-Phasen können übersprungen werden falls supervisor_enabled=false",
+      "skip_on_error": false,
+      "checkpoint_enabled": true,
+      "checkpoint_frequency": "per_phase",
+      "conditional_phases": ["supervisor_agent_selection", "agent_execution", "agent_result_synthesis"]
+    },
+    
+    "error_handling": {
+      "stop_on_critical_error": true,
+      "critical_phases": ["hypothesis", "conclusion"],
+      "optional_phases": ["metacognition"],
+      "fallback_strategy": "use_partial_results"
+    },
+    
+    "parallelization": {
+      "enabled": false,
+      "description": "Scientific method ist inherently sequential",
+      "future_optimization": "Agent tasks können parallel laufen (via UnifiedOrchestrator)"
+    },
+    
+    "progress_tracking": {
+      "enabled": true,
+      "emit_events": true,
+      "event_types": ["phase_start", "phase_complete", "phase_error", "validation_failed"],
+      "streaming_protocol": "ndjson"
+    },
+    
+    "timeout_config": {
+      "total_timeout_seconds": 300,
+      "phase_timeout_multiplier": 1.5,
+      "description": "Total max 5min, individual phases get 1.5x their configured timeout"
+    }
+  },
+  
+  "quality_standards": {
+    "min_overall_confidence": 0.0,
+    "max_unresolved_contradictions": 5,
+    "min_evidence_sources": 1,
+    "required_phases": ["hypothesis", "synthesis", "validation", "conclusion"],
+    
+    "confidence_calibration": {
+      "very_high": {"range": [0.9, 1.0], "requires": "clear_legal_basis_no_contradictions"},
+      "high": {"range": [0.75, 0.9], "requires": "legal_basis_minor_contradictions"},
+      "medium": {"range": [0.5, 0.75], "requires": "partial_evidence_some_gaps"},
+      "low": {"range": [0.3, 0.5], "requires": "weak_evidence_many_gaps"},
+      "very_low": {"range": [0.0, 0.3], "requires": "insufficient_evidence"}
+    }
+  },
+  
+  "version_history": [
+    {
+      "version": "2.0.0",
+      "date": "2025-10-12",
+      "changes": "Supervisor Integration - Added Phase 1.5 (Agent Selection), 1.6 (Agent Execution), 6.5 (Agent Synthesis)",
+      "tested_queries": 0,
+      "quality_score": null,
+      "new_features": [
+        "LLM-based intelligent agent selection",
+        "Parallel agent execution for external data sources",
+        "Agent result synthesis with scientific process",
+        "Support for Construction, Weather, Financial agents"
+      ]
+    },
+    {
+      "version": "1.0.0",
+      "date": "2025-10-12",
+      "changes": "Initial implementation - 6-phase scientific method",
+      "tested_queries": 0,
+      "quality_score": null
+    }
+  ]
+}

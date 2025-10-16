@@ -1,0 +1,451 @@
+[
+  {
+    "role": "system",
+    "content": "Willkommen bei Veritas v3.15.0! 🚀\nBackend-API: http://127.0.0.1:5000\nDrücken Sie \"➕ Neuer Chat\" um weitere Fenster zu öffnen.",
+    "timestamp": "2025-10-16T07:59:15.776214"
+  },
+  {
+    "role": "user",
+    "content": "Was ist das BGB?",
+    "timestamp": "2025-10-16T07:59:24.130798"
+  },
+  {
+    "role": "assistant",
+    "content": "**Antwort auf Ihre Frage**: Was ist das BGB?\n\n\n**Gesprächskontext**:\n- Sie: Was ist das BGB?...\n\n\n**Zusammenfassung der Analyse** (General, Basic):\n\n🟢 **Geo Context**: Geografischer Kontext und lokale Bestimmungen identifiziert\n\n🟢 **Document Retrieval**: Relevante Dokumente und Formulare gefunden\n\n🟢 **Legal Framework**: Rechtliche Rahmenbedingungen und Vorschriften analysiert\n\n\n**Nächste Schritte**: Basierend auf der Analyse empfehlen wir Ihnen, sich zunächst über die spezifischen Anforderungen zu informieren und die entsprechenden Antragsformulare zu beschaffen.\n\n**Hinweis**: Diese Antwort wurde durch 3 spezialisierte Agenten erstellt und mit einem durchschnittlichen Vertrauenswert von 93% bewertet.\n\n📚 **Quellen:**\n  1. Formulardatenbank (Relevanz: 80%)\n  2. GemO (Relevanz: 80%)\n  3. Gemeinde-DB (Relevanz: 80%)\n  4. VwVfG (Relevanz: 80%)\n  5. Verwaltungsportal (Relevanz: 80%)\n\n🤖 **Verarbeitet von 3 Agenten:**\n  • geo_context: 90% Confidence (1.60s)\n  • document_retrieval: 100% Confidence (1.60s)\n  • legal_framework: 90% Confidence (1.50s)",
+    "timestamp": "2025-10-16T07:59:54.370908",
+    "sources": [
+      {
+        "title": "Formulardatenbank",
+        "url": "test://formulardatenbank",
+        "relevance": 0.8
+      },
+      {
+        "title": "GemO",
+        "url": "test://gemo",
+        "relevance": 0.8
+      },
+      {
+        "title": "Gemeinde-DB",
+        "url": "test://gemeinde-db",
+        "relevance": 0.8
+      },
+      {
+        "title": "VwVfG",
+        "url": "test://vwvfg",
+        "relevance": 0.8
+      },
+      {
+        "title": "Verwaltungsportal",
+        "url": "test://verwaltungsportal",
+        "relevance": 0.8
+      },
+      {
+        "title": "Landesrecht",
+        "url": "test://landesrecht",
+        "relevance": 0.8
+      },
+      {
+        "title": "FAQ-Sammlung",
+        "url": "test://faq-sammlung",
+        "relevance": 0.8
+      },
+      {
+        "title": "OpenStreetMap",
+        "url": "test://openstreetmap",
+        "relevance": 0.8
+      },
+      {
+        "title": "Geoportal",
+        "url": "test://geoportal",
+        "relevance": 0.8
+      },
+      {
+        "title": "BauGB",
+        "url": "test://baugb",
+        "relevance": 0.8
+      }
+    ],
+    "worker_results": {
+      "geo_context": {
+        "agent_type": "geo_context",
+        "confidence_score": 0.9,
+        "processing_time": 1.6,
+        "summary": "Geografischer Kontext und lokale Bestimmungen identifiziert",
+        "details": "Relevante Gebiets- und Standortinformationen gesammelt",
+        "sources": [
+          "OpenStreetMap",
+          "Gemeinde-DB",
+          "Geoportal"
+        ],
+        "status": "completed"
+      },
+      "document_retrieval": {
+        "agent_type": "document_retrieval",
+        "confidence_score": 1.0,
+        "processing_time": 1.6,
+        "summary": "Relevante Dokumente und Formulare gefunden",
+        "details": "Antragsformulare und Informationsmaterialien identifiziert",
+        "sources": [
+          "Verwaltungsportal",
+          "Formulardatenbank",
+          "FAQ-Sammlung"
+        ],
+        "status": "completed"
+      },
+      "legal_framework": {
+        "agent_type": "legal_framework",
+        "confidence_score": 0.9,
+        "processing_time": 1.5,
+        "summary": "Rechtliche Rahmenbedingungen und Vorschriften analysiert",
+        "details": "Aktuelle Gesetze und Verordnungen ausgewertet",
+        "sources": [
+          "BauGB",
+          "VwVfG",
+          "GemO",
+          "Landesrecht"
+        ],
+        "status": "completed"
+      }
+    },
+    "metadata": {},
+    "confidence_score": 0.9333333333333332
+  },
+  {
+    "role": "assistant",
+    "content": "**Antwort auf Ihre Frage**: Was ist das BGB?\n\n\n**Gesprächskontext**:\n- Sie: Was ist das BGB?...\n\n\n**Zusammenfassung der Analyse** (General, Basic):\n\n🟢 **Geo Context**: Geografischer Kontext und lokale Bestimmungen identifiziert\n\n🟢 **Document Retrieval**: Relevante Dokumente und Formulare gefunden\n\n🟢 **Legal Framework**: Rechtliche Rahmenbedingungen und Vorschriften analysiert\n\n\n**Nächste Schritte**: Basierend auf der Analyse empfehlen wir Ihnen, sich zunächst über die spezifischen Anforderungen zu informieren und die entsprechenden Antragsformulare zu beschaffen.\n\n**Hinweis**: Diese Antwort wurde durch 3 spezialisierte Agenten erstellt und mit einem durchschnittlichen Vertrauenswert von 93% bewertet.\n\n📚 **Quellen:**\n  1. Formulardatenbank (Relevanz: 80%)\n  2. GemO (Relevanz: 80%)\n  3. Gemeinde-DB (Relevanz: 80%)\n  4. VwVfG (Relevanz: 80%)\n  5. Verwaltungsportal (Relevanz: 80%)\n\n🤖 **Verarbeitet von 3 Agenten:**\n  • geo_context: 90% Confidence (1.60s)\n  • document_retrieval: 100% Confidence (1.60s)\n  • legal_framework: 90% Confidence (1.50s)",
+    "timestamp": "2025-10-16T07:59:54.371030",
+    "sources": [
+      {
+        "title": "Formulardatenbank",
+        "url": "test://formulardatenbank",
+        "relevance": 0.8
+      },
+      {
+        "title": "GemO",
+        "url": "test://gemo",
+        "relevance": 0.8
+      },
+      {
+        "title": "Gemeinde-DB",
+        "url": "test://gemeinde-db",
+        "relevance": 0.8
+      },
+      {
+        "title": "VwVfG",
+        "url": "test://vwvfg",
+        "relevance": 0.8
+      },
+      {
+        "title": "Verwaltungsportal",
+        "url": "test://verwaltungsportal",
+        "relevance": 0.8
+      },
+      {
+        "title": "Landesrecht",
+        "url": "test://landesrecht",
+        "relevance": 0.8
+      },
+      {
+        "title": "FAQ-Sammlung",
+        "url": "test://faq-sammlung",
+        "relevance": 0.8
+      },
+      {
+        "title": "OpenStreetMap",
+        "url": "test://openstreetmap",
+        "relevance": 0.8
+      },
+      {
+        "title": "Geoportal",
+        "url": "test://geoportal",
+        "relevance": 0.8
+      },
+      {
+        "title": "BauGB",
+        "url": "test://baugb",
+        "relevance": 0.8
+      }
+    ],
+    "worker_results": {
+      "geo_context": {
+        "agent_type": "geo_context",
+        "confidence_score": 0.9,
+        "processing_time": 1.6,
+        "summary": "Geografischer Kontext und lokale Bestimmungen identifiziert",
+        "details": "Relevante Gebiets- und Standortinformationen gesammelt",
+        "sources": [
+          "OpenStreetMap",
+          "Gemeinde-DB",
+          "Geoportal"
+        ],
+        "status": "completed"
+      },
+      "document_retrieval": {
+        "agent_type": "document_retrieval",
+        "confidence_score": 1.0,
+        "processing_time": 1.6,
+        "summary": "Relevante Dokumente und Formulare gefunden",
+        "details": "Antragsformulare und Informationsmaterialien identifiziert",
+        "sources": [
+          "Verwaltungsportal",
+          "Formulardatenbank",
+          "FAQ-Sammlung"
+        ],
+        "status": "completed"
+      },
+      "legal_framework": {
+        "agent_type": "legal_framework",
+        "confidence_score": 0.9,
+        "processing_time": 1.5,
+        "summary": "Rechtliche Rahmenbedingungen und Vorschriften analysiert",
+        "details": "Aktuelle Gesetze und Verordnungen ausgewertet",
+        "sources": [
+          "BauGB",
+          "VwVfG",
+          "GemO",
+          "Landesrecht"
+        ],
+        "status": "completed"
+      }
+    },
+    "metadata": {
+      "suggestions": []
+    },
+    "confidence_score": 0.9333333333333332
+  },
+  {
+    "role": "user",
+    "content": "Wie funktioniert das Baugenehmigungsverfahren in München?",
+    "timestamp": "2025-10-16T08:00:02.842106"
+  },
+  {
+    "role": "assistant",
+    "content": "**Antwort auf Ihre Frage**: Wie funktioniert das Baugenehmigungsverfahren in München?\n\n\n**Gesprächskontext**:\n- Assistent: **Antwort auf Ihre Frage**: Was ist das BGB?\n\n\n**Gesprächskontext**:\n- Sie: Was ist das BGB?...\n\n\n**...\n- Assistent: **Antwort auf Ihre Frage**: Was ist das BGB?\n\n\n**Gesprächskontext**:\n- Sie: Was ist das BGB?...\n\n\n**...\n- Sie: Wie funktioniert das Baugenehmigungsverfahren in München?...\n\n\n**Zusammenfassung der Analyse** (Building, Standard):\n\n🟢 **Geo Context**: Geografischer Kontext und lokale Bestimmungen identifiziert\n\n🟡 **Construction**: Bautechnische Aspekte und Genehmigungsverfahren bewertet\n\n🟡 **Document Retrieval**: Relevante Dokumente und Formulare gefunden\n\n🟢 **Legal Framework**: Rechtliche Rahmenbedingungen und Vorschriften analysiert\n\n\n**Nächste Schritte**: Basierend auf der Analyse empfehlen wir Ihnen, sich zunächst über die spezifischen Anforderungen zu informieren und die entsprechenden Antragsformulare zu beschaffen.\n\n**Hinweis**: Diese Antwort wurde durch 4 spezialisierte Agenten erstellt und mit einem durchschnittlichen Vertrauenswert von 85% bewertet.\n\n📚 **Quellen:**\n  1. DIN-Normen (Relevanz: 80%)\n  2. Formulardatenbank (Relevanz: 80%)\n  3. GemO (Relevanz: 80%)\n  4. Gemeinde-DB (Relevanz: 80%)\n  5. Bauordnung (Relevanz: 80%)\n\n🤖 **Verarbeitet von 4 Agenten:**\n  • geo_context: 95% Confidence (1.60s)\n  • construction: 75% Confidence (1.40s)\n  • document_retrieval: 75% Confidence (1.60s)",
+    "timestamp": "2025-10-16T08:00:37.502488",
+    "sources": [
+      {
+        "title": "DIN-Normen",
+        "url": "test://din-normen",
+        "relevance": 0.8
+      },
+      {
+        "title": "Formulardatenbank",
+        "url": "test://formulardatenbank",
+        "relevance": 0.8
+      },
+      {
+        "title": "GemO",
+        "url": "test://gemo",
+        "relevance": 0.8
+      },
+      {
+        "title": "Gemeinde-DB",
+        "url": "test://gemeinde-db",
+        "relevance": 0.8
+      },
+      {
+        "title": "Bauordnung",
+        "url": "test://bauordnung",
+        "relevance": 0.8
+      },
+      {
+        "title": "Verwaltungsportal",
+        "url": "test://verwaltungsportal",
+        "relevance": 0.8
+      },
+      {
+        "title": "VwVfG",
+        "url": "test://vwvfg",
+        "relevance": 0.8
+      },
+      {
+        "title": "Technische Richtlinien",
+        "url": "test://technische_richtlinien",
+        "relevance": 0.8
+      },
+      {
+        "title": "Landesrecht",
+        "url": "test://landesrecht",
+        "relevance": 0.8
+      },
+      {
+        "title": "FAQ-Sammlung",
+        "url": "test://faq-sammlung",
+        "relevance": 0.8
+      }
+    ],
+    "worker_results": {
+      "geo_context": {
+        "agent_type": "geo_context",
+        "confidence_score": 0.95,
+        "processing_time": 1.6,
+        "summary": "Geografischer Kontext und lokale Bestimmungen identifiziert",
+        "details": "Relevante Gebiets- und Standortinformationen gesammelt",
+        "sources": [
+          "OpenStreetMap",
+          "Gemeinde-DB",
+          "Geoportal"
+        ],
+        "status": "completed"
+      },
+      "construction": {
+        "agent_type": "construction",
+        "confidence_score": 0.75,
+        "processing_time": 1.4,
+        "summary": "Bautechnische Aspekte und Genehmigungsverfahren bewertet",
+        "details": "Bauvorschriften und technische Anforderungen geprüft",
+        "sources": [
+          "DIN-Normen",
+          "Bauordnung",
+          "Technische Richtlinien"
+        ],
+        "status": "completed"
+      },
+      "document_retrieval": {
+        "agent_type": "document_retrieval",
+        "confidence_score": 0.75,
+        "processing_time": 1.6,
+        "summary": "Relevante Dokumente und Formulare gefunden",
+        "details": "Antragsformulare und Informationsmaterialien identifiziert",
+        "sources": [
+          "Verwaltungsportal",
+          "Formulardatenbank",
+          "FAQ-Sammlung"
+        ],
+        "status": "completed"
+      },
+      "legal_framework": {
+        "agent_type": "legal_framework",
+        "confidence_score": 0.95,
+        "processing_time": 1.5,
+        "summary": "Rechtliche Rahmenbedingungen und Vorschriften analysiert",
+        "details": "Aktuelle Gesetze und Verordnungen ausgewertet",
+        "sources": [
+          "BauGB",
+          "VwVfG",
+          "GemO",
+          "Landesrecht"
+        ],
+        "status": "completed"
+      }
+    },
+    "metadata": {},
+    "confidence_score": 0.85
+  },
+  {
+    "role": "assistant",
+    "content": "**Antwort auf Ihre Frage**: Wie funktioniert das Baugenehmigungsverfahren in München?\n\n\n**Gesprächskontext**:\n- Assistent: **Antwort auf Ihre Frage**: Was ist das BGB?\n\n\n**Gesprächskontext**:\n- Sie: Was ist das BGB?...\n\n\n**...\n- Assistent: **Antwort auf Ihre Frage**: Was ist das BGB?\n\n\n**Gesprächskontext**:\n- Sie: Was ist das BGB?...\n\n\n**...\n- Sie: Wie funktioniert das Baugenehmigungsverfahren in München?...\n\n\n**Zusammenfassung der Analyse** (Building, Standard):\n\n🟢 **Geo Context**: Geografischer Kontext und lokale Bestimmungen identifiziert\n\n🟡 **Construction**: Bautechnische Aspekte und Genehmigungsverfahren bewertet\n\n🟡 **Document Retrieval**: Relevante Dokumente und Formulare gefunden\n\n🟢 **Legal Framework**: Rechtliche Rahmenbedingungen und Vorschriften analysiert\n\n\n**Nächste Schritte**: Basierend auf der Analyse empfehlen wir Ihnen, sich zunächst über die spezifischen Anforderungen zu informieren und die entsprechenden Antragsformulare zu beschaffen.\n\n**Hinweis**: Diese Antwort wurde durch 4 spezialisierte Agenten erstellt und mit einem durchschnittlichen Vertrauenswert von 85% bewertet.\n\n📚 **Quellen:**\n  1. DIN-Normen (Relevanz: 80%)\n  2. Formulardatenbank (Relevanz: 80%)\n  3. GemO (Relevanz: 80%)\n  4. Gemeinde-DB (Relevanz: 80%)\n  5. Bauordnung (Relevanz: 80%)\n\n🤖 **Verarbeitet von 4 Agenten:**\n  • geo_context: 95% Confidence (1.60s)\n  • construction: 75% Confidence (1.40s)\n  • document_retrieval: 75% Confidence (1.60s)",
+    "timestamp": "2025-10-16T08:00:37.502550",
+    "sources": [
+      {
+        "title": "DIN-Normen",
+        "url": "test://din-normen",
+        "relevance": 0.8
+      },
+      {
+        "title": "Formulardatenbank",
+        "url": "test://formulardatenbank",
+        "relevance": 0.8
+      },
+      {
+        "title": "GemO",
+        "url": "test://gemo",
+        "relevance": 0.8
+      },
+      {
+        "title": "Gemeinde-DB",
+        "url": "test://gemeinde-db",
+        "relevance": 0.8
+      },
+      {
+        "title": "Bauordnung",
+        "url": "test://bauordnung",
+        "relevance": 0.8
+      },
+      {
+        "title": "Verwaltungsportal",
+        "url": "test://verwaltungsportal",
+        "relevance": 0.8
+      },
+      {
+        "title": "VwVfG",
+        "url": "test://vwvfg",
+        "relevance": 0.8
+      },
+      {
+        "title": "Technische Richtlinien",
+        "url": "test://technische_richtlinien",
+        "relevance": 0.8
+      },
+      {
+        "title": "Landesrecht",
+        "url": "test://landesrecht",
+        "relevance": 0.8
+      },
+      {
+        "title": "FAQ-Sammlung",
+        "url": "test://faq-sammlung",
+        "relevance": 0.8
+      }
+    ],
+    "worker_results": {
+      "geo_context": {
+        "agent_type": "geo_context",
+        "confidence_score": 0.95,
+        "processing_time": 1.6,
+        "summary": "Geografischer Kontext und lokale Bestimmungen identifiziert",
+        "details": "Relevante Gebiets- und Standortinformationen gesammelt",
+        "sources": [
+          "OpenStreetMap",
+          "Gemeinde-DB",
+          "Geoportal"
+        ],
+        "status": "completed"
+      },
+      "construction": {
+        "agent_type": "construction",
+        "confidence_score": 0.75,
+        "processing_time": 1.4,
+        "summary": "Bautechnische Aspekte und Genehmigungsverfahren bewertet",
+        "details": "Bauvorschriften und technische Anforderungen geprüft",
+        "sources": [
+          "DIN-Normen",
+          "Bauordnung",
+          "Technische Richtlinien"
+        ],
+        "status": "completed"
+      },
+      "document_retrieval": {
+        "agent_type": "document_retrieval",
+        "confidence_score": 0.75,
+        "processing_time": 1.6,
+        "summary": "Relevante Dokumente und Formulare gefunden",
+        "details": "Antragsformulare und Informationsmaterialien identifiziert",
+        "sources": [
+          "Verwaltungsportal",
+          "Formulardatenbank",
+          "FAQ-Sammlung"
+        ],
+        "status": "completed"
+      },
+      "legal_framework": {
+        "agent_type": "legal_framework",
+        "confidence_score": 0.95,
+        "processing_time": 1.5,
+        "summary": "Rechtliche Rahmenbedingungen und Vorschriften analysiert",
+        "details": "Aktuelle Gesetze und Verordnungen ausgewertet",
+        "sources": [
+          "BauGB",
+          "VwVfG",
+          "GemO",
+          "Landesrecht"
+        ],
+        "status": "completed"
+      }
+    },
+    "metadata": {
+      "suggestions": []
+    },
+    "confidence_score": 0.85
+  }
+]

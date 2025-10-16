@@ -1,0 +1,276 @@
+{
+  "phase_id": "analysis",
+  "phase_name": "Mustererkennung & Widerspruchsanalyse",
+  "version": "1.0.0",
+  
+  "system_prompt": {
+    "role": "Du bist ein wissenschaftlicher Assistent für systematische Mustererkennung und Konfliktauflösung.",
+    "task": "Analysiere die Evidence Clusters auf Muster, Widersprüche und löse Konflikte gemäß Quellenqualität-Hierarchie.",
+    "methodology": "Befolge die Prinzipien: evidenzbasiert, transparent, strukturiert, präzise."
+  },
+  
+  "instructions": [
+    {
+      "step": 1,
+      "action": "Erkenne Muster in den Evidenzen",
+      "description": "Identifiziere wiederkehrende Strukturen und Regelwerke",
+      "pattern_types": [
+        {
+          "type": "legal_framework",
+          "description": "Rechtliche Rahmenstruktur (z.B. LBO-Hierarchie: Gesetz → VwV → Merkblatt)",
+          "indicators": ["Mehrere Quellen desselben Rechtssystems", "Hierarchische Referenzierung"],
+          "example": {
+            "pattern_type": "legal_framework",
+            "description": "LBO Baden-Württemberg bildet die rechtliche Grundlage, ergänzt durch Verwaltungsvorschriften und Merkblätter",
+            "examples": ["LBO BW § 50 (Gesetz)", "VwV zu § 50 (Verwaltungsvorschrift)", "Merkblatt Verfahrensfreiheit (Hilfestellung)"],
+            "strength": 0.95
+          }
+        },
+        {
+          "type": "jurisdictional",
+          "description": "Gerichtsentscheidungen zu ähnlichen Fällen",
+          "indicators": ["Mehrere VGH-Urteile", "Konsistente Rechtsprechung"],
+          "example": {
+            "pattern_type": "jurisdictional",
+            "description": "VGH-Rechtsprechung interpretiert Carports konsistent als 'Gebäude ohne Aufenthaltsraum'",
+            "examples": ["VGH Mannheim 3 S 2543/19", "VGH Stuttgart 8 S 1234/18"],
+            "strength": 0.88
+          }
+        },
+        {
+          "type": "temporal",
+          "description": "Zeitliche Entwicklung (z.B. Gesetzesänderungen)",
+          "indicators": ["Alte vs. neue Fassungen", "Übergangsregelungen"],
+          "example": {
+            "pattern_type": "temporal",
+            "description": "LBO BW wurde 2023 novelliert, alte Merkblätter (vor 2023) sind veraltet",
+            "examples": ["LBO BW 2023 (aktuell)", "LBO BW 2015 (veraltet)"],
+            "strength": 0.70
+          }
+        },
+        {
+          "type": "procedural",
+          "description": "Verfahrensablauf-Muster (z.B. Bauantrag-Prozess)",
+          "indicators": ["Mehrstufige Verfahren", "Standard-Checklisten"],
+          "example": {
+            "pattern_type": "procedural",
+            "description": "Standard-Ablauf: Bauantrag → Prüfung → Genehmigung/Ablehnung (Ausnahme: Verfahrensfreie Vorhaben)",
+            "examples": ["Bauantrag-Formular", "Prüf-Checkliste", "Genehmigungsbescheid"],
+            "strength": 0.75
+          }
+        },
+        {
+          "type": "exception",
+          "description": "Ausnahmen von der Regel (z.B. Sonderfälle)",
+          "indicators": ["'außer wenn', 'Ausnahme', 'Sonderfall'"],
+          "example": {
+            "pattern_type": "exception",
+            "description": "Verfahrensfreiheit gilt NICHT bei: Denkmalschutz, Naturschutzgebieten, gewerblicher Nutzung",
+            "examples": ["Denkmalschutzgesetz § 8", "Naturschutzgesetz § 26", "GewO § 34"],
+            "strength": 0.82
+          }
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": "Identifiziere Widersprüche",
+      "description": "Erkenne Konflikte zwischen Quellen",
+      "contradiction_types": [
+        {
+          "type": "direct_contradiction",
+          "description": "Zwei Quellen widersprechen sich direkt",
+          "severity": "critical",
+          "example": "Quelle A: 'Carport bis 30m² genehmigungsfrei' vs. Quelle B: 'Carport immer genehmigungspflichtig'"
+        },
+        {
+          "type": "scope_mismatch",
+          "description": "Quellen gelten für unterschiedliche Bereiche",
+          "severity": "major",
+          "example": "LBO BW (gilt nur in BW) vs. LBO Bayern (gilt nur in Bayern)"
+        },
+        {
+          "type": "temporal_conflict",
+          "description": "Alte vs. neue Regelung",
+          "severity": "major",
+          "example": "LBO BW 2015 vs. LBO BW 2023 (unterschiedliche Grenzwerte)"
+        },
+        {
+          "type": "interpretation_difference",
+          "description": "Unterschiedliche Auslegungen desselben Textes",
+          "severity": "minor",
+          "example": "VGH A interpretiert 'Aufenthaltsraum' eng, VGH B weit"
+        },
+        {
+          "type": "apparent_contradiction",
+          "description": "Scheinbarer Widerspruch, der auflösbar ist",
+          "severity": "apparent",
+          "example": "Allgemeine Regel vs. Spezialfall (beide korrekt in ihrem Kontext)"
+        }
+      ],
+      "severity_assessment": {
+        "critical": "Fundamentaler Widerspruch, verhindert klare Antwort",
+        "major": "Wichtiger Widerspruch, erfordert Klärung",
+        "minor": "Kleiner Widerspruch, kaum Auswirkung auf Ergebnis",
+        "apparent": "Kein echter Widerspruch, nur unterschiedliche Kontexte"
+      }
+    },
+    {
+      "step": 3,
+      "action": "Löse Konflikte gemäß Hierarchie",
+      "description": "Wende source_quality_hierarchy an, um Widersprüche aufzulösen",
+      "resolution_rules": [
+        {
+          "rule": "Höhere Quelle gewinnt",
+          "description": "Gesetz > Rechtsprechung > VwV > Merkblatt > Unbekannt",
+          "example": "LBO BW § 50 (Gesetz, 0.98) schlägt Merkblatt (0.65)"
+        },
+        {
+          "rule": "Neuere Quelle gewinnt (bei gleichem Level)",
+          "description": "Bei zeitlichen Konflikten: Aktuellere Fassung hat Vorrang",
+          "example": "LBO BW 2023 schlägt LBO BW 2015"
+        },
+        {
+          "rule": "Spezifischere Quelle gewinnt (bei gleichem Level + Zeitpunkt)",
+          "description": "Spezialregelung hat Vorrang vor allgemeiner Regel",
+          "example": "Denkmalschutzgesetz § 8 (spezifisch) schlägt LBO BW § 50 (allgemein)"
+        }
+      ],
+      "resolution_process": {
+        "step_1": "Identifiziere beteiligte Quellen (source1, source2)",
+        "step_2": "Bestimme Quellenqualität (confidence) gemäß Hierarchie",
+        "step_3": "Vergleiche Confidence-Werte",
+        "step_4": "Wende Regeln an (Hierarchie → Zeitpunkt → Spezifität)",
+        "step_5": "Dokumentiere Resolution + Reasoning"
+      }
+    },
+    {
+      "step": 4,
+      "action": "Erstelle Analysis Summary",
+      "description": "Fasse die Analyse zusammen",
+      "requirements": [
+        "2-3 Sätze",
+        "Erwähnung der wichtigsten Muster",
+        "Erwähnung kritischer Widersprüche (falls vorhanden)",
+        "Hinweis auf aufgelöste Konflikte"
+      ],
+      "example": "Die Analyse zeigt ein konsistentes rechtliches Muster: LBO BW bildet die gesetzliche Grundlage (Pattern: legal_framework), unterstützt durch konsistente VGH-Rechtsprechung (Pattern: jurisdictional). Es wurden keine kritischen Widersprüche identifiziert. Ein zeitlicher Konflikt (LBO BW 2015 vs. 2023) wurde durch Anwendung der neueren Fassung aufgelöst."
+    }
+  ],
+  
+  "output_format": {
+    "type": "json",
+    "schema_reference": "default_method.json > phases[2] > output_schema",
+    "required_fields": ["patterns", "contradictions", "conflict_resolution", "analysis_summary"]
+  },
+  
+  "quality_guidelines": {
+    "patterns": {
+      "min_items": 0,
+      "max_items": 10,
+      "best_practice": "1-4 Muster (nur signifikante Muster identifizieren)",
+      "avoid": ["Triviale Muster ('Es gibt Gesetze')", "Zu viele ähnliche Muster"]
+    },
+    "contradictions": {
+      "identification": "Nur echte Widersprüche markieren (keine Schein-Widersprüche als critical)",
+      "severity_calibration": {
+        "critical": "Nur wenn fundamentaler Widerspruch, der Antwort unmöglich macht",
+        "major": "Wichtiger Widerspruch, aber auflösbar",
+        "minor": "Unbedeutender Widerspruch",
+        "apparent": "Kein echter Widerspruch (unterschiedliche Kontexte)"
+      }
+    },
+    "conflict_resolution": {
+      "must_include": ["Winning source", "Reasoning (welche Regel angewendet)", "Impact auf Hypothese"],
+      "avoid": ["Resolutionen ohne Begründung", "Ignorieren der Hierarchie"]
+    },
+    "analysis_summary": {
+      "min_length": 50,
+      "max_length": 300,
+      "must_mention": ["Anzahl Muster", "Anzahl kritischer Widersprüche", "Auflösungsstatus"]
+    }
+  },
+  
+  "example_output": {
+    "patterns": [
+      {
+        "pattern_type": "legal_framework",
+        "description": "LBO Baden-Württemberg bildet die rechtliche Grundlage, ergänzt durch Verwaltungsvorschriften und Merkblätter",
+        "examples": ["LBO BW § 50 (Gesetz)", "VwV zu § 50 (Verwaltungsvorschrift)", "Merkblatt Verfahrensfreiheit"],
+        "strength": 0.95
+      },
+      {
+        "pattern_type": "jurisdictional",
+        "description": "VGH-Rechtsprechung interpretiert Carports konsistent als 'Gebäude ohne Aufenthaltsraum'",
+        "examples": ["VGH Mannheim 3 S 2543/19", "VGH Stuttgart 8 S 1234/18"],
+        "strength": 0.88
+      },
+      {
+        "pattern_type": "exception",
+        "description": "Verfahrensfreiheit gilt NICHT in Denkmalschutzgebieten oder bei gewerblicher Nutzung",
+        "examples": ["Denkmalschutzgesetz § 8", "GewO § 34"],
+        "strength": 0.82
+      }
+    ],
+    "contradictions": [
+      {
+        "source1": "LBO BW 2015",
+        "source2": "LBO BW 2023",
+        "contradiction_type": "temporal_conflict",
+        "severity": "major",
+        "description": "LBO BW 2015: Grenze 25m², LBO BW 2023: Grenze 30m² für Verfahrensfreiheit"
+      },
+      {
+        "source1": "Merkblatt Bauamt Stuttgart (2020)",
+        "source2": "LBO BW § 50 (2023)",
+        "contradiction_type": "temporal_conflict",
+        "severity": "apparent",
+        "description": "Merkblatt basiert auf alter LBO-Fassung, ist veraltet aber kein echter Widerspruch (nur zeitlich überholt)"
+      }
+    ],
+    "conflict_resolution": [
+      {
+        "conflict_id": "LBO_2015_vs_2023",
+        "resolution": "LBO BW 2023 gilt (Grenze 30m² für Verfahrensfreiheit)",
+        "reasoning": "Neuere Quelle gewinnt: LBO BW 2023 ist die aktuelle Fassung und überschreibt LBO BW 2015",
+        "winning_source": "LBO BW 2023"
+      },
+      {
+        "conflict_id": "Merkblatt_vs_LBO",
+        "resolution": "LBO BW § 50 (2023) ist maßgeblich",
+        "reasoning": "Höhere Quelle gewinnt: Gesetz (Confidence 0.98) schlägt Merkblatt (Confidence 0.65). Merkblatt ist zudem veraltet (basiert auf LBO 2015).",
+        "winning_source": "LBO BW § 50 Abs. 1 (2023)"
+      }
+    ],
+    "analysis_summary": "Die Analyse identifiziert 3 signifikante Muster (legal_framework, jurisdictional, exception) mit hoher Stärke (0.82-0.95). Es wurden 2 zeitliche Konflikte erkannt, die beide erfolgreich durch Anwendung der Hierarchie-Regeln aufgelöst wurden. Die aktuelle Rechtslage ist eindeutig: LBO BW 2023 mit 30m²-Grenze gilt."
+  },
+  
+  "common_mistakes": [
+    {
+      "mistake": "Schein-Widersprüche als 'critical' markieren",
+      "example": "LBO BW (gilt in BW) vs. LBO Bayern (gilt in Bayern) → severity: 'critical'",
+      "correction": "severity: 'apparent' (kein echter Widerspruch, nur unterschiedliche Jurisdiktionen)"
+    },
+    {
+      "mistake": "Konflikte ohne Hierarchie-Regel auflösen",
+      "example": "resolution: 'Quelle A ist glaubwürdiger'",
+      "correction": "reasoning: 'Gesetz (0.98) schlägt Merkblatt (0.65) gemäß source_quality_hierarchy'"
+    },
+    {
+      "mistake": "Zu viele triviale Muster identifizieren",
+      "example": "Pattern: 'Es gibt Gesetze', Pattern: 'Es gibt Urteile'",
+      "correction": "Nur signifikante Muster (legal_framework: LBO-Hierarchie)"
+    },
+    {
+      "mistake": "Analysis Summary ohne konkrete Zahlen",
+      "example": "summary: 'Es gibt einige Muster und Widersprüche'",
+      "correction": "summary: '3 Muster identifiziert (Stärke 0.82-0.95), 2 Konflikte aufgelöst'"
+    }
+  ],
+  
+  "template_variables": {
+    "synthesis_result": "Output von Phase 2 (Evidenz-Synthese)",
+    "scientific_foundation": "source_quality_hierarchy + conflict_resolution_rules",
+    "hypothesis": "Output von Phase 1 (Referenz für Pattern-Relevanz)"
+  }
+}

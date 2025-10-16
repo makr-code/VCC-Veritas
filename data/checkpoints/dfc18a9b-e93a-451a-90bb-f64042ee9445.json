@@ -1,0 +1,26 @@
+{
+  "checkpoint_id": "dfc18a9b-e93a-451a-90bb-f64042ee9445",
+  "plan_id": "test_checkpoint_001",
+  "step_index": 0,
+  "completed_steps": [],
+  "plan_state": {
+    "plan_id": "test_checkpoint_001",
+    "query": "Test checkpoints",
+    "steps": [
+      {
+        "step_id": "step_1",
+        "action": "search"
+      },
+      {
+        "step_id": "step_2",
+        "action": "analyze"
+      }
+    ]
+  },
+  "context": {
+    "orchestration_state": "running",
+    "failed_steps": [],
+    "skipped_steps": []
+  },
+  "timestamp": "2025-10-08T17:45:26.389580"
+}

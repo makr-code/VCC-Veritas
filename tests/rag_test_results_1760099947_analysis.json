@@ -1,0 +1,161 @@
+{
+  "summary": {
+    "total_tests": 50,
+    "models_tested": 10,
+    "test_ids": 5
+  },
+  "quality_ranking": [
+    {
+      "rank": 1,
+      "model": "all-minilm:latest",
+      "quality_score": 7.3,
+      "avg_citations": 0.0,
+      "avg_quotes": 0.4,
+      "avg_legal_refs": 0.0,
+      "avg_aspect_coverage": 0.26
+    },
+    {
+      "rank": 2,
+      "model": "codellama:latest",
+      "quality_score": 2.1,
+      "avg_citations": 0.0,
+      "avg_quotes": 0.0,
+      "avg_legal_refs": 0.0,
+      "avg_aspect_coverage": 0.42000000000000004
+    },
+    {
+      "rank": 3,
+      "model": "mixtral:latest",
+      "quality_score": 1.7000000000000002,
+      "avg_citations": 0.0,
+      "avg_quotes": 0.0,
+      "avg_legal_refs": 0.0,
+      "avg_aspect_coverage": 0.34
+    },
+    {
+      "rank": 4,
+      "model": "gemma3:latest",
+      "quality_score": 1.666666666666667,
+      "avg_citations": 0.0,
+      "avg_quotes": 0.0,
+      "avg_legal_refs": 0.0,
+      "avg_aspect_coverage": 0.33333333333333337
+    },
+    {
+      "rank": 5,
+      "model": "nomic-embed-text:latest",
+      "quality_score": 1.666666666666667,
+      "avg_citations": 0.0,
+      "avg_quotes": 0.0,
+      "avg_legal_refs": 0.0,
+      "avg_aspect_coverage": 0.33333333333333337
+    },
+    {
+      "rank": 6,
+      "model": "llama3:latest",
+      "quality_score": 1.5333333333333332,
+      "avg_citations": 0.0,
+      "avg_quotes": 0.0,
+      "avg_legal_refs": 0.0,
+      "avg_aspect_coverage": 0.30666666666666664
+    },
+    {
+      "rank": 7,
+      "model": "phi3:latest",
+      "quality_score": 1.5,
+      "avg_citations": 0.0,
+      "avg_quotes": 0.0,
+      "avg_legal_refs": 0.0,
+      "avg_aspect_coverage": 0.3
+    },
+    {
+      "rank": 8,
+      "model": "qwen2.5-coder:1.5b-base",
+      "quality_score": 1.5,
+      "avg_citations": 0.0,
+      "avg_quotes": 0.0,
+      "avg_legal_refs": 0.0,
+      "avg_aspect_coverage": 0.3
+    },
+    {
+      "rank": 9,
+      "model": "gpt-oss:latest",
+      "quality_score": 1.4666666666666668,
+      "avg_citations": 0.0,
+      "avg_quotes": 0.0,
+      "avg_legal_refs": 0.0,
+      "avg_aspect_coverage": 0.29333333333333333
+    },
+    {
+      "rank": 10,
+      "model": "llama3.2:latest",
+      "quality_score": 1.4666666666666668,
+      "avg_citations": 0.0,
+      "avg_quotes": 0.0,
+      "avg_legal_refs": 0.0,
+      "avg_aspect_coverage": 0.29333333333333333
+    }
+  ],
+  "speed_ranking": [
+    {
+      "rank": 1,
+      "model": "nomic-embed-text:latest",
+      "avg_duration_seconds": 19.184002351760864
+    },
+    {
+      "rank": 2,
+      "model": "llama3:latest",
+      "avg_duration_seconds": 19.43351459503174
+    },
+    {
+      "rank": 3,
+      "model": "mixtral:latest",
+      "avg_duration_seconds": 19.573250389099123
+    },
+    {
+      "rank": 4,
+      "model": "gpt-oss:latest",
+      "avg_duration_seconds": 19.661759996414183
+    },
+    {
+      "rank": 5,
+      "model": "codellama:latest",
+      "avg_duration_seconds": 20.201998138427733
+    },
+    {
+      "rank": 6,
+      "model": "phi3:latest",
+      "avg_duration_seconds": 20.256797981262206
+    },
+    {
+      "rank": 7,
+      "model": "qwen2.5-coder:1.5b-base",
+      "avg_duration_seconds": 20.28300609588623
+    },
+    {
+      "rank": 8,
+      "model": "llama3.2:latest",
+      "avg_duration_seconds": 20.351231575012207
+    },
+    {
+      "rank": 9,
+      "model": "gemma3:latest",
+      "avg_duration_seconds": 20.490722751617433
+    },
+    {
+      "rank": 10,
+      "model": "all-minilm:latest",
+      "avg_duration_seconds": 25.24221897125244
+    }
+  ],
+  "recommendations": {
+    "best_quality_model": "all-minilm:latest",
+    "fastest_model": "nomic-embed-text:latest",
+    "critical_issues": [
+      "Zero IEEE citations across all models",
+      "Zero direct quotes across all models",
+      "Low aspect coverage (32% average)",
+      "Prompt optimization required"
+    ]
+  }
+}

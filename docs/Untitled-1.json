@@ -1,0 +1,101 @@
+{
+    "user_id": uuid,
+    "username": "johndoe",
+    "query": "was ist das BImSchG",
+    "timestamp": "2024-06-15T14:30:00Z",
+    "nlp": {
+        "query_enrichment": {
+            "language": "de",
+            "intent": "information_request",
+            "entities": ["BImSchG"]
+        },
+        "parsed_query": {
+            "main_topic": "BImSchG",
+            "subtopics": [],
+            "keywords": ["BImSchG", "Bundes-Immissionsschutzgesetz", "Umweltschutz"]
+        },
+        "estimated_complexity": "simple",
+        "sentiment": "neutral",
+        "process": "information_retrieval",
+        "metadata": {
+            "source": "web",
+            "device": "desktop"
+        },
+    },
+    "processes": {
+        "steps": [
+            {
+                "step_id": "step_1",
+                "action": "query_expansion",
+                "prompt": "Erweitere die Anfrage um Synonyme und verwandte Begriffe",
+                "hypotheses": [ "Bundes-Immissionsschutzgesetz", "Umweltschutzgesetz", "BImSchG", "Luftreinhaltegesetz"  ],
+                "description": "Erweitern der Anfrage um Synonyme und verwandte Begriffe",
+                "status": "completed",
+                "timestamp": "2024-06-15T14:30:01Z",
+                "confidence_score": 0.9
+                "status": "completed",
+                "timestamp": "2024-06-15T14:30:02Z"
+                "steps": [{
+                    "step_id": "substep_1",
+                    "action": "entity_recognition",
+                    "description": "Erkennen von Entitäten in der erweiterten Anfrage",
+                    "status": "completed",
+                    "timestamp": "2024-06-15T14:30:02Z"
+                }, {
+                    "step_id": "substep_2",
+                    "action": "intent_classification",
+                    "description": "Klassifizieren der Nutzerintention",
+                    "status": "completed",
+                    "timestamp": "2024-06-15T14:30:02Z"
+                }]
+                "results": [...]
+            },
+            {
+                "step_id": "step_2",
+                "action": "document_retrieval",
+                "description": "Abrufen relevanter Dokumente aus der Wissensdatenbank",
+                "status": "completed",
+                "timestamp": "2024-06-15T14:30:03Z"
+            },
+            {
+                "action": "hypothesis_generation",
+                "prompt": "Generiere Hypothesen basierend auf der erweiterten Anfrage und den abgerufenen Dokumenten",
+                "hypotheses": [ "Das BImSchG ist ein deutsches Gesetz zum Schutz der Umwelt vor schädlichen Einwirkungen."  ]
+
+            },
+            {
+                "action": "evidence_evaluation",
+                "document_id": "doc_12345",
+                "relevance_score": 0.92
+            },
+            {
+                "step_id": "step_3",
+                "action": "answer_generation",
+                "description": "Generieren einer Antwort basierend auf den abgerufenen Dokumenten",
+                "status": "completed",
+                "timestamp": "2024-06-15T14:30:05Z"
+            }
+        ]
+        "documents": [
+            {
+                "title": "Bundes-Immissionsschutzgesetz (BImSchG)",
+                "url": "https://www.gesetze-im-internet.de/bimschg/",
+                "summary": "Das Bundes-Immissionsschutzgesetz (BImSchG) ist ein deutsches Gesetz zum Schutz vor schädlichen Umwelteinwirkungen durch Luftverunreinigungen, Geräusche, Erschütterungen und ähnliche Vorgänge."
+            },
+            {
+                "title": "Überblick über das BImSchG",
+                "url": "https://www.umweltbundesamt.de/themen/luft/luftschadstoffe/bundes-immissionsschutzgesetz-bimschg",
+                "summary": "Das BImSchG regelt die Genehmigung und Überwachung von Anlagen, die Emissionen verursachen können, um die Umwelt und die menschliche Gesundheit zu schützen."
+            }
+        ],
+        "retrieval_time_ms": 150
+    },
+    "response": {
+        "answer": "Das Bundes-Immissionsschutzgesetz (BImSchG) ist ein deutsches Gesetz, das den Schutz vor schädlichen Umwelteinwirkungen durch Luftverunreinigungen, Geräusche, Erschütterungen und ähnliche Vorgänge regelt. Es umfasst die Genehmigung und Überwachung von Anlagen, die Emissionen verursachen können, um die Umwelt und die menschliche Gesundheit zu schützen.",
+        "confidence_score": 0.95,
+        "sources": [
+            "https://www.gesetze-im-internet.de/bimschg/",
+            "https://www.umweltbundesamt.de/themen/luft/luftschadstoffe/bundes-immissionsschutzgesetz-bimschg"
+        ]
+    }
+}

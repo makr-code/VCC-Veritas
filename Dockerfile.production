@@ -1,0 +1,103 @@
+# ======================================================================
+# VERITAS Framework - Production Dockerfile
+# Multi-stage build for optimized, secure production deployment
+# ======================================================================
+
+# ======================================================================
+# Stage 1: Builder - Compile dependencies and prepare application
+# ======================================================================
+FROM python:3.11-slim AS builder
+
+LABEL maintainer="VERITAS Team <veritas@example.com>" \
+      description="VERITAS Framework - Production Builder Stage" \
+      version="1.0.0"
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    g++ \
+    make \
+    libpq-dev \
+    libssl-dev \
+    libffi-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /build
+
+# Copy dependency files
+COPY requirements.txt .
+COPY backend/requirements.txt backend/requirements.txt
+COPY frontend/requirements.txt frontend/requirements.txt
+
+# Create virtual environment
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Install Python dependencies
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
+    pip install --no-cache-dir -r requirements.txt && \
+    pip install --no-cache-dir -r backend/requirements.txt && \
+    pip install --no-cache-dir uvicorn[standard] gunicorn
+
+# Copy application code
+COPY . /build/
+
+# Remove unnecessary files
+RUN find /build -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true && \
+    find /build -type d -name ".pytest_cache" -exec rm -rf {} + 2>/dev/null || true && \
+    find /build -type d -name "*.egg-info" -exec rm -rf {} + 2>/dev/null || true && \
+    find /build -type f -name "*.pyc" -delete && \
+    find /build -type f -name "*.pyo" -delete
+
+# ======================================================================
+# Stage 2: Runtime - Minimal production image
+# ======================================================================
+FROM python:3.11-slim
+
+LABEL maintainer="VERITAS Team <veritas@example.com>" \
+      description="VERITAS Framework - Production Runtime" \
+      version="1.0.0"
+
+# Install runtime dependencies only
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq5 \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user for security
+RUN groupadd -r veritas && useradd -r -g veritas -u 1000 veritas
+
+# Set working directory
+WORKDIR /app
+
+# Copy virtual environment from builder
+COPY --from=builder /opt/venv /opt/venv
+
+# Copy application code from builder
+COPY --from=builder --chown=veritas:veritas /build /app
+
+# Set environment variables
+ENV PATH="/opt/venv/bin:$PATH" \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONPATH=/app \
+    VERITAS_ENV=production \
+    VERITAS_LOG_LEVEL=INFO
+
+# Create necessary directories
+RUN mkdir -p /app/logs /app/data /app/uploads && \
+    chown -R veritas:veritas /app
+
+# Switch to non-root user
+USER veritas
+
+# Expose API port
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:8000/api/v1/health || exit 1
+
+# Default command - can be overridden
+CMD ["uvicorn", "backend.api.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]

@@ -1,0 +1,65 @@
+# ======================================================================
+# VERITAS Framework - Persistent Volume Claims
+# Storage for uploads and application data
+# ======================================================================
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: veritas-uploads-pvc
+  namespace: veritas-production
+  labels:
+    app: veritas
+    component: storage
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 50Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: veritas-data-pvc
+  namespace: veritas-production
+  labels:
+    app: veritas
+    component: storage
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 100Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+  namespace: veritas-production
+  labels:
+    app: postgres
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 100Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-pvc
+  namespace: veritas-production
+  labels:
+    app: redis
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 10Gi

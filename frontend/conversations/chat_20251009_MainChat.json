@@ -1,0 +1,161 @@
+[
+  {
+    "role": "system",
+    "content": "Willkommen bei Veritas v3.15.0! 🚀\nBackend-API: http://127.0.0.1:5000\nDrücken Sie \"➕ Neuer Chat\" um weitere Fenster zu öffnen.",
+    "timestamp": "2025-10-09T16:01:40.729309"
+  },
+  {
+    "role": "user",
+    "content": "Was ist das BImSchG?",
+    "timestamp": "2025-10-09T16:02:00.834891"
+  },
+  {
+    "role": "assistant",
+    "content": "**BImSchG: Was ist das?**\n\nDie Analyse von sechs verschiedenen Agenten hat ergeben, dass das BImSchG (Baugesetzbuch) ein deutsches Gesetz ist, das die Planung, Errichtung und den Betrieb von Bauwerken regelt. Die Agenten haben ihre Erkenntnisse wie folgt vorgelegt:\n\n* **geo_context**: Die geo-contextuelle Analyse hat ergeben, dass das BImSchG ein wichtiger Teil des deutschen Rechts ist, der die Planung und Errichtung von Bauwerken regelt.\n* **response_generator**: Die response-generierte Analyse hat ergeben, dass das BImSchG ein umfassendes Gesetz ist, das alle Aspekte des Bauwesens abdeckt, von der Planung bis hin zur Betriebsführung.\n* **temporal_analyzer**: Die zeitliche Analyse hat ergeben, dass das BImSchG seit 1960 in Kraft getreten ist und seither mehrmals geändert wurde, um den sich ändernden Bedürfnissen der Bauwirtschaft Rechnung zu tragen.\n* **document_retrieval**: Die Dokumentenrecherche hat ergeben, dass das BImSchG in verschiedenen Quellen wie dem Verwaltungsportal und der Formulardatenbank abgerufen werden kann.\n* **legal_framework**: Die Analyse des rechtlichen Rahmens hat ergeben, dass das BImSchG auf Grundlage von Gesetzen wie dem BauGB (Baugesetz) und dem VwVfG (Verwaltungsverfahrensgesetz) entwickelt wurde.\n* **quality_assessor**: Die Qualitätserkennung hat ergeben, dass das BImSchG ein wichtiger Teil des deutschen Rechts ist, der die Planung und Errichtung von Bauwerken regelt.\n\n**Zusammenfassend**: Das BImSchG ist ein deutsches Gesetz, das die Planung, Errichtung und den Betrieb von Bauwerken regelt. Es ist ein wichtiges Instrument für die Bauwirtschaft und hat sich seit 1960 entwickelt, um den sich ändernden Bedürfnissen der Bauwirtschaft Rechnung zu tragen.\n\n**Nächste Schritte**: Um weitere Informationen zu erhalten, können Sie weitere Agenten hinzufügen oder die Analyse auf spezielle Aspekte des BImSchG ausweiten. Darüber hinaus können Sie die Quellen und Agenten in der RAG-Übersicht genauer betrachten, um weitere Erkenntnisse zu gewinnen.\n\n**Quellen**: Die folgenden Quellen wurden verwendet:\n\n* Standard-Quellen\n* Verwaltungsportal\n* Formulardatenbank\n* BauGB (Baugesetz)\n* VwVfG (Verwaltungsverfahrensgesetz)\n\n💡 🎯 Confidence: 88.7% | 📚 8 Quellen | ⚡ 25.91s | 🤖 6 Agents\n\n🔍 **Vorschläge:**\n• Benötigen Sie weitere Details zu einem bestimmten Aspekt?\n• Möchten Sie ähnliche Anfragen in anderen Bereichen stellen?\n• Soll ich Ihnen konkrete Handlungsschritte aufzeigen?",
+    "timestamp": "2025-10-09T16:02:26.771489",
+    "sources": [
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "geo_context",
+        "relevance": 0.75
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "response_generator",
+        "relevance": 0.75
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "temporal_analyzer",
+        "relevance": 0.75
+      },
+      {
+        "title": "Verwaltungsportal",
+        "type": "agent_source",
+        "agent": "document_retrieval",
+        "relevance": 0.85
+      },
+      {
+        "title": "Formulardatenbank",
+        "type": "agent_source",
+        "agent": "document_retrieval",
+        "relevance": 0.85
+      },
+      {
+        "title": "BauGB",
+        "type": "agent_source",
+        "agent": "legal_framework",
+        "relevance": 0.9
+      },
+      {
+        "title": "VwVfG",
+        "type": "agent_source",
+        "agent": "legal_framework",
+        "relevance": 0.9
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "quality_assessor",
+        "relevance": 0.75
+      }
+    ],
+    "worker_results": {
+      "geo_context": {
+        "agent_type": "geo_context",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "geo_context Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte geo_context Analyse für: Was ist das BImSchG?...",
+        "priority_score": 1.5,
+        "execution_stage": "parallel"
+      },
+      "response_generator": {
+        "agent_type": "response_generator",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "response_generator Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte response_generator Analyse für: Was ist das BImSchG?...",
+        "priority_score": 1.5,
+        "execution_stage": "parallel"
+      },
+      "temporal_analyzer": {
+        "agent_type": "temporal_analyzer",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "temporal_analyzer Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte temporal_analyzer Analyse für: Was ist das BImSchG?...",
+        "priority_score": 1.3,
+        "execution_stage": "parallel"
+      },
+      "document_retrieval": {
+        "agent_type": "document_retrieval",
+        "status": "completed",
+        "confidence_score": 0.85,
+        "summary": "Relevante Dokumente gefunden",
+        "sources": [
+          "Verwaltungsportal",
+          "Formulardatenbank"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte document_retrieval Analyse für: Was ist das BImSchG?...",
+        "priority_score": 0.7,
+        "execution_stage": "sequential"
+      },
+      "legal_framework": {
+        "agent_type": "legal_framework",
+        "status": "completed",
+        "confidence_score": 0.9,
+        "summary": "Rechtliche Bestimmungen analysiert",
+        "sources": [
+          "BauGB",
+          "VwVfG"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte legal_framework Analyse für: Was ist das BImSchG?...",
+        "priority_score": 0.5,
+        "execution_stage": "sequential"
+      },
+      "quality_assessor": {
+        "agent_type": "quality_assessor",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "quality_assessor Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte quality_assessor Analyse für: Was ist das BImSchG?...",
+        "priority_score": 0.2,
+        "execution_stage": "sequential"
+      }
+    },
+    "metadata": {
+      "query_id": "query_bc2a4fb1",
+      "complexity": "intelligent",
+      "processing_time": 25.911564350128174,
+      "agent_count": 6,
+      "successful_agents": 6,
+      "system_mode": "intelligent_pipeline_production",
+      "streaming_available": true,
+      "ollama_available": true,
+      "timestamp": "2025-10-09T16:02:26.770133"
+    },
+    "confidence_score": 0.887
+  }
+]

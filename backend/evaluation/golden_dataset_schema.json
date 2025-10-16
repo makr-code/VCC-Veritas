@@ -1,0 +1,193 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "VERITAS RAG Golden Dataset",
+  "description": "Test-Cases für automatisierte RAG-Pipeline-Evaluation. Inspiriert von AWS Bedrock Evaluations und Azure ML Evaluations.",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Schema-Version",
+      "default": "1.0"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Erstellungsdatum des Datasets"
+    },
+    "description": {
+      "type": "string",
+      "description": "Beschreibung des Datasets (z.B. 'Verwaltungsrecht BGB', 'Baurecht')"
+    },
+    "test_cases": {
+      "type": "array",
+      "description": "Liste der Test-Cases",
+      "items": {
+        "$ref": "#/definitions/test_case"
+      }
+    }
+  },
+  "required": ["version", "test_cases"],
+  "definitions": {
+    "test_case": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Eindeutige Test-Case-ID (z.B. 'bgb_110_basic')"
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "legal",
+            "building",
+            "environmental",
+            "social",
+            "financial",
+            "traffic",
+            "construction",
+            "mixed"
+          ],
+          "description": "Domänen-Kategorie"
+        },
+        "complexity": {
+          "type": "string",
+          "enum": ["simple", "medium", "complex", "multi_hop"],
+          "description": "Query-Komplexität"
+        },
+        "question": {
+          "type": "string",
+          "description": "Frage in natürlicher Sprache"
+        },
+        "query_intent": {
+          "type": "string",
+          "description": "Intention der Anfrage (z.B. 'Rechtliche Auskunft zu § 110 BGB')"
+        },
+        "expected_retrieval": {
+          "$ref": "#/definitions/expected_retrieval",
+          "description": "Erwartete Retrieval-Ergebnisse"
+        },
+        "expected_answer": {
+          "$ref": "#/definitions/expected_answer",
+          "description": "Erwartete Antwort-Eigenschaften"
+        },
+        "hallucination_triggers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Begriffe die NICHT in der Antwort vorkommen dürfen (Halluzination-Indikatoren)"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Tags für Kategorisierung und Filterung"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Notizen zum Test-Case"
+        }
+      },
+      "required": ["id", "category", "complexity", "question", "expected_retrieval", "expected_answer"]
+    },
+    "expected_retrieval": {
+      "type": "object",
+      "properties": {
+        "expected_documents": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Liste erwarteter Dokument-IDs oder Titel (Mindest-Set)"
+        },
+        "expected_entities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Erwartete Entitäten (z.B. '§ 110 BGB', 'Minderjährige')"
+        },
+        "expected_relationships": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "from": {"type": "string"},
+              "type": {"type": "string"},
+              "to": {"type": "string"}
+            }
+          },
+          "description": "Erwartete Graph-Beziehungen (optional)"
+        },
+        "min_documents": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Minimale Anzahl relevanter Dokumente"
+        },
+        "min_relevance_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Minimaler Relevanz-Score für Top-Dokument"
+        }
+      },
+      "required": ["expected_documents", "expected_entities"]
+    },
+    "expected_answer": {
+      "type": "object",
+      "properties": {
+        "must_contain": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Begriffe/Phrasen die in der Antwort enthalten sein MÜSSEN"
+        },
+        "should_contain": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Begriffe/Phrasen die in der Antwort enthalten sein SOLLTEN"
+        },
+        "must_not_contain": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Begriffe/Phrasen die in der Antwort NICHT enthalten sein dürfen"
+        },
+        "expected_structure": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "legal_reference",
+              "definition",
+              "example",
+              "procedure",
+              "deadline",
+              "authority",
+              "citation"
+            ]
+          },
+          "description": "Erwartete strukturelle Elemente in der Antwort"
+        },
+        "min_length": {
+          "type": "integer",
+          "description": "Minimale Antwort-Länge in Zeichen"
+        },
+        "max_length": {
+          "type": "integer",
+          "description": "Maximale Antwort-Länge in Zeichen"
+        },
+        "reference_answer": {
+          "type": "string",
+          "description": "Referenz-Antwort für semantischen Vergleich (optional)"
+        }
+      },
+      "required": ["must_contain"]
+    }
+  }
+}

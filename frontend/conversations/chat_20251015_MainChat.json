@@ -1,0 +1,23 @@
+[
+  {
+    "role": "system",
+    "content": "Willkommen bei Veritas v3.15.0! 🚀\nBackend-API: http://127.0.0.1:5000\nDrücken Sie \"➕ Neuer Chat\" um weitere Fenster zu öffnen.",
+    "timestamp": "2025-10-15T20:11:32.722096"
+  },
+  {
+    "role": "user",
+    "content": "Welche Unterlagen brauche ich für einen Bauantrag für einen Carport in Brandenburg?",
+    "timestamp": "2025-10-15T20:12:06.209634"
+  },
+  {
+    "role": "assistant",
+    "content": "Streaming-Antwort erhalten",
+    "timestamp": "2025-10-15T20:12:23.284604",
+    "sources": [],
+    "worker_results": {},
+    "metadata": {
+      "suggestions": []
+    },
+    "confidence_score": 0.8
+  }
+]

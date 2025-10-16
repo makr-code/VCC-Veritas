@@ -1,0 +1,223 @@
+{
+  "summary": {
+    "total_test_cases": 5,
+    "passed_test_cases": 0,
+    "failed_test_cases": 5,
+    "pass_rate": 0.0,
+    "retrieval_metrics": {
+      "precision_at_k": {},
+      "recall_at_k": {},
+      "mean_reciprocal_rank": 0.0,
+      "ndcg_at_k": {},
+      "total_queries": 0,
+      "avg_retrieved_docs": 0.0,
+      "avg_relevant_docs": 0.0
+    },
+    "context_metrics": {
+      "avg_relevance_score": 0.0,
+      "context_precision": 0.0,
+      "context_recall": 0.0,
+      "graph_enrichment_rate": 0.0,
+      "avg_related_entities": 0.0
+    },
+    "answer_metrics": {
+      "faithfulness": 0.0,
+      "completeness": 0.0,
+      "hallucination_rate": 0.0,
+      "avg_answer_length": 0.0,
+      "must_contain_match_rate": 0.0,
+      "must_not_contain_violation_rate": 0.0
+    },
+    "avg_duration_ms": 0.02002716064453125,
+    "total_duration_s": 0.0,
+    "category_performance": {
+      "legal": 0.0,
+      "building": 0.0,
+      "environmental": 0.0,
+      "social": 0.0
+    },
+    "complexity_performance": {
+      "simple": 0.0,
+      "medium": 0.0,
+      "complex": 0.0
+    },
+    "evaluated_at": "2025-10-06T15:39:37.371264"
+  },
+  "results": [
+    {
+      "test_case_id": "bgb_110_basic",
+      "query": "Was steht im Taschengeldparagraphen?",
+      "passed": false,
+      "retrieval_passed": false,
+      "context_passed": false,
+      "answer_passed": false,
+      "retrieved_docs": [
+        "doc1",
+        "doc2"
+      ],
+      "expected_docs": [
+        "BGB § 110",
+        "bgb_paragraph_110",
+        "bgb_110.pdf"
+      ],
+      "found_entities": [
+        "Test Entity 2",
+        "Test Entity 1"
+      ],
+      "expected_entities": [
+        "§ 110 BGB",
+        "Minderjährige",
+        "gesetzlicher Vertreter",
+        "Taschengeldparagraph"
+      ],
+      "retrieval_score": 0.1,
+      "context_score": 0.4,
+      "answer_score": 0.3,
+      "overall_score": 0.27,
+      "errors": [],
+      "warnings": [],
+      "hallucinations_found": [],
+      "duration_ms": 0.035762786865234375
+    },
+    {
+      "test_case_id": "bgb_110_practical",
+      "query": "Darf ein 16-jähriger ohne Erlaubnis seiner Eltern ein Handy kaufen, wenn er sein Taschengeld dafür verwendet?",
+      "passed": false,
+      "retrieval_passed": false,
+      "context_passed": false,
+      "answer_passed": false,
+      "retrieved_docs": [
+        "doc1",
+        "doc2"
+      ],
+      "expected_docs": [
+        "bgb_paragraph_110",
+        "bgb_110.pdf"
+      ],
+      "found_entities": [
+        "Test Entity 2",
+        "Test Entity 1"
+      ],
+      "expected_entities": [
+        "Kaufvertrag",
+        "§ 110 BGB",
+        "Taschengeld",
+        "Minderjährige"
+      ],
+      "retrieval_score": 0.1,
+      "context_score": 0.4,
+      "answer_score": 0.3,
+      "overall_score": 0.27,
+      "errors": [],
+      "warnings": [],
+      "hallucinations_found": [],
+      "duration_ms": 0.022411346435546875
+    },
+    {
+      "test_case_id": "baurecht_baugenehmigung",
+      "query": "Welche Unterlagen werden für eine Baugenehmigung benötigt?",
+      "passed": false,
+      "retrieval_passed": false,
+      "context_passed": false,
+      "answer_passed": false,
+      "retrieved_docs": [
+        "doc1",
+        "doc2"
+      ],
+      "expected_docs": [
+        "baurecht_verfahren",
+        "baugenehmigung_unterlagen",
+        "bauordnung"
+      ],
+      "found_entities": [
+        "Test Entity 2",
+        "Test Entity 1"
+      ],
+      "expected_entities": [
+        "Baugenehmigung",
+        "Bauamt",
+        "Bauordnung",
+        "Bauantrag"
+      ],
+      "retrieval_score": 0.1,
+      "context_score": 0.4,
+      "answer_score": 0.3,
+      "overall_score": 0.27,
+      "errors": [],
+      "warnings": [],
+      "hallucinations_found": [],
+      "duration_ms": 0.014543533325195312
+    },
+    {
+      "test_case_id": "umweltrecht_emissionsgrenzwerte",
+      "query": "Welche Emissionsgrenzwerte gelten für Industrieanlagen und wie werden sie überwacht?",
+      "passed": false,
+      "retrieval_passed": false,
+      "context_passed": false,
+      "answer_passed": false,
+      "retrieved_docs": [
+        "doc1",
+        "doc2"
+      ],
+      "expected_docs": [
+        "emissionsgrenzwerte",
+        "ta_luft",
+        "bundes_immissionsschutzgesetz"
+      ],
+      "found_entities": [
+        "Test Entity 2",
+        "Test Entity 1"
+      ],
+      "expected_entities": [
+        "TA Luft",
+        "Umweltamt",
+        "BImSchG",
+        "Industrieanlagen",
+        "Emissionsgrenzwerte"
+      ],
+      "retrieval_score": 0.1,
+      "context_score": 0.4,
+      "answer_score": 0.3,
+      "overall_score": 0.27,
+      "errors": [],
+      "warnings": [],
+      "hallucinations_found": [],
+      "duration_ms": 0.012874603271484375
+    },
+    {
+      "test_case_id": "sozialrecht_wohngeld",
+      "query": "Wer hat Anspruch auf Wohngeld und wie wird es berechnet?",
+      "passed": false,
+      "retrieval_passed": false,
+      "context_passed": false,
+      "answer_passed": false,
+      "retrieved_docs": [
+        "doc1",
+        "doc2"
+      ],
+      "expected_docs": [
+        "wohngeld_berechnung",
+        "sozialleistungen",
+        "wohngeldgesetz"
+      ],
+      "found_entities": [
+        "Test Entity 2",
+        "Test Entity 1"
+      ],
+      "expected_entities": [
+        "Anspruchsvoraussetzungen",
+        "Wohngeldgesetz",
+        "Einkommensgrenze",
+        "Wohngeld"
+      ],
+      "retrieval_score": 0.1,
+      "context_score": 0.4,
+      "answer_score": 0.3,
+      "overall_score": 0.27,
+      "errors": [],
+      "warnings": [],
+      "hallucinations_found": [],
+      "duration_ms": 0.014543533325195312
+    }
+  ]
+}

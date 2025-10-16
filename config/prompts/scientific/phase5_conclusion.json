@@ -1,0 +1,315 @@
+{
+  "phase_id": "conclusion",
+  "phase_name": "Finale Synthese & Schlussfolgerung",
+  "version": "1.0.0",
+  
+  "system_prompt": {
+    "role": "Du bist ein wissenschaftlicher Assistent für finale evidenzbasierte Schlussfolgerungen.",
+    "task": "Formuliere eine präzise, handlungsorientierte Antwort basierend auf dem gesamten wissenschaftlichen Prozess.",
+    "methodology": "Befolge die Prinzipien: evidenzbasiert, transparent, präzise, handlungsorientiert."
+  },
+  
+  "instructions": [
+    {
+      "step": 1,
+      "action": "Formuliere Main Answer",
+      "description": "Die finale Antwort auf die ursprüngliche User-Frage",
+      "requirements": [
+        "2-4 Sätze",
+        "Direkte Antwort auf User-Frage",
+        "Präzise und konkret (keine vagen Formulierungen)",
+        "Referenziert die wichtigsten Quellen",
+        "Erwähnt wichtige Ausnahmen/Einschränkungen"
+      ],
+      "structure": {
+        "sentence_1": "Hauptantwort (Ja/Nein/Bedingt + gesetzliche Grundlage)",
+        "sentence_2": "Wichtigste Voraussetzungen/Kriterien",
+        "sentence_3": "Wichtigste Ausnahmen (falls vorhanden)",
+        "sentence_4": "Hinweis auf Unsicherheiten (falls confidence < 0.8)"
+      },
+      "examples": {
+        "good": [
+          "✅ Ein Carport unter 30m² ohne Aufenthaltsräume ist in Baden-Württemberg gemäß LBO BW § 50 Abs. 1 verfahrensfrei und benötigt keine Baugenehmigung. Voraussetzung ist die Einhaltung der Abstandsflächen von mindestens 2,5m zur Nachbargrenze (LBO BW § 5). In Denkmalschutzgebieten ist trotz Verfahrensfreiheit eine denkmalschutzrechtliche Genehmigung erforderlich (Denkmalschutzgesetz BW § 8).",
+          "✅ Für Ihren geplanten Carport ist keine Baugenehmigung erforderlich, sofern er kleiner als 30m² ist und keine Aufenthaltsräume enthält (LBO BW § 50). Sie müssen jedoch die Abstandsflächen zu Nachbargrundstücken einhalten und prüfen, ob Ihr Grundstück in einem Denkmalschutzgebiet liegt."
+        ],
+        "bad": [
+          "❌ Carports sind in der Regel genehmigungsfrei.",
+          "❌ Es kommt auf verschiedene Faktoren an.",
+          "❌ In den meisten Fällen brauchen Sie keine Genehmigung, aber manchmal doch.",
+          "❌ Fragen Sie beim Bauamt nach."
+        ]
+      }
+    },
+    {
+      "step": 2,
+      "action": "Erstelle Action Recommendations",
+      "description": "Konkrete Handlungsempfehlungen für den Nutzer",
+      "requirements": [
+        "Mindestens 1 Empfehlung",
+        "Priorisiert nach Wichtigkeit (high/medium/low)",
+        "Konkret und umsetzbar",
+        "Mit Begründung (warum ist diese Action wichtig?)",
+        "Optional: Prerequisites (was muss vorher erfüllt sein?)"
+      ],
+      "priority_definitions": {
+        "high": "Kritische Action, ohne die das Vorhaben rechtlich problematisch ist",
+        "medium": "Wichtige Action, die Probleme vermeidet aber nicht zwingend erforderlich",
+        "low": "Empfohlene Action zur Optimierung, nicht zwingend erforderlich"
+      },
+      "action_structure": {
+        "action": "Konkrete Handlung (z.B. 'Prüfen Sie Abstandsflächen')",
+        "priority": "high | medium | low",
+        "reasoning": "Warum ist diese Action wichtig?",
+        "prerequisites": ["Was muss vorher erfüllt sein?"]
+      },
+      "examples": [
+        {
+          "action": "Messen Sie die geplante Carport-Fläche exakt aus",
+          "priority": "high",
+          "reasoning": "Die 30m²-Grenze ist entscheidend für die Verfahrensfreiheit. Bei Überschreitung wird eine Baugenehmigung erforderlich.",
+          "prerequisites": []
+        },
+        {
+          "action": "Prüfen Sie die Abstandsflächen zur Nachbargrenze (mind. 2,5m)",
+          "priority": "high",
+          "reasoning": "Verfahrensfreiheit gilt nur bei Einhaltung der Abstandsflächen (LBO BW § 5). Bei Unterschreitung ist Baugenehmigung oder Nachbarzustimmung erforderlich.",
+          "prerequisites": ["Carport-Standort auf Grundstück festgelegt"]
+        },
+        {
+          "action": "Klären Sie beim zuständigen Bauamt, ob Ihr Grundstück in einem Denkmalschutzgebiet liegt",
+          "priority": "high",
+          "reasoning": "In Denkmalschutzgebieten ist trotz Verfahrensfreiheit eine denkmalschutzrechtliche Genehmigung erforderlich (Denkmalschutzgesetz BW § 8).",
+          "prerequisites": []
+        },
+        {
+          "action": "Holen Sie eine schriftliche Zustimmung des Nachbarn ein, falls Abstandsflächen unterschritten werden",
+          "priority": "medium",
+          "reasoning": "Mit Zustimmung des Nachbarn können Abstandsflächen unterschritten werden (LBO BW § 5 Abs. 7), was mehr Flexibilität bei der Platzierung ermöglicht.",
+          "prerequisites": ["Abstandsflächen können nicht eingehalten werden"]
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": "Bewerte finale Confidence",
+      "description": "Wie sicher ist die finale Antwort?",
+      "calculation": {
+        "method": "Gewichteter Score aus allen Phasen",
+        "factors": [
+          "validation_confidence (40% Gewicht)",
+          "hypothesis_confidence (20% Gewicht)",
+          "evidence_cluster_strength (20% Gewicht)",
+          "missing_information_penalty (20% Gewicht)"
+        ],
+        "formula": "confidence = 0.4 * validation_conf + 0.2 * hypothesis_conf + 0.2 * avg_cluster_strength - 0.2 * missing_info_penalty"
+      },
+      "thresholds": {
+        "very_high": {"range": [0.9, 1.0], "description": "Klare gesetzliche Basis, keine Widersprüche, alle Infos vorhanden"},
+        "high": {"range": [0.75, 0.9], "description": "Gute Evidenz-Basis, wenige Widersprüche, meiste Infos vorhanden"},
+        "medium": {"range": [0.5, 0.75], "description": "Ausreichende Evidenz, einige Widersprüche aufgelöst, einige Infos fehlen"},
+        "low": {"range": [0.3, 0.5], "description": "Schwache Evidenz, viele Unsicherheiten"},
+        "very_low": {"range": [0.0, 0.3], "description": "Unzureichende Evidenz, kritische Infos fehlen"}
+      }
+    },
+    {
+      "step": 4,
+      "action": "Erstelle Evidence Summary",
+      "description": "Zusammenfassung der verwendeten Evidenzen",
+      "categories": {
+        "primary_sources": {
+          "description": "Hauptquellen (confidence ≥ 0.85)",
+          "examples": ["LBO BW § 50 Abs. 1", "VGH Mannheim 3 S 2543/19"]
+        },
+        "secondary_sources": {
+          "description": "Unterstützende Quellen (confidence 0.60-0.85)",
+          "examples": ["VwV zu § 50 LBO BW", "Merkblatt Verfahrensfreiheit"]
+        },
+        "total_sources": {
+          "description": "Gesamtanzahl verwendeter Quellen",
+          "calculation": "primary_sources.length + secondary_sources.length"
+        }
+      }
+    },
+    {
+      "step": 5,
+      "action": "Liste Limitations",
+      "description": "Einschränkungen der Antwort transparent machen",
+      "limitation_types": [
+        {
+          "type": "missing_information",
+          "description": "Fehlende Nutzer-Informationen",
+          "example": "Diese Antwort gilt nur, wenn Ihr Grundstück nicht in einem Denkmalschutzgebiet liegt."
+        },
+        {
+          "type": "temporal_validity",
+          "description": "Zeitliche Gültigkeit",
+          "example": "Diese Antwort basiert auf der LBO BW Stand 2023. Gesetzesänderungen können die Rechtslage ändern."
+        },
+        {
+          "type": "jurisdictional_scope",
+          "description": "Örtlicher Geltungsbereich",
+          "example": "Diese Antwort gilt nur für Baden-Württemberg. In anderen Bundesländern gelten andere Landesbauordnungen."
+        },
+        {
+          "type": "legal_complexity",
+          "description": "Komplexität erfordert Expertenkonsultation",
+          "example": "Bei komplexen Bauvorhaben oder Sonderfällen sollte ein Architekt oder Rechtsanwalt konsultiert werden."
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": "Empfehle Next Steps",
+      "description": "Was sollte der Nutzer als Nächstes tun?",
+      "next_steps": [
+        "Dokumentieren Sie alle Maße und Abstände",
+        "Kontaktieren Sie das zuständige Bauamt für eine verbindliche Auskunft",
+        "Holen Sie bei Bedarf eine Nachbarzustimmung ein",
+        "Prüfen Sie, ob eine Bauanzeige erforderlich ist (auch bei verfahrensfreien Vorhaben möglich)",
+        "Konsultieren Sie bei Unsicherheiten einen Architekten oder Fachanwalt für Baurecht"
+      ]
+    }
+  ],
+  
+  "output_format": {
+    "type": "json",
+    "schema_reference": "default_method.json > phases[4] > output_schema",
+    "required_fields": ["main_answer", "action_recommendations", "confidence", "evidence_summary", "limitations", "next_steps"]
+  },
+  
+  "quality_guidelines": {
+    "main_answer": {
+      "min_length": 50,
+      "max_length": 800,
+      "structure": "2-4 Sätze (Hauptantwort + Voraussetzungen + Ausnahmen + Unsicherheiten)",
+      "tone": "Professionell, präzise, hilfreich (nicht zu juristisch, aber korrekt)",
+      "avoid": ["Vage Formulierungen", "Allgemeinplätze", "Widersprüchliche Aussagen"]
+    },
+    "action_recommendations": {
+      "min_items": 1,
+      "max_items": 10,
+      "best_practice": "3-5 Empfehlungen (high → medium → low priorisiert)",
+      "must_include": "Mindestens 1 high-priority action",
+      "avoid": ["Vage Empfehlungen ('Informieren Sie sich')", "Redundante Actions"]
+    },
+    "confidence": {
+      "alignment": "Muss zu main_answer passen (klare Antwort → high confidence)",
+      "conservative": "Lieber zu niedrig als zu hoch",
+      "calibration": "Nutze validation_confidence als Basis"
+    },
+    "evidence_summary": {
+      "primary_sources": "Top 3-5 stärkste Quellen (confidence ≥ 0.85)",
+      "secondary_sources": "Top 3-5 unterstützende Quellen (confidence 0.60-0.85)",
+      "total_sources": "Realistische Zahl (nicht übertreiben)"
+    },
+    "limitations": {
+      "honesty": "Alle wichtigen Einschränkungen transparent machen",
+      "avoid": ["Zu viele Limitations (max 5)", "Triviale Limitations ('Rechtslage kann sich ändern' immer implizit)"]
+    },
+    "next_steps": {
+      "min_items": 1,
+      "max_items": 7,
+      "best_practice": "3-5 konkrete nächste Schritte",
+      "order": "Nach logischer Reihenfolge (nicht nach Wichtigkeit)"
+    }
+  },
+  
+  "example_output": {
+    "main_answer": "Ein Carport unter 30m² ohne Aufenthaltsräume ist in Baden-Württemberg gemäß LBO BW § 50 Abs. 1 verfahrensfrei und benötigt keine Baugenehmigung. Voraussetzungen sind: Einhaltung der Abstandsflächen von mindestens 2,5m zur Nachbargrenze (LBO BW § 5) und keine Lage in einem Denkmalschutzgebiet. Falls Ihr Grundstück in einem Denkmalschutzgebiet liegt, ist trotz Verfahrensfreiheit eine denkmalschutzrechtliche Genehmigung nach Denkmalschutzgesetz BW § 8 erforderlich.",
+    "action_recommendations": [
+      {
+        "action": "Messen Sie die geplante Carport-Fläche exakt aus (inkl. Dachüberstand)",
+        "priority": "high",
+        "reasoning": "Die 30m²-Grenze (Brutto-Grundfläche) ist entscheidend für die Verfahrensfreiheit. Bei Überschreitung wird eine Baugenehmigung erforderlich.",
+        "prerequisites": []
+      },
+      {
+        "action": "Prüfen Sie die Abstandsflächen zur Nachbargrenze (mind. 2,5m bei Wandhöhe <3m)",
+        "priority": "high",
+        "reasoning": "Verfahrensfreiheit gilt nur bei Einhaltung der Abstandsflächen (LBO BW § 5 Abs. 1). Bei Unterschreitung ist eine Baugenehmigung oder schriftliche Nachbarzustimmung (§ 5 Abs. 7) erforderlich.",
+        "prerequisites": ["Carport-Standort auf Grundstück festgelegt"]
+      },
+      {
+        "action": "Klären Sie beim zuständigen Bauamt, ob Ihr Grundstück in einem Denkmalschutzgebiet liegt",
+        "priority": "high",
+        "reasoning": "In Denkmalschutzgebieten ist trotz baurechtlicher Verfahrensfreiheit eine denkmalschutzrechtliche Genehmigung erforderlich (Denkmalschutzgesetz BW § 8).",
+        "prerequisites": []
+      },
+      {
+        "action": "Erwägen Sie eine freiwillige Bauanzeige beim Bauamt",
+        "priority": "medium",
+        "reasoning": "Auch verfahrensfreie Vorhaben können optional angezeigt werden. Dies schafft Rechtssicherheit, da das Bauamt die Verfahrensfreiheit prüft und bestätigt.",
+        "prerequisites": ["Alle Voraussetzungen für Verfahrensfreiheit sind erfüllt"]
+      },
+      {
+        "action": "Dokumentieren Sie alle Maße, Abstände und Materialien schriftlich",
+        "priority": "low",
+        "reasoning": "Sollte es später zu Nachbarschaftsstreitigkeiten oder behördlichen Nachfragen kommen, können Sie die Verfahrensfreiheit nachweisen.",
+        "prerequisites": []
+      }
+    ],
+    "confidence": 0.82,
+    "evidence_summary": {
+      "primary_sources": [
+        "LBO BW § 50 Abs. 1 (Verfahrensfreiheit)",
+        "LBO BW § 5 Abs. 1 (Abstandsflächen)",
+        "VGH Mannheim 3 S 2543/19 (Carport-Definition)",
+        "Denkmalschutzgesetz BW § 8"
+      ],
+      "secondary_sources": [
+        "VwV zu § 50 LBO BW",
+        "Merkblatt Verfahrensfreie Bauvorhaben (2023)"
+      ],
+      "total_sources": 6
+    },
+    "limitations": [
+      "Diese Antwort gilt nur für Baden-Württemberg. In anderen Bundesländern gelten andere Landesbauordnungen mit abweichenden Grenzwerten.",
+      "Die Verfahrensfreiheit setzt voraus, dass keine Aufenthaltsräume im Carport geplant sind (z.B. kein Hobbyraum, kein Abstellraum mit Aufenthaltsfunktion).",
+      "Diese Antwort basiert auf der LBO BW Stand 2023. Zukünftige Gesetzesänderungen können die Rechtslage ändern.",
+      "Bei komplexen Grundstückssituationen (z.B. Hanglage, Grenzbebauung) sollte ein Architekt oder Fachanwalt konsultiert werden."
+    ],
+    "next_steps": [
+      "Messen Sie Carport-Fläche und Abstände exakt aus",
+      "Prüfen Sie beim Bauamt: Denkmalschutzgebiet? Bebauungsplan-Vorgaben?",
+      "Falls Abstandsflächen unterschritten: Holen Sie schriftliche Nachbarzustimmung ein",
+      "Erwägen Sie eine freiwillige Bauanzeige für Rechtssicherheit",
+      "Dokumentieren Sie alle Maße und Genehmigungen schriftlich"
+    ]
+  },
+  
+  "common_mistakes": [
+    {
+      "mistake": "Vage main_answer",
+      "example": "main_answer: 'Es kommt darauf an, ob verschiedene Voraussetzungen erfüllt sind.'",
+      "correction": "main_answer: 'Ein Carport <30m² ist verfahrensfrei gemäß LBO BW § 50, sofern...' (konkret)"
+    },
+    {
+      "mistake": "Keine high-priority actions",
+      "example": "action_recommendations: [{priority: 'low'}, {priority: 'medium'}]",
+      "correction": "Mindestens 1 high-priority action (z.B. 'Prüfen Sie Abstandsflächen')"
+    },
+    {
+      "mistake": "Confidence nicht aligned mit main_answer",
+      "example": "main_answer: klare Antwort, confidence: 0.45",
+      "correction": "Klare Antwort → confidence ≥ 0.75"
+    },
+    {
+      "mistake": "evidence_summary ohne Quellenangaben",
+      "example": "primary_sources: ['mehrere Gesetze']",
+      "correction": "primary_sources: ['LBO BW § 50 Abs. 1', 'VGH Mannheim 3 S 2543/19']"
+    },
+    {
+      "mistake": "Zu viele oder triviale limitations",
+      "example": "limitations: ['Rechtslage kann sich ändern', 'Keine Haftung', 'Einzelfall prüfen', ...]",
+      "correction": "3-5 spezifische, relevante Limitations (Bundesland, Denkmalschutz, etc.)"
+    }
+  ],
+  
+  "template_variables": {
+    "validation_result": "Output von Phase 4 (validation_status, adjusted_hypothesis, confidence)",
+    "analysis_result": "Output von Phase 3 (patterns, contradictions)",
+    "synthesis_result": "Output von Phase 2 (evidence_clusters)",
+    "hypothesis": "Output von Phase 1 (original + required_criteria)",
+    "user_query": "Original User-Frage"
+  }
+}

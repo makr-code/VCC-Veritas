@@ -1,0 +1,588 @@
+{
+  "timestamp": "2025-10-08T16:17:28.237050",
+  "summary": {
+    "total_agents": 14,
+    "total_tools": 4,
+    "priority_counts": {
+      "HIGH": 10,
+      "LOW": 1,
+      "MEDIUM": 3
+    },
+    "domain_counts": {
+      "environmental": 5,
+      "construction": 1,
+      "financial": 4,
+      "social": 1,
+      "technical": 1,
+      "traffic": 1,
+      "general": 1
+    },
+    "mockup_mapping": {
+      "DataRetrievalAgent": 11,
+      "OrchestratorAgent": 2,
+      "AgentRegistry": 1
+    },
+    "most_used_tools": [
+      {
+        "name": "database",
+        "usage_count": 14,
+        "type": "database"
+      },
+      {
+        "name": "api_call",
+        "usage_count": 13,
+        "type": "api"
+      },
+      {
+        "name": "uds3",
+        "usage_count": 4,
+        "type": "database"
+      },
+      {
+        "name": "vector_search",
+        "usage_count": 1,
+        "type": "search"
+      }
+    ],
+    "code_statistics": {
+      "total_lines": 13707,
+      "avg_lines_per_agent": 979.1,
+      "total_complexity": 1179,
+      "avg_complexity_per_agent": 84.2
+    },
+    "test_coverage": {
+      "agents_with_tests": 0,
+      "percentage": 0.0
+    }
+  },
+  "recommendations": [
+    "🔥 HIGH: Migrate 10 high-priority agents next",
+    "⚠️ TEST COVERAGE: 14 agents lack tests - add before migration",
+    "🔧 REFACTORING: 13 complex agents will benefit from framework structure"
+  ],
+  "agents": [
+    {
+      "name": "atmospheric_flow",
+      "file_path": "backend\\agents\\veritas_api_agent_atmospheric_flow.py",
+      "class_name": "AtmosphericFlowAgent",
+      "domain": "environmental",
+      "mockup_equivalent": "DataRetrievalAgent",
+      "migration_priority": "HIGH",
+      "line_count": 1241,
+      "complexity_score": 103,
+      "has_tests": false,
+      "methods": [
+        "distance_to",
+        "to_dict",
+        "u_component",
+        "v_component",
+        "to_dict",
+        "get_wind_at_point",
+        "interpolate_wind_field",
+        "to_dict",
+        "effective_stack_height",
+        "to_dict",
+        "to_dict",
+        "to_dict",
+        "to_dict",
+        "to_dict",
+        "get_max_impact_receptor",
+        "to_dict",
+        "calculate_flow",
+        "get_status"
+      ],
+      "tools_used": [
+        "database",
+        "api_call"
+      ],
+      "migration_notes": [
+        "Atmospheric - specialized tool",
+        "High complexity - benefits from framework",
+        "Many dependencies - framework simplifies",
+        "⚠️ No tests - add tests before migration"
+      ]
+    },
+    {
+      "name": "chemical_data",
+      "file_path": "backend\\agents\\veritas_api_agent_chemical_data.py",
+      "class_name": "ChemicalDataAgent",
+      "domain": "environmental",
+      "mockup_equivalent": "DataRetrievalAgent",
+      "migration_priority": "HIGH",
+      "line_count": 1232,
+      "complexity_score": 124,
+      "has_tests": false,
+      "methods": [
+        "to_dict",
+        "to_dict",
+        "to_dict",
+        "to_dict",
+        "to_dict",
+        "to_dict",
+        "to_dict",
+        "get_identifier",
+        "get_cas_number",
+        "get_property",
+        "get_exposure_limit",
+        "is_hazardous",
+        "get_signal_word",
+        "to_dict",
+        "to_dict",
+        "get_best_match",
+        "get_substances_by_hazard",
+        "to_dict",
+        "to_dict",
+        "query_chemical_data",
+        "get_status"
+      ],
+      "tools_used": [
+        "database",
+        "api_call"
+      ],
+      "migration_notes": [
+        "Chemical data - specialized tool",
+        "High complexity - benefits from framework",
+        "Many dependencies - framework simplifies",
+        "⚠️ No tests - add tests before migration"
+      ]
+    },
+    {
+      "name": "construction",
+      "file_path": "backend\\agents\\veritas_api_agent_construction.py",
+      "class_name": null,
+      "domain": "construction",
+      "mockup_equivalent": "DataRetrievalAgent",
+      "migration_priority": "HIGH",
+      "line_count": 891,
+      "complexity_score": 79,
+      "has_tests": false,
+      "methods": [],
+      "tools_used": [
+        "database",
+        "api_call"
+      ],
+      "migration_notes": [
+        "Construction domain retrieval",
+        "High complexity - benefits from framework",
+        "Many dependencies - framework simplifies",
+        "⚠️ No tests - add tests before migration"
+      ]
+    },
+    {
+      "name": "core_components",
+      "file_path": "backend\\agents\\veritas_api_agent_core_components.py",
+      "class_name": "AgentMessageType",
+      "domain": "financial",
+      "mockup_equivalent": "DataRetrievalAgent",
+      "migration_priority": "HIGH",
+      "line_count": 884,
+      "complexity_score": 100,
+      "has_tests": false,
+      "methods": [
+        "register_agent",
+        "update_agent_activity",
+        "should_terminate_agent",
+        "analyze_query_demand",
+        "send_agent_update",
+        "start",
+        "stop",
+        "submit_query",
+        "get_query_result",
+        "get_status",
+        "process_query_sync",
+        "process_query"
+      ],
+      "tools_used": [
+        "uds3",
+        "database",
+        "api_call"
+      ],
+      "migration_notes": [
+        "Financial domain agent",
+        "High complexity - benefits from framework",
+        "Many dependencies - framework simplifies",
+        "⚠️ No tests - add tests before migration"
+      ]
+    },
+    {
+      "name": "dwd_weather",
+      "file_path": "backend\\agents\\veritas_api_agent_dwd_weather.py",
+      "class_name": "DwdWeatherAgent",
+      "domain": "environmental",
+      "mockup_equivalent": "DataRetrievalAgent",
+      "migration_priority": "HIGH",
+      "line_count": 896,
+      "complexity_score": 88,
+      "has_tests": false,
+      "methods": [
+        "validate_input",
+        "process_query",
+        "execute_query",
+        "get_capabilities",
+        "get_status",
+        "shutdown"
+      ],
+      "tools_used": [
+        "database",
+        "api_call"
+      ],
+      "migration_notes": [
+        "Weather API - specialized tool",
+        "High complexity - benefits from framework",
+        "Many dependencies - framework simplifies",
+        "⚠️ No tests - add tests before migration"
+      ]
+    },
+    {
+      "name": "environmental",
+      "file_path": "backend\\agents\\veritas_api_agent_environmental.py",
+      "class_name": "EnvironmentalAgentConfig",
+      "domain": "environmental",
+      "mockup_equivalent": "DataRetrievalAgent",
+      "migration_priority": "LOW",
+      "line_count": 573,
+      "complexity_score": 39,
+      "has_tests": false,
+      "methods": [
+        "process_query",
+        "validate_input",
+        "get_capabilities",
+        "preprocess_query",
+        "postprocess_results",
+        "handle_error",
+        "execute_query",
+        "get_status",
+        "shutdown",
+        "process_query",
+        "validate_input",
+        "get_capabilities"
+      ],
+      "tools_used": [
+        "uds3",
+        "database",
+        "api_call"
+      ],
+      "migration_notes": [
+        "Environmental domain retrieval",
+        "Many dependencies - framework simplifies",
+        "⚠️ No tests - add tests before migration"
+      ]
+    },
+    {
+      "name": "financial",
+      "file_path": "backend\\agents\\veritas_api_agent_financial.py",
+      "class_name": null,
+      "domain": "financial",
+      "mockup_equivalent": "DataRetrievalAgent",
+      "migration_priority": "MEDIUM",
+      "line_count": 1050,
+      "complexity_score": 81,
+      "has_tests": false,
+      "methods": [],
+      "tools_used": [
+        "database",
+        "api_call"
+      ],
+      "migration_notes": [
+        "Financial domain retrieval",
+        "High complexity - benefits from framework",
+        "⚠️ No tests - add tests before migration"
+      ]
+    },
+    {
+      "name": "orchestrator",
+      "file_path": "backend\\agents\\veritas_api_agent_orchestrator.py",
+      "class_name": "AgentPipelineTask",
+      "domain": "financial",
+      "mockup_equivalent": "OrchestratorAgent",
+      "migration_priority": "HIGH",
+      "line_count": 1105,
+      "complexity_score": 89,
+      "has_tests": false,
+      "methods": [
+        "set_agent_coordinator",
+        "preprocess_query",
+        "aggregate_results",
+        "get_orchestrator_status",
+        "process_query_with_pipeline"
+      ],
+      "tools_used": [
+        "uds3",
+        "database",
+        "api_call"
+      ],
+      "migration_notes": [
+        "Core orchestration - migrate first",
+        "High complexity - benefits from framework",
+        "Many dependencies - framework simplifies",
+        "⚠️ No tests - add tests before migration"
+      ]
+    },
+    {
+      "name": "pipeline_manager",
+      "file_path": "backend\\agents\\veritas_api_agent_pipeline_manager.py",
+      "class_name": "AgentQueryItem",
+      "domain": "environmental",
+      "mockup_equivalent": "OrchestratorAgent",
+      "migration_priority": "HIGH",
+      "line_count": 620,
+      "complexity_score": 53,
+      "has_tests": false,
+      "methods": [
+        "submit_query",
+        "get_pending_queries",
+        "start_query_processing",
+        "complete_query_processing",
+        "get_query_status",
+        "get_pipeline_statistics",
+        "cleanup_old_queries"
+      ],
+      "tools_used": [
+        "database"
+      ],
+      "migration_notes": [
+        "Part of core orchestration",
+        "High complexity - benefits from framework",
+        "Many dependencies - framework simplifies",
+        "⚠️ No tests - add tests before migration"
+      ]
+    },
+    {
+      "name": "registry",
+      "file_path": "backend\\agents\\veritas_api_agent_registry.py",
+      "class_name": "AgentCapability",
+      "domain": "financial",
+      "mockup_equivalent": "AgentRegistry",
+      "migration_priority": "HIGH",
+      "line_count": 675,
+      "complexity_score": 71,
+      "has_tests": false,
+      "methods": [
+        "filter",
+        "get_database_api",
+        "get_ollama_llm",
+        "get_ollama_embeddings",
+        "cache_external_api_result",
+        "get_cached_external_api_result",
+        "get_resource_usage_stats",
+        "register_agent",
+        "get_agents_for_capability",
+        "get_agent_instance",
+        "release_agent_instance",
+        "get_registry_status",
+        "auto_discover_agents"
+      ],
+      "tools_used": [
+        "uds3",
+        "database",
+        "vector_search",
+        "api_call"
+      ],
+      "migration_notes": [
+        "Core registry - migrate early",
+        "High complexity - benefits from framework",
+        "Many dependencies - framework simplifies",
+        "⚠️ No tests - add tests before migration"
+      ]
+    },
+    {
+      "name": "social",
+      "file_path": "backend\\agents\\veritas_api_agent_social.py",
+      "class_name": null,
+      "domain": "social",
+      "mockup_equivalent": "DataRetrievalAgent",
+      "migration_priority": "MEDIUM",
+      "line_count": 1300,
+      "complexity_score": 94,
+      "has_tests": false,
+      "methods": [],
+      "tools_used": [
+        "database",
+        "api_call"
+      ],
+      "migration_notes": [
+        "Social domain retrieval",
+        "High complexity - benefits from framework",
+        "⚠️ No tests - add tests before migration"
+      ]
+    },
+    {
+      "name": "technical_standards",
+      "file_path": "backend\\agents\\veritas_api_agent_technical_standards.py",
+      "class_name": "TechnicalStandardsAgent",
+      "domain": "technical",
+      "mockup_equivalent": "DataRetrievalAgent",
+      "migration_priority": "HIGH",
+      "line_count": 1252,
+      "complexity_score": 116,
+      "has_tests": false,
+      "methods": [
+        "to_dict",
+        "to_dict",
+        "to_dict",
+        "to_dict",
+        "to_dict",
+        "get_current_version",
+        "is_current",
+        "get_mandatory_requirements",
+        "get_requirements_by_section",
+        "to_dict",
+        "to_dict",
+        "to_dict",
+        "get_by_organization",
+        "get_by_category",
+        "get_mandatory_standards",
+        "to_dict",
+        "to_dict",
+        "search_standards",
+        "get_status"
+      ],
+      "tools_used": [
+        "database",
+        "api_call"
+      ],
+      "migration_notes": [
+        "Standards - specialized tool",
+        "High complexity - benefits from framework",
+        "Many dependencies - framework simplifies",
+        "⚠️ No tests - add tests before migration"
+      ]
+    },
+    {
+      "name": "traffic",
+      "file_path": "backend\\agents\\veritas_api_agent_traffic.py",
+      "class_name": null,
+      "domain": "traffic",
+      "mockup_equivalent": "DataRetrievalAgent",
+      "migration_priority": "MEDIUM",
+      "line_count": 949,
+      "complexity_score": 64,
+      "has_tests": false,
+      "methods": [],
+      "tools_used": [
+        "database",
+        "api_call"
+      ],
+      "migration_notes": [
+        "Traffic domain retrieval",
+        "High complexity - benefits from framework",
+        "⚠️ No tests - add tests before migration"
+      ]
+    },
+    {
+      "name": "wikipedia",
+      "file_path": "backend\\agents\\veritas_api_agent_wikipedia.py",
+      "class_name": "WikipediaAgent",
+      "domain": "general",
+      "mockup_equivalent": "DataRetrievalAgent",
+      "migration_priority": "HIGH",
+      "line_count": 1039,
+      "complexity_score": 78,
+      "has_tests": false,
+      "methods": [
+        "to_dict",
+        "to_dict",
+        "get_section",
+        "get_summary_sentences",
+        "to_dict",
+        "to_dict",
+        "to_dict",
+        "get_best_result",
+        "get_primary_article",
+        "to_dict",
+        "execute_query",
+        "get_status"
+      ],
+      "tools_used": [
+        "database",
+        "api_call"
+      ],
+      "migration_notes": [
+        "Wikipedia API - specialized tool",
+        "High complexity - benefits from framework",
+        "Many dependencies - framework simplifies",
+        "⚠️ No tests - add tests before migration"
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "name": "database",
+      "type": "database",
+      "usage_count": 14,
+      "used_by": [
+        "atmospheric_flow",
+        "chemical_data",
+        "construction",
+        "core_components",
+        "dwd_weather",
+        "environmental",
+        "financial",
+        "orchestrator",
+        "pipeline_manager",
+        "registry",
+        "social",
+        "technical_standards",
+        "traffic",
+        "wikipedia"
+      ]
+    },
+    {
+      "name": "api_call",
+      "type": "api",
+      "usage_count": 13,
+      "used_by": [
+        "atmospheric_flow",
+        "chemical_data",
+        "construction",
+        "core_components",
+        "dwd_weather",
+        "environmental",
+        "financial",
+        "orchestrator",
+        "registry",
+        "social",
+        "technical_standards",
+        "traffic",
+        "wikipedia"
+      ]
+    },
+    {
+      "name": "uds3",
+      "type": "database",
+      "usage_count": 4,
+      "used_by": [
+        "core_components",
+        "environmental",
+        "orchestrator",
+        "registry"
+      ]
+    },
+    {
+      "name": "vector_search",
+      "type": "search",
+      "usage_count": 1,
+      "used_by": [
+        "registry"
+      ]
+    }
+  ],
+  "mockup_agents": [
+    "AgentRequest",
+    "AgentResult",
+    "AgentToolNotSupported",
+    "BaseAgent",
+    "ResponderAgent",
+    "StorageAdapterAgent",
+    "DataRetrievalAgent",
+    "DataAnalysisAgent",
+    "SynthesisAgent",
+    "ValidationAgent",
+    "TriageAgent",
+    "SQLStorageAgent",
+    "GraphStorageAgent",
+    "VectorStorageAgent",
+    "FileStorageAgent",
+    "AgentRegistry"
+  ]
+}

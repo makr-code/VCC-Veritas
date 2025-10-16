@@ -1,0 +1,437 @@
+{
+  "phase_id": "metacognition",
+  "phase_name": "Metakognitive Selbstbewertung",
+  "version": "1.0.0",
+  
+  "system_prompt": {
+    "role": "Du bist ein wissenschaftlicher Assistent für metakognitive Selbstreflexion.",
+    "task": "Bewerte den gesamten wissenschaftlichen Reasoning-Prozess kritisch und identifiziere Verbesserungspotenziale.",
+    "methodology": "Befolge die Prinzipien: transparent, selbstkritisch, lernorientiert."
+  },
+  
+  "instructions": [
+    {
+      "step": 1,
+      "action": "Bewerte Reasoning Quality",
+      "description": "Wie gut war der gesamte Reasoning-Prozess?",
+      "quality_levels": [
+        {
+          "level": "excellent",
+          "criteria": [
+            "Alle 6 Phasen vollständig und korrekt durchlaufen",
+            "Hypothese präzise formuliert und validiert",
+            "Evidenzen umfassend synthetisiert",
+            "Widersprüche vollständig aufgelöst",
+            "Finale Antwort klar, präzise und handlungsorientiert",
+            "Keine signifikanten Lücken im Reasoning"
+          ],
+          "example": "Reasoning-Prozess war exzellent: Klare Hypothese (Confidence 0.85) → umfassende Evidenz-Synthese (3 Cluster, Stärke 0.88-0.98) → keine kritischen Widersprüche → validierte Hypothese → präzise Handlungsempfehlungen."
+        },
+        {
+          "level": "good",
+          "criteria": [
+            "Alle Phasen durchlaufen, wenige kleinere Fehler",
+            "Hypothese gut, aber könnte präziser sein",
+            "Evidenzen gut aggregiert, aber einige Lücken",
+            "Die meisten Widersprüche aufgelöst",
+            "Finale Antwort gut, aber könnte konkreter sein"
+          ],
+          "example": "Reasoning-Prozess war gut: Solide Hypothese → gute Evidenz-Synthese (2 Cluster) → 1 minor Widerspruch unaufgelöst → validierte Antwort → hilfreiche Empfehlungen."
+        },
+        {
+          "level": "adequate",
+          "criteria": [
+            "Alle Phasen durchlaufen, aber mit Mängeln",
+            "Hypothese zu vage oder zu breit",
+            "Evidenzen unvollständig synthetisiert",
+            "Einige Widersprüche nicht aufgelöst",
+            "Finale Antwort akzeptabel, aber nicht optimal"
+          ],
+          "example": "Reasoning-Prozess war ausreichend: Vage Hypothese → lückenhafte Evidenz-Synthese → 2 major Widersprüche nur teilweise aufgelöst → eingeschränkte Antwort."
+        },
+        {
+          "level": "poor",
+          "criteria": [
+            "Wesentliche Phasen fehlerhaft oder übersprungen",
+            "Hypothese unklar oder falsch",
+            "Evidenzen nicht systematisch verarbeitet",
+            "Widersprüche ignoriert",
+            "Finale Antwort vage oder widersprüchlich"
+          ],
+          "example": "Reasoning-Prozess war schwach: Unklare Hypothese → keine systematische Evidenz-Aggregation → Widersprüche ignoriert → vage Antwort ohne Handlungsempfehlungen."
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": "Bewerte Evidence Quality",
+      "description": "Wie gut waren die verwendeten Evidenzen?",
+      "quality_dimensions": [
+        {
+          "dimension": "source_strength",
+          "description": "Qualität der Quellen gemäß Hierarchie",
+          "levels": {
+            "excellent": "Primär hochwertige Quellen (Gesetze, VGH-Urteile), Confidence ≥ 0.85",
+            "good": "Gute Quellen (VwV, aktuelle Merkblätter), Confidence 0.70-0.85",
+            "adequate": "Ausreichende Quellen (Merkblätter), Confidence 0.60-0.70",
+            "poor": "Schwache Quellen (veraltete Merkblätter, unbekannte Quellen), Confidence < 0.60"
+          }
+        },
+        {
+          "dimension": "source_coverage",
+          "description": "Vollständigkeit der Evidenz-Basis",
+          "levels": {
+            "excellent": "Alle required_criteria durch Evidenzen abgedeckt",
+            "good": "Die meisten required_criteria abgedeckt (≥ 80%)",
+            "adequate": "Einige required_criteria abgedeckt (60-80%)",
+            "poor": "Viele required_criteria nicht abgedeckt (< 60%)"
+          }
+        },
+        {
+          "dimension": "contradiction_handling",
+          "description": "Umgang mit widersprüchlichen Evidenzen",
+          "levels": {
+            "excellent": "Alle Widersprüche identifiziert und aufgelöst",
+            "good": "Die meisten Widersprüche aufgelöst, wenige minor unaufgelöst",
+            "adequate": "Einige Widersprüche aufgelöst, einige major unaufgelöst",
+            "poor": "Widersprüche ignoriert oder nicht erkannt"
+          }
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": "Begründe Confidence Justification",
+      "description": "Warum ist das finale Confidence-Level angemessen?",
+      "justification_structure": {
+        "supporting_factors": "Was spricht für hohes Confidence? (starke Evidenzen, klare Rechtslage)",
+        "limiting_factors": "Was spricht gegen hohes Confidence? (fehlende Infos, Widersprüche)",
+        "calibration_check": "Ist Confidence konservativ genug? (lieber zu niedrig als zu hoch)",
+        "alignment_check": "Passt Confidence zu validation_status? (confirmed → high confidence)"
+      },
+      "examples": {
+        "good": "Confidence 0.82 ist angemessen: Starke gesetzliche Grundlage (LBO BW § 50, Confidence 0.98) + VGH-Bestätigung (0.90) sprechen für hohes Confidence. Jedoch fehlt Information über Denkmalschutz-Status (limiting factor), daher nicht 0.90+. Alignment mit validation_status 'partially_confirmed' ist korrekt.",
+        "bad": "Confidence ist gut."
+      }
+    },
+    {
+      "step": 4,
+      "action": "Identifiziere Information Gaps",
+      "description": "Welche Informationslücken bestehen noch?",
+      "gap_types": [
+        {
+          "gap_type": "user_input",
+          "description": "Informationen, die der Nutzer liefern muss",
+          "impact_levels": {
+            "high": "Kritische Info fehlt, verhindert definitive Antwort (z.B. Bundesland unbekannt)",
+            "medium": "Wichtige Info fehlt, schränkt Antwort ein (z.B. Carport-Größe unbekannt)",
+            "low": "Optionale Info fehlt, kaum Auswirkung (z.B. Dachfarbe)"
+          },
+          "resolution": "Nutzer muss Information bereitstellen (via Interactive Form oder Follow-Up)",
+          "example": {
+            "gap_type": "user_input",
+            "description": "Unbekannt, ob Grundstück in Denkmalschutzgebiet liegt",
+            "impact": "high",
+            "resolution": "Nutzer muss beim Bauamt nachfragen oder Bebauungsplan prüfen"
+          }
+        },
+        {
+          "gap_type": "data",
+          "description": "Fehlende Daten im RAG-System",
+          "impact_levels": {
+            "high": "Kritische Daten fehlen (z.B. aktuelle LBO-Fassung)",
+            "medium": "Wichtige Daten fehlen (z.B. VGH-Rechtsprechung zu Spezialfall)",
+            "low": "Ergänzende Daten fehlen (z.B. Statistiken)"
+          },
+          "resolution": "RAG-Datenbank erweitern, neue Quellen indexieren",
+          "example": {
+            "gap_type": "data",
+            "description": "Keine VGH-Rechtsprechung zu Carports in Denkmalschutzgebieten vorhanden",
+            "impact": "medium",
+            "resolution": "Rechtsprechungs-Datenbank um Denkmalschutz-Urteile erweitern"
+          }
+        },
+        {
+          "gap_type": "context",
+          "description": "Unklarer Kontext der Anfrage",
+          "impact_levels": {
+            "high": "Kritischer Kontext unklar (z.B. gewerblich vs. privat)",
+            "medium": "Wichtiger Kontext unklar (z.B. Neubau vs. Anbau)",
+            "low": "Ergänzender Kontext unklar (z.B. Baujahr des Hauptgebäudes)"
+          },
+          "resolution": "Nachfrage beim Nutzer oder Kontext-Inferenz aus anderen Infos",
+          "example": {
+            "gap_type": "context",
+            "description": "Unklar, ob Carport an bestehendes Gebäude angebaut oder freistehend",
+            "impact": "medium",
+            "resolution": "Nutzer nachfragen: 'Ist der Carport freistehend oder angebaut?'"
+          }
+        },
+        {
+          "gap_type": "expertise",
+          "description": "Expertenwissen erforderlich",
+          "impact_levels": {
+            "high": "Kritisches Expertenwissen fehlt (z.B. statische Berechnung)",
+            "medium": "Wichtiges Expertenwissen fehlt (z.B. Brandschutz-Detailfragen)",
+            "low": "Ergänzendes Expertenwissen fehlt (z.B. Optimierungs-Tipps)"
+          },
+          "resolution": "Empfehlung zur Konsultation eines Experten (Architekt, Rechtsanwalt)",
+          "example": {
+            "gap_type": "expertise",
+            "description": "Statische Berechnung der Dachkonstruktion erforderlich",
+            "impact": "high",
+            "resolution": "Empfehlung: Konsultieren Sie einen Statiker oder Architekten"
+          }
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": "Bewerte Process Quality Metrics",
+      "description": "Quantitative Qualitäts-Metriken des Prozesses",
+      "metrics": [
+        {
+          "metric": "hypothesis_accuracy",
+          "description": "Wie genau war die initiale Hypothese?",
+          "calculation": "Vergleich original_hypothesis vs. adjusted_hypothesis vs. final_answer",
+          "scale": {
+            "1.0": "Hypothese war 100% korrekt, keine Anpassung nötig",
+            "0.8-0.9": "Hypothese war größtenteils korrekt, kleine Anpassung",
+            "0.6-0.8": "Hypothese war teilweise korrekt, moderate Anpassung",
+            "0.4-0.6": "Hypothese war grob korrekt, große Anpassung",
+            "0.0-0.4": "Hypothese war falsch, fundamental revidiert"
+          },
+          "example": {
+            "original_hypothesis": "Carport ist verfahrensfrei",
+            "adjusted_hypothesis": "Carport ist verfahrensfrei, außer in Denkmalschutzgebieten",
+            "final_answer": "Carport ist verfahrensfrei, außer in Denkmalschutzgebieten und bei Abstandsflächenunterschreitung",
+            "hypothesis_accuracy": 0.75
+          }
+        },
+        {
+          "metric": "evidence_coverage",
+          "description": "Anteil der required_criteria, die durch Evidenzen abgedeckt wurden",
+          "calculation": "covered_criteria / total_required_criteria",
+          "scale": {
+            "1.0": "100% der Kriterien abgedeckt",
+            "0.8-0.9": "80-90% abgedeckt (sehr gut)",
+            "0.6-0.8": "60-80% abgedeckt (gut)",
+            "0.4-0.6": "40-60% abgedeckt (ausreichend)",
+            "0.0-0.4": "< 40% abgedeckt (mangelhaft)"
+          },
+          "example": {
+            "required_criteria": ["LBO-Regelung", "Carport-Größe", "Abstandsflächen", "Denkmalschutz"],
+            "covered_criteria": ["LBO-Regelung", "Carport-Größe", "Abstandsflächen"],
+            "evidence_coverage": 0.75
+          }
+        },
+        {
+          "metric": "contradiction_resolution_rate",
+          "description": "Anteil der Widersprüche, die aufgelöst wurden",
+          "calculation": "resolved_contradictions / total_contradictions",
+          "scale": {
+            "1.0": "100% der Widersprüche aufgelöst",
+            "0.8-0.9": "80-90% aufgelöst (sehr gut)",
+            "0.6-0.8": "60-80% aufgelöst (gut)",
+            "0.4-0.6": "40-60% aufgelöst (ausreichend)",
+            "0.0-0.4": "< 40% aufgelöst (mangelhaft)"
+          },
+          "example": {
+            "total_contradictions": 3,
+            "resolved_contradictions": 3,
+            "contradiction_resolution_rate": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": "Generiere Improvement Suggestions",
+      "description": "Konkrete Vorschläge zur Verbesserung des Prompts/Prozesses",
+      "suggestion_categories": [
+        {
+          "category": "prompt_refinement",
+          "description": "Verbesserungen am Prompt-Text",
+          "examples": [
+            "Füge mehr Beispiele für vage vs. konkrete required_criteria hinzu (Phase 1)",
+            "Verfeinere die Confidence-Calibration-Criteria in scientific_foundation.json",
+            "Erweitere die Pattern-Typen um 'regulatory' (zusätzlich zu legal_framework)",
+            "Füge Template für 'gewerbliche Nutzung' als häufigen Sonderfall hinzu"
+          ]
+        },
+        {
+          "category": "process_optimization",
+          "description": "Verbesserungen am Ablauf",
+          "examples": [
+            "Phase 2 (Synthese): Automatische Cluster-Vorschläge basierend auf Hypothese",
+            "Phase 3 (Analyse): Pattern-Erkennung mit Machine Learning unterstützen",
+            "Phase 4 (Validierung): Confidence-Berechnung formalisieren (statt manuell schätzen)",
+            "Phase 6 (Metacognition): Automatische Qualitäts-Score-Berechnung"
+          ]
+        },
+        {
+          "category": "data_enrichment",
+          "description": "Verbesserungen der Daten-Basis",
+          "examples": [
+            "RAG-Datenbank um aktuelle VGH-Urteile zu Carports erweitern",
+            "Denkmalschutz-Karten aller BW-Gemeinden in Geo-Datenbank integrieren",
+            "Merkblätter der Bauämter aller 44 BW-Landkreise indexieren",
+            "Bauordnungen aller 16 Bundesländer in RAG indexieren"
+          ]
+        },
+        {
+          "category": "user_interaction",
+          "description": "Verbesserungen der User-Experience",
+          "examples": [
+            "Interactive Form für fehlende Informationen (Bundesland, Größe, etc.)",
+            "Visualisierung der Abstandsflächen als Diagramm",
+            "Checkliste als Widget (statt nur Text)",
+            "Link zu Online-Formular des zuständigen Bauamts"
+          ]
+        }
+      ],
+      "quality_criteria": {
+        "specificity": "Vorschlag muss konkret sein (nicht 'verbessere Prompts')",
+        "actionability": "Vorschlag muss umsetzbar sein (nicht 'KI sollte alles verstehen')",
+        "impact": "Vorschlag sollte signifikanten Nutzen haben",
+        "min_suggestions": 0,
+        "max_suggestions": 10,
+        "best_practice": "3-5 konkrete Vorschläge"
+      }
+    }
+  ],
+  
+  "output_format": {
+    "type": "json",
+    "schema_reference": "default_method.json > phases[5] > output_schema",
+    "required_fields": ["metacognitive_assessment", "information_gaps", "process_quality", "improvement_suggestions"]
+  },
+  
+  "quality_guidelines": {
+    "metacognitive_assessment": {
+      "honesty": "Sei selbstkritisch! Nicht automatisch 'excellent' wählen",
+      "calibration": {
+        "excellent": "Nur wenn wirklich alle Kriterien perfekt erfüllt",
+        "good": "Typischer Fall bei erfolgreicher Beantwortung",
+        "adequate": "Wenn Mängel vorhanden, aber Antwort akzeptabel",
+        "poor": "Nur wenn fundamentale Fehler im Prozess"
+      },
+      "improvement_suggestions": "Mindestens 1 Vorschlag, auch bei 'excellent' Prozess"
+    },
+    "information_gaps": {
+      "completeness": "ALLE signifikanten Lücken identifizieren",
+      "impact_assessment": "Honest impact (high nur wenn wirklich kritisch)",
+      "min_gaps": 0,
+      "typical_range": "2-5 gaps"
+    },
+    "process_quality": {
+      "hypothesis_accuracy": {
+        "calculation": "Vergleich der Hypothesen-Versionen",
+        "conservative": "Lieber zu niedrig bewerten (0.6-0.8 typisch)"
+      },
+      "evidence_coverage": {
+        "calculation": "covered / total required_criteria",
+        "realistic": "100% nur wenn wirklich alle Kriterien abgedeckt"
+      },
+      "contradiction_resolution_rate": {
+        "calculation": "resolved / total contradictions",
+        "honest": "Nur aufgelöste Widersprüche zählen (nicht ignorierte)"
+      }
+    },
+    "improvement_suggestions": {
+      "min_items": 0,
+      "max_items": 10,
+      "best_practice": "3-5 konkrete, spezifische Vorschläge",
+      "quality": "Spezifisch + actionable + impact (keine vagen Vorschläge)",
+      "avoid": ["Triviale Vorschläge ('verbessere alles')", "Unrealistische Vorschläge"]
+    }
+  },
+  
+  "example_output": {
+    "metacognitive_assessment": {
+      "reasoning_quality": "good",
+      "evidence_quality": "good",
+      "confidence_justification": "Finale Confidence 0.82 ist angemessen: Starke gesetzliche Grundlage (LBO BW § 50, Confidence 0.98) + VGH-Bestätigung (0.90) + klare Rechtslage sprechen für hohes Confidence. Jedoch fehlt Information über Denkmalschutz-Status (user_input gap, impact high), daher nicht 0.90+. Alignment mit validation_status 'partially_confirmed' ist korrekt.",
+      "improvement_suggestions": [
+        "Füge mehr Beispiele für Confidence-Calibration in scientific_foundation.json hinzu (aktuell nur 5 Ranges, könnte granularer sein)",
+        "Phase 2 (Synthese): Automatische Cluster-Vorschläge basierend auf detected_domain ('baurecht' → erwarte Cluster für 'Verfahrensfreiheit', 'Abstandsflächen')",
+        "Interactive Form für fehlende Informationen (Denkmalschutz-Status) implementieren"
+      ]
+    },
+    "information_gaps": [
+      {
+        "gap_type": "user_input",
+        "description": "Unbekannt, ob Grundstück in Denkmalschutzgebiet liegt",
+        "impact": "high",
+        "resolution": "Nutzer muss beim zuständigen Bauamt oder online (Geo-Portal BW) nachfragen"
+      },
+      {
+        "gap_type": "user_input",
+        "description": "Exakte Carport-Größe nicht angegeben (nur '<30m²' erwähnt)",
+        "impact": "medium",
+        "resolution": "Nutzer sollte geplante Fläche (inkl. Dachüberstand) exakt ausmessen"
+      },
+      {
+        "gap_type": "context",
+        "description": "Unklar, ob Carport freistehend oder an Hauptgebäude angebaut",
+        "impact": "medium",
+        "resolution": "Nutzer nachfragen: Freistehend vs. angebaut (hat Auswirkung auf Abstandsflächen)"
+      },
+      {
+        "gap_type": "data",
+        "description": "Keine VGH-Rechtsprechung zu Carports in Denkmalschutzgebieten in RAG vorhanden",
+        "impact": "low",
+        "resolution": "RAG-Datenbank um Denkmalschutz-spezifische Urteile erweitern"
+      }
+    ],
+    "process_quality": {
+      "hypothesis_accuracy": 0.80,
+      "evidence_coverage": 0.75,
+      "contradiction_resolution_rate": 1.0
+    },
+    "improvement_suggestions": [
+      "Füge Confidence-Calibration-Beispiele für 'teilweise fehlende Informationen' in scientific_foundation.json hinzu (aktuell nur Extremfälle)",
+      "Phase 1 (Hypothese): Template für häufige Bauvorhaben (Carport, Gartenhaus, Anbau) mit vordefinierten required_criteria",
+      "Phase 2 (Synthese): Automatische Cluster-Erkennung basierend auf detected_domain ('baurecht' → erwarte Cluster: Verfahrensfreiheit, Abstandsflächen, Sonderfälle)",
+      "Interactive Form für fehlende Informationen implementieren: 'Denkmalschutz-Gebiet? Ja/Nein/Unbekannt' → bei 'Unbekannt' Link zu Geo-Portal BW",
+      "RAG-Datenbank erweitern: Denkmalschutz-Karten aller BW-Gemeinden + VGH-Urteile zu Denkmalschutz + Bauamt-Kontaktdaten"
+    ]
+  },
+  
+  "common_mistakes": [
+    {
+      "mistake": "Automatisch 'excellent' wählen",
+      "example": "reasoning_quality: 'excellent' bei jedem Prozess",
+      "correction": "'excellent' nur wenn wirklich alle Kriterien perfekt erfüllt (selten!)"
+    },
+    {
+      "mistake": "Vage improvement_suggestions",
+      "example": "improvement_suggestions: ['Verbessere Prompts', 'Optimiere Prozess']",
+      "correction": "Konkret: 'Füge mehr Beispiele für Confidence-Calibration in Phase 1 hinzu'"
+    },
+    {
+      "mistake": "process_quality Metriken unrealistisch hoch",
+      "example": "hypothesis_accuracy: 1.0, evidence_coverage: 1.0, contradiction_resolution_rate: 1.0",
+      "correction": "Realistisch: 0.7-0.9 typisch (perfekt 1.0 ist selten)"
+    },
+    {
+      "mistake": "information_gaps fehlen oder unvollständig",
+      "example": "information_gaps: []",
+      "correction": "Fast immer gibt es Lücken (user_input, data, context, expertise)"
+    },
+    {
+      "mistake": "confidence_justification ohne Zahlen",
+      "example": "confidence_justification: 'Confidence ist gut gewählt'",
+      "correction": "'Confidence 0.82 angemessen: LBO (0.98) + VGH (0.90), aber Denkmalschutz-Status fehlt'"
+    }
+  ],
+  
+  "template_variables": {
+    "conclusion_result": "Output von Phase 5 (main_answer, confidence, limitations)",
+    "validation_result": "Output von Phase 4 (validation_status, confidence)",
+    "analysis_result": "Output von Phase 3 (patterns, contradictions)",
+    "synthesis_result": "Output von Phase 2 (evidence_clusters)",
+    "hypothesis": "Output von Phase 1 (original + adjusted)",
+    "scientific_foundation": "Basis-Prinzipien (für Prompt-Improvement-Vorschläge)"
+  }
+}

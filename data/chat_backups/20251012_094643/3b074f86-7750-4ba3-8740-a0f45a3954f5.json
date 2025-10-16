@@ -1,0 +1,40 @@
+{
+  "session_id": "3b074f86-7750-4ba3-8740-a0f45a3954f5",
+  "created_at": "2025-10-12T09:46:43.026637",
+  "updated_at": "2025-10-12T09:46:43.027097",
+  "title": "Was ist das BImSchG?",
+  "llm_model": "llama3.1:8b",
+  "messages": [
+    {
+      "id": "21b9055b-d579-49ad-bef8-df5e55fba585",
+      "role": "user",
+      "content": "Was ist das BImSchG?",
+      "timestamp": "2025-10-12T09:46:43.026890",
+      "attachments": [],
+      "metadata": {}
+    },
+    {
+      "id": "793b1214-2231-4c1b-bed0-ff4f013df292",
+      "role": "assistant",
+      "content": "Das Bundes-Immissionsschutzgesetz (BImSchG) ist ein deutsches Gesetz...",
+      "timestamp": "2025-10-12T09:46:43.026940",
+      "attachments": [],
+      "metadata": {
+        "confidence_score": 0.887,
+        "sources": [
+          "BImSchG.pdf",
+          "Gesetzestext.pdf"
+        ]
+      }
+    },
+    {
+      "id": "ffcb77a2-f128-411b-8fa6-2edd1bdfc976",
+      "role": "user",
+      "content": "Welche Grenzwerte gelten?",
+      "timestamp": "2025-10-12T09:46:43.026952",
+      "attachments": [],
+      "metadata": {}
+    }
+  ],
+  "metadata": {}
+}

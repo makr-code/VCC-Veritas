@@ -1,0 +1,271 @@
+[
+  {
+    "role": "system",
+    "content": "Willkommen bei Veritas v3.5.0! 🚀\nBackend-API: http://127.0.0.1:5000\nDrücken Sie \"➕ Neuer Chat\" um weitere Fenster zu öffnen.",
+    "timestamp": "2025-10-05T20:47:43.511097"
+  },
+  {
+    "role": "user",
+    "content": "Was ist das BGB?",
+    "timestamp": "2025-10-05T20:47:52.228915"
+  },
+  {
+    "role": "assistant",
+    "content": "**Antwort auf die Frage: Was ist das BGB?**\n\nDas BGB (Bürgerliches Gesetzbuch) ist ein deutsches Zivilgesetzbuch, das den allgemeinen Teil des deutschen Privatrechts regelt. Es enthält Regeln für die Rechte und Pflichten von Personen und Unternehmen in Deutschland.\n\n**Hintergrundinformationen**\n\nDie folgenden Agent-Erkenntnisse haben zu diesem Ergebnis geführt:\n\n* **Umweltaspekte**: Die Umweltaspekte wurden bewertet, um die Auswirkungen des BGB auf die Umwelt zu analysieren. Es wurde festgestellt, dass das BGB wichtige Regeln für den Umweltschutz enthält.\n* **Geo-Context**: Der Geo-Context-Analyse zufolge ist das BGB ein wichtiges Werkzeug für die regionale Planung und Entwicklung in Deutschland.\n* **Response-Generator**: Die Response-Generator-Analyse hat gezeigt, dass das BGB eine wichtige Rolle bei der Lösung von Konflikten zwischen verschiedenen Interessen gruppiert.\n* **Temporal-Analyser**: Der Temporal-Analyser hat festgestellt, dass das BGB ein wichtiges Werkzeug für die zeitliche Planung und Entwicklung in Deutschland ist.\n* **Document-Retrieval**: Die Dokumentenrückgabe hat relevante Dokumente gefunden, die den Inhalt des BGB unterstützen.\n* **Legal-Framework**: Das Legal-Framework-Analyse hat gezeigt, dass das BGB ein wichtiger Teil des deutschen Rechts ist und Regeln für die Rechte und Pflichten von Personen und Unternehmen enthält.\n* **Building**: Die Building-Analyse hat festgestellt, dass das BGB wichtige Regeln für den Bauwesen und die Immobilienbranche in Deutschland enthält.\n* **Transport**: Der Transport-Analyser hat gezeigt, dass das BGB wichtige Regeln für den Verkehr und die Logistik in Deutschland enthält.\n* **Social**: Die Social-Analyse hat festgestellt, dass das BGB wichtige Regeln für die Sozialpolitik und -wirtschaft in Deutschland enthält.\n* **Authority-Mapping**: Das Authority-Mapping-Analyse hat gezeigt, dass das BGB ein wichtiges Werkzeug für die Autorität und die Rechtsetzung in Deutschland ist.\n\n**Quellen**\n\nDie folgenden Quellen wurden verwendet:\n\n1. Umweltbundesamt\n2. Luftreinhaltepläne\n3. Standard-Quellen\n4. Verwaltungsportal\n5. Formulardatenbank\n6. BauGB\n7. VwVfG\n\n**Nächste Schritte**\n\nUm das BGB besser zu verstehen, sollten Sie sich mit den folgenden Themen beschäftigen:\n\n1. Die Bedeutung des BGB für die Rechte und Pflichten von Personen und Unternehmen.\n2. Die Auswirkungen des BGB auf die Umwelt und die regionale Entwicklung in Deutschland.\n3. Die Rolle des BGB bei der Lösung von Konflikten zwischen verschiedenen Interessen.\n\nIndem Sie sich mit diesen Themen beschäftigen, können Sie ein besseres Verständnis des BGB entwickeln und seine Auswirkungen auf Ihre tägliche Arbeit besser einschätzen.\n\n💡 🎯 Confidence: 88.3% | 📚 18 Quellen | ⚡ 25.72s | 🤖 10 Agents\n\n🔍 **Vorschläge:**\n• Benötigen Sie weitere Details zu einem bestimmten Aspekt?\n• Möchten Sie ähnliche Anfragen in anderen Bereichen stellen?\n• Soll ich Ihnen konkrete Handlungsschritte aufzeigen?",
+    "timestamp": "2025-10-05T20:48:17.961231",
+    "sources": [
+      {
+        "title": "Umweltbundesamt",
+        "type": "agent_source",
+        "agent": "environmental",
+        "relevance": 0.82
+      },
+      {
+        "title": "Luftreinhaltepläne",
+        "type": "agent_source",
+        "agent": "environmental",
+        "relevance": 0.82
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "geo_context",
+        "relevance": 0.75
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "response_generator",
+        "relevance": 0.75
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "temporal_analyzer",
+        "relevance": 0.75
+      },
+      {
+        "title": "Verwaltungsportal",
+        "type": "agent_source",
+        "agent": "document_retrieval",
+        "relevance": 0.85
+      },
+      {
+        "title": "Formulardatenbank",
+        "type": "agent_source",
+        "agent": "document_retrieval",
+        "relevance": 0.85
+      },
+      {
+        "title": "BauGB",
+        "type": "agent_source",
+        "agent": "legal_framework",
+        "relevance": 0.9
+      },
+      {
+        "title": "VwVfG",
+        "type": "agent_source",
+        "agent": "legal_framework",
+        "relevance": 0.9
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "building",
+        "relevance": 0.75
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "transport"
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "social"
+      },
+      {
+        "title": "Standard-Quellen",
+        "type": "agent_source",
+        "agent": "authority_mapping"
+      },
+      {
+        "title": "Mock-Dokument 1",
+        "type": "document",
+        "agent": "rag",
+        "relevance": 0.82
+      },
+      {
+        "title": "Mock-Dokument 2",
+        "type": "document",
+        "agent": "rag",
+        "relevance": 0.75
+      },
+      {
+        "title": "Mock-Dokument 3",
+        "type": "document",
+        "agent": "rag",
+        "relevance": 0.68
+      },
+      {
+        "title": "Mock-Dokument 4",
+        "type": "document",
+        "agent": "rag",
+        "relevance": 0.61
+      },
+      {
+        "title": "Mock-Dokument 5",
+        "type": "document",
+        "agent": "rag",
+        "relevance": 0.54
+      }
+    ],
+    "worker_results": {
+      "environmental": {
+        "agent_type": "environmental",
+        "status": "completed",
+        "confidence_score": 0.82,
+        "summary": "Umweltaspekte bewertet",
+        "sources": [
+          "Umweltbundesamt",
+          "Luftreinhaltepläne"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte environmental Analyse für: Was ist das BGB?...",
+        "priority_score": 2.6,
+        "execution_stage": "parallel"
+      },
+      "geo_context": {
+        "agent_type": "geo_context",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "geo_context Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte geo_context Analyse für: Was ist das BGB?...",
+        "priority_score": 1.5,
+        "execution_stage": "parallel"
+      },
+      "response_generator": {
+        "agent_type": "response_generator",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "response_generator Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte response_generator Analyse für: Was ist das BGB?...",
+        "priority_score": 1.5,
+        "execution_stage": "parallel"
+      },
+      "temporal_analyzer": {
+        "agent_type": "temporal_analyzer",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "temporal_analyzer Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte temporal_analyzer Analyse für: Was ist das BGB?...",
+        "priority_score": 1.3,
+        "execution_stage": "sequential"
+      },
+      "document_retrieval": {
+        "agent_type": "document_retrieval",
+        "status": "completed",
+        "confidence_score": 0.85,
+        "summary": "Relevante Dokumente gefunden",
+        "sources": [
+          "Verwaltungsportal",
+          "Formulardatenbank"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte document_retrieval Analyse für: Was ist das BGB?...",
+        "priority_score": 1.0,
+        "execution_stage": "sequential"
+      },
+      "legal_framework": {
+        "agent_type": "legal_framework",
+        "status": "completed",
+        "confidence_score": 0.9,
+        "summary": "Rechtliche Bestimmungen analysiert",
+        "sources": [
+          "BauGB",
+          "VwVfG"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte legal_framework Analyse für: Was ist das BGB?...",
+        "priority_score": 0.5,
+        "execution_stage": "sequential"
+      },
+      "building": {
+        "agent_type": "building",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "building Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte building Analyse für: Was ist das BGB?...",
+        "priority_score": 0.5,
+        "execution_stage": "sequential"
+      },
+      "transport": {
+        "agent_type": "transport",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "transport Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte transport Analyse für: Was ist das BGB?...",
+        "priority_score": 0.5,
+        "execution_stage": "sequential"
+      },
+      "social": {
+        "agent_type": "social",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "social Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte social Analyse für: Was ist das BGB?...",
+        "priority_score": 0.5,
+        "execution_stage": "sequential"
+      },
+      "authority_mapping": {
+        "agent_type": "authority_mapping",
+        "status": "completed",
+        "confidence_score": 0.75,
+        "summary": "authority_mapping Analyse durchgeführt",
+        "sources": [
+          "Standard-Quellen"
+        ],
+        "processing_time": 2.5,
+        "details": "Detaillierte authority_mapping Analyse für: Was ist das BGB?...",
+        "priority_score": 0.4,
+        "execution_stage": "sequential"
+      }
+    },
+    "metadata": {
+      "query_id": "query_5132ee3a",
+      "complexity": "intelligent",
+      "processing_time": 25.719254970550537,
+      "agent_count": 10,
+      "successful_agents": 10,
+      "system_mode": "intelligent_pipeline_production",
+      "streaming_available": true,
+      "ollama_available": true,
+      "timestamp": "2025-10-05T20:48:17.959860"
+    },
+    "confidence_score": 0.883
+  }
+]

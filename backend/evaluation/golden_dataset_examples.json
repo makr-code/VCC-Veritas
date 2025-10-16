@@ -1,0 +1,293 @@
+{
+  "version": "1.0",
+  "created_at": "2025-10-06T21:30:00Z",
+  "description": "VERITAS Golden Dataset - Verwaltungsrecht & BGB Test-Cases",
+  "test_cases": [
+    {
+      "id": "bgb_110_basic",
+      "category": "legal",
+      "complexity": "simple",
+      "question": "Was steht im Taschengeldparagraphen?",
+      "query_intent": "Rechtliche Auskunft zu § 110 BGB",
+      "expected_retrieval": {
+        "expected_documents": [
+          "bgb_110.pdf",
+          "bgb_paragraph_110",
+          "BGB § 110"
+        ],
+        "expected_entities": [
+          "§ 110 BGB",
+          "Taschengeldparagraph",
+          "Minderjährige",
+          "gesetzlicher Vertreter"
+        ],
+        "min_documents": 1,
+        "min_relevance_score": 0.85
+      },
+      "expected_answer": {
+        "must_contain": [
+          "§ 110 BGB",
+          "Minderjährige",
+          "ohne Zustimmung",
+          "eigene Mittel",
+          "wirksam"
+        ],
+        "should_contain": [
+          "Taschengeld",
+          "Rechtsgeschäft",
+          "Leistung",
+          "Erfüllung"
+        ],
+        "must_not_contain": [
+          "Geldtransport",
+          "räumliche Dimension",
+          "Banktransfer",
+          "Währung"
+        ],
+        "expected_structure": [
+          "legal_reference",
+          "definition",
+          "example"
+        ],
+        "min_length": 100,
+        "max_length": 1000,
+        "reference_answer": "§ 110 BGB (Taschengeldparagraph) besagt, dass ein von einem Minderjährigen ohne Zustimmung des gesetzlichen Vertreters geschlossener Vertrag von Anfang an wirksam ist, wenn der Minderjährige die vertragsmäßige Leistung mit Mitteln bewirkt, die ihm zu diesem Zweck oder zu freier Verfügung von dem Vertreter oder mit dessen Zustimmung von einem Dritten überlassen worden sind."
+      },
+      "hallucination_triggers": [
+        "Geldtransport",
+        "räumliche Dimension",
+        "geografisch",
+        "Währungsumtausch"
+      ],
+      "tags": ["bgb", "minderjährige", "vertragsrecht", "basic"],
+      "notes": "Kritischer Test-Case - früher lieferte das System halluzinierte Antworten über 'Geldtransport'"
+    },
+    {
+      "id": "bgb_110_practical",
+      "category": "legal",
+      "complexity": "medium",
+      "question": "Darf ein 16-jähriger ohne Erlaubnis seiner Eltern ein Handy kaufen, wenn er sein Taschengeld dafür verwendet?",
+      "query_intent": "Praktische Anwendung von § 110 BGB",
+      "expected_retrieval": {
+        "expected_documents": [
+          "bgb_110.pdf",
+          "bgb_paragraph_110"
+        ],
+        "expected_entities": [
+          "§ 110 BGB",
+          "Minderjährige",
+          "Taschengeld",
+          "Kaufvertrag"
+        ],
+        "min_documents": 1,
+        "min_relevance_score": 0.80
+      },
+      "expected_answer": {
+        "must_contain": [
+          "§ 110 BGB",
+          "wirksam",
+          "eigene Mittel",
+          "Taschengeld"
+        ],
+        "should_contain": [
+          "freie Verfügung",
+          "ohne Zustimmung",
+          "Voraussetzung"
+        ],
+        "must_not_contain": [
+          "illegal",
+          "Straftat",
+          "verboten ohne Kontext"
+        ],
+        "expected_structure": [
+          "legal_reference",
+          "example",
+          "procedure"
+        ],
+        "min_length": 150,
+        "max_length": 800
+      },
+      "hallucination_triggers": [
+        "Polizei",
+        "Strafanzeige",
+        "Gefängnis"
+      ],
+      "tags": ["bgb", "minderjährige", "anwendungsfall", "medium"],
+      "notes": "Test für praktische Rechtsanwendung"
+    },
+    {
+      "id": "baurecht_baugenehmigung",
+      "category": "building",
+      "complexity": "medium",
+      "question": "Welche Unterlagen werden für eine Baugenehmigung benötigt?",
+      "query_intent": "Informationen zum Baugenehmigungsverfahren",
+      "expected_retrieval": {
+        "expected_documents": [
+          "bauordnung",
+          "baugenehmigung_unterlagen",
+          "baurecht_verfahren"
+        ],
+        "expected_entities": [
+          "Baugenehmigung",
+          "Bauantrag",
+          "Bauordnung",
+          "Bauamt"
+        ],
+        "min_documents": 2,
+        "min_relevance_score": 0.75
+      },
+      "expected_answer": {
+        "must_contain": [
+          "Bauantrag",
+          "Bauzeichnung",
+          "Baubeschreibung"
+        ],
+        "should_contain": [
+          "Lageplan",
+          "Grundriss",
+          "Statik",
+          "Baugenehmigungsbehörde"
+        ],
+        "must_not_contain": [
+          "nicht erforderlich ohne Kontext",
+          "optional ohne Kontext"
+        ],
+        "expected_structure": [
+          "procedure",
+          "authority",
+          "deadline"
+        ],
+        "min_length": 200,
+        "max_length": 1000
+      },
+      "hallucination_triggers": [
+        "keine Unterlagen",
+        "automatisch genehmigt",
+        "innerhalb einer Stunde"
+      ],
+      "tags": ["baurecht", "genehmigung", "verfahren"],
+      "notes": "Test für Verwaltungsverfahren"
+    },
+    {
+      "id": "umweltrecht_emissionsgrenzwerte",
+      "category": "environmental",
+      "complexity": "complex",
+      "question": "Welche Emissionsgrenzwerte gelten für Industrieanlagen und wie werden sie überwacht?",
+      "query_intent": "Umweltrechtliche Anforderungen und Kontrollverfahren",
+      "expected_retrieval": {
+        "expected_documents": [
+          "bundes_immissionsschutzgesetz",
+          "ta_luft",
+          "emissionsgrenzwerte"
+        ],
+        "expected_entities": [
+          "BImSchG",
+          "TA Luft",
+          "Emissionsgrenzwerte",
+          "Industrieanlagen",
+          "Umweltamt"
+        ],
+        "expected_relationships": [
+          {
+            "from": "Industrieanlage",
+            "type": "unterliegt",
+            "to": "BImSchG"
+          },
+          {
+            "from": "BImSchG",
+            "type": "regelt",
+            "to": "Emissionsgrenzwerte"
+          }
+        ],
+        "min_documents": 3,
+        "min_relevance_score": 0.70
+      },
+      "expected_answer": {
+        "must_contain": [
+          "Grenzwerte",
+          "Überwachung",
+          "BImSchG"
+        ],
+        "should_contain": [
+          "TA Luft",
+          "Messung",
+          "Behörde",
+          "Genehmigung"
+        ],
+        "must_not_contain": [
+          "keine Kontrolle",
+          "freiwillig"
+        ],
+        "expected_structure": [
+          "legal_reference",
+          "procedure",
+          "authority",
+          "citation"
+        ],
+        "min_length": 300,
+        "max_length": 1500
+      },
+      "hallucination_triggers": [
+        "keine Grenzwerte",
+        "Selbstkontrolle ausreichend",
+        "EU verbietet"
+      ],
+      "tags": ["umweltrecht", "emissionen", "industrie", "complex"],
+      "notes": "Komplexer Multi-Hop-Test mit Graph-Relationen"
+    },
+    {
+      "id": "sozialrecht_wohngeld",
+      "category": "social",
+      "complexity": "medium",
+      "question": "Wer hat Anspruch auf Wohngeld und wie wird es berechnet?",
+      "query_intent": "Sozialleistungen Wohngeld - Anspruch und Berechnung",
+      "expected_retrieval": {
+        "expected_documents": [
+          "wohngeldgesetz",
+          "wohngeld_berechnung",
+          "sozialleistungen"
+        ],
+        "expected_entities": [
+          "Wohngeld",
+          "Wohngeldgesetz",
+          "Anspruchsvoraussetzungen",
+          "Einkommensgrenze"
+        ],
+        "min_documents": 2,
+        "min_relevance_score": 0.75
+      },
+      "expected_answer": {
+        "must_contain": [
+          "Wohngeld",
+          "Einkommen",
+          "Miete",
+          "Haushalt"
+        ],
+        "should_contain": [
+          "Antrag",
+          "Berechnung",
+          "Voraussetzungen",
+          "Wohngeldstelle"
+        ],
+        "must_not_contain": [
+          "automatisch",
+          "jeder Bürger"
+        ],
+        "expected_structure": [
+          "legal_reference",
+          "procedure",
+          "example"
+        ],
+        "min_length": 200,
+        "max_length": 1000
+      },
+      "hallucination_triggers": [
+        "bedingungslos",
+        "ohne Antrag",
+        "Garantie"
+      ],
+      "tags": ["sozialrecht", "wohngeld", "leistungen"],
+      "notes": "Test für Sozialleistungen"
+    }
+  ]
+}

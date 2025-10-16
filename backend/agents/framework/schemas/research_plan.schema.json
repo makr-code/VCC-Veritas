@@ -1,0 +1,349 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.ai/schemas/research_plan.schema.json",
+  "title": "VERITAS Research Plan Schema",
+  "description": "Schema for multi-agent research plan execution in VERITAS",
+  "version": "1.0.0",
+  "type": "object",
+  "required": [
+    "plan_id",
+    "research_question",
+    "schema_name",
+    "steps"
+  ],
+  "properties": {
+    "plan_id": {
+      "type": "string",
+      "description": "Unique identifier for the research plan",
+      "pattern": "^[a-zA-Z0-9_-]+$",
+      "minLength": 1,
+      "maxLength": 255
+    },
+    "research_question": {
+      "type": "string",
+      "description": "Main research question to be answered",
+      "minLength": 5,
+      "maxLength": 2000
+    },
+    "schema_name": {
+      "type": "string",
+      "description": "Name of the execution schema (e.g., 'standard', 'environmental', 'legal')",
+      "enum": [
+        "standard",
+        "environmental",
+        "legal",
+        "construction",
+        "financial",
+        "social",
+        "technical"
+      ]
+    },
+    "schema_version": {
+      "type": "string",
+      "description": "Version of the schema",
+      "pattern": "^\\d+\\.\\d+(\\.\\d+)?$",
+      "default": "1.0"
+    },
+    "created_at": {
+      "type": "string",
+      "description": "ISO 8601 timestamp of plan creation",
+      "format": "date-time"
+    },
+    "status": {
+      "type": "string",
+      "description": "Current execution status of the plan",
+      "enum": ["pending", "running", "paused", "completed", "failed", "cancelled"],
+      "default": "pending"
+    },
+    "priority": {
+      "type": "integer",
+      "description": "Execution priority (1-10, higher = more urgent)",
+      "minimum": 1,
+      "maximum": 10,
+      "default": 5
+    },
+    "query_complexity": {
+      "type": "string",
+      "description": "Complexity level of the research question",
+      "enum": ["simple", "standard", "complex"],
+      "default": "standard"
+    },
+    "source_domains": {
+      "type": "array",
+      "description": "VERITAS source domains to search",
+      "items": {
+        "type": "string",
+        "enum": [
+          "environmental",
+          "construction",
+          "financial",
+          "social",
+          "traffic",
+          "legal",
+          "technical",
+          "general"
+        ]
+      },
+      "uniqueItems": true,
+      "minItems": 1
+    },
+    "security_level": {
+      "type": "string",
+      "description": "Security classification for data access",
+      "enum": ["public", "internal", "confidential", "restricted"],
+      "default": "internal"
+    },
+    "uds3_databases": {
+      "type": "array",
+      "description": "List of UDS3 databases to search",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true,
+      "default": []
+    },
+    "phase5_hybrid_search": {
+      "type": "boolean",
+      "description": "Enable Phase 5 hybrid search (BM25 + UDS3 + RRF)",
+      "default": true
+    },
+    "max_execution_time_seconds": {
+      "type": "integer",
+      "description": "Maximum execution time in seconds",
+      "minimum": 10,
+      "maximum": 3600,
+      "default": 300
+    },
+    "steps": {
+      "type": "array",
+      "description": "Execution steps in the research plan",
+      "items": {
+        "$ref": "#/$defs/ResearchPlanStep"
+      },
+      "minItems": 1
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional metadata",
+      "properties": {
+        "created_by": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "context": {
+          "type": "object"
+        }
+      }
+    },
+    "final_result": {
+      "type": "object",
+      "description": "Final aggregated result from all steps",
+      "properties": {
+        "answer": {
+          "type": "string"
+        },
+        "confidence_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "metadata": {
+          "type": "object"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "ResearchPlanStep": {
+      "type": "object",
+      "required": [
+        "step_id",
+        "step_name",
+        "step_type",
+        "agent_name"
+      ],
+      "properties": {
+        "step_id": {
+          "type": "string",
+          "description": "Unique identifier for the step",
+          "pattern": "^[a-zA-Z0-9_-]+$"
+        },
+        "step_index": {
+          "type": "integer",
+          "description": "Execution order (0-indexed)",
+          "minimum": 0
+        },
+        "step_name": {
+          "type": "string",
+          "description": "Human-readable step name",
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "step_type": {
+          "type": "string",
+          "description": "Type of step execution",
+          "enum": [
+            "data_retrieval",
+            "data_analysis",
+            "synthesis",
+            "validation",
+            "quality_check",
+            "reranking",
+            "final_answer"
+          ]
+        },
+        "agent_name": {
+          "type": "string",
+          "description": "Name of the agent to execute this step",
+          "enum": [
+            "environmental",
+            "construction",
+            "financial",
+            "social",
+            "traffic",
+            "legal",
+            "technical",
+            "registry",
+            "orchestrator",
+            "pipeline_manager",
+            "quality_assessor",
+            "wikipedia",
+            "weather",
+            "chemical_data",
+            "atmospheric_flow"
+          ]
+        },
+        "agent_type": {
+          "type": "string",
+          "description": "Type/category of agent",
+          "enum": [
+            "DataRetrievalAgent",
+            "DataAnalysisAgent",
+            "SynthesisAgent",
+            "ValidationAgent",
+            "OrchestratorAgent",
+            "AgentRegistry",
+            "QualityAssessor"
+          ]
+        },
+        "assigned_capability": {
+          "type": "string",
+          "description": "Specific capability required from agent"
+        },
+        "tool_name": {
+          "type": "string",
+          "description": "Tool to be used by the agent",
+          "enum": [
+            "uds3",
+            "database",
+            "api_call",
+            "vector_search",
+            "bm25_search",
+            "hybrid_search",
+            "reranking"
+          ]
+        },
+        "tool_input": {
+          "type": "object",
+          "description": "Input parameters for the tool",
+          "properties": {
+            "query": {
+              "type": "string"
+            },
+            "filters": {
+              "type": "object"
+            },
+            "max_results": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "parameters": {
+              "type": "object"
+            }
+          }
+        },
+        "depends_on": {
+          "type": "array",
+          "description": "List of step_ids this step depends on",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true,
+          "default": []
+        },
+        "parallel_group": {
+          "type": "string",
+          "description": "Group identifier for parallel execution",
+          "default": null
+        },
+        "status": {
+          "type": "string",
+          "description": "Current execution status",
+          "enum": ["pending", "running", "completed", "failed", "skipped"],
+          "default": "pending"
+        },
+        "retry_count": {
+          "type": "integer",
+          "description": "Number of retry attempts",
+          "minimum": 0,
+          "default": 0
+        },
+        "max_retries": {
+          "type": "integer",
+          "description": "Maximum number of retry attempts",
+          "minimum": 0,
+          "maximum": 5,
+          "default": 3
+        },
+        "timeout_seconds": {
+          "type": "integer",
+          "description": "Step timeout in seconds",
+          "minimum": 5,
+          "maximum": 300,
+          "default": 60
+        },
+        "step_config": {
+          "type": "object",
+          "description": "Additional step-specific configuration"
+        },
+        "result": {
+          "type": "object",
+          "description": "Result from step execution",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": ["success", "error", "partial"]
+            },
+            "data": {
+              "type": "object"
+            },
+            "confidence_score": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "execution_time_ms": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "error_message": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

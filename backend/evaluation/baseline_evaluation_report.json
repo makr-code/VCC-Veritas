@@ -1,0 +1,253 @@
+{
+  "summary": {
+    "total_test_cases": 5,
+    "passed_test_cases": 0,
+    "failed_test_cases": 5,
+    "pass_rate": 0.0,
+    "retrieval_metrics": {
+      "precision_at_k": {},
+      "recall_at_k": {},
+      "mean_reciprocal_rank": 0.0,
+      "ndcg_at_k": {},
+      "total_queries": 0,
+      "avg_retrieved_docs": 0.0,
+      "avg_relevant_docs": 0.0
+    },
+    "context_metrics": {
+      "avg_relevance_score": 0.0,
+      "context_precision": 0.0,
+      "context_recall": 0.0,
+      "graph_enrichment_rate": 0.0,
+      "avg_related_entities": 0.0
+    },
+    "answer_metrics": {
+      "faithfulness": 0.0,
+      "completeness": 0.0,
+      "hallucination_rate": 0.0,
+      "avg_answer_length": 0.0,
+      "must_contain_match_rate": 0.0,
+      "must_not_contain_violation_rate": 0.0
+    },
+    "avg_duration_ms": 37137.44115829468,
+    "total_duration_s": 0.0,
+    "category_performance": {
+      "legal": 0.0,
+      "building": 0.0,
+      "environmental": 0.0,
+      "social": 0.0
+    },
+    "complexity_performance": {
+      "simple": 0.0,
+      "medium": 0.0,
+      "complex": 0.0
+    },
+    "evaluated_at": "2025-10-06T18:07:25.703316"
+  },
+  "results": [
+    {
+      "test_case_id": "bgb_110_basic",
+      "query": "Was steht im Taschengeldparagraphen?",
+      "passed": false,
+      "retrieval_passed": false,
+      "context_passed": false,
+      "answer_passed": false,
+      "retrieved_docs": [
+        "Standard-Quellen",
+        "Standard-Quellen",
+        "Standard-Quellen",
+        "Verwaltungsportal",
+        "Formulardatenbank",
+        "BauGB",
+        "VwVfG",
+        "Standard-Quellen"
+      ],
+      "expected_docs": [
+        "BGB § 110",
+        "bgb_110.pdf",
+        "bgb_paragraph_110"
+      ],
+      "found_entities": [],
+      "expected_entities": [
+        "gesetzlicher Vertreter",
+        "Taschengeldparagraph",
+        "Minderjährige",
+        "§ 110 BGB"
+      ],
+      "retrieval_score": 0.0,
+      "context_score": 0.2,
+      "answer_score": 0.3,
+      "overall_score": 0.18,
+      "errors": [],
+      "warnings": [],
+      "hallucinations_found": [],
+      "duration_ms": 44885.05411148071
+    },
+    {
+      "test_case_id": "bgb_110_practical",
+      "query": "Darf ein 16-jähriger ohne Erlaubnis seiner Eltern ein Handy kaufen, wenn er sein Taschengeld dafür verwendet?",
+      "passed": false,
+      "retrieval_passed": false,
+      "context_passed": false,
+      "answer_passed": false,
+      "retrieved_docs": [
+        "Standard-Quellen",
+        "Standard-Quellen",
+        "Umweltbundesamt",
+        "Luftreinhaltepläne",
+        "Verwaltungsportal",
+        "Formulardatenbank",
+        "Standard-Quellen",
+        "BauGB",
+        "VwVfG",
+        "API-Services",
+        "Open-Data-Portale",
+        "Standard-Quellen"
+      ],
+      "expected_docs": [
+        "bgb_110.pdf",
+        "bgb_paragraph_110"
+      ],
+      "found_entities": [],
+      "expected_entities": [
+        "Minderjährige",
+        "§ 110 BGB",
+        "Taschengeld",
+        "Kaufvertrag"
+      ],
+      "retrieval_score": 0.0,
+      "context_score": 0.2,
+      "answer_score": 0.425,
+      "overall_score": 0.23,
+      "errors": [],
+      "warnings": [],
+      "hallucinations_found": [],
+      "duration_ms": 37796.98085784912
+    },
+    {
+      "test_case_id": "baurecht_baugenehmigung",
+      "query": "Welche Unterlagen werden für eine Baugenehmigung benötigt?",
+      "passed": false,
+      "retrieval_passed": false,
+      "context_passed": false,
+      "answer_passed": false,
+      "retrieved_docs": [
+        "Standard-Quellen",
+        "Standard-Quellen",
+        "BauGB",
+        "VwVfG",
+        "Standard-Quellen",
+        "Verwaltungsportal",
+        "Formulardatenbank",
+        "Standard-Quellen",
+        "API-Services",
+        "Open-Data-Portale",
+        "Standard-Quellen"
+      ],
+      "expected_docs": [
+        "baugenehmigung_unterlagen",
+        "bauordnung",
+        "baurecht_verfahren"
+      ],
+      "found_entities": [],
+      "expected_entities": [
+        "Bauantrag",
+        "Bauamt",
+        "Baugenehmigung",
+        "Bauordnung"
+      ],
+      "retrieval_score": 0.1,
+      "context_score": 0.2,
+      "answer_score": 0.3,
+      "overall_score": 0.21,
+      "errors": [],
+      "warnings": [],
+      "hallucinations_found": [],
+      "duration_ms": 34361.69695854187
+    },
+    {
+      "test_case_id": "umweltrecht_emissionsgrenzwerte",
+      "query": "Welche Emissionsgrenzwerte gelten für Industrieanlagen und wie werden sie überwacht?",
+      "passed": false,
+      "retrieval_passed": false,
+      "context_passed": false,
+      "answer_passed": false,
+      "retrieved_docs": [
+        "Umweltbundesamt",
+        "Luftreinhaltepläne",
+        "Standard-Quellen",
+        "Standard-Quellen",
+        "Verwaltungsportal",
+        "Formulardatenbank",
+        "Standard-Quellen",
+        "BauGB",
+        "VwVfG",
+        "API-Services",
+        "Open-Data-Portale",
+        "Standard-Quellen"
+      ],
+      "expected_docs": [
+        "emissionsgrenzwerte",
+        "bundes_immissionsschutzgesetz",
+        "ta_luft"
+      ],
+      "found_entities": [],
+      "expected_entities": [
+        "BImSchG",
+        "Umweltamt",
+        "Industrieanlagen",
+        "Emissionsgrenzwerte",
+        "TA Luft"
+      ],
+      "retrieval_score": 0.1,
+      "context_score": 0.2,
+      "answer_score": 0.3,
+      "overall_score": 0.21,
+      "errors": [],
+      "warnings": [],
+      "hallucinations_found": [],
+      "duration_ms": 34573.85778427124
+    },
+    {
+      "test_case_id": "sozialrecht_wohngeld",
+      "query": "Wer hat Anspruch auf Wohngeld und wie wird es berechnet?",
+      "passed": false,
+      "retrieval_passed": false,
+      "context_passed": false,
+      "answer_passed": false,
+      "retrieved_docs": [
+        "Umweltbundesamt",
+        "Luftreinhaltepläne",
+        "Standard-Quellen",
+        "Standard-Quellen",
+        "Verwaltungsportal",
+        "Formulardatenbank",
+        "Standard-Quellen",
+        "BauGB",
+        "VwVfG",
+        "API-Services",
+        "Open-Data-Portale",
+        "Standard-Quellen"
+      ],
+      "expected_docs": [
+        "sozialleistungen",
+        "wohngeld_berechnung",
+        "wohngeldgesetz"
+      ],
+      "found_entities": [],
+      "expected_entities": [
+        "Wohngeld",
+        "Einkommensgrenze",
+        "Wohngeldgesetz",
+        "Anspruchsvoraussetzungen"
+      ],
+      "retrieval_score": 0.1,
+      "context_score": 0.2,
+      "answer_score": 0.425,
+      "overall_score": 0.26,
+      "errors": [],
+      "warnings": [],
+      "hallucinations_found": [],
+      "duration_ms": 34069.616079330444
+    }
+  ]
+}

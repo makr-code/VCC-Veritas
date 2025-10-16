@@ -1,0 +1,73 @@
+{
+  "summary": {
+    "total_test_cases": 1,
+    "passed_test_cases": 0,
+    "failed_test_cases": 1,
+    "pass_rate": 0.0,
+    "retrieval_metrics": {
+      "precision_at_k": {},
+      "recall_at_k": {},
+      "mean_reciprocal_rank": 0.0,
+      "ndcg_at_k": {},
+      "total_queries": 0,
+      "avg_retrieved_docs": 0.0,
+      "avg_relevant_docs": 0.0
+    },
+    "context_metrics": {
+      "avg_relevance_score": 0.0,
+      "context_precision": 0.0,
+      "context_recall": 0.0,
+      "graph_enrichment_rate": 0.0,
+      "avg_related_entities": 0.0
+    },
+    "answer_metrics": {
+      "faithfulness": 0.0,
+      "completeness": 0.0,
+      "hallucination_rate": 0.0,
+      "avg_answer_length": 0.0,
+      "must_contain_match_rate": 0.0,
+      "must_not_contain_violation_rate": 0.0
+    },
+    "avg_duration_ms": 0.03337860107421875,
+    "total_duration_s": 0.0,
+    "category_performance": {
+      "legal": 0.0
+    },
+    "complexity_performance": {
+      "simple": 0.0
+    },
+    "evaluated_at": "2025-10-06T15:21:09.220321"
+  },
+  "results": [
+    {
+      "test_case_id": "test_001",
+      "query": "Test-Frage",
+      "passed": false,
+      "retrieval_passed": true,
+      "context_passed": false,
+      "answer_passed": true,
+      "retrieved_docs": [
+        "doc1",
+        "doc2"
+      ],
+      "expected_docs": [
+        "doc1"
+      ],
+      "found_entities": [
+        "Test Entity 1",
+        "Test Entity 2"
+      ],
+      "expected_entities": [
+        "Entity 1"
+      ],
+      "retrieval_score": 0.85,
+      "context_score": 0.4,
+      "answer_score": 1.0,
+      "overall_score": 0.775,
+      "errors": [],
+      "warnings": [],
+      "hallucinations_found": [],
+      "duration_ms": 0.03337860107421875
+    }
+  ]
+}

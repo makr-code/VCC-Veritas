@@ -1,0 +1,120 @@
+# ======================================================================
+# VERITAS Helm Chart - Staging Values
+# Overrides for staging environment
+# ======================================================================
+
+global:
+  environment: staging
+
+api:
+  replicaCount: 1
+  
+  image:
+    tag: staging
+  
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+  
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 80
+
+worker:
+  replicaCount: 1
+  
+  image:
+    tag: staging
+  
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+  
+  autoscaling:
+    enabled: false
+
+ingress:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-staging
+  
+  hosts:
+    - host: staging.api.veritas.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  
+  tls:
+    - secretName: veritas-staging-tls-cert
+      hosts:
+        - staging.api.veritas.example.com
+
+config:
+  veritas:
+    env: staging
+    logLevel: DEBUG
+  
+  api:
+    corsOrigins: "*"
+  
+  worker:
+    concurrency: 2
+  
+  database:
+    poolSize: 10
+    maxOverflow: 5
+  
+  redis:
+    maxConnections: 25
+  
+  rateLimit:
+    default: "200/minute"
+    auth: "10/minute"
+  
+  session:
+    lifetime: 7200  # 2 hours
+  
+  agent:
+    maxConcurrent: 5
+  
+  quality:
+    threshold: 0.6
+    enableAutoReview: false
+  
+  monitoring:
+    tracingSampleRate: 1.0
+
+secrets:
+  database:
+    host: "postgres.veritas-staging.svc.cluster.local"
+    name: "veritas_staging"
+    password: "staging_password"
+  
+  redis:
+    host: "redis.veritas-staging.svc.cluster.local"
+    password: "staging_redis_password"
+  
+  jwt:
+    secretKey: "staging_jwt_secret_key_change_in_production"
+  
+  apiKeys:
+    admin: "staging_admin_key"
+  
+  encryption:
+    key: "staging_encryption_key_32_bytes_"
+
+persistence:
+  uploads:
+    size: 10Gi
+  
+  data:
+    size: 20Gi

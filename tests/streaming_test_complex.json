@@ -1,0 +1,6 @@
+{
+  "query": "Bauantrag für Einfamilienhaus in Stuttgart - welche Unterlagen werden benötigt?",
+  "enable_streaming": true,
+  "enable_intermediate_results": true,
+  "enable_llm_thinking": true
+}
