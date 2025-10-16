@@ -32,12 +32,21 @@ query_data = {
 
 try:
     response = requests.post(
-        "http://localhost:5000/api/v2/query/stream",
+        "http://localhost:5000/v2/query/stream",
         json=query_data,
         timeout=5
     )
+    
+    if response.status_code != 200:
+        print(f"✗ HTTP {response.status_code}: {response.text}")
+        exit(1)
+    
     result = response.json()
     session_id = result.get("session_id")
+    
+    if not session_id:
+        print(f"✗ Keine Session ID in Response: {result}")
+        exit(1)
     
     print(f"✓ Query gestartet: Session ID = {session_id}")
     
@@ -48,10 +57,10 @@ try:
     agent_count = 0
     last_stage = None
     
-    for i in range(60):  # Max 60 Sekunden
+    for i in range(120):  # Max 120 Sekunden (2 Minuten)
         try:
             progress_response = requests.get(
-                f"http://localhost:5000/api/v2/progress/{session_id}",
+                f"http://localhost:5000/progress/{session_id}",
                 headers={"Accept": "text/event-stream"},
                 stream=True,
                 timeout=2
@@ -107,11 +116,11 @@ try:
                 
                 time.sleep(0.1)
         
-        except Exception as e:
-            print(f"  (Warte auf Events... {i}s)")
+        except requests.exceptions.RequestException:
+            # Warte auf Events
             time.sleep(1)
     
-    print("\n⏱️ Timeout nach 60 Sekunden")
+    print("\n⏱️ Timeout nach 120 Sekunden")
     
 except Exception as e:
     print(f"\n✗ Fehler: {e}")
