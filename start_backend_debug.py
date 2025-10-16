@@ -30,12 +30,12 @@ sys.path.insert(0, os.path.join(project_root, 'uds3'))
 logger = logging.getLogger(__name__)
 
 print("=" * 80)
-print("🔍 VERITAS Backend API - DEBUG MODE")
+print("VERITAS Backend API - DEBUG MODE")
 print("=" * 80)
-print(f"📁 Project Root: {project_root}")
-print(f"🌐 API: http://localhost:5000")
-print(f"📝 Debug Log: data/backend_debug.log")
-print(f"⚙️ Reload: DISABLED (für Code-Stabilität)")
+print(f"Project Root: {project_root}")
+print(f"API: http://localhost:5000")
+print(f"Debug Log: data/backend_debug.log")
+print(f"Reload: DISABLED (for code stability)")
 print("=" * 80)
 
 try:
@@ -43,7 +43,7 @@ try:
     import uvicorn
     
     # Starte Backend mit uvicorn - OHNE reload
-    logger.info("🚀 Starte uvicorn Server...")
+    logger.info("Starting uvicorn Server...")
     uvicorn.run(
         "backend.api.veritas_api_backend:app",
         host="0.0.0.0",
@@ -54,10 +54,10 @@ try:
     )
     
 except KeyboardInterrupt:
-    logger.info("⏹️ Server gestoppt durch Benutzer")
+    logger.info("Server stopped by user")
     
 except Exception as e:
-    logger.error(f"❌ Fehler beim Starten des Backends: {e}")
+    logger.error(f"Error starting backend: {e}")
     import traceback
     traceback.print_exc()
     
