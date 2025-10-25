@@ -1,0 +1,274 @@
+{
+  "database": "C:\\VCC\\veritas\\data\\wka\\wka.sqlite",
+  "size_mb": 1.37109375,
+  "tables": [
+    {
+      "name": "wka",
+      "columns": [
+        {
+          "id": 0,
+          "name": "betreiber",
+          "type": "TEXT",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 1,
+          "name": "bst_nr",
+          "type": "TEXT",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 2,
+          "name": "bst_name",
+          "type": "TEXT",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 3,
+          "name": "ort",
+          "type": "TEXT",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 4,
+          "name": "ortsteil",
+          "type": "TEXT",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 5,
+          "name": "anl_nr",
+          "type": "TEXT",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 6,
+          "name": "anl_bez",
+          "type": "TEXT",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 7,
+          "name": "genehmigt",
+          "type": "TEXT",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 8,
+          "name": "ostwert",
+          "type": "REAL",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 9,
+          "name": "nordwert",
+          "type": "REAL",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 10,
+          "name": "kreis",
+          "type": "TEXT",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 11,
+          "name": "geme_kenn",
+          "type": "TEXT",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 12,
+          "name": "plz",
+          "type": "TEXT",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 13,
+          "name": "inbetriebn",
+          "type": "TEXT",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 14,
+          "name": "alt_an_anz",
+          "type": "TEXT",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 15,
+          "name": "leistung",
+          "type": "REAL",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 16,
+          "name": "status",
+          "type": "TEXT",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 17,
+          "name": "nabenhoehe",
+          "type": "REAL",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 18,
+          "name": "rotordurch",
+          "type": "REAL",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 19,
+          "name": "lw_tag",
+          "type": "REAL",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 20,
+          "name": "lw_nacht",
+          "type": "REAL",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 21,
+          "name": "stand_abw",
+          "type": "REAL",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 22,
+          "name": "wka_id",
+          "type": "TEXT",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        }
+      ],
+      "indexes": [],
+      "row_count": 5457,
+      "sample_data": [
+        {
+          "betreiber": "Dezentrale Energie Anlagen zweite GmbH & Co. Windpark  Oyten 3 KG",
+          "bst_nr": "10652840000",
+          "bst_name": "Dezentrale Energie Anlagen zweite GmbH & Co. Windpark  Oyten 3 KG",
+          "ort": "Oranienburg",
+          "ortsteil": "Zehlendorf",
+          "anl_nr": "6001",
+          "anl_bez": "Vestas V 47/660-76",
+          "genehmigt": "2002-06-24",
+          "ostwert": 393480.0,
+          "nordwert": 5850040.0,
+          "kreis": "LK Oberhavel",
+          "geme_kenn": "12065256",
+          "plz": "16515",
+          "inbetriebn": "2003-02-07",
+          "alt_an_anz": null,
+          "leistung": 0.66,
+          "status": "in Betrieb",
+          "nabenhoehe": 76.0,
+          "rotordurch": 47.0,
+          "lw_tag": -99.0,
+          "lw_nacht": -99.0,
+          "stand_abw": -99.0,
+          "wka_id": "106528400006001"
+        },
+        {
+          "betreiber": "Dezentrale Energie Anlagen zweite GmbH & Co. Windpark  Oyten 3 KG",
+          "bst_nr": "10652840000",
+          "bst_name": "Dezentrale Energie Anlagen zweite GmbH & Co. Windpark  Oyten 3 KG",
+          "ort": "Oranienburg",
+          "ortsteil": "Zehlendorf",
+          "anl_nr": "6002",
+          "anl_bez": "Vestas V 47/660-76",
+          "genehmigt": "2002-06-24",
+          "ostwert": 393610.0,
+          "nordwert": 5849888.0,
+          "kreis": "LK Oberhavel",
+          "geme_kenn": "12065256",
+          "plz": "16515",
+          "inbetriebn": "2003-02-07",
+          "alt_an_anz": null,
+          "leistung": 0.66,
+          "status": "in Betrieb",
+          "nabenhoehe": 76.0,
+          "rotordurch": 47.0,
+          "lw_tag": -99.0,
+          "lw_nacht": -99.0,
+          "stand_abw": -99.0,
+          "wka_id": "106528400006002"
+        },
+        {
+          "betreiber": "Dezentrale Energie Anlagen zweite GmbH & Co. Windpark  Oyten 3 KG",
+          "bst_nr": "10652840000",
+          "bst_name": "Dezentrale Energie Anlagen zweite GmbH & Co. Windpark  Oyten 3 KG",
+          "ort": "Oranienburg",
+          "ortsteil": "Zehlendorf",
+          "anl_nr": "6003",
+          "anl_bez": "Vestas V 47/660-76",
+          "genehmigt": "2002-06-24",
+          "ostwert": 393793.0,
+          "nordwert": 5849966.0,
+          "kreis": "LK Oberhavel",
+          "geme_kenn": "12065256",
+          "plz": "16515",
+          "inbetriebn": "2003-02-07",
+          "alt_an_anz": null,
+          "leistung": 0.66,
+          "status": "in Betrieb",
+          "nabenhoehe": 76.0,
+          "rotordurch": 47.0,
+          "lw_tag": -99.0,
+          "lw_nacht": -99.0,
+          "stand_abw": -99.0,
+          "wka_id": "106528400006003"
+        }
+      ]
+    }
+  ]
+}

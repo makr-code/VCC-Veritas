@@ -1,0 +1,12 @@
+[
+  {
+    "role": "system",
+    "content": "Willkommen bei Veritas v3.15.0! 🚀\nBackend-API: http://127.0.0.1:5000\nDrücken Sie \"➕ Neuer Chat\" um weitere Fenster zu öffnen.",
+    "timestamp": "2025-10-17T21:27:06.817276"
+  },
+  {
+    "role": "user",
+    "content": "Was steht im Taschengeldparagrafen?",
+    "timestamp": "2025-10-17T21:27:27.276049"
+  }
+]

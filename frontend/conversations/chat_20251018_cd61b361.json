@@ -1,0 +1,232 @@
+[
+  {
+    "role": "system",
+    "content": "Willkommen bei Veritas v3.15.0! 🚀\nBackend-API: http://127.0.0.1:5000/api/v3\nDrücken Sie \"➕ Neuer Chat\" um weitere Fenster zu öffnen.",
+    "timestamp": "2025-10-18T23:35:26.581931"
+  },
+  {
+    "role": "user",
+    "content": "Was ist das BImSchG?",
+    "timestamp": "2025-10-18T23:35:39.355854"
+  },
+  {
+    "role": "assistant",
+    "content": "Das BImSchG!\n\nDas Bauliche Vorhabenmeldegesetz (BImSchG) ist ein deutsches Gesetz, das am 1. Januar 2018 in Kraft getreten ist. Es regelt die Meldepflicht für bauliche Vorhaben und soll die Planungs- und Baubewertung von Infrastrukturprojekten verbessern.\n\nMit dem BImSchG müssen Bauherren und -planer bestimmte Informationen über ihre Vorhaben offenlegen, um eine frühzeitige Beurteilung der Auswirkungen auf die Umwelt und die Gesellschaft zu ermöglichen. Dazu gehören unter anderem:\n\n* Die Art und Weise des Vorhabens (z.B. Neubau, Erweiterung, Abriss)\n* Der Standort des Vorhabens\n* Die erwarteten Auswirkungen auf die Umwelt und die Gesellschaft\n\nDas BImSchG gilt für alle baulichen Vorhaben, die eine bestimmte Größe oder Bedeutung haben. Es dient dazu, die Planungs- und Baubewertung von Infrastrukturprojekten zu verbess\n\n💡 📚 8 Quellen | ⚡ 11.72s\n\n📚 **Quellen:**\n  1. Standard-Quellen\n  2. Standard-Quellen\n  3. Standard-Quellen\n  4. Verwaltungsportal\n  5. Formulardatenbank",
+    "timestamp": "2025-10-18T23:35:51.087623",
+    "sources": [
+      {
+        "id": "src_1",
+        "file": null,
+        "page": null,
+        "confidence": 0.0,
+        "author": null,
+        "title": "Standard-Quellen",
+        "year": null,
+        "publisher": null,
+        "url": null,
+        "type": "document"
+      },
+      {
+        "id": "src_2",
+        "file": null,
+        "page": null,
+        "confidence": 0.0,
+        "author": null,
+        "title": "Standard-Quellen",
+        "year": null,
+        "publisher": null,
+        "url": null,
+        "type": "document"
+      },
+      {
+        "id": "src_3",
+        "file": null,
+        "page": null,
+        "confidence": 0.0,
+        "author": null,
+        "title": "Standard-Quellen",
+        "year": null,
+        "publisher": null,
+        "url": null,
+        "type": "document"
+      },
+      {
+        "id": "src_4",
+        "file": null,
+        "page": null,
+        "confidence": 0.0,
+        "author": null,
+        "title": "Verwaltungsportal",
+        "year": null,
+        "publisher": null,
+        "url": null,
+        "type": "document"
+      },
+      {
+        "id": "src_5",
+        "file": null,
+        "page": null,
+        "confidence": 0.0,
+        "author": null,
+        "title": "Formulardatenbank",
+        "year": null,
+        "publisher": null,
+        "url": null,
+        "type": "document"
+      },
+      {
+        "id": "src_6",
+        "file": null,
+        "page": null,
+        "confidence": 0.0,
+        "author": null,
+        "title": "BauGB",
+        "year": null,
+        "publisher": null,
+        "url": null,
+        "type": "document"
+      },
+      {
+        "id": "src_7",
+        "file": null,
+        "page": null,
+        "confidence": 0.0,
+        "author": null,
+        "title": "VwVfG",
+        "year": null,
+        "publisher": null,
+        "url": null,
+        "type": "document"
+      },
+      {
+        "id": "src_8",
+        "file": null,
+        "page": null,
+        "confidence": 0.0,
+        "author": null,
+        "title": "Standard-Quellen",
+        "year": null,
+        "publisher": null,
+        "url": null,
+        "type": "document"
+      }
+    ],
+    "worker_results": {},
+    "metadata": {
+      "model": "llama3.1:8b",
+      "mode": "veritas",
+      "duration": 11.712302,
+      "tokens_used": null,
+      "sources_count": 8,
+      "sources_metadata": [
+        {
+          "id": "src_1",
+          "file": null,
+          "page": null,
+          "confidence": 0.0,
+          "author": null,
+          "title": "Standard-Quellen",
+          "year": null,
+          "publisher": null,
+          "url": null,
+          "type": "document"
+        },
+        {
+          "id": "src_2",
+          "file": null,
+          "page": null,
+          "confidence": 0.0,
+          "author": null,
+          "title": "Standard-Quellen",
+          "year": null,
+          "publisher": null,
+          "url": null,
+          "type": "document"
+        },
+        {
+          "id": "src_3",
+          "file": null,
+          "page": null,
+          "confidence": 0.0,
+          "author": null,
+          "title": "Standard-Quellen",
+          "year": null,
+          "publisher": null,
+          "url": null,
+          "type": "document"
+        },
+        {
+          "id": "src_4",
+          "file": null,
+          "page": null,
+          "confidence": 0.0,
+          "author": null,
+          "title": "Verwaltungsportal",
+          "year": null,
+          "publisher": null,
+          "url": null,
+          "type": "document"
+        },
+        {
+          "id": "src_5",
+          "file": null,
+          "page": null,
+          "confidence": 0.0,
+          "author": null,
+          "title": "Formulardatenbank",
+          "year": null,
+          "publisher": null,
+          "url": null,
+          "type": "document"
+        },
+        {
+          "id": "src_6",
+          "file": null,
+          "page": null,
+          "confidence": 0.0,
+          "author": null,
+          "title": "BauGB",
+          "year": null,
+          "publisher": null,
+          "url": null,
+          "type": "document"
+        },
+        {
+          "id": "src_7",
+          "file": null,
+          "page": null,
+          "confidence": 0.0,
+          "author": null,
+          "title": "VwVfG",
+          "year": null,
+          "publisher": null,
+          "url": null,
+          "type": "document"
+        },
+        {
+          "id": "src_8",
+          "file": null,
+          "page": null,
+          "confidence": 0.0,
+          "author": null,
+          "title": "Standard-Quellen",
+          "year": null,
+          "publisher": null,
+          "url": null,
+          "type": "document"
+        }
+      ],
+      "complexity": null,
+      "agents_involved": [
+        "geo_context",
+        "temporal_analyzer",
+        "response_generator",
+        "document_retrieval",
+        "legal_framework",
+        "quality_assessor"
+      ],
+      "suggestions": []
+    },
+    "confidence_score": 0.0
+  }
+]

@@ -1,0 +1,348 @@
+{
+	"info": {
+		"_postman_id": "veritas-hybrid-search-v1",
+		"name": "VERITAS Hybrid Search API",
+		"description": "Complete API collection for VERITAS Hybrid Search with Multi-Database Retrieval and LLM Re-Ranking",
+		"version": "1.0.0",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Hybrid Search",
+			"item": [
+				{
+					"name": "1. Basic Hybrid Search",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"Was sind die Anforderungen für einen Bauantrag nach BauGB?\",\n  \"model\": \"llama3.1:8b\",\n  \"temperature\": 0.1,\n  \"top_k\": 20,\n  \"enable_reranking\": true,\n  \"enable_rrf\": true,\n  \"rrf_k\": 60\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/query/hybrid",
+							"host": ["{{base_url}}"],
+							"path": ["api", "query", "hybrid"]
+						},
+						"description": "Basic hybrid search with re-ranking enabled"
+					},
+					"response": []
+				},
+				{
+					"name": "2. Fast Mode (No Re-Ranking)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"Lärmschutz nach BImSchG\",\n  \"enable_reranking\": false,\n  \"top_k\": 10\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/query/hybrid",
+							"host": ["{{base_url}}"],
+							"path": ["api", "query", "hybrid"]
+						},
+						"description": "Fast mode without LLM re-ranking (~2s latency)"
+					},
+					"response": []
+				},
+				{
+					"name": "3. Legal Document Search",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"Zeige alle Paragraphen die auf § 35 BauGB verweisen\",\n  \"model\": \"llama3.1:8b\",\n  \"temperature\": 0.1,\n  \"top_k\": 30,\n  \"enable_reranking\": true,\n  \"enable_rrf\": true,\n  \"rrf_k\": 60\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/query/hybrid",
+							"host": ["{{base_url}}"],
+							"path": ["api", "query", "hybrid"]
+						},
+						"description": "Entity-heavy search for legal cross-references"
+					},
+					"response": []
+				},
+				{
+					"name": "4. Environmental Law Query",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"Welche Umweltverträglichkeitsprüfung ist nach BImSchG erforderlich?\",\n  \"model\": \"llama3.1:8b\",\n  \"temperature\": 0.1,\n  \"top_k\": 20,\n  \"enable_reranking\": true,\n  \"enable_rrf\": true,\n  \"rrf_k\": 60,\n  \"session_id\": \"env_law_session_001\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/query/hybrid",
+							"host": ["{{base_url}}"],
+							"path": ["api", "query", "hybrid"]
+						},
+						"description": "Environmental law query with session tracking"
+					},
+					"response": []
+				},
+				{
+					"name": "5. Accurate Mode (Max Quality)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"Detaillierte Analyse der Genehmigungspflicht nach § 4 BImSchG\",\n  \"model\": \"llama3.1:8b\",\n  \"temperature\": 0.05,\n  \"top_k\": 50,\n  \"enable_reranking\": true,\n  \"enable_rrf\": true,\n  \"rrf_k\": 60\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/query/hybrid",
+							"host": ["{{base_url}}"],
+							"path": ["api", "query", "hybrid"]
+						},
+						"description": "Maximum quality mode with low temperature and high top_k"
+					},
+					"response": []
+				}
+			],
+			"description": "Hybrid Search endpoints with multi-database retrieval"
+		},
+		{
+			"name": "Unified Query",
+			"item": [
+				{
+					"name": "1. Unified Hybrid Query",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"Was ist ein Bebauungsplan nach BauGB?\",\n  \"mode\": \"hybrid\",\n  \"model\": \"llama3.1:8b\",\n  \"temperature\": 0.1,\n  \"top_k\": 20\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/query",
+							"host": ["{{base_url}}"],
+							"path": ["api", "query"]
+						},
+						"description": "Unified endpoint with hybrid mode"
+					},
+					"response": []
+				},
+				{
+					"name": "2. Unified RAG Query",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"Erkläre § 35 BauGB\",\n  \"mode\": \"rag\",\n  \"model\": \"llama3.1:8b\",\n  \"top_k\": 10\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/query",
+							"host": ["{{base_url}}"],
+							"path": ["api", "query"]
+						},
+						"description": "Standard RAG mode (vector-only)"
+					},
+					"response": []
+				}
+			],
+			"description": "Mode-agnostic unified query endpoint"
+		},
+		{
+			"name": "Other Modes",
+			"item": [
+				{
+					"name": "1. Simple Ask (No Retrieval)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"Was ist ein Bauantrag?\",\n  \"model\": \"llama3.1:8b\",\n  \"temperature\": 0.3,\n  \"max_tokens\": 500\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/query/ask",
+							"host": ["{{base_url}}"],
+							"path": ["api", "query", "ask"]
+						},
+						"description": "Direct LLM query without document retrieval"
+					},
+					"response": []
+				},
+				{
+					"name": "2. RAG Query",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"Genehmigungspflicht BImSchG\",\n  \"model\": \"llama3.1:8b\",\n  \"top_k\": 10\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/query/rag",
+							"host": ["{{base_url}}"],
+							"path": ["api", "query", "rag"]
+						},
+						"description": "Standard RAG with UDS3 vector database"
+					},
+					"response": []
+				}
+			],
+			"description": "Alternative query modes"
+		},
+		{
+			"name": "System",
+			"item": [
+				{
+					"name": "1. Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/system/health",
+							"host": ["{{base_url}}"],
+							"path": ["api", "system", "health"]
+						},
+						"description": "Check system health and component status"
+					},
+					"response": []
+				},
+				{
+					"name": "2. System Info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/system/info",
+							"host": ["{{base_url}}"],
+							"path": ["api", "system", "info"]
+						},
+						"description": "Get system information and API version"
+					},
+					"response": []
+				},
+				{
+					"name": "3. Root Info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/",
+							"host": ["{{base_url}}"],
+							"path": [""]
+						},
+						"description": "Get API root information"
+					},
+					"response": []
+				}
+			],
+			"description": "System health and information endpoints"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Log request details",
+					"console.log('Request:', pm.info.requestName);",
+					"console.log('URL:', pm.request.url.toString());"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Test response status",
+					"pm.test('Status code is 200', function() {",
+					"    pm.response.to.have.status(200);",
+					"});",
+					"",
+					"// Test response time",
+					"pm.test('Response time < 15s', function() {",
+					"    pm.expect(pm.response.responseTime).to.be.below(15000);",
+					"});",
+					"",
+					"// Test JSON structure",
+					"pm.test('Response has answer', function() {",
+					"    var jsonData = pm.response.json();",
+					"    pm.expect(jsonData).to.have.property('answer');",
+					"});",
+					"",
+					"pm.test('Response has sources', function() {",
+					"    var jsonData = pm.response.json();",
+					"    pm.expect(jsonData).to.have.property('sources');",
+					"});",
+					"",
+					"pm.test('Response has metadata', function() {",
+					"    var jsonData = pm.response.json();",
+					"    pm.expect(jsonData).to.have.property('metadata');",
+					"});",
+					"",
+					"// Log execution time",
+					"var jsonData = pm.response.json();",
+					"if (jsonData.metadata && jsonData.metadata.execution_time_ms) {",
+					"    console.log('Execution time:', jsonData.metadata.execution_time_ms, 'ms');",
+					"}"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string"
+		},
+		{
+			"key": "api_version",
+			"value": "4.0.1",
+			"type": "string"
+		}
+	]
+}

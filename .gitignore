@@ -7,3 +7,74 @@ ca_storage/
 pki_storage/
 temp_ca.pem
 backups/pki-cleanup-*/
+
+# ========================================
+# Python Compiled Files & Cache
+# Added: 20251025 - Cleanup
+# ========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# ========================================
+# Logs & Temporary Files
+# Added: 20251025 - Cleanup
+# ========================================
+*.log
+*.tmp
+*.temp
+*.cache
+logs/
+*.err.log
+
+# ========================================
+# IDE & Editor Files
+# Added: 20251025 - Cleanup
+# ========================================
+.vs/
+.vscode/
+*.swp
+*.swo
+*~
+.idea/
+
+# ========================================
+# Database Files (Development)
+# Added: 20251025 - Cleanup
+# ========================================
+*.sqlite
+*.db
+data/*.sqlite
+data/*.db
+
+# ========================================
+# Environment Variables
+# Added: 20251022 - PKI Integration
+# ========================================
+.env
+.env.local
+.env.*.local
+
+# ========================================
+# Secrets Storage (DPAPI/Azure)
+# Added: 20251022 - Secrets Encryption
+# ========================================
+data/secrets/
+data/backups/

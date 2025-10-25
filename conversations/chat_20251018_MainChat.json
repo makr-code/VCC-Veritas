@@ -1,0 +1,23 @@
+[
+  {
+    "role": "system",
+    "content": "Willkommen bei Veritas v3.15.0! 🚀\nBackend-API: http://127.0.0.1:5000/api/v3\nDrücken Sie \"➕ Neuer Chat\" um weitere Fenster zu öffnen.",
+    "timestamp": "2025-10-18T19:13:03.830046"
+  },
+  {
+    "role": "user",
+    "content": "Was steht im BGB?",
+    "timestamp": "2025-10-18T19:13:22.013969"
+  },
+  {
+    "role": "assistant",
+    "content": "Keine Antwort erhalten.",
+    "timestamp": "2025-10-18T19:14:01.442821",
+    "sources": [],
+    "worker_results": {},
+    "metadata": {
+      "suggestions": []
+    },
+    "confidence_score": 0.0
+  }
+]

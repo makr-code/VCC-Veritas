@@ -1,0 +1,183 @@
+[
+  {
+    "step_id": "step_001",
+    "plan_id": "test_plan_001",
+    "step_index": 0,
+    "step_name": "Query Environmental Data",
+    "step_type": "data_retrieval",
+    "agent_name": "environmental",
+    "agent_type": "DataRetrievalAgent",
+    "status": "completed",
+    "step_config": "{\"max_results\": 10}",
+    "retry_count": 0,
+    "started_at": "now",
+    "completed_at": "now",
+    "result": "{\"query_results\": [{\"id\": 1, \"title\": \"Test Document 1\", \"score\": 0.95}, {\"id\": 2, \"title\": \"Test Document 2\", \"score\": 0.87}], \"total_results\": 2, \"execution_time_ms\": 123}"
+  },
+  {
+    "step_id": "step_001",
+    "plan_id": "test_plan_001",
+    "step_index": 0,
+    "step_name": "Query Environmental Data",
+    "step_type": "data_retrieval",
+    "agent_name": "environmental",
+    "agent_type": "DataRetrievalAgent",
+    "status": "pending",
+    "step_config": "{\"max_results\": 10}",
+    "retry_count": 0
+  },
+  {
+    "step_id": "research_20251022_160335_step_0",
+    "plan_id": "research_20251022_160335",
+    "step_index": 0,
+    "step_name": "Query Environmental Data",
+    "step_type": "data_retrieval",
+    "agent_name": "environmental",
+    "agent_type": "DataRetrievalAgent",
+    "status": "completed",
+    "step_config": "{\"max_results\": 10, \"use_hybrid_search\": true, \"databases\": [\"chromadb\", \"neo4j\", \"postgres\"]}",
+    "retry_count": 0,
+    "started_at": "2025-10-22T16:03:35.346287",
+    "completed_at": "2025-10-22T16:03:35.850550",
+    "execution_time_ms": 450,
+    "result": "{\"success\": true, \"data_retrieved\": 10, \"confidence\": 0.85, \"sources\": [\"chromadb\", \"neo4j\"]}"
+  },
+  {
+    "step_id": "research_20251022_160335_step_1",
+    "plan_id": "research_20251022_160335",
+    "step_index": 1,
+    "step_name": "Analyze Air Quality Metrics",
+    "step_type": "data_analysis",
+    "agent_name": "environmental",
+    "agent_type": "AnalysisAgent",
+    "status": "completed",
+    "step_config": "{\"max_results\": 10, \"use_hybrid_search\": true, \"databases\": [\"chromadb\", \"neo4j\", \"postgres\"]}",
+    "retry_count": 0,
+    "started_at": "2025-10-22T16:03:35.865277",
+    "completed_at": "2025-10-22T16:03:36.370945",
+    "execution_time_ms": 550,
+    "result": "{\"success\": true, \"data_retrieved\": 15, \"confidence\": 0.88, \"sources\": [\"chromadb\", \"neo4j\"]}"
+  },
+  {
+    "step_id": "research_20251022_160335_step_2",
+    "plan_id": "research_20251022_160335",
+    "step_index": 2,
+    "step_name": "Identify Contributing Factors",
+    "step_type": "data_analysis",
+    "agent_name": "environmental",
+    "agent_type": "AnalysisAgent",
+    "status": "completed",
+    "step_config": "{\"max_results\": 10, \"use_hybrid_search\": true, \"databases\": [\"chromadb\", \"neo4j\", \"postgres\"]}",
+    "retry_count": 0,
+    "started_at": "2025-10-22T16:03:36.383461",
+    "completed_at": "2025-10-22T16:03:36.888182",
+    "execution_time_ms": 650,
+    "result": "{\"success\": true, \"data_retrieved\": 20, \"confidence\": 0.9099999999999999, \"sources\": [\"postgres\"]}"
+  },
+  {
+    "step_id": "research_20251022_160335_step_3",
+    "plan_id": "research_20251022_160335",
+    "step_index": 3,
+    "step_name": "Synthesize Final Report",
+    "step_type": "synthesis",
+    "agent_name": "pipeline_manager",
+    "agent_type": "AnalysisAgent",
+    "status": "completed",
+    "step_config": "{\"max_results\": 10, \"use_hybrid_search\": true, \"databases\": [\"chromadb\", \"neo4j\", \"postgres\"]}",
+    "retry_count": 0,
+    "started_at": "2025-10-22T16:03:36.903106",
+    "completed_at": "2025-10-22T16:03:37.408344",
+    "execution_time_ms": 750,
+    "result": "{\"success\": true, \"data_retrieved\": 25, \"confidence\": 0.94, \"sources\": [\"postgres\"]}"
+  },
+  {
+    "step_id": "step_001",
+    "plan_id": "test_research_plan_001",
+    "step_index": 0,
+    "step_name": "Query Environmental Data",
+    "step_type": "data_retrieval",
+    "agent_name": "test_data_retrieval",
+    "agent_type": "TestDataRetrievalAgent",
+    "status": "pending",
+    "step_config": "{\"databases\": [\"chromadb\"], \"max_results\": 10, \"use_hybrid_search\": true}",
+    "retry_count": 0
+  },
+  {
+    "step_id": "step_002",
+    "plan_id": "test_research_plan_001",
+    "step_index": 1,
+    "step_name": "Analyze Air Quality Metrics",
+    "step_type": "data_analysis",
+    "agent_name": "test_data_retrieval",
+    "agent_type": "TestDataRetrievalAgent",
+    "status": "completed",
+    "step_config": "{\"metrics\": [\"PM2.5\", \"PM10\", \"NO2\"], \"threshold_check\": true}",
+    "depends_on": [
+      "step_001"
+    ],
+    "retry_count": 0,
+    "started_at": "now",
+    "completed_at": "now",
+    "result": "{\"analysis\": \"Test analysis completed\", \"metrics\": {\"accuracy\": 0.94, \"completeness\": 0.88}}"
+  },
+  {
+    "step_id": "step_003",
+    "plan_id": "test_research_plan_001",
+    "step_index": 2,
+    "step_name": "Synthesize Findings",
+    "step_type": "synthesis",
+    "agent_name": "test_data_retrieval",
+    "agent_type": "TestDataRetrievalAgent",
+    "status": "completed",
+    "step_config": "{\"format\": \"summary\", \"include_recommendations\": true}",
+    "depends_on": [
+      "step_002"
+    ],
+    "retry_count": 0,
+    "started_at": "now",
+    "completed_at": "now",
+    "result": "{\"synthesis\": \"Test synthesis of findings\", \"key_points\": [\"Point 1\", \"Point 2\", \"Point 3\"]}"
+  },
+  {
+    "step_id": "step_001",
+    "plan_id": "test_research_plan_001",
+    "step_index": 0,
+    "step_name": "Query Environmental Data",
+    "step_type": "data_retrieval",
+    "agent_name": "test_data_retrieval",
+    "agent_type": "TestDataRetrievalAgent",
+    "status": "pending",
+    "step_config": "{\"databases\": [\"chromadb\"], \"max_results\": 10, \"use_hybrid_search\": true}",
+    "retry_count": 0
+  },
+  {
+    "step_id": "step_002",
+    "plan_id": "test_research_plan_001",
+    "step_index": 1,
+    "step_name": "Analyze Air Quality Metrics",
+    "step_type": "data_analysis",
+    "agent_name": "test_data_retrieval",
+    "agent_type": "TestDataRetrievalAgent",
+    "status": "pending",
+    "step_config": "{\"metrics\": [\"PM2.5\", \"PM10\", \"NO2\"], \"threshold_check\": true}",
+    "depends_on": [
+      "step_001"
+    ],
+    "retry_count": 0
+  },
+  {
+    "step_id": "step_003",
+    "plan_id": "test_research_plan_001",
+    "step_index": 2,
+    "step_name": "Synthesize Findings",
+    "step_type": "synthesis",
+    "agent_name": "test_data_retrieval",
+    "agent_type": "TestDataRetrievalAgent",
+    "status": "pending",
+    "step_config": "{\"format\": \"summary\", \"include_recommendations\": true}",
+    "depends_on": [
+      "step_002"
+    ],
+    "retry_count": 0
+  }
+]

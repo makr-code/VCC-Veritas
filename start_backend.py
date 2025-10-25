@@ -1,7 +1,17 @@
 #!/usr/bin/env python3
 """
-VERITAS Backend Launcher
-Startet das VERITAS Backend-API mit korrekter Pfad-Konfiguration
+VERITAS Unified Backend Launcher
+=================================
+
+Startet das konsolidierte VERITAS Backend v4.0.0
+
+Features:
+- UDS3 v2.0.0 Integration
+- Intelligent Multi-Agent Pipeline
+- Unified Response Model (IEEE Citations)
+- Hybrid Search, Streaming, Agent Queries
+
+Version: 4.0.0
 """
 import sys
 import os
@@ -21,17 +31,22 @@ sys.path.insert(0, os.path.join(project_root, 'shared'))
 sys.path.insert(0, os.path.join(project_root, 'database'))
 sys.path.insert(0, os.path.join(project_root, 'uds3'))
 
-print("⚙️ Starte VERITAS Backend API...")
+print("=" * 80)
+print("⚙️  Starte VERITAS Unified Backend v4.0.0...")
+print("=" * 80)
 print("📁 Project Root:", project_root)
-print("🌐 API wird verfügbar unter: http://localhost:5000")
+print("🌐 API Base: http://localhost:5000/api")
+print("📖 Docs: http://localhost:5000/docs")
+print("📊 Health: http://localhost:5000/api/system/health")
+print("=" * 80)
 
 try:
     # Import uvicorn
     import uvicorn
     
-    # Starte Backend mit uvicorn
+    # Starte Konsolidiertes Backend
     uvicorn.run(
-        "backend.api.veritas_api_backend:app",
+        "backend.app:app",  # ✨ Backend v4.0.0: Unified Application
         host="0.0.0.0",
         port=5000,
         log_level="info",

@@ -1,0 +1,27 @@
+{
+  "metadata": {
+    "session_id": "session_92c008b64eef",
+    "window_id": "MainChat",
+    "created_at": "2025-10-20T16:00:20.554922",
+    "message_count": 2,
+    "llm_model": "llama3:latest",
+    "settings": {
+      "temperature": 0.7,
+      "max_tokens": 1200,
+      "top_p": 0.9
+    }
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "Willkommen bei Veritas v3.15.0! 🚀\nBackend-API: http://127.0.0.1:5000/api\nDrücken Sie \"➕ Neuer Chat\" um weitere Fenster zu öffnen.",
+      "timestamp": "2025-10-20T14:30:08.033899"
+    },
+    {
+      "role": "user",
+      "content": "Was ist das Bimschg?",
+      "timestamp": "2025-10-20T14:30:17.243257"
+    }
+  ],
+  "version": "1.0"
+}

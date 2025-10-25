@@ -36,10 +36,15 @@ class UDS3VectorSearchAdapter:
     Usage:
     ------
     ```python
-    from uds3.uds3_core import get_optimized_unified_strategy
+    from uds3.core import UDS3PolyglotManager  # ✨ UDS3 v2.0.0 (Legacy stable)
     from backend.agents.veritas_uds3_adapter import UDS3VectorSearchAdapter
     
-    uds3 = get_optimized_unified_strategy()
+    backend_config = {
+        "vector": {"enabled": True, "backend": "chromadb"},
+        "graph": {"enabled": False},
+        "relational": {"enabled": False}
+    }
+    uds3 = UDS3PolyglotManager(backend_config=backend_config, enable_rag=True)
     adapter = UDS3VectorSearchAdapter(uds3)
     
     # Jetzt kompatibel mit HybridRetriever
@@ -52,7 +57,7 @@ class UDS3VectorSearchAdapter:
         Initialisiert UDS3 Adapter.
         
         Args:
-            uds3_strategy: UDS3 UnifiedDatabaseStrategy Instance
+            uds3_strategy: UDS3 PolyglotManager Instance (v2.0.0+)
             
         Raises:
             RuntimeError: Wenn uds3_strategy None ist

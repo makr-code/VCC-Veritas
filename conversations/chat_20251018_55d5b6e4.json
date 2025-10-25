@@ -1,0 +1,23 @@
+[
+  {
+    "role": "system",
+    "content": "Willkommen bei Veritas v3.15.0! 🚀\nBackend-API: http://127.0.0.1:5000/api/v3\nDrücken Sie \"➕ Neuer Chat\" um weitere Fenster zu öffnen.",
+    "timestamp": "2025-10-18T19:32:34.105279"
+  },
+  {
+    "role": "user",
+    "content": "Welche Daten haben wir zu einer BST 60694990000?",
+    "timestamp": "2025-10-18T19:33:09.669383"
+  },
+  {
+    "role": "assistant",
+    "content": "Keine Antwort erhalten.\n\n💡 ⚡ 20.96s",
+    "timestamp": "2025-10-18T19:33:30.641167",
+    "sources": [],
+    "worker_results": {},
+    "metadata": {
+      "suggestions": []
+    },
+    "confidence_score": 0.0
+  }
+]

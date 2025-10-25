@@ -1,0 +1,12 @@
+[
+  {
+    "role": "system",
+    "content": "Willkommen bei Veritas v3.15.0! 🚀\nBackend-API: http://127.0.0.1:5000/api\nDrücken Sie \"➕ Neuer Chat\" um weitere Fenster zu öffnen.",
+    "timestamp": "2025-10-20T11:56:11.968380"
+  },
+  {
+    "role": "user",
+    "content": "Was ist das Bimschg?",
+    "timestamp": "2025-10-20T11:56:21.650048"
+  }
+]

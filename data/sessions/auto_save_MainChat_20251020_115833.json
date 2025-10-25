@@ -1,0 +1,35 @@
+{
+  "metadata": {
+    "session_id": "session_aaa2449d74df",
+    "window_id": "MainChat",
+    "created_at": "2025-10-20T11:58:33.768336",
+    "message_count": 3,
+    "llm_model": "llama3:latest",
+    "settings": {
+      "temperature": 0.7,
+      "max_tokens": 1200,
+      "top_p": 0.9
+    }
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "Willkommen bei Veritas v3.15.0! 🚀\nBackend-API: http://127.0.0.1:5000/api\nDrücken Sie \"➕ Neuer Chat\" um weitere Fenster zu öffnen.",
+      "timestamp": "2025-10-20T11:56:11.968380"
+    },
+    {
+      "role": "user",
+      "content": "Was ist das Bimschg?",
+      "timestamp": "2025-10-20T11:56:21.650048"
+    },
+    {
+      "role": "error",
+      "content": "HTTP 422: [{'type': 'missing', 'loc': ['query', 'request'], 'msg': 'Field required', 'input': None}]",
+      "timestamp": "2025-10-20T11:56:21.693666",
+      "original_query": "Was ist das Bimschg?",
+      "error_type": "api_error",
+      "retryable": true
+    }
+  ],
+  "version": "1.0"
+}

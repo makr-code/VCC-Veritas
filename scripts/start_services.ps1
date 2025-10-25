@@ -24,29 +24,101 @@ function Write-Info($text) {
     Write-Host "  ℹ️  $text" -ForegroundColor Blue
 }
 
+# Basis-Pfade/PID-Datei
+$RootDir = Split-Path -Parent $PSScriptRoot
+$PidDir = Join-Path $RootDir "data"
+if (-not (Test-Path $PidDir)) { New-Item -ItemType Directory -Path $PidDir | Out-Null }
+$BackendPidFile = Join-Path $PidDir ".veritas_backend.pid"
+"$null" | Out-Null
+
+# Logs-Verzeichnis und Log-Datei
+$LogsDir = Join-Path $RootDir "logs"
+if (-not (Test-Path $LogsDir)) { New-Item -ItemType Directory -Path $LogsDir | Out-Null }
+$BackendLogFile = Join-Path $LogsDir "backend_uvicorn.log"
+
 Write-Header "VERITAS Service Starter"
 
 # Backend starten
 if (-not $FrontendOnly) {
     Write-Step "Starte Backend (Port 5000)..."
-    
-    $backendJob = Start-Job -ScriptBlock {
-        Set-Location $using:PWD
-        # Nutze uvicorn statt direktem Python-Call
-        python -m uvicorn backend.api.veritas_api_backend:app --host 0.0.0.0 --port 5000
-    }
-    
-    Write-Success "Backend gestartet (Job ID: $($backendJob.Id))"
-    Write-Info "Warte 5 Sekunden auf Backend-Start..."
-    Start-Sleep -Seconds 5
-    
-    # Health Check
+
+    # 🧹 Lösche Python Cache (kritisch für Code-Updates!)
+    Write-Step "Lösche __pycache__ für frischen Start..."
+    Get-ChildItem -Path (Join-Path $RootDir "backend") -Filter "__pycache__" -Recurse -Directory -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force
+    Get-ChildItem -Path (Join-Path $RootDir "backend") -Filter "*.pyc" -Recurse -File -ErrorAction SilentlyContinue | Remove-Item -Force
+    Write-Success "Cache gelöscht"
+
+    # Sicherstellen, dass 'uds3' als Schwester-Ordner gefunden wird (falls vorhanden)
     try {
-        $response = Invoke-RestMethod -Uri "http://127.0.0.1:5000/health" -TimeoutSec 5
-        Write-Success "Backend Health Check: OK"
-        Write-Host "    Response: $($response | ConvertTo-Json -Compress)" -ForegroundColor Gray
+        $ParentDir = Split-Path -Parent $RootDir
+        $pythonPathParts = @()
+        # Repo-Root selbst (für 'backend', 'shared', etc.)
+        $pythonPathParts += $RootDir
+        # Falls ein lokales uds3 innerhalb des Repos liegt
+        if (Test-Path (Join-Path $RootDir 'uds3')) { $pythonPathParts += (Join-Path $RootDir '') }
+        # Falls uds3 als Schwester-Ordner existiert (z.B. C:\VCC\uds3)
+        if (Test-Path (Join-Path $ParentDir 'uds3')) { $pythonPathParts += $ParentDir }
+        # PYTHONPATH setzen (vorhandene Werte beibehalten)
+        $existingPyPath = $env:PYTHONPATH
+        $newPyPath = ($pythonPathParts -join ';')
+        if ([string]::IsNullOrEmpty($existingPyPath)) {
+            $env:PYTHONPATH = $newPyPath
+        } else {
+            $env:PYTHONPATH = "$newPyPath;$existingPyPath"
+        }
+        Write-Info "PYTHONPATH gesetzt: $($env:PYTHONPATH)"
     } catch {
-        Write-Host "  ⚠️  Backend Health Check fehlgeschlagen (startet möglicherweise noch)" -ForegroundColor Yellow
+        Write-Host "  ⚠️  Konnte PYTHONPATH nicht setzen: $_" -ForegroundColor Yellow
+    }
+
+    # Starte gezielt den uvicorn Prozess und speichere PID
+    # ⚡ Backend v4.0.0: Unified backend.app:app (flat structure)
+    $arguments = "-m uvicorn backend.app:app --host 0.0.0.0 --port 5000 --log-level info"
+    try {
+        # Vor Start: alte Log-Datei rotieren
+        if (Test-Path $BackendLogFile) {
+            try { Move-Item -Path $BackendLogFile -Destination ($BackendLogFile + ".old") -Force -ErrorAction SilentlyContinue } catch {}
+        }
+
+        $BackendErrFile = $BackendLogFile.Replace('.log', '.err.log')
+        $proc = Start-Process -FilePath "python" -ArgumentList $arguments -WorkingDirectory $RootDir -PassThru -WindowStyle Hidden -RedirectStandardOutput $BackendLogFile -RedirectStandardError $BackendErrFile
+        $proc.Id | Out-File -FilePath $BackendPidFile -Encoding ascii -Force
+        Write-Success "Backend v4.0.0 gestartet (PID: $($proc.Id))"
+        Write-Info "PID gespeichert in: $BackendPidFile"
+        Write-Info "Logs: $BackendLogFile"
+        Write-Info "Errors: $BackendErrFile"
+    } catch {
+        Write-Host "  ❌ Backend konnte nicht gestartet werden: $_" -ForegroundColor Red
+        exit 1
+    }
+
+    # Health Check mit Retry (max. 10s) - Backend v4.0.0
+    Write-Info "Prüfe Health-Status (bis zu 10s)..."
+    $healthy = $false
+    for ($i = 0; $i -lt 10; $i++) {
+        try {
+            $response = Invoke-RestMethod -Uri "http://127.0.0.1:5000/api/system/health" -TimeoutSec 2 -ErrorAction Stop
+            $healthy = $true
+            Write-Success "Backend v4.0.0 Health Check: OK"
+            if ($response.status) {
+                Write-Host "    Status: $($response.status)" -ForegroundColor Gray
+                if ($response.components) {
+                    Write-Host "    Components:" -ForegroundColor Gray
+                    if ($response.components.uds3) { Write-Host "      • UDS3: ✓" -ForegroundColor Green }
+                    if ($response.components.pipeline) { Write-Host "      • Pipeline: ✓" -ForegroundColor Green }
+                    if ($response.components.agents) { Write-Host "      • Agents: ✓" -ForegroundColor Green }
+                }
+            }
+            break
+        } catch { Start-Sleep -Milliseconds 800 }
+    }
+    if (-not $healthy) {
+        Write-Host "  ⚠️  Backend Health Check fehlgeschlagen (bitte Logs prüfen)" -ForegroundColor Yellow
+        Write-Host "     Tipp: Get-CimInstance Win32_Process -Filter 'ProcessId = $((Get-Content $BackendPidFile))' | Select-Object CommandLine" -ForegroundColor DarkYellow
+        if (Test-Path $BackendLogFile) {
+            Write-Host "     📄 Letzte Log-Zeilen:" -ForegroundColor DarkYellow
+            try { Get-Content -Path $BackendLogFile -Tail 60 | ForEach-Object { Write-Host ("       " + $_) -ForegroundColor DarkGray } } catch {}
+        }
     }
 }
 
@@ -68,11 +140,16 @@ Write-Host "`n" -NoNewline
 Write-Header "Services gestartet"
 
 if (-not $FrontendOnly) {
-    Write-Host "Backend:  " -NoNewline -ForegroundColor White
+    Write-Host "Backend v4.0.0:  " -NoNewline -ForegroundColor White
     Write-Host "http://127.0.0.1:5000" -ForegroundColor Cyan
-    Write-Host "  • Health:    http://127.0.0.1:5000/health" -ForegroundColor Gray
+    Write-Host "  • Health:    http://127.0.0.1:5000/api/system/health" -ForegroundColor Gray
+    Write-Host "  • Info:      http://127.0.0.1:5000/api/system/info" -ForegroundColor Gray
     Write-Host "  • Docs:      http://127.0.0.1:5000/docs" -ForegroundColor Gray
-    Write-Host "  • Job ID:    $($backendJob.Id)" -ForegroundColor Gray
+    Write-Host "  • Query:     http://127.0.0.1:5000/api/query" -ForegroundColor Gray
+    if (Test-Path $BackendPidFile) {
+        $backendPid = Get-Content $BackendPidFile -ErrorAction SilentlyContinue
+        if ($backendPid) { Write-Host "  • PID:       $backendPid" -ForegroundColor Gray }
+    }
 }
 
 if (-not $BackendOnly) {
@@ -84,7 +161,7 @@ if (-not $BackendOnly) {
 # Befehle anzeigen
 Write-Host "`n📋 Nützliche Befehle:" -ForegroundColor Cyan
 Write-Host "  • Logs anzeigen:    Get-Job | Receive-Job -Keep" -ForegroundColor White
-Write-Host "  • Services stoppen: Get-Job | Stop-Job; Get-Job | Remove-Job" -ForegroundColor White
+Write-Host "  • Backend stoppen:  .\\scripts\\stop_services.ps1 -BackendOnly" -ForegroundColor White
 Write-Host "  • Status prüfen:    Get-Job" -ForegroundColor White
 
 Write-Host "`n✅ Services laufen im Hintergrund!`n" -ForegroundColor Green

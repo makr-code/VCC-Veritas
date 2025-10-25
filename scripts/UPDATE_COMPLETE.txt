@@ -1,0 +1,285 @@
+┌─────────────────────────────────────────────────────────────────────┐
+│                                                                     │
+│  ✅ VERITAS Backend v4.0.0 - PowerShell Skripte Update Complete    │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+
+📦 AKTUALISIERTE DATEIEN
+════════════════════════════════════════════════════════════════════
+
+✅ scripts/start_services.ps1            (7.1 KB)  ← AKTUALISIERT
+   └─ backend.app:app
+   └─ /api/system/health
+   └─ Component-Status Anzeige
+
+✅ scripts/stop_services.ps1             (2.7 KB)  ← AKTUALISIERT
+   └─ /api/system/health
+   └─ v4.0.0 Labels
+
+✅ scripts/restart_backend_debug.ps1     (2.5 KB)  ← AKTUALISIERT
+   └─ backend.app:app
+   └─ logs/backend_v4.log
+   └─ --reload Flag
+
+
+🆕 NEUE DATEIEN
+════════════════════════════════════════════════════════════════════
+
+🌟 scripts/manage_backend_v4.ps1        (19.0 KB)  ← NEU!
+   ├─ Action: start
+   ├─ Action: stop
+   ├─ Action: restart
+   ├─ Action: status      (PID, CPU, Memory, API-Status)
+   ├─ Action: test        (5 umfassende Tests)
+   ├─ Action: info        (Version, Components, Capabilities)
+   ├─ Debug-Modus Support (-Debug)
+   ├─ PID-Management      (data/backend_v4.pid)
+   ├─ Log-Management      (logs/backend_v4.log)
+   └─ Health Check        (10 Retries mit Component-Status)
+
+📚 scripts/README_BACKEND_V4.md          (7.1 KB)  ← NEU!
+   ├─ Übersicht aller Skripte
+   ├─ Quick Start Guide
+   ├─ Vollständige Befehls-Referenz
+   ├─ Endpoint-Dokumentation (Flat Structure)
+   ├─ Troubleshooting Guide
+   ├─ Migration Guide (v3 → v4)
+   ├─ Best Practices
+   ├─ Umgebungsvariablen
+   └─ Support-Hinweise
+
+🎯 scripts/QUICK_REFERENCE.md            (3.1 KB)  ← NEU!
+   ├─ Schnellstart-Befehle
+   ├─ Endpoint-Liste
+   ├─ Health Check Beispiele
+   ├─ Query Test Beispiele
+   ├─ Log-Befehle
+   ├─ Troubleshooting-Snippets
+   └─ UnifiedResponse Format
+
+📋 scripts/UPDATE_SUMMARY.md             (6.9 KB)  ← NEU!
+   └─ Diese Zusammenfassung der Änderungen
+
+
+🔧 TECHNISCHE ÄNDERUNGEN
+════════════════════════════════════════════════════════════════════
+
+Backend-Modul:
+  OLD: backend.api.veritas_api_backend_v3:app
+  NEW: backend.app:app                          ✅ Flat Structure
+
+Endpoints:
+  OLD: /health
+  NEW: /api/system/health                           ✅ Flat Structure
+
+  OLD: /v2/query
+  NEW: /api/query                                   ✅ Unified Endpoint
+
+  NEW: /api/system/info                             ✅ Neu
+  NEW: /api/system/capabilities                     ✅ Neu
+  NEW: /api/system/modes                            ✅ Neu
+
+PID-Datei:
+  OLD: data/.veritas_backend.pid
+  NEW: data/backend_v4.pid                          ✅ Versioniert
+
+Log-Dateien:
+  OLD: logs/backend_uvicorn.log
+  NEW: logs/backend_v4.log                          ✅ Versioniert
+
+
+🎨 FEATURES
+════════════════════════════════════════════════════════════════════
+
+✅ Unified Backend Architecture (v4.0.0)
+✅ Flat API Structure (kein /api/v3/ nesting)
+✅ UnifiedResponse mit IEEE Citations (35+ Felder)
+✅ Component-Status Monitoring (UDS3, Pipeline, Agents)
+✅ Umfassende Test-Suite (5 Tests)
+✅ Debug-Modus mit Auto-Reload
+✅ Log-Rotation (.log → .log.old)
+✅ Health Check mit Retry-Logic
+✅ Detaillierte Status-Anzeige (CPU, Memory, Threads)
+✅ Vollständige Dokumentation (README + Quick Reference)
+
+
+📊 VERWENDUNG
+════════════════════════════════════════════════════════════════════
+
+┌─ STANDARD-BETRIEB ─────────────────────────────────────────────┐
+│                                                                 │
+│  Start Backend + Frontend:                                     │
+│  > .\scripts\start_services.ps1                                │
+│                                                                 │
+│  Nur Backend:                                                  │
+│  > .\scripts\start_services.ps1 -BackendOnly                   │
+│                                                                 │
+│  Stop:                                                         │
+│  > .\scripts\stop_services.ps1                                 │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─ MANAGEMENT ───────────────────────────────────────────────────┐
+│                                                                 │
+│  Status prüfen:                                                │
+│  > .\scripts\manage_backend_v4.ps1 -Action status              │
+│                                                                 │
+│  Tests durchführen:                                            │
+│  > .\scripts\manage_backend_v4.ps1 -Action test                │
+│                                                                 │
+│  Info anzeigen:                                                │
+│  > .\scripts\manage_backend_v4.ps1 -Action info                │
+│                                                                 │
+│  Neustart:                                                     │
+│  > .\scripts\manage_backend_v4.ps1 -Action restart             │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─ ENTWICKLUNG ──────────────────────────────────────────────────┐
+│                                                                 │
+│  Debug-Modus (Auto-Reload):                                    │
+│  > .\scripts\restart_backend_debug.ps1                         │
+│                                                                 │
+│  Oder mit Management-Skript:                                   │
+│  > .\scripts\manage_backend_v4.ps1 -Action start -Debug        │
+│                                                                 │
+│  Logs überwachen:                                              │
+│  > Get-Content logs/backend_v4.log -Wait -Tail 50              │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+
+
+🧪 TESTING
+════════════════════════════════════════════════════════════════════
+
+Quick Test:
+┌─────────────────────────────────────────────────────────────────┐
+│ > .\scripts\manage_backend_v4.ps1 -Action start                │
+│ > .\scripts\manage_backend_v4.ps1 -Action test                 │
+│                                                                 │
+│ Erwarteter Output:                                             │
+│ ✅ Health: healthy                                              │
+│ ✅ Backend Version: 4.0.0                                       │
+│ ✅ Features: 8                                                  │
+│ ✅ Modi: 5 (rag, hybrid, streaming, agent, ask)                │
+│ ✅ Query erfolgreich                                            │
+└─────────────────────────────────────────────────────────────────┘
+
+Manual Health Check:
+┌─────────────────────────────────────────────────────────────────┐
+│ > Invoke-RestMethod http://localhost:5000/api/system/health    │
+│                                                                 │
+│ Response (Mock-Modus):                                         │
+│ {                                                              │
+│   "status": "healthy",                                         │
+│   "version": "4.0.0",                                          │
+│   "components": {                                              │
+│     "uds3": false,      // Normal ohne UDS3                   │
+│     "pipeline": false,  // Normal im Mock-Modus               │
+│     "agents": false     // Optional                           │
+│   }                                                            │
+│ }                                                              │
+└─────────────────────────────────────────────────────────────────┘
+
+
+🌐 ENDPOINTS (v4.0.0)
+════════════════════════════════════════════════════════════════════
+
+System:
+  http://localhost:5000/api/system/health        ✅ Health Status
+  http://localhost:5000/api/system/info          ✅ Backend Info
+  http://localhost:5000/api/system/capabilities  ✅ Feature Liste
+  http://localhost:5000/api/system/modes         ✅ Query Modes
+
+Query:
+  http://localhost:5000/api/query                ✅ Unified Query
+  http://localhost:5000/api/query/ask            ✅ Simple Ask
+  http://localhost:5000/api/query/rag            ✅ RAG Query
+  http://localhost:5000/api/query/hybrid         ✅ Hybrid Search
+  http://localhost:5000/api/query/stream         ✅ Streaming
+
+Agents:
+  http://localhost:5000/api/agent/list           ✅ Agent Liste
+  http://localhost:5000/api/agent/capabilities   ✅ Agent Features
+  http://localhost:5000/api/agent/status/{id}    ✅ Agent Status
+
+Docs:
+  http://localhost:5000/docs                     ✅ OpenAPI Docs
+  http://localhost:5000/redoc                    ✅ ReDoc
+
+
+📚 DOKUMENTATION
+════════════════════════════════════════════════════════════════════
+
+scripts/README_BACKEND_V4.md     Vollständige Skript-Dokumentation
+scripts/QUICK_REFERENCE.md       Schnellreferenz-Karte
+scripts/UPDATE_SUMMARY.md        Änderungs-Übersicht
+
+docs/BACKEND_REFACTORING.md      Backend-Architektur
+docs/QUICK_START.md              Quick Start Guide
+docs/FRONTEND_INTEGRATION.md     Frontend-Migration
+
+
+🎯 NEXT STEPS
+════════════════════════════════════════════════════════════════════
+
+1️⃣  Backend testen:
+    > .\scripts\manage_backend_v4.ps1 -Action start
+    > .\scripts\manage_backend_v4.ps1 -Action test
+
+2️⃣  Frontend migrieren:
+    Siehe: frontend/migration_example.py
+
+3️⃣  Integration testen:
+    > .\scripts\start_services.ps1
+
+4️⃣  Optional: Alte Skripte backup-en:
+    > Move-Item scripts/manage_backend_v3.ps1 backup/
+
+
+✅ STATUS
+════════════════════════════════════════════════════════════════════
+
+PHASE 1: Backend Refactoring          [████████████████████] 100%
+  ✅ Unified Backend (backend.app:app)
+  ✅ Flat API Structure (/api/...)
+  ✅ UnifiedResponse Model
+  ✅ IEEE Citations (35+ Felder)
+  ✅ Mock-Fallback
+
+PHASE 2: PowerShell Skripte           [████████████████████] 100%
+  ✅ start_services.ps1 aktualisiert
+  ✅ stop_services.ps1 aktualisiert
+  ✅ restart_backend_debug.ps1 aktualisiert
+  ✅ manage_backend_v4.ps1 erstellt
+  ✅ Dokumentation erstellt (3 Dateien)
+
+PHASE 3: Frontend Integration          [████████████░░░░░░░░]  60%
+  ✅ API Client erstellt (frontend/api_client.py)
+  ✅ Migration Guide (frontend/migration_example.py)
+  ✅ Integration Docs (docs/FRONTEND_INTEGRATION.md)
+  ⏳ veritas_app.py Migration (ausstehend)
+  ⏳ Integration Testing (ausstehend)
+
+
+🆘 SUPPORT
+════════════════════════════════════════════════════════════════════
+
+Bei Problemen:
+
+1. Logs prüfen:
+   > Get-Content logs/backend_v4.log -Tail 100
+
+2. Status prüfen:
+   > .\scripts\manage_backend_v4.ps1 -Action status
+
+3. Neustart:
+   > .\scripts\manage_backend_v4.ps1 -Action restart
+
+4. Tests:
+   > .\scripts\manage_backend_v4.ps1 -Action test
+
+
+════════════════════════════════════════════════════════════════════
+│                    🎉 Update Complete! 🎉                        │
+════════════════════════════════════════════════════════════════════

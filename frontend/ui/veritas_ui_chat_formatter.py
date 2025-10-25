@@ -7,17 +7,21 @@ Verantwortlich für formatierte Chat-Darstellung mit RAG-Sections
 
 import tkinter as tk
 import re
-from typing import Dict, Any, List, Optional
+import time
+from typing import Dict, Any, List, Optional, Callable
 from datetime import datetime, timedelta
 import logging
 import os
 import platform
 
+# ✨ Logger initialisieren (MUSS VOR allen Imports kommen!)
+logger = logging.getLogger(__name__)
+
 # ✨ Zentrale Konfiguration
 try:
     from frontend.config.frontend_config import BACKEND_URL
 except ImportError:
-    BACKEND_URL = "http://localhost:5000"
+    BACKEND_URL = "http://localhost:5000/api/v3"  # API v3 Base URL
 
 # ✨ NEW v3.16.0: Feedback API Client
 try:
@@ -25,7 +29,6 @@ try:
     FEEDBACK_API_AVAILABLE = True
 except ImportError:
     FEEDBACK_API_AVAILABLE = False
-    logger = logging.getLogger(__name__)
     logger.warning("⚠️ Feedback API Client nicht verfügbar")
 
 # ✨ Icon-System importieren
@@ -40,6 +43,20 @@ except ImportError:
         def get(cat, name, fallback='•'):
             return fallback
 
+# ✨ v3.16.0: Modern Chat Bubbles & IEEE Citations
+try:
+    from .veritas_ui_chat_bubbles import (
+        UserMessageBubble,
+        AssistantFullWidthLayout,
+        MetadataCompactWrapper,
+        TkinterBestPractices
+    )
+    CHAT_BUBBLES_AVAILABLE = True
+    logger.info("✅ Modern Chat Bubbles & Best Practices geladen")
+except ImportError:
+    CHAT_BUBBLES_AVAILABLE = False
+    logger.warning("⚠️ Modern Chat Bubbles nicht verfügbar - verwende Legacy-Darstellung")
+
 # ✨ Feature #1: Collapsible Sections importieren
 try:
     from .veritas_ui_components import CollapsibleSection
@@ -47,8 +64,6 @@ try:
 except ImportError:
     COLLAPSIBLE_AVAILABLE = False
     logger.warning("⚠️ CollapsibleSection nicht verfügbar - Fallback auf alte Darstellung")
-
-logger = logging.getLogger(__name__)
 
 
 # ✨ Feature #14: Relative Timestamp-Formatierung
@@ -112,6 +127,50 @@ def format_relative_timestamp(timestamp_str: str) -> tuple[str, str]:
         return (timestamp_str, timestamp_str)
 
 
+def get_date_group_label(timestamp_str: str) -> str:
+    """
+    Bestimmt die Datums-Gruppe für Message Grouping (Feature #6)
+    
+    Args:
+        timestamp_str: ISO-Format Timestamp
+    
+    Returns:
+        Label für Datums-Trenner: "Heute", "Gestern", "Diese Woche", "Letzte Woche", 
+        oder formatiertes Datum (z.B. "15. Oktober 2025")
+    """
+    try:
+        # Parse Timestamp
+        if '.' in timestamp_str:
+            dt = datetime.fromisoformat(timestamp_str)
+        else:
+            dt = datetime.fromisoformat(timestamp_str)
+        
+        now = datetime.now()
+        diff = now - dt
+        
+        # Datums-Gruppe bestimmen
+        if diff.days == 0 and dt.date() == now.date():
+            return "Heute"
+        elif diff.days == 1 or (diff.days == 0 and dt.date() < now.date()):
+            return "Gestern"
+        elif diff.days < 7:
+            return "Diese Woche"
+        elif diff.days < 14:
+            return "Letzte Woche"
+        elif diff.days < 30:
+            return "Letzter Monat"
+        else:
+            # Älter: Formatiertes Datum
+            month_names = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 
+                          'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember']
+            month = month_names[dt.month - 1]
+            return f"{dt.day}. {month} {dt.year}"
+        
+    except Exception as e:
+        logger.debug(f"Fehler beim Date-Group-Parsing: {e}")
+        return None
+
+
 class ChatDisplayFormatter:
     """
     Formatiert Chat-Nachrichten mit RAG-spezifischen Sections
@@ -125,7 +184,8 @@ class ChatDisplayFormatter:
         markdown_renderer = None,
         source_link_handler = None,
         backend_url: str = None,
-        suggestion_click_callback = None  # ✨ v3.19.0: Callback für klickbare Vorschläge
+        suggestion_click_callback = None,  # ✨ v3.19.0: Callback für klickbare Vorschläge
+        enable_modern_ui: bool = True  # ✨ v3.16.0: Modern Chat Bubbles aktivieren
     ):
         """
         Initialisiert den Chat Display Formatter
@@ -137,18 +197,26 @@ class ChatDisplayFormatter:
             source_link_handler: SourceLinkHandler-Instanz (optional)
             backend_url: Backend-URL für API-Calls (default: aus Config)
             suggestion_click_callback: ✨ v3.19.0 - Callback(suggestion_text) für klickbare Vorschläge
+            enable_modern_ui: ✨ v3.16.0 - Aktiviere moderne Chat-Bubbles & IEEE-Citations
         """
         self.text_widget = text_widget
         self.parent_window = parent_window
         self.markdown_renderer = markdown_renderer
         self.source_link_handler = source_link_handler
         self.suggestion_click_callback = suggestion_click_callback  # ✨ v3.19.0
+        self.enable_modern_ui = enable_modern_ui and CHAT_BUBBLES_AVAILABLE  # ✨ v3.16.0
         
         # ✨ Feature #1: Message-ID Counter für eindeutige Section-IDs
         self._message_counter = 0
         
+        # ✨ v3.16.0: Modern UI Components initialisieren
+        self._init_modern_ui_components()
+        
         # ✨ NEW v3.16.0: Feedback State Management & API Client
         self._feedback_states = {}  # {message_id: {'rating': int, 'submitted': bool}}
+        
+        # ✨ v3.18.0: Answer Toolbar aktivieren
+        self._answer_toolbar_enabled = True
         
         # Backend URL (aus Parameter oder Config)
         self._backend_url = backend_url or BACKEND_URL
@@ -158,6 +226,66 @@ class ChatDisplayFormatter:
             logger.info(f"✅ Feedback API Client initialisiert: {self._backend_url}")
         else:
             self.feedback_api = None
+    
+    def _init_modern_ui_components(self):
+        """
+        ✨ v3.16.0: Initialisiert moderne UI-Komponenten
+        
+        Features:
+        - MetadataCompactWrapper (für IEEE-Quellenverzeichnis)
+        - AssistantFullWidthLayout (für vollbreite Assistant-Antworten)
+        - Tkinter Best Practices (Smooth Scrolling, Performance)
+        """
+        if not self.enable_modern_ui:
+            logger.info("Modern UI deaktiviert - verwende Legacy-Darstellung")
+            self.metadata_handler = None
+            self.assistant_layout = None
+            return
+        
+        try:
+            # Metadata-Handler (kompakte Metadaten-Zeile)
+            self.metadata_handler = MetadataCompactWrapper(
+                text_widget=self.text_widget,
+                feedback_callback=self._on_feedback_received,
+                initially_collapsed=True  # Default: zugeklappt
+            )
+            
+            # Assistant-Layout-Handler (vollbreite mit IEEE-Citations)
+            self.assistant_layout = AssistantFullWidthLayout(
+                text_widget=self.text_widget,
+                markdown_renderer=self.markdown_renderer,
+                metadata_handler=self.metadata_handler,
+                enable_ieee_citations=True  # ✨ IEEE-Citations aktiviert
+            )
+            
+            # Best-Practice Optimierungen anwenden
+            TkinterBestPractices.optimize_text_widget(self.text_widget)
+            TkinterBestPractices.enable_smooth_scrolling(self.text_widget)
+            
+            logger.info("✅ Modern UI Components initialisiert (Bubbles, IEEE-Citations, Best-Practices)")
+            
+        except Exception as e:
+            logger.error(f"❌ Fehler beim Initialisieren Modern UI: {e}")
+            self.enable_modern_ui = False
+            self.metadata_handler = None
+            self.assistant_layout = None
+    
+    def _on_feedback_received(self, rating: str):
+        """
+        ✨ v3.16.0: Behandelt Feedback von Modern UI Components
+        
+        Args:
+            rating: 'positive' (👍) oder 'negative' (👎)
+        """
+        logger.info(f"✅ User-Feedback erhalten: {rating}")
+        
+        # TODO: An Backend senden
+        # POST /feedback mit {message_id, rating, timestamp}
+        
+        # Visuelles Feedback (optional)
+        if hasattr(self, 'parent_window'):
+            # Kurz "Danke!" anzeigen (könnte auch Statusbar sein)
+            pass
             logger.warning("⚠️ Feedback API nicht verfügbar - Fallback zu lokalem State")
     
     def update_chat_display(self, chat_messages: List[Dict]) -> None:
@@ -179,6 +307,9 @@ class ChatDisplayFormatter:
         # ✨ Feature #1: Reset Message Counter
         self._message_counter = 0
         
+        # ✨ Feature #6: Message Grouping - Track last date group
+        last_date_group = None
+        
         for idx, msg in enumerate(chat_messages):
             role = msg.get('role', 'unknown')
             content = msg.get('content', '')
@@ -190,6 +321,13 @@ class ChatDisplayFormatter:
                 timestamp_short, timestamp_full = format_relative_timestamp(timestamp)
             else:
                 timestamp_short, timestamp_full = ('', '')
+            
+            # ✨ Feature #6: Datums-Trenner einfügen wenn sich Gruppe ändert
+            if timestamp:
+                current_date_group = get_date_group_label(timestamp)
+                if current_date_group and current_date_group != last_date_group:
+                    self._render_date_separator(current_date_group)
+                    last_date_group = current_date_group
             
             logger.debug(f"  Message {idx+1}/{len(chat_messages)}: role={role}, len={len(content)}")
             
@@ -239,6 +377,57 @@ class ChatDisplayFormatter:
         self.text_widget.see(tk.END)
         logger.info(f"✅ Chat-Display aktualisiert")
     
+    def _render_date_separator(self, date_label: str) -> None:
+        """
+        ✨ Feature #6: Rendert einen Datums-Trenner zwischen Message-Gruppen
+        
+        Args:
+            date_label: Label für den Trenner (z.B. "Heute", "Gestern", "Diese Woche")
+        """
+        try:
+            # Abstand vor Trenner
+            self.text_widget.insert(tk.END, "\n")
+            
+            # Zentrierter Trenner mit Linie und Label
+            # Format: ━━━━━ Heute ━━━━━
+            separator_width = 60  # Gesamtbreite in Zeichen
+            label_with_spaces = f" {date_label} "
+            label_len = len(label_with_spaces)
+            line_len = (separator_width - label_len) // 2
+            
+            # Linke Linie
+            left_line = "─" * line_len
+            # Rechte Linie (eventuell +1 wenn ungerade)
+            right_line = "─" * (separator_width - label_len - line_len)
+            
+            separator_text = f"{left_line}{label_with_spaces}{right_line}"
+            
+            # Separator einfügen mit speziellem Tag
+            start_pos = self.text_widget.index(tk.END)
+            self.text_widget.insert(tk.END, separator_text, "date_separator")
+            end_pos = self.text_widget.index(tk.END)
+            
+            # Tag konfigurieren (falls noch nicht geschehen)
+            try:
+                self.text_widget.tag_configure(
+                    "date_separator",
+                    foreground="#9E9E9E",  # Grau
+                    font=("Segoe UI", 9, "bold"),
+                    justify=tk.CENTER,
+                    spacing1=10,  # Abstand oben
+                    spacing3=10   # Abstand unten
+                )
+            except:
+                pass  # Tag bereits konfiguriert
+            
+            # Newline nach Separator
+            self.text_widget.insert(tk.END, "\n\n")
+            
+            logger.debug(f"📅 Datums-Trenner eingefügt: {date_label}")
+            
+        except Exception as e:
+            logger.error(f"❌ Fehler beim Rendern des Datums-Trenners: {e}")
+    
     def _render_user_message(
         self, 
         content: str, 
@@ -247,7 +436,7 @@ class ChatDisplayFormatter:
         attachments: List[Dict] = None
     ) -> None:
         """
-        ✨ NEW: Rendert User-Message als rechtsbündige Sprechblase
+        ✨ v3.16.0: Rendert User-Message als moderne rechtsbündige Bubble
         
         Args:
             content: Nachrichtentext
@@ -255,7 +444,44 @@ class ChatDisplayFormatter:
             timestamp_full: Voller Timestamp für Tooltip
             attachments: Liste von Datei-Anhängen [{'name': 'file.pdf', 'size': 1234567, 'path': '...'}]
         """
-        # === METADATA-ZEILE (oberhalb Bubble) ===
+        
+        # ✨ v3.16.0: Modern UI mit Bubbles
+        if self.enable_modern_ui and CHAT_BUBBLES_AVAILABLE:
+            try:
+                # Verwende UserMessageBubble für moderne Darstellung
+                bubble = UserMessageBubble(
+                    text_widget=self.text_widget,
+                    message=content,
+                    timestamp=timestamp_full if timestamp_full else None,
+                    max_width_percent=0.7  # 70% Breite
+                )
+                bubble.render()
+                
+                # Anhänge separat anzeigen (falls vorhanden)
+                if attachments and len(attachments) > 0:
+                    for attachment in attachments:
+                        name = attachment.get('name', 'unbekannt')
+                        size = attachment.get('size', 0)
+                        
+                        # Formatiere Größe
+                        if size > 1024 * 1024:
+                            size_str = f"{size / (1024 * 1024):.1f} MB"
+                        elif size > 1024:
+                            size_str = f"{size / 1024:.1f} KB"
+                        else:
+                            size_str = f"{size} B"
+                        
+                        self.text_widget.insert(tk.END, f"  📎 {name} ({size_str})\n", "user_attachment")
+                
+                logger.debug(f"✅ User-Bubble gerendert (attachments={len(attachments) if attachments else 0})")
+                return
+                
+            except Exception as e:
+                logger.warning(f"⚠️ Fehler beim Rendern User-Bubble: {e} - Fallback auf Legacy")
+                # Fallback unten
+        
+        # === LEGACY FALLBACK ===
+        # Metadata-Zeile (oberhalb Bubble)
         metadata_parts = []
         
         # Datei-Anhänge
@@ -296,7 +522,7 @@ class ChatDisplayFormatter:
         # Separator nach Message
         self.text_widget.insert(tk.END, "\n\n", "message_separator")
         
-        logger.debug(f"✅ User-Message gerendert (attachments={len(attachments) if attachments else 0})")
+        logger.debug(f"✅ User-Message (Legacy) gerendert (attachments={len(attachments) if attachments else 0})")
     
     def _insert_attachment_list(self, attachments: List[Dict]) -> None:
         """
@@ -371,24 +597,82 @@ class ChatDisplayFormatter:
         message_id: str = None
     ) -> None:
         """
-        ✨ NEW: Rendert Assistant-Message mit strukturiertem Layout
+        ✨ v3.16.0: Rendert Assistant-Message mit modernem Layout
         
-        Layout:
-        1) Timestamp + "🤖 VERITAS:"
-        2) Hauptantwort (Markdown)
-        3) Metriken-Badge (kompakt)
-        4) Feedback-Widget (embedded Frame)
-        5) Quellen (Collapsible)
-        6) Vorschläge (Collapsible)
+        Modern Layout (v3.16.0):
+        - Vollbreite Markdown-Rendering (keine Bubble)
+        - IEEE-Citations im Text [1], [2], [3]
+        - Kompakte Metadaten-Zeile (collapsible)
+        - IEEE-Quellenverzeichnis in Metadaten
+        
+        Legacy Layout (Fallback):
+        - Strukturiertes Layout mit Sections
+        - Metriken-Badge
+        - Feedback-Widget
+        - Collapsible Sections
         
         Args:
-            content: Antwort-Content
+            content: Antwort-Content (mit {cite:source_id} Markern für IEEE)
             timestamp_short: Kurzer Timestamp
             timestamp_full: Voller Timestamp
-            metadata: Metadaten {confidence, duration, sources_count, agents_count}
+            metadata: Metadaten {complexity, duration, model, sources_metadata, suggestions, ...}
             message_id: Message-ID für Sections
         """
-        # === HEADER (Timestamp + VERITAS) ===
+        
+        # 🔍 DEBUG: Prüfe Modern UI Status (INFO-Level für bessere Sichtbarkeit)
+        logger.info(f"🔍 _format_assistant_message() aufgerufen")
+        logger.info(f"  - enable_modern_ui: {self.enable_modern_ui}")
+        logger.info(f"  - assistant_layout: {self.assistant_layout}")
+        logger.info(f"  - Bedingung erfüllt: {self.enable_modern_ui and self.assistant_layout}")
+        
+        # ✨ v3.16.0: Modern UI mit IEEE-Citations
+        if self.enable_modern_ui and self.assistant_layout:
+            # 🔍 DEBUG: Kein Fallback - Hard Fail für besseres Debugging
+            logger.info(f"✅ Modern UI Pfad wird verwendet!")
+            
+            # Header (Timestamp + Icon)
+            if timestamp_short:
+                self.text_widget.insert(tk.END, f"[{timestamp_short}] ", "timestamp")
+            self.text_widget.insert(tk.END, "🤖 VERITAS:\n", "assistant")
+            
+            # Extrahiere Sources für IEEE-Formatierung
+            sources = metadata.get('sources_metadata', []) if metadata else []
+            
+            # 🔍 CRITICAL DEBUG: Was ist wirklich in sources_metadata?
+            logger.info(f"🔍 RAW metadata['sources_metadata']: {metadata.get('sources_metadata', 'NOT FOUND')[:500] if metadata else 'NO METADATA'}")
+            
+            logger.info(f"🔍 DEBUG - Rendering Modern Layout:")
+            logger.info(f"  - content type: {type(content)}, length: {len(content) if content else 'None'}")
+            logger.info(f"  - content preview: {content[:200] if content else 'None'}")
+            logger.info(f"  - metadata type: {type(metadata)}")
+            logger.info(f"  - metadata keys: {list(metadata.keys()) if metadata else 'None'}")
+            logger.info(f"  - sources count: {len(sources)}")
+            if sources:
+                logger.info(f"  - first source keys: {list(sources[0].keys())}")
+                logger.info(f"  - first source title: {sources[0].get('title', 'NO TITLE')}")
+                logger.info(f"  - Has 'ieee_citation'?: {'ieee_citation' in sources[0]}")
+                logger.info(f"  - Has 'authors'?: {'authors' in sources[0]}")
+                logger.info(f"  - Has 'impact'?: {'impact' in sources[0]}")
+            logger.info(f"  - enable_citations: True")
+            logger.info(f"  - enable_modern_ui: {self.enable_modern_ui}")
+            logger.info(f"  - assistant_layout exists: {self.assistant_layout is not None}")
+            
+            # Verwende AssistantFullWidthLayout für modernen Render
+            self.assistant_layout.render_assistant_message(
+                content=content,
+                metadata=metadata,
+                sources=sources,
+                enable_citations=True  # IEEE-Citations aktiviert
+            )
+            
+            # ✨ v3.18.0: Answer Toolbar unter Antwort einfügen
+            self._insert_answer_toolbar(content, metadata, message_id)
+            
+            logger.debug(f"✅ Modern Assistant-Message gerendert (IEEE-Citations, {len(sources)} Sources)")
+            return
+        
+        # === LEGACY FALLBACK ===
+        # Header (Timestamp + VERITAS)
         if timestamp_short:
             self.text_widget.insert(tk.END, f"[{timestamp_short}] ", "timestamp")
         self.text_widget.insert(tk.END, "🤖 VERITAS:\n", "assistant")
@@ -461,7 +745,7 @@ class ChatDisplayFormatter:
         # Separator nach Message
         self.text_widget.insert(tk.END, "\n", "message_separator")
         
-        logger.debug(f"✅ Strukturierte Assistant-Message gerendert (msg_id={message_id})")
+        logger.debug(f"✅ Strukturierte Assistant-Message (Legacy) gerendert (msg_id={message_id})")
     
     def insert_processing_placeholder(self, message_id: str) -> None:
         """
@@ -1020,6 +1304,141 @@ class ChatDisplayFormatter:
             logger.debug(f"✅ Feedback-Widget eingefügt für {message_id}")
         except tk.TclError as e:
             logger.error(f"❌ Fehler beim Einfügen des Feedback-Widgets: {e}")
+    
+    def _insert_answer_toolbar(self, content: str, metadata: Dict, message_id: str) -> None:
+        """
+        ✨ v3.18.0: Fügt kompakte Answer Toolbar unter Assistant-Antwort ein
+        
+        Layout: [👍 👎] | [📋 Kopieren] [🔄 Wiederholen] | [▼ Meta] [▼ Quellen] [▼ Vorschläge] [▼ Raw]
+        
+        Args:
+            content: Antwort-Text
+            metadata: Metadaten (sources, suggestions, etc.)
+            message_id: Message-ID
+        """
+        # Prüfe Feature-Flag
+        if not hasattr(self, '_answer_toolbar_enabled') or not self._answer_toolbar_enabled:
+            logger.debug("⏭️ AnswerToolbar deaktiviert")
+            return
+        
+        try:
+            # Import AnswerToolbar (lazy)
+            from frontend.components.answer_toolbar import create_answer_toolbar
+            
+            # Message-Daten vorbereiten
+            message_data = {
+                'id': message_id,
+                'content': content,
+                'metadata': metadata if metadata else {},
+                'sources': metadata.get('sources_metadata', []) if metadata else [],
+                'suggestions': metadata.get('suggestions', []) if metadata else [],
+                'raw_response': content,
+                'original_query': ''  # TODO: Extract from context if needed
+            }
+            
+            # Toolbar erstellen mit Callbacks
+            toolbar = create_answer_toolbar(
+                parent=self.text_widget,
+                message_data=message_data,
+                on_feedback=lambda feedback_type: self._handle_toolbar_feedback(message_id, feedback_type),
+                on_copy=lambda text: self._handle_toolbar_copy(text),
+                on_repeat=lambda query: self._handle_toolbar_repeat(query),
+                on_show_raw=lambda raw: self._handle_toolbar_raw(raw)
+            )
+            
+            # Toolbar rendern (als embedded frame)
+            toolbar.render()
+            
+            logger.debug(f"✅ AnswerToolbar gerendert für {message_id}")
+            
+        except ImportError as e:
+            logger.warning(f"⚠️ AnswerToolbar nicht verfügbar: {e}")
+        except Exception as e:
+            logger.error(f"❌ Fehler beim Rendern der AnswerToolbar: {e}")
+    
+    def _handle_toolbar_feedback(self, message_id: str, feedback_type: str) -> None:
+        """
+        ✨ v3.18.0: Callback für Toolbar-Feedback (👍 👎)
+        
+        Args:
+            message_id: Message-ID
+            feedback_type: 'positive' oder 'negative'
+        """
+        try:
+            logger.info(f"📊 Toolbar-Feedback: {feedback_type} für {message_id}")
+            
+            # Feedback in State speichern
+            if not hasattr(self, '_feedback_states'):
+                self._feedback_states = {}
+            
+            self._feedback_states[message_id] = {
+                'type': feedback_type,
+                'submitted': True,
+                'timestamp': time.time()
+            }
+            
+            # TODO: Backend-Endpoint für Feedback aufrufen
+            logger.debug(f"✅ Feedback gespeichert: {feedback_type}")
+            
+        except Exception as e:
+            logger.error(f"❌ Fehler beim Speichern des Feedbacks: {e}")
+    
+    def _handle_toolbar_copy(self, text: str) -> None:
+        """
+        ✨ v3.18.0: Callback für Toolbar-Copy (📋 Kopieren)
+        
+        Args:
+            text: Text zum Kopieren
+        """
+        try:
+            logger.info(f"📋 Antwort in Zwischenablage kopiert ({len(text)} Zeichen)")
+            # Clipboard-Handling erfolgt bereits in AnswerToolbar
+            
+        except Exception as e:
+            logger.error(f"❌ Fehler beim Kopieren: {e}")
+    
+    def _handle_toolbar_repeat(self, query: str) -> None:
+        """
+        ✨ v3.18.0: Callback für Toolbar-Repeat (🔄 Wiederholen)
+        
+        Args:
+            query: Query zum Wiederholen
+        """
+        try:
+            logger.info(f"🔄 Query wiederholen: {query}")
+            
+            # Verwende suggestion_click_callback (falls gesetzt)
+            if hasattr(self, 'suggestion_click_callback') and self.suggestion_click_callback:
+                self.suggestion_click_callback(query)
+                logger.debug("✅ Query weitergeleitet an suggestion_click_callback")
+            else:
+                logger.warning("⚠️ suggestion_click_callback nicht gesetzt - Wiederholen nicht möglich")
+            
+        except Exception as e:
+            logger.error(f"❌ Fehler beim Wiederholen: {e}")
+    
+    def _handle_toolbar_raw(self, raw_response: str) -> None:
+        """
+        ✨ v3.18.0: Callback für Toolbar-Raw (Raw-Response anzeigen)
+        
+        Args:
+            raw_response: Raw Response Text
+        """
+        try:
+            logger.info(f"🔍 Raw-Response anzeigen ({len(raw_response)} Zeichen)")
+            
+            # Verwende DialogManager (falls verfügbar)
+            if hasattr(self, 'dialog_manager') and self.dialog_manager:
+                self.dialog_manager.show_info(
+                    title="Raw Response",
+                    message=raw_response
+                )
+                logger.debug("✅ Raw-Response in Dialog angezeigt")
+            else:
+                logger.warning("⚠️ DialogManager nicht verfügbar")
+            
+        except Exception as e:
+            logger.error(f"❌ Fehler beim Anzeigen der Raw-Response: {e}")
     
     def _insert_collapsible_details(self, sections: Dict) -> None:
         """Fügt ausklappbare Details-Section ein"""
@@ -2001,6 +2420,169 @@ class ChatDisplayFormatter:
         else:
             self.text_widget.tag_configure("hidden_details", elide=True)
             animation_state['value'] = False
+    
+    # ✨ v3.16.0: Typing Indicator für Assistant-Antworten
+    
+    def show_typing_indicator(self) -> str:
+        """
+        Zeigt animierten Typing Indicator während Assistant antwortet
+        
+        Returns:
+            Mark-ID für späteren Zugriff zum Entfernen
+        """
+        self.text_widget.config(state='normal')
+        
+        # Füge Typing Indicator hinzu
+        mark_id = f"typing_{int(datetime.now().timestamp() * 1000)}"
+        self.text_widget.mark_set(mark_id, tk.END)
+        
+        self.text_widget.insert(tk.END, "💭 VERITAS denkt nach", "typing_indicator")
+        self.text_widget.insert(tk.END, ".", "typing_indicator")
+        
+        self.text_widget.config(state='disabled')
+        self.text_widget.see(tk.END)
+        
+        # Starte Animation
+        self._animate_typing_indicator(mark_id, dots=1)
+        
+        logger.debug(f"Typing indicator gestartet: {mark_id}")
+        return mark_id
+    
+    def hide_typing_indicator(self, mark_id: str):
+        """
+        Entfernt Typing Indicator
+        
+        Args:
+            mark_id: Mark-ID vom show_typing_indicator() Return
+        """
+        try:
+            if not mark_id:
+                return
+            
+            self.text_widget.config(state='normal')
+            
+            # Hole Position der Mark
+            try:
+                mark_pos = self.text_widget.index(mark_id)
+                # Lösche bis Ende der Zeile
+                self.text_widget.delete(mark_pos, f"{mark_pos} lineend")
+                self.text_widget.delete(mark_pos, f"{mark_pos} +1c")  # Newline
+                self.text_widget.mark_unset(mark_id)
+                logger.debug(f"Typing indicator entfernt: {mark_id}")
+            except tk.TclError:
+                # Mark existiert nicht mehr
+                pass
+            
+            self.text_widget.config(state='disabled')
+            
+        except Exception as e:
+            logger.debug(f"Fehler beim Entfernen des Typing Indicators: {e}")
+    
+    def _animate_typing_indicator(self, mark_id: str, dots: int = 1):
+        """
+        Animiert Typing Indicator (1-3 Punkte oszillierend)
+        
+        Args:
+            mark_id: Mark-ID des Indicators
+            dots: Aktuelle Anzahl Punkte (1-3)
+        """
+        try:
+            # Prüfe ob Mark noch existiert
+            if mark_id not in self.text_widget.mark_names():
+                return
+            
+            mark_pos = self.text_widget.index(mark_id)
+            
+            # Update Punkte
+            self.text_widget.config(state='normal')
+            # Lösche alte Punkte
+            self.text_widget.delete(f"{mark_pos} lineend -4c", f"{mark_pos} lineend")
+            # Füge neue Punkte ein
+            new_dots = "." * dots
+            self.text_widget.insert(f"{mark_pos} lineend", new_dots, "typing_indicator")
+            self.text_widget.config(state='disabled')
+            
+            # Nächster Schritt
+            next_dots = (dots % 3) + 1
+            
+            # Wiederhole nach 500ms
+            if self.parent_window:
+                self.parent_window.after(500, lambda: self._animate_typing_indicator(mark_id, next_dots))
+                
+        except Exception as e:
+            logger.debug(f"Fehler bei Typing-Indicator-Animation: {e}")
+    
+    # ✨ v3.16.0: Copy-Button für Messages
+    
+    def add_copy_button_to_message(self, message_start: str, message_end: str, content: str, message_id: str = None):
+        """
+        Fügt dezenten Copy-Button rechts oben an einer Message hinzu
+        
+        Args:
+            message_start: Start-Index der Message (z.B. "5.0")
+            message_end: End-Index der Message (z.B. "8.0")
+            content: Message-Content zum Kopieren
+            message_id: Optionale Message-ID für Tracking
+        """
+        try:
+            # Erstelle einzigartigen Tag für diese Message
+            msg_tag = f"msg_copy_{message_id or int(datetime.now().timestamp() * 1000)}"
+            
+            # Füge Tag zur Message hinzu
+            self.text_widget.tag_add(msg_tag, message_start, message_end)
+            
+            # Erstelle Copy-Button als eingebettetes Label
+            copy_btn = tk.Label(
+                self.text_widget,
+                text="📋",
+                font=('Segoe UI', 10),
+                cursor='hand2',
+                bg=self.text_widget.cget('bg'),
+                fg='#9E9E9E',  # Grau (dezent)
+                padx=3,
+                pady=1
+            )
+            
+            # Click-Handler
+            def on_copy(event=None):
+                try:
+                    import pyperclip
+                    pyperclip.copy(content)
+                    # Visual Feedback
+                    copy_btn.configure(text="✓", fg='#4CAF50')  # Grünes Checkmark
+                    if self.parent_window:
+                        self.parent_window.after(1500, lambda: copy_btn.configure(text="📋", fg='#9E9E9E'))
+                    logger.debug(f"Message kopiert (ID: {message_id})")
+                except ImportError:
+                    # Fallback ohne pyperclip
+                    self.text_widget.clipboard_clear()
+                    self.text_widget.clipboard_append(content)
+                    copy_btn.configure(text="✓", fg='#4CAF50')
+                    if self.parent_window:
+                        self.parent_window.after(1500, lambda: copy_btn.configure(text="📋", fg='#9E9E9E'))
+                except Exception as e:
+                    logger.error(f"Fehler beim Kopieren: {e}")
+                    copy_btn.configure(text="❌", fg='#F44336')
+            
+            copy_btn.bind('<Button-1>', on_copy)
+            
+            # Hover-Effekt
+            def on_enter(e):
+                copy_btn.configure(fg='#0066CC')  # Blau bei Hover
+            def on_leave(e):
+                if copy_btn.cget('text') == "📋":
+                    copy_btn.configure(fg='#9E9E9E')
+            
+            copy_btn.bind('<Enter>', on_enter)
+            copy_btn.bind('<Leave>', on_leave)
+            
+            # Füge Button rechts oben in die Message ein
+            self.text_widget.window_create(message_start, window=copy_btn, align='right')
+            
+            logger.debug(f"Copy-Button hinzugefügt für Message: {message_id}")
+            
+        except Exception as e:
+            logger.debug(f"Fehler beim Hinzufügen des Copy-Buttons: {e}")
 
 
 # Convenience-Funktionen
@@ -2188,5 +2770,12 @@ def setup_chat_tags(text_widget: tk.Text) -> None:
                              font=('Segoe UI', 8, 'italic'), 
                              foreground='#0066CC',
                              lmargin1=20)
+    
+    # ✨ v3.16.0: Typing Indicator Tag
+    text_widget.tag_configure("typing_indicator",
+                             font=('Segoe UI', 10),
+                             foreground='#9E9E9E',
+                             spacing1=5,
+                             spacing3=5)
     
     logger.info("✅ Chat-Tags konfiguriert (inkl. Sprechblasen-Design + Raw-Response)")

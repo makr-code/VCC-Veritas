@@ -1,0 +1,232 @@
+[
+  {
+    "role": "system",
+    "content": "Willkommen bei Veritas v3.15.0! 🚀\nBackend-API: http://127.0.0.1:5000/api/v3\nDrücken Sie \"➕ Neuer Chat\" um weitere Fenster zu öffnen.",
+    "timestamp": "2025-10-18T20:14:12.374748"
+  },
+  {
+    "role": "user",
+    "content": "Was wird im BGB geregelt?",
+    "timestamp": "2025-10-18T20:14:36.118361"
+  },
+  {
+    "role": "assistant",
+    "content": "Das Bürgerliche Gesetzbuch (BGB) regelt im Wesentlichen die allgemeinen Rechtsverhältnisse zwischen Menschen und Unternehmen in Deutschland. Es enthält Bestimmungen über das Eigentum, den Vertragsschluss, die Schuldnerhaftung, die Gewährleistung und viele weitere wichtige Themen.\n\n**Details:**\n\n* Das BGB ist ein zentraler Teil des deutschen Privatrechtes.\n* Es regelt die Beziehungen zwischen Menschen und Unternehmen in verschiedenen Lebensbereichen, wie zum Beispiel im Kaufvertrag, im Mietrecht oder im Schuldnerrecht.\n* Im BGB sind insbesondere die allgemeinen Grundsätze des Vertragsrechts, der Schadensersatz und die Rechte von Verbrauchern geregelt.\n\n**Quellen:**\n\n* Bürgerliches Gesetzbuch (BGB)\n* Deutsches Privatrecht\n\n**Nächste Schritte:**\nWenn Sie weitere Informationen über das BGB benötigen oder spezielle Fragen haben, stehe ich Ihnen gerne zur Verfügung!\n\n💡 📚 8 Quellen | ⚡ 22.83s",
+    "timestamp": "2025-10-18T20:14:58.966153",
+    "sources": [
+      {
+        "id": "src_1",
+        "file": null,
+        "page": null,
+        "confidence": 0.0,
+        "author": null,
+        "title": "Standard-Quellen",
+        "year": null,
+        "publisher": null,
+        "url": null,
+        "type": "document"
+      },
+      {
+        "id": "src_2",
+        "file": null,
+        "page": null,
+        "confidence": 0.0,
+        "author": null,
+        "title": "Standard-Quellen",
+        "year": null,
+        "publisher": null,
+        "url": null,
+        "type": "document"
+      },
+      {
+        "id": "src_3",
+        "file": null,
+        "page": null,
+        "confidence": 0.0,
+        "author": null,
+        "title": "Standard-Quellen",
+        "year": null,
+        "publisher": null,
+        "url": null,
+        "type": "document"
+      },
+      {
+        "id": "src_4",
+        "file": null,
+        "page": null,
+        "confidence": 0.0,
+        "author": null,
+        "title": "Verwaltungsportal",
+        "year": null,
+        "publisher": null,
+        "url": null,
+        "type": "document"
+      },
+      {
+        "id": "src_5",
+        "file": null,
+        "page": null,
+        "confidence": 0.0,
+        "author": null,
+        "title": "Formulardatenbank",
+        "year": null,
+        "publisher": null,
+        "url": null,
+        "type": "document"
+      },
+      {
+        "id": "src_6",
+        "file": null,
+        "page": null,
+        "confidence": 0.0,
+        "author": null,
+        "title": "BauGB",
+        "year": null,
+        "publisher": null,
+        "url": null,
+        "type": "document"
+      },
+      {
+        "id": "src_7",
+        "file": null,
+        "page": null,
+        "confidence": 0.0,
+        "author": null,
+        "title": "VwVfG",
+        "year": null,
+        "publisher": null,
+        "url": null,
+        "type": "document"
+      },
+      {
+        "id": "src_8",
+        "file": null,
+        "page": null,
+        "confidence": 0.0,
+        "author": null,
+        "title": "Standard-Quellen",
+        "year": null,
+        "publisher": null,
+        "url": null,
+        "type": "document"
+      }
+    ],
+    "worker_results": {},
+    "metadata": {
+      "model": "llama3.1:8b",
+      "mode": "veritas",
+      "duration": 22.804996,
+      "tokens_used": null,
+      "sources_count": 8,
+      "sources_metadata": [
+        {
+          "id": "src_1",
+          "file": null,
+          "page": null,
+          "confidence": 0.0,
+          "author": null,
+          "title": "Standard-Quellen",
+          "year": null,
+          "publisher": null,
+          "url": null,
+          "type": "document"
+        },
+        {
+          "id": "src_2",
+          "file": null,
+          "page": null,
+          "confidence": 0.0,
+          "author": null,
+          "title": "Standard-Quellen",
+          "year": null,
+          "publisher": null,
+          "url": null,
+          "type": "document"
+        },
+        {
+          "id": "src_3",
+          "file": null,
+          "page": null,
+          "confidence": 0.0,
+          "author": null,
+          "title": "Standard-Quellen",
+          "year": null,
+          "publisher": null,
+          "url": null,
+          "type": "document"
+        },
+        {
+          "id": "src_4",
+          "file": null,
+          "page": null,
+          "confidence": 0.0,
+          "author": null,
+          "title": "Verwaltungsportal",
+          "year": null,
+          "publisher": null,
+          "url": null,
+          "type": "document"
+        },
+        {
+          "id": "src_5",
+          "file": null,
+          "page": null,
+          "confidence": 0.0,
+          "author": null,
+          "title": "Formulardatenbank",
+          "year": null,
+          "publisher": null,
+          "url": null,
+          "type": "document"
+        },
+        {
+          "id": "src_6",
+          "file": null,
+          "page": null,
+          "confidence": 0.0,
+          "author": null,
+          "title": "BauGB",
+          "year": null,
+          "publisher": null,
+          "url": null,
+          "type": "document"
+        },
+        {
+          "id": "src_7",
+          "file": null,
+          "page": null,
+          "confidence": 0.0,
+          "author": null,
+          "title": "VwVfG",
+          "year": null,
+          "publisher": null,
+          "url": null,
+          "type": "document"
+        },
+        {
+          "id": "src_8",
+          "file": null,
+          "page": null,
+          "confidence": 0.0,
+          "author": null,
+          "title": "Standard-Quellen",
+          "year": null,
+          "publisher": null,
+          "url": null,
+          "type": "document"
+        }
+      ],
+      "complexity": null,
+      "agents_involved": [
+        "geo_context",
+        "temporal_analyzer",
+        "response_generator",
+        "document_retrieval",
+        "legal_framework",
+        "quality_assessor"
+      ],
+      "suggestions": []
+    },
+    "confidence_score": 0.0
+  }
+]

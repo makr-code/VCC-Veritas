@@ -43,7 +43,7 @@ class ChatToolbar(ttk.Frame):
             import requests
             from config import API_BASE_URL
             user_id = self.current_user.get("user_id") or self.current_user.get("email")
-            response = requests.get(f"{API_BASE_URL}/recent_conversations", timeout=3)
+            response = requests.get(f"{API_BASE_URL}/system/conversations/recent", timeout=3)
             if response.status_code == 200:
                 data = response.json()
                 conversations = data.get("recent_conversations", [])
@@ -157,7 +157,7 @@ class ChatToolbar(ttk.Frame):
             import requests
             from config import API_BASE_URL
             user_id = self.current_user.get("user_id") or self.current_user.get("email")
-            response = requests.get(f"{API_BASE_URL}/recent_conversations", timeout=3)
+            response = requests.get(f"{API_BASE_URL}/system/conversations/recent", timeout=3)
             if response.status_code == 200:
                 data = response.json()
                 conversations = data.get("recent_conversations", [])
@@ -215,7 +215,7 @@ class ChatToolbar(ttk.Frame):
             import requests
             from config import API_BASE_URL
             user_id = self.current_user.get("user_id") or self.current_user.get("email")
-            response = requests.get(f"{API_BASE_URL}/recent_conversations", timeout=3)
+            response = requests.get(f"{API_BASE_URL}/system/conversations/recent", timeout=3)
             if response.status_code == 200:
                 data = response.json()
                 conversations = data.get("recent_conversations", [])
@@ -484,7 +484,7 @@ class ChatToolbar(ttk.Frame):
         def check_status():
             try:
                 from config import API_BASE_URL
-                response = requests.get(f"{API_BASE_URL}/health", timeout=5)
+                response = requests.get(f"http://127.0.0.1:5000/health", timeout=5)
                 if response.status_code == 200:
                     # Verwende try-except für Thread-Safety
                     try:

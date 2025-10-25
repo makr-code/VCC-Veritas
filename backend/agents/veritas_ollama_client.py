@@ -377,11 +377,42 @@ ERLAUBT:
 - Persönlich: "Das hängt von Ihrem konkreten Fall ab..."
 - Empathisch: "Das ist eine häufige Frage - hier die wichtigsten Punkte:"
 
-FORMAT:
-1. **Direkte Antwort** (2-3 Sätze)
-2. **Details** (strukturiert mit Aufzählungen)
-3. **Quellen** (wenn relevant)
-4. **Nächste Schritte** (optional, wenn sinnvoll)""",
+FORMAT (MARKDOWN-STRUKTURIERUNG NACH BEDARF!):
+✅ VERWENDE FREI: 
+- Überschriften (##, ###) für Struktur
+- **Fettdruck** für wichtige Begriffe
+- Listen (•, -, 1.) für Aufzählungen
+- Absätze für Lesbarkeit
+- Tabellen (|) wenn sinnvoll
+- Code-Blöcke (```) für Beispiele
+
+✅ ANTWORT-STRUKTUR:
+Beginne direkt mit einem zusammenhängenden Fließtext, der die Frage beantwortet.
+Kombiniere Direkt-Antwort und Details zu einem natürlichen, gut lesbaren Text.
+Nutze Markdown-Strukturierung (Überschriften, Listen, Hervorhebungen) dort, wo es die Lesbarkeit verbessert.
+
+✅ NÄCHSTE SCHRITTE (JSON-Format am Ende - COMPLIANCE-PFLICHT):
+Wenn sinnvoll, füge am ENDE der Antwort folgendes JSON an:
+```json
+{{
+  "next_steps": [
+    {{"action": "Beschreibung der Handlung", "type": "link"}},
+    {{"action": "Weitere Aktion", "type": "info"}},
+    {{"action": "Dokumentation prüfen", "type": "document"}}
+  ],
+  "related_topics": ["Thema 1", "Thema 2", "Thema 3"]
+}}
+```
+
+**Types:**
+- "link" = Externe Ressource/Link
+- "info" = Informationshinweis  
+- "document" = Dokument/Formular
+
+❌ VERBOTEN:
+- Separate "## Direkte Antwort" und "## Details" Sections
+- "## Nächste Schritte" als Markdown-Text (nur JSON!)
+- Abrupte Strukturbrüche zwischen Sections""",
                 
                 "user_template": """**User fragte:** {query}
 
@@ -407,25 +438,43 @@ WICHTIG:
 - Strukturiere die Antwort übersichtlich
 - Sei konkret und präzise
 
-**Beispiel (GUT):**
-"Für eine Baugenehmigung in Brandenburg benötigen Sie folgende Unterlagen:
+**Beispiel (GUT - FLIESSTEXT MIT STRUKTURIERUNG):**
 
-• Bauantrag (amtliches Formular)
-• Lageplan mit Grundstücksgrenzen
-• Bauvorlagen (Grundrisse, Schnitte, Ansichten)
-• Statische Berechnungen
-• Baubeschreibung
+Für eine Baugenehmigung in Brandenburg benötigen Sie mehrere Unterlagen, die beim zuständigen Bauordnungsamt eingereicht werden müssen. Die Bearbeitungsdauer beträgt in der Regel 2-3 Monate.
 
-Der Bauantrag wird beim zuständigen Bauordnungsamt eingereicht. Die Bearbeitungsdauer beträgt in der Regel 2-3 Monate.
+### Erforderliche Unterlagen
 
-📋 Nächste Schritte:
-• Termin beim Bauordnungsamt vereinbaren
-• Vollständige Unterlagen zusammenstellen
-• Bei Fragen: Bauvoranfrage stellen"
+Die wichtigsten Dokumente sind:
 
-**Beispiel (SCHLECHT):**
+• **Bauantrag:** Amtliches Formular des Bauordnungsamts
+• **Lageplan:** Mit Grundstücksgrenzen und Gebäudepositionierung  
+• **Bauvorlagen:** Grundrisse, Schnitte und Ansichten
+• **Statische Berechnungen:** Von zugelassenem Statiker
+• **Baubeschreibung:** Detaillierte Beschreibung des Bauvorhabens
+
+Der Bauantrag wird beim zuständigen Bauordnungsamt eingereicht. Bei komplexeren Vorhaben kann eine **Bauvoranfrage** sinnvoll sein, um Grundsatzfragen vorab zu klären.
+
+```json
+{{
+  "next_steps": [
+    {{"action": "Vollständige Unterlagen zusammenstellen", "type": "info"}},
+    {{"action": "Termin mit Bauordnungsamt vereinbaren", "type": "link"}},
+    {{"action": "Bei Unsicherheit: Bauvoranfrage stellen", "type": "document"}}
+  ],
+  "related_topics": ["Bauvoranfrage", "Baugenehmigungsverfahren", "Bauordnungsamt Brandenburg"]
+}}
+```
+
+**Beispiel (SCHLECHT - FLOSKELHAFTE EINLEITUNG):**
 "Antwort auf die Frage 'Was brauche ich für eine Baugenehmigung?':
 Basierend auf den bereitgestellten Informationen kann ich Ihnen mitteilen, dass Sie verschiedene Unterlagen benötigen..."
+
+**Beispiel (SCHLECHT - GETRENNTE SECTIONS):**
+"## Direkte Antwort
+Sie brauchen Unterlagen.
+
+## Details  
+Hier sind die Details..."
 
 **Jetzt beantworte die User-Frage:**"""
             },
@@ -1022,7 +1071,8 @@ Beispiel:
                                      agent_results: Dict[str, Any],
                                      rag_context: Dict[str, Any] = None,
                                      aggregation_summary: Dict[str, Any] = None,
-                                     consensus_summary: Dict[str, Any] = None) -> Dict[str, Any]:
+                                     consensus_summary: Dict[str, Any] = None,
+                                     max_tokens: int = 1500) -> Dict[str, Any]:
         """
         Synthetisiert Multi-Agent-Ergebnisse zu finaler Antwort
         
@@ -1052,17 +1102,23 @@ Beispiel:
             prompt=prompt,
             system=template["system"],
             temperature=0.5,  # Ausgewogen
-            max_tokens=1500
+            max_tokens=max_tokens  # 🆕 Dynamisches Token-Budget übergeben
         )
         
         try:
             response = await self.generate_response(request)
             
+            # 🔧 Extrahiere JSON aus LLM-Antwort (Compliance-konform)
+            # Import hier um zirkuläre Imports zu vermeiden
+            from backend.utils.json_extractor import extract_json_from_text, extract_next_steps, extract_related_topics
+            
+            clean_text, json_metadata = extract_json_from_text(response.response)
+            
             # Confidence Score berechnen
             confidence_score = response.confidence_score or 0.8
             
-            return {
-                "response_text": response.response,
+            result = {
+                "response_text": clean_text,  # ✅ Sauberer Text ohne JSON
                 "confidence_score": confidence_score,
                 "model_used": request.model,
                 "tokens_used": response.eval_count,
@@ -1074,8 +1130,19 @@ Beispiel:
                 }
             }
             
+            # ✅ Füge extrahierte JSON-Metadaten hinzu
+            if json_metadata:
+                result["json_metadata"] = {
+                    "next_steps": extract_next_steps(json_metadata),
+                    "related_topics": extract_related_topics(json_metadata),
+                    "raw": json_metadata
+                }
+                logger.info("✅ JSON-Metadaten aus LLM-Antwort extrahiert")
+            
+            return result
+            
         except Exception as e:
-            logger.error(f"❌ Agent-Result-Synthesis fehlgeschlagen: {e}")
+            logger.error(f"❌ Agent-Result-Synthesis fehlgeschlagen: {e}", exc_info=True)
             return {
                 "response_text": "Entschuldigung, bei der Verarbeitung Ihrer Anfrage ist ein Fehler aufgetreten.",
                 "confidence_score": 0.0,

@@ -54,6 +54,7 @@ class ProgressType(Enum):
     AGENT_COMPLETE = "agent_complete"
     INTERMEDIATE_RESULT = "intermediate_result"
     LLM_THINKING = "llm_thinking"
+    HYPOTHESIS = "hypothesis"  # NEU: Hypothesen-Generierung
     STAGE_REFLECTION = "stage_reflection"  # NEU: LLM Meta-Reflection zu Stage
     FULFILLMENT_ANALYSIS = "fulfillment_analysis"  # NEU: Erfüllungsgrad-Analyse
     GAP_IDENTIFICATION = "gap_identification"  # NEU: Lücken-Identifikation
@@ -84,6 +85,12 @@ class ProgressUpdate:
     # LLM-specific
     llm_thinking_step: Optional[str] = None
     intermediate_conclusion: Optional[str] = None
+    
+    # Hypothesis (NEU)
+    hypothesis_data: Optional[Dict[str, Any]] = None
+    confidence: Optional[str] = None
+    information_gaps: Optional[List[Dict[str, Any]]] = None
+    clarification_questions: Optional[List[str]] = None
     
     # Stage Reflection (NEU)
     reflection_data: Optional[Dict[str, Any]] = None
@@ -381,6 +388,70 @@ class VeritasProgressManager:
             llm_thinking_step=thinking_step
         )
     
+    def add_hypothesis(self,
+                      session_id: str,
+                      hypothesis: Any,
+                      confidence: str = "medium") -> None:
+        """
+        Fügt Hypothesen-Generierung als Progress-Event hinzu
+        
+        Args:
+            session_id: Session-ID
+            hypothesis: Hypothesis object from HypothesisService
+            confidence: Confidence level (high/medium/low)
+        """
+        
+        confidence_emoji = {
+            "high": "🟢",
+            "medium": "🟡",
+            "low": "🔴",
+            "unknown": "⚪"
+        }
+        
+        emoji = confidence_emoji.get(confidence, "⚪")
+        
+        # Extrahiere Hypothesis-Daten (nutze Methoden statt Attribute wo nötig)
+        hypothesis_data = {
+            'question_type': hypothesis.question_type.value if hasattr(hypothesis.question_type, 'value') else str(hypothesis.question_type),
+            'confidence': hypothesis.confidence.value if hasattr(hypothesis.confidence, 'value') else str(hypothesis.confidence),
+            'primary_intent': hypothesis.primary_intent,
+            'information_gaps': [
+                {
+                    'gap_type': gap.gap_type,
+                    'severity': gap.severity.value if hasattr(gap.severity, 'value') else str(gap.severity),
+                    'suggested_query': gap.suggested_query,
+                    'examples': gap.examples
+                }
+                for gap in hypothesis.information_gaps
+            ],
+            'assumptions': hypothesis.assumptions,
+            'clarification_questions': hypothesis.get_clarification_questions(),  # ← Methode nutzen!
+            'required_information': hypothesis.required_information,  # ← Korrektes Attribut
+            'suggested_steps': hypothesis.suggested_steps
+        }
+        
+        # Formatierte Message
+        gap_count = len(hypothesis.information_gaps)
+        critical_gaps = sum(1 for gap in hypothesis.information_gaps 
+                          if hasattr(gap.severity, 'value') and gap.severity.value == 'critical')
+        
+        message = f"{emoji} Hypothese: {hypothesis.question_type.value} | Konfidenz: {hypothesis.confidence.value}"
+        if gap_count > 0:
+            message += f" | Lücken: {gap_count} ({critical_gaps} kritisch)"
+        
+        self._emit_progress(
+            session_id=session_id,
+            query_id=self.active_sessions[session_id]['query_id'],
+            update_type=ProgressType.HYPOTHESIS,
+            stage=ProgressStage.ANALYZING_QUERY,
+            message=message,
+            details=hypothesis_data,
+            hypothesis_data=hypothesis_data,
+            confidence=hypothesis.confidence.value if hasattr(hypothesis.confidence, 'value') else str(hypothesis.confidence),
+            information_gaps=hypothesis_data['information_gaps'],
+            clarification_questions=hypothesis.get_clarification_questions()  # ← Methode nutzen!
+        )
+    
     def add_stage_reflection(self,
                            session_id: str,
                            reflection_stage: str,
@@ -601,6 +672,18 @@ class VeritasProgressStreamer:
         
         self.progress_manager.subscribe_to_progress(session_id, progress_callback)
         
+        # 🔥 WICHTIG: Sende bereits vorhandene Events aus progress_history!
+        # Wenn Client nach Hypothesis-Generation connected, würde er sonst das Event verpassen!
+        try:
+            with self.progress_manager.progress_lock:
+                if session_id in self.progress_manager.active_sessions:
+                    history = self.progress_manager.active_sessions[session_id]['progress_history']
+                    for past_update in history:
+                        await progress_queue.put(past_update)
+                        logger.debug(f"📜 Sending historical event: {past_update.update_type.value}")
+        except Exception as e:
+            logger.warning(f"⚠️ Could not send historical events: {e}")
+        
         try:
             while True:
                 # Warte auf nächstes Update
@@ -624,6 +707,28 @@ class VeritasProgressStreamer:
                         sse_data['intermediate_result'] = update.intermediate_conclusion
                     if update.llm_thinking_step:
                         sse_data['llm_thinking'] = update.llm_thinking_step
+                    
+                    # ✨ NEU: Hypothesis-Daten
+                    if update.hypothesis_data:
+                        sse_data['hypothesis_data'] = update.hypothesis_data
+                    if update.confidence:
+                        sse_data['confidence'] = update.confidence
+                    if update.information_gaps:
+                        sse_data['information_gaps'] = update.information_gaps
+                    if update.clarification_questions:
+                        sse_data['clarification_questions'] = update.clarification_questions
+                    
+                    # ✨ NEU: Stage Reflection Daten
+                    if update.reflection_data:
+                        sse_data['reflection_data'] = update.reflection_data
+                    if update.completion_percent is not None:
+                        sse_data['completion_percent'] = update.completion_percent
+                    if update.identified_gaps:
+                        sse_data['identified_gaps'] = update.identified_gaps
+                    if update.gathered_info:
+                        sse_data['gathered_info'] = update.gathered_info
+                    if update.next_actions:
+                        sse_data['next_actions'] = update.next_actions
                     
                     # Server-Sent Event Format
                     yield f"data: {json.dumps(sse_data)}\n\n"

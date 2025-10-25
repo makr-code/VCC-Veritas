@@ -25,15 +25,12 @@ import logging
 import hashlib
 from datetime import datetime
 
-# Import UDS3 components (assuming they exist in the codebase)
-try:
-    from uds3.database.database_api_chromadb_remote import ChromaDBRemoteBackend
-    from uds3.uds3_relations_core import UDS3RelationsCore
-    from backend.database.database_api_postgresql import PostgreSQLRelationalBackend
-    UDS3_AVAILABLE = True
-except ImportError:
-    UDS3_AVAILABLE = False
-    logging.warning("UDS3 components not available - RAG Service will operate in mock mode")
+# ============================================================================
+# UDS3 Polyglot Manager - STRICT SEPARATION OF CONCERNS
+# ============================================================================
+# RAG Service uses ONLY UDS3 PolyglotManager.
+# NO direct backend imports - UDS3 handles all database connections!
+# Import happens in __init__ to ensure clean startup.
 
 
 class SearchMethod(Enum):
@@ -174,83 +171,54 @@ class RAGService:
     Supports vector, graph, and relational search with hybrid ranking.
     """
     
-    def __init__(
-        self,
-        chromadb_host: str = "192.168.178.94",
-        chromadb_port: int = 8000,
-        neo4j_uri: str = "bolt://192.168.178.94:7687",
-        neo4j_user: str = "neo4j",
-        neo4j_password: str = "neo4j",
-        postgres_config: Optional[Dict[str, Any]] = None
-    ):
+    def __init__(self):
         """
-        Initialize RAG Service with UDS3 backends
+        Initialize RAG Service with UDS3 Polyglot Manager
         
-        Args:
-            chromadb_host: ChromaDB server host
-            chromadb_port: ChromaDB server port
-            neo4j_uri: Neo4j connection URI
-            neo4j_user: Neo4j username
-            neo4j_password: Neo4j password
-            postgres_config: PostgreSQL configuration dict
+        UDS3 handles ALL database connections internally (auto-config).
+        RAG Service only orchestrates search operations.
         """
         self.logger = logging.getLogger(__name__)
         
-        # Initialize backends
-        self.chromadb: Optional[ChromaDBRemoteBackend] = None
-        self.neo4j: Optional[UDS3RelationsCore] = None
-        self.postgresql: Optional[PostgreSQLRelationalBackend] = None
+        # ============================================================================
+        # UDS3 Polyglot Manager - STRICT SEPARATION OF CONCERNS
+        # ============================================================================
+        # UDS3 manages ALL database backends internally.
+        # RAG Service ONLY orchestrates search logic.
+        # NO direct backend access - everything through UDS3!
         
-        if UDS3_AVAILABLE:
-            try:
-                # ChromaDB for vector search
-                self.chromadb = ChromaDBRemoteBackend(
-                    host=chromadb_host,
-                    port=chromadb_port
-                )
-                self.chromadb.connect()
-                self.logger.info(f"✅ ChromaDB connected: {chromadb_host}:{chromadb_port}")
-            except Exception as e:
-                self.logger.warning(f"ChromaDB connection failed: {e}")
+        try:
+            from uds3.core.polyglot_manager import UDS3PolyglotManager
             
-            try:
-                # Neo4j for graph search
-                self.neo4j = UDS3RelationsCore(
-                    uri=neo4j_uri,
-                    user=neo4j_user,
-                    password=neo4j_password
-                )
-                self.logger.info(f"✅ Neo4j connected: {neo4j_uri}")
-            except Exception as e:
-                self.logger.warning(f"Neo4j connection failed: {e}")
+            # Nur Backend-TYPEN angeben - UDS3 übernimmt Rest!
+            backend_config = {
+                "relational": {"enabled": True},  # PostgreSQL - Auto-Config
+                "vector": {"enabled": True},      # ChromaDB - Auto-Config
+                "graph": {"enabled": True},       # Neo4j - Auto-Config
+                "file": {"enabled": True}         # CouchDB - Auto-Config
+            }
             
-            try:
-                # PostgreSQL for metadata search
-                if postgres_config is None:
-                    postgres_config = {
-                        'host': '192.168.178.94',
-                        'port': 5432,
-                        'user': 'postgres',
-                        'password': 'postgres',
-                        'database': 'postgres',
-                        'schema': 'public'
-                    }
-                
-                self.postgresql = PostgreSQLRelationalBackend(**postgres_config)
-                self.postgresql.connect()
-                self.logger.info(f"✅ PostgreSQL connected: {postgres_config['host']}")
-            except Exception as e:
-                self.logger.warning(f"PostgreSQL connection failed: {e}")
-        else:
-            self.logger.warning("UDS3 not available - operating in mock mode")
+            self.uds3_manager = UDS3PolyglotManager(
+                backend_config=backend_config,
+                enable_rag=False  # RAG Service handles RAG logic, not UDS3
+            )
+            self.logger.info("✅ UDS3 PolyglotManager initialisiert (Auto-Config)")
+            
+        except Exception as e:
+            self.logger.error(f"❌ CRITICAL: UDS3 PolyglotManager Init FAILED: {e}")
+            raise RuntimeError(f"RAG Service requires UDS3 PolyglotManager - Init failed: {e}")
     
     def is_available(self) -> bool:
-        """Check if at least one backend is available"""
-        return any([
-            self.chromadb is not None,
-            self.neo4j is not None,
-            self.postgresql is not None
-        ])
+        """
+        Check if UDS3 manager is available
+        
+        Returns:
+            True if UDS3 PolyglotManager initialized
+            
+        Note: In production mode, this should ALWAYS return True
+              because __init__ throws RuntimeError if initialization fails.
+        """
+        return hasattr(self, 'uds3_manager') and self.uds3_manager is not None
     
     def vector_search(
         self,
@@ -958,9 +926,9 @@ if __name__ == "__main__":
     print("RAG SERVICE - STANDALONE TEST")
     print("="*80)
     
-    # Initialize service
+    # Initialize service (will throw RuntimeError if any backend fails)
     rag = RAGService()
-    print(f"\n✅ RAG Service initialized (UDS3 available: {UDS3_AVAILABLE})")
+    print(f"\n✅ RAG Service initialized - ALL backends connected!")
     print(f"   - ChromaDB: {'✅' if rag.chromadb else '❌'}")
     print(f"   - Neo4j: {'✅' if rag.neo4j else '❌'}")
     print(f"   - PostgreSQL: {'✅' if rag.postgresql else '❌'}")

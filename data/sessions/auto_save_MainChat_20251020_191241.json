@@ -1,0 +1,22 @@
+{
+  "metadata": {
+    "session_id": "session_e6e5bc549822",
+    "window_id": "MainChat",
+    "created_at": "2025-10-20T19:12:41.028828",
+    "message_count": 1,
+    "llm_model": "llama3:latest",
+    "settings": {
+      "temperature": 0.7,
+      "max_tokens": 1200,
+      "top_p": 0.9
+    }
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "Willkommen bei Veritas v3.15.0! 🚀\nBackend-API: http://127.0.0.1:5000/api\nDrücken Sie \"➕ Neuer Chat\" um weitere Fenster zu öffnen.",
+      "timestamp": "2025-10-20T19:06:14.813070"
+    }
+  ],
+  "version": "1.0"
+}

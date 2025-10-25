@@ -131,12 +131,24 @@ WISSENSCHAFTLICHE ZITATIONEN (IEEE-Standard) - SEHR WICHTIG!:
 - BEISPIEL: "Nach § 58 LBO BW ist eine Baugenehmigung erforderlich[1]. Die Bearbeitungsdauer beträgt 2-3 Monate[2]."
 - WICHTIG: Auch bei mehrfacher Nutzung derselben Quelle → gleiche Nummer verwenden
 
-FORMAT:
-1. **Direkte Antwort** (2-3 Sätze, MIT [N] Zitationen!)
-2. **Details** (strukturiert mit Aufzählungen, MIT [N] Zitationen!)
-3. **Quellen** (automatisch ergänzt aus Zitationen)
-4. **Nächste Schritte** (optional, wenn sinnvoll)
-5. **💡 Vorschläge** (3-5 konkrete Follow-up-Fragen für den User)""",
+FORMAT (MARKDOWN-ÜBERSCHRIFTEN VERWENDEN!):
+## Direkte Antwort
+2-3 Sätze mit direkter Beantwortung, MIT [N] IEEE-Zitationen!
+
+## Details
+Strukturierte Detailinformationen mit:
+• Aufzählungen
+• Jeder Fakt MIT [N] Zitationen!
+• Konkrete Beispiele
+
+## Quellen
+(automatisch ergänzt aus Zitationen - nicht manuell auflisten!)
+
+## Nächste Schritte
+(optional, wenn sinnvoll - praktische Handlungsempfehlungen)
+
+💡 **Vorschläge:**
+• 3-5 konkrete Follow-up-Fragen für den User""",
         
         "user_template": """**User fragte:** {query}
 
@@ -174,19 +186,32 @@ Quellen: [1] Bauordnungsamt Brandenburg, [2] LBO BW §58, [3] Verwaltungsportal
 Frage: "Was brauche ich für eine Baugenehmigung?"
 
 Antwort:
-"Für eine Baugenehmigung benötigen Sie folgende Unterlagen[1]:
 
-• Bauantrag (amtliches Formular)
-• Lageplan mit Grundstücksgrenzen
-• Bauvorlagen (Grundrisse, Schnitte)[1]
-• Statische Berechnungen[2]
+## Direkte Antwort
+Für eine Baugenehmigung benötigen Sie Bauantrag, Lageplan, Bauvorlagen und statische Berechnungen[1]. Der Antrag wird beim Bauordnungsamt eingereicht und die Bearbeitung dauert 2-3 Monate[3].
 
-Der Bauantrag wird beim Bauordnungsamt eingereicht[1]. Die Bearbeitungsdauer beträgt 2-3 Monate[3].
+## Details
+Die erforderlichen Unterlagen umfassen:
 
-� Vorschläge:
-• Welche Kosten fallen an?
-• Welche Fristen gelten?
-• Kann ich eine vereinfachte Genehmigung beantragen?"
+• **Bauantrag:** Amtliches Formular des Bauordnungsamts[1]
+• **Lageplan:** Mit Grundstücksgrenzen und Gebäudepositionierung[1]
+• **Bauvorlagen:** Grundrisse, Schnitte, Ansichten[1]
+• **Statische Berechnungen:** Von zugelassenem Statiker[2]
+• **Wärmeschutznachweis:** Nach EnEV[2]
+
+Der Bauantrag wird direkt beim zuständigen Bauordnungsamt eingereicht[1]. Die Bearbeitungsdauer beträgt in der Regel 2-3 Monate[3].
+
+## Nächste Schritte
+1. Vollständige Unterlagen zusammenstellen
+2. Termin mit Bauordnungsamt vereinbaren
+3. Bauantrag einreichen
+
+💡 **Vorschläge:**
+• Welche Kosten fallen für die Baugenehmigung an?
+• Welche Fristen muss ich einhalten?
+• Kann ich eine vereinfachte Genehmigung beantragen?
+• Welche Unterlagen brauche ich für den Bauantrag?
+• Was passiert, wenn die Genehmigung abgelehnt wird?
 
 **BEISPIEL 2 (EXZELLENT - MEHRFACHE QUELLENNUTZUNG!):**
 
@@ -195,24 +220,40 @@ Quellen: [1] BauGB, [2] Kostenordnung, [3] Gebührentabelle
 Frage: "Was kostet eine Baugenehmigung?"
 
 Antwort:
-"Die Kosten für eine Baugenehmigung richten sich nach der Gebührenordnung[2] und setzen sich zusammen aus:
 
-• Grundgebühr: 150-500€[3]
-• Größenabhängige Gebühr: 0,5% der Bausumme[2]
-• Prüfungsgebühr für Statik: 200-800€[2]
+## Direkte Antwort
+Die Kosten für eine Baugenehmigung richten sich nach der Gebührenordnung[2] und setzen sich aus Grundgebühr (150-500€), größenabhängiger Gebühr (0,5% der Bausumme) und Prüfungsgebühr (200-800€) zusammen[2][3].
 
-Bei einem Einfamilienhaus (200m²) liegen die Gesamtkosten typischerweise bei 1.500-3.000€[3]. Die genaue Berechnung erfolgt nach § 34 BauGB[1].
+## Details
+Die Gesamtkosten berechnen sich wie folgt:
 
-💡 Vorschläge:
-• Kann ich Gebühren vermeiden?
+• **Grundgebühr:** 150-500€ je nach Gemeinde[3]
+• **Größenabhängige Gebühr:** 0,5% der Bausumme[2]
+• **Prüfungsgebühr für Statik:** 200-800€[2]
+• **Zusatzprüfungen:** Brandschutz, Schallschutz (variabel)[2]
+
+Bei einem Einfamilienhaus (200m², Bausumme 400.000€) liegen die Gesamtkosten typischerweise bei 1.500-3.000€[3]. Die genaue Berechnung erfolgt nach § 34 BauGB[1].
+
+## Nächste Schritte
+1. Bausumme kalkulieren lassen
+2. Gebührenordnung der Gemeinde einsehen
+3. Budget entsprechend planen
+
+💡 **Vorschläge:**
+• Kann ich Gebühren vermeiden oder reduzieren?
 • Wann werden die Gebühren fällig?
-• Gibt es Ermäßigungen für bestimmte Bauvorhaben?"
+• Gibt es Ermäßigungen für bestimmte Bauvorhaben?
+• Was passiert bei Ablehnung - muss ich erneut zahlen?
+• Welche weiteren Kosten kommen auf mich zu?
 
 **BEISPIEL 3 (SCHLECHT - KEINE ZITATIONEN!):**
-"Basierend auf den Informationen kann ich mitteilen, dass für eine Baugenehmigung verschiedene Unterlagen erforderlich sind. Dies umfasst den Bauantrag sowie weitere Dokumente..."  
-❌ KEINE [N] Zitationen! → FALSCH!
 
-**Jetzt beantworte die User-Frage GENAU WIE IN DEN EXZELLENTEN BEISPIELEN (MIT [N] ZITATIONEN!)**:
+## Direkte Antwort
+Basierend auf den Informationen kann ich mitteilen, dass für eine Baugenehmigung verschiedene Unterlagen erforderlich sind. Dies umfasst den Bauantrag sowie weitere Dokumente...  
+
+❌ **FEHLER:** KEINE [N] Zitationen! → FALSCH! NICHT SO MACHEN!
+
+**Jetzt beantworte die User-Frage GENAU WIE IN DEN EXZELLENTEN BEISPIELEN (MIT [N] ZITATIONEN UND MARKDOWN-ÜBERSCHRIFTEN!)**:
 """
     }
     

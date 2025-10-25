@@ -446,28 +446,47 @@ class RAGContextService:
         documents = getattr(raw_result, "documents", None) or getattr(raw_result, "content", None)
         if isinstance(documents, list):
             for item in documents[: opts.limit_documents]:
-                normalized["documents"].append(
-                    {
-                        "id": getattr(item, "id", None) or item.get("id") if isinstance(item, dict) else None,
-                        "title": getattr(item, "title", "Unbenannt")
-                        if not isinstance(item, dict)
-                        else item.get("title", "Unbenannt"),
-                        "snippet": getattr(item, "snippet", "")
-                        if not isinstance(item, dict)
-                        else item.get("snippet", ""),
-                        "relevance": float(
-                            getattr(item, "score", item.get("score", 0.75))
-                            if isinstance(item, dict)
-                            else getattr(item, "score", 0.75)
-                        ),
-                        "source": getattr(item, "source", None)
-                        if not isinstance(item, dict)
-                        else item.get("source"),
-                        "domain_tags": getattr(item, "tags", [])
-                        if not isinstance(item, dict)
-                        else item.get("tags", []),
-                    }
-                )
+                # ✨ BEWAHRE ALLE METADATEN (IEEE-Extended)
+                # Basis-Dokument-Struktur
+                doc = {
+                    "id": getattr(item, "id", None) or item.get("id") if isinstance(item, dict) else None,
+                    "title": getattr(item, "title", "Unbenannt")
+                    if not isinstance(item, dict)
+                    else item.get("title", "Unbenannt"),
+                    "snippet": getattr(item, "snippet", "")
+                    if not isinstance(item, dict)
+                    else item.get("snippet", ""),
+                    "relevance": float(
+                        getattr(item, "score", item.get("score", 0.75))
+                        if isinstance(item, dict)
+                        else getattr(item, "score", 0.75)
+                    ),
+                    "source": getattr(item, "source", None)
+                    if not isinstance(item, dict)
+                    else item.get("source"),
+                    "domain_tags": getattr(item, "tags", [])
+                    if not isinstance(item, dict)
+                    else item.get("tags", []),
+                }
+                
+                # ✨ IEEE-EXTENDED: Bewahre alle zusätzlichen Metadaten aus UDS3
+                if isinstance(item, dict):
+                    # Füge alle zusätzlichen Felder hinzu, die UDS3 bereitstellt
+                    for key, value in item.items():
+                        if key not in doc:  # Nur neue Felder, keine Überschreibung
+                            doc[key] = value
+                else:
+                    # Für Objekte: Extrahiere alle Attribute
+                    for attr in dir(item):
+                        if not attr.startswith('_') and attr not in doc:
+                            try:
+                                value = getattr(item, attr)
+                                if not callable(value):
+                                    doc[attr] = value
+                            except:
+                                pass
+                
+                normalized["documents"].append(doc)
 
         # Vector Resultate
         if opts.include_vector:

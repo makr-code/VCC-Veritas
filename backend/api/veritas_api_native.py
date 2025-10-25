@@ -199,7 +199,7 @@ def _extract_suggestions(llm_response: str) -> List[str]:
     
     # Suche nach "💡 Vorschläge:" oder "Vorschläge:" Section
     patterns = [
-        r'💡\s*Vorschläge?:(.+?)(?:\n\n|$)',
+        r'💡\s*\*?\*?Vorschläge?\*?\*?:(.+?)(?:\n\n|$)',
         r'Vorschläge?:(.+?)(?:\n\n|$)',
         r'Follow[- ]?up[- ]?Fragen?:(.+?)(?:\n\n|$)'
     ]
@@ -222,42 +222,310 @@ def _extract_suggestions(llm_response: str) -> List[str]:
     logging.info(f"[SUGGESTIONS] {len(suggestions)} Follow-ups extrahiert")
     return suggestions[:5]  # Max 5 Vorschläge
 
-def _create_source_metadata(chunk, citation_id: int) -> Dict[str, Any]:
+def _extract_ieee_citations(answer: str) -> List[int]:
     """
-    Erstellt SourceMetadata-Dict aus EnhancedChunk
+    Extrahiert verwendete IEEE-Zitationen [N] aus Antwort
     
     Args:
-        chunk: EnhancedChunk mit Metadaten
-        citation_id: 1-basierte Zitations-ID
+        answer: LLM-generierte Antwort mit [1], [2], [3] Citations
         
     Returns:
-        Dict im SourceMetadata-Format (für Pydantic Model)
+        Liste von Citation-IDs (sortiert, unique)
+    
+    Beispiel:
+        Input: "Text[1] weitere Info[2] mehr[1] Details[3]"
+        Output: [1, 2, 3]
     """
+    import re
+    
+    # Finde alle [N] Patterns
+    citations = re.findall(r'\[(\d+)\]', answer)
+    
+    # Konvertiere zu Integers, unique + sortiert
+    unique_citations = sorted(set(int(c) for c in citations))
+    
+    logging.info(f"[CITATIONS] {len(unique_citations)} unique citations verwendet: {unique_citations}")
+    return unique_citations
+
+def format_ieee_citation(source_meta: Dict[str, Any]) -> str:
+    """
+    Formatiert SourceMetadata als IEEE-konforme Citation
+    
+    IEEE Citation Standard:
+    [N] Autor(en), "Titel," Publikation, Jahr, Seiten, DOI/URL, [Metadaten]
+    
+    Args:
+        source_meta: SourceMetadata-Dict mit allen Feldern
+        
+    Returns:
+        Vollständig formatierte IEEE-Citation
+        
+    Beispiel:
+        [1] Bundesministerium für Umwelt et al., "BImSchG Kommentar," 
+            Umweltrecht Online, 2024, pp. 58-62, 
+            DOI: 10.1234/bimschg, Retrieved: 2025-10-18,
+            Relevance: Very High, Impact: High, Score: 0.95
+    """
+    parts = []
+    
+    # [N] Citation ID
+    parts.append(f"[{source_meta['id']}]")
+    
+    # Autor(en)
+    if source_meta.get('authors'):
+        parts.append(f"{source_meta['authors']},")
+    
+    # "Titel"
+    parts.append(f'"{source_meta["title"]},"')
+    
+    # Publikation/Quelle
+    if source_meta.get('original_source'):
+        parts.append(f"{source_meta['original_source']},")
+    
+    # Jahr
+    if source_meta.get('year'):
+        parts.append(f"{source_meta['year']},")
+    elif source_meta.get('date'):
+        parts.append(f"{source_meta['date']},")
+    
+    # Seiten (falls vorhanden)
+    if source_meta.get('page'):
+        parts.append(f"pp. {source_meta['page']},")
+    
+    # Section/Paragraph (falls vorhanden)
+    if source_meta.get('section'):
+        parts.append(f"§ {source_meta['section']},")
+    
+    # DOI (falls vorhanden)
+    if source_meta.get('doi'):
+        parts.append(f"DOI: {source_meta['doi']},")
+    
+    # URL (falls vorhanden und kein DOI)
+    elif source_meta.get('url'):
+        parts.append(f"URL: {source_meta['url']},")
+    
+    # Ingestion Date
+    if source_meta.get('ingestion_date'):
+        parts.append(f"Retrieved: {source_meta['ingestion_date']},")
+    
+    # Relevance & Impact
+    metadata_parts = []
+    if source_meta.get('relevance'):
+        metadata_parts.append(f"Relevance: {source_meta['relevance']}")
+    if source_meta.get('impact'):
+        metadata_parts.append(f"Impact: {source_meta['impact']}")
+    if source_meta.get('score'):
+        metadata_parts.append(f"Score: {source_meta['score']:.2f}")
+    
+    if metadata_parts:
+        parts.append(f"[{', '.join(metadata_parts)}]")
+    
+    # Zusammensetzen
+    citation = " ".join(parts)
+    
+    # Bereinige doppelte Kommata
+    citation = citation.replace(', ,', ',').replace(',,', ',')
+    
+    return citation
+
+def _create_source_metadata(chunk, citation_id: int) -> Dict[str, Any]:
+    """
+    Erstellt vollständige IEEE-konforme SourceMetadata aus EnhancedChunk
+    
+    IEEE Citation Format:
+    [N] Autor(en), "Titel," Publikation, Jahr, Seiten, DOI/URL, [Zusatzinfo]
+    
+    Beispiel:
+    [1] Bundesministerium für Umwelt, "BImSchG Kommentar," 
+        Umweltrecht Online, 2024, pp. 58-62, 
+        DOI: 10.1234/bimschg.2024, 
+        Retrieved: 2025-10-18, Score: 0.95, Impact: High
+    
+    Args:
+        chunk: EnhancedChunk mit Metadaten und Quality-Scores
+        citation_id: 1-basierte Zitations-ID [N]
+        
+    Returns:
+        Dict im erweiterten IEEE SourceMetadata-Format
+    """
+    from datetime import datetime
+    
     metadata = chunk.metadata
     
-    # Dokumenttyp aus Metadaten ableiten
+    # === TITEL & DOKUMENTTYP ===
+    title = metadata.get('title', 'Unbekanntes Dokument')
     doc_type = metadata.get('document_type', 'Dokument')
-    if 'gesetz' in metadata.get('title', '').lower():
-        doc_type = 'Gesetz'
-    elif 'verordnung' in metadata.get('title', '').lower():
-        doc_type = 'Verordnung'
-    elif 'urteil' in metadata.get('title', '').lower():
-        doc_type = 'Urteil'
-    elif 'verwaltungsvorschrift' in metadata.get('title', '').lower():
-        doc_type = 'Verwaltungsvorschrift'
     
+    # Intelligente Typ-Erkennung
+    title_lower = title.lower()
+    if 'gesetz' in title_lower or 'gg ' in title_lower:
+        doc_type = 'Gesetz'
+    elif 'verordnung' in title_lower or 'vo ' in title_lower:
+        doc_type = 'Verordnung'
+    elif 'urteil' in title_lower or 'beschluss' in title_lower:
+        doc_type = 'Urteil'
+    elif 'verwaltungsvorschrift' in title_lower or 'vwv' in title_lower:
+        doc_type = 'Verwaltungsvorschrift'
+    elif 'richtlinie' in title_lower:
+        doc_type = 'Richtlinie'
+    elif 'satzung' in title_lower:
+        doc_type = 'Satzung'
+    
+    # === AUTOREN (IEEE: "A. Mustermann et al.") ===
+    author = metadata.get('author', 'N/A')
+    authors_list = []
+    
+    if author and author != 'N/A':
+        # Parse multiple authors
+        if ',' in author or ';' in author or ' und ' in author:
+            authors_raw = author.replace(';', ',').replace(' und ', ',').split(',')
+            authors_list = [a.strip() for a in authors_raw if a.strip()]
+        else:
+            authors_list = [author]
+    
+    # IEEE-Format: Erste 3 Autoren, dann "et al."
+    if len(authors_list) == 0:
+        authors_formatted = metadata.get('behoerde', 'Unbekannter Autor')
+    elif len(authors_list) == 1:
+        authors_formatted = authors_list[0]
+    elif len(authors_list) <= 3:
+        authors_formatted = ', '.join(authors_list)
+    else:
+        authors_formatted = f"{', '.join(authors_list[:3])} et al."
+    
+    # === DATUM ===
+    source_date = metadata.get('date', metadata.get('year', 'o.J.'))
+    year = None
+    date_formatted = 'o.J.'
+    
+    if source_date and source_date != 'o.J.':
+        try:
+            # Parse ISO date (YYYY-MM-DD) oder Jahr
+            if '-' in str(source_date):
+                year = str(source_date).split('-')[0]
+                date_formatted = source_date  # Keep full date
+            else:
+                year = str(source_date)
+                date_formatted = year
+        except:
+            date_formatted = str(source_date)
+    
+    # === ORIGINAL SOURCE (Publikation/Quelle) ===
+    original_source = metadata.get('source_file', 'Interne Datenbank')
+    
+    # Bereinige Dateinamen zu Publikationsnamen
+    if original_source.endswith('.pdf'):
+        original_source = original_source.replace('.pdf', '').replace('_', ' ')
+    
+    # === INGESTION DATE ===
+    ingestion_date = metadata.get('ingestion_date', metadata.get('indexed_at'))
+    if not ingestion_date:
+        ingestion_date = datetime.now().strftime('%Y-%m-%d')
+    
+    # === SCORES & QUALITY METRICS ===
+    # Similarity Score (Retrieval)
+    similarity_score = metadata.get('score', chunk.metadata.get('rerank_score', 0.0))
+    if hasattr(chunk, 'overall_quality_score'):
+        quality_score = chunk.overall_quality_score
+    else:
+        quality_score = similarity_score
+    
+    # Confidence Score (LLM)
+    confidence = getattr(chunk, 'confidence_score', quality_score)
+    
+    # Rerank Score (falls verfügbar)
+    rerank_score = metadata.get('rerank_score', similarity_score)
+    
+    # === IMPACT & RELEVANCE ===
+    # Impact basierend auf Dokumenttyp und Quality
+    impact = 'Medium'
+    if doc_type in ['Gesetz', 'Verordnung', 'Urteil']:
+        impact = 'High' if quality_score > 0.7 else 'Medium'
+    elif doc_type in ['Richtlinie', 'Verwaltungsvorschrift']:
+        impact = 'Medium' if quality_score > 0.5 else 'Low'
+    else:
+        impact = 'Low'
+    
+    # Relevance basierend auf Scores
+    if rerank_score > 0.8 or similarity_score > 0.8:
+        relevance = 'Very High'
+    elif rerank_score > 0.6 or similarity_score > 0.6:
+        relevance = 'High'
+    elif rerank_score > 0.4 or similarity_score > 0.4:
+        relevance = 'Medium'
+    else:
+        relevance = 'Low'
+    
+    # === ZUSÄTZLICHE METADATEN ===
+    doi = metadata.get('doi')
+    url = metadata.get('url')
+    page = metadata.get('page')
+    section = metadata.get('section', metadata.get('paragraph'))
+    rechtsgebiet = metadata.get('rechtsgebiet', metadata.get('legal_domain'))
+    behoerde = metadata.get('behoerde', metadata.get('authority'))
+    
+    # === IEEE-KONFORMES METADATA-DICT ===
     return {
+        # Core IEEE Fields
         'id': citation_id,
-        'title': metadata.get('title', 'Unbekanntes Dokument'),
+        'title': title,
+        'authors': authors_formatted,
+        'author': author,  # Original (für Kompatibilität)
+        'year': year,
+        'date': date_formatted,
+        'original_source': original_source,
+        'publication': original_source,  # Alias
+        
+        # Extended IEEE Fields
         'type': doc_type,
-        'author': metadata.get('author'),
-        'year': metadata.get('date', '').split('-')[0] if metadata.get('date') else None,  # Extrahiere Jahr
-        'url': metadata.get('url'),
+        'doi': doi,
+        'url': url,
+        'page': page,
+        'section': section,
+        
+        # Ingestion & Processing
+        'ingestion_date': ingestion_date,
+        'indexed_at': ingestion_date,  # Alias
+        
+        # Quality & Relevance Scores
+        'similarity_score': round(similarity_score, 4),
+        'rerank_score': round(rerank_score, 4),
+        'quality_score': round(quality_score, 4),
+        'confidence': round(confidence, 4),
+        'score': round(max(similarity_score, rerank_score), 4),  # Best score
+        
+        # Impact & Relevance
+        'impact': impact,
+        'relevance': relevance,
+        
+        # Legal-specific Metadata
+        'rechtsgebiet': rechtsgebiet,
+        'behoerde': behoerde,
+        'legal_domain': rechtsgebiet,  # Alias
+        'authority': behoerde,  # Alias
+        
+        # Additional Info
         'source_file': metadata.get('source_file'),
-        'page': metadata.get('page'),
-        'confidence': chunk.confidence_score,
-        'content_preview': (chunk.content[:200] + '...') if len(chunk.content) > 200 else chunk.content
+        'chunk_id': metadata.get('chunk_id'),
+        'content_preview': (chunk.content[:200] + '...') if len(chunk.content) > 200 else chunk.content,
+        
+        # Reliability (aus Quality Enhancement)
+        'reliability': getattr(chunk, 'reliability_indicator', 'medium'),
+        'quality_flags': getattr(chunk, 'quality_flags', [])
     }
+
+def _enrich_source_metadata_with_ieee_citation(source_meta: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Fügt formatierte IEEE-Citation zum SourceMetadata hinzu
+    
+    Args:
+        source_meta: SourceMetadata-Dict
+        
+    Returns:
+        Angereichertes SourceMetadata mit 'ieee_citation' Feld
+    """
+    source_meta['ieee_citation'] = format_ieee_citation(source_meta)
+    return source_meta
 
 # =============================================================================
 # NATIVE RAG CHAIN IMPLEMENTATION (Ersetzt LangChain Runnables)
@@ -439,12 +707,14 @@ Antwort:"""
             for i, chunk in enumerate(enhanced_chunks)
         ])
         
-        # ✨ NEW: Source-List für IEEE-Zitationen formatieren
+        # ✨ v3.20.0: OPTIMIERUNG - Minimale Source-Liste im Prompt (nur Title + Filename)
+        # Spart ~60% Tokens gegenüber vollständiger Metadaten-Liste
         source_list = "\n".join([
-            f"[{i+1}] {chunk.metadata.get('title', 'Unbekanntes Dokument')} "
-            f"({chunk.metadata.get('source_file', 'Unbekannte Quelle')})"
+            f"[{i+1}] {chunk.metadata.get('title', 'Unbekanntes Dokument')}"
             for i, chunk in enumerate(enhanced_chunks)
         ])
+        
+        logging.info(f"[TOKEN-OPT] Kompakte Source-Liste: {len(source_list)} Zeichen (vs. ~{len(source_list)*2.5:.0f} bei voller Metadaten)")
         
         # 5. Finaler Prompt (Native String-Formatierung)
         main_prompt = f"""Du bist ein erfahrener Rechtsexperte für deutsches Verwaltungsrecht.
@@ -483,11 +753,32 @@ Antwort (WICHTIG: Nutze [1], [2] Zitationen für jeden Fakt!):"""
         # 7. ✨ NEW: Extrahiere Follow-up-Vorschläge aus LLM-Antwort
         suggestions = _extract_suggestions(answer)
         
-        # 8. ✨ NEW: Erstelle SourceMetadata für IEEE-Zitationen
+        # 8. ✨ v3.20.0: Post-Generation Citation Reconstruction mit vollständigem IEEE-Format
+        # Extrahiere NUR die tatsächlich verwendeten Zitationen aus der Antwort
+        cited_ids = _extract_ieee_citations(answer)
+        
+        # Erstelle vollständige IEEE-konforme SourceMetadata nur für zitierte Quellen
         sources_metadata = []
-        for i, chunk in enumerate(enhanced_chunks):
-            source_meta = _create_source_metadata(chunk, citation_id=i+1)
-            sources_metadata.append(source_meta)
+        for citation_id in cited_ids:
+            # citation_id ist 1-basiert, enhanced_chunks ist 0-basiert
+            if 1 <= citation_id <= len(enhanced_chunks):
+                chunk = enhanced_chunks[citation_id - 1]
+                
+                # Erstelle Basis-Metadaten
+                source_meta = _create_source_metadata(chunk, citation_id=citation_id)
+                
+                # Füge formatierte IEEE-Citation hinzu
+                source_meta = _enrich_source_metadata_with_ieee_citation(source_meta)
+                
+                sources_metadata.append(source_meta)
+                
+                # Log IEEE-Citation (Debug)
+                logging.debug(f"[IEEE] {source_meta['ieee_citation']}")
+            else:
+                logging.warning(f"[CITATION-RECON] Invalid citation ID {citation_id}, skipping")
+        
+        logging.info(f"[TOKEN-OPT] Citation Reconstruction: {len(sources_metadata)} von {len(enhanced_chunks)} Quellen verwendet ({len(sources_metadata)/len(enhanced_chunks)*100:.1f}%)")
+        logging.info(f"[IEEE] Vollständige Metadaten generiert: authors, date, original_source, ingestion_date, scores, impact, relevance")
         
         # 9. Konvertiere Enhanced Chunks zu Standard-Source-Format (Legacy)
         detailed_sources = []

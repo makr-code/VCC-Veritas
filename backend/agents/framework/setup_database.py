@@ -48,7 +48,13 @@ class DatabaseSetup:
             self.port = os.getenv('POSTGRES_PORT', '5432')
             self.database = os.getenv('POSTGRES_DB', 'veritas')
             self.user = os.getenv('POSTGRES_USER', 'postgres')
-            self.password = os.getenv('POSTGRES_PASSWORD', 'postgres')
+            # Prefer encrypted password from SecretsManager when available
+            try:
+                from backend.security.secrets import get_database_password
+                secret_pw = get_database_password('POSTGRES')
+            except Exception:
+                secret_pw = None
+            self.password = secret_pw or os.getenv('POSTGRES_PASSWORD', 'postgres')
             
             self.database_url = (
                 f"postgresql://{self.user}:{self.password}@"
@@ -62,13 +68,23 @@ class DatabaseSetup:
         """Check if database exists."""
         try:
             # Connect to postgres database to check if target exists
-            conn = psycopg2.connect(
-                host=self.host,
-                port=self.port,
-                user=self.user,
-                password=self.password,
-                database='postgres'
-            )
+            # Prefer pooled connection for control queries
+            try:
+                from backend.database.connection_pool import PostgresPool
+                dsn = (
+                    f"host={self.host} port={self.port} dbname=postgres user={self.user} password={self.password}"
+                )
+                # Create a temporary one-off pool for the 'postgres' DB if main pool points elsewhere
+                pool = PostgresPool.instance()
+                conn = psycopg2.connect(dsn)
+            except Exception:
+                conn = psycopg2.connect(
+                    host=self.host,
+                    port=self.port,
+                    user=self.user,
+                    password=self.password,
+                    database='postgres'
+                )
             conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
             cursor = conn.cursor()
             

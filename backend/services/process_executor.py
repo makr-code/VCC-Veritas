@@ -63,6 +63,14 @@ except ImportError:
     RAG_AVAILABLE = False
     logging.warning("⚠️ RAG Service not available - using mock data")
 
+# Import RerankerService for semantic re-ranking
+try:
+    from backend.services.reranker_service import RerankerService, ScoringMode
+    RERANKER_AVAILABLE = True
+except ImportError:
+    RERANKER_AVAILABLE = False
+    logging.warning("⚠️ RerankerService not available - reranking disabled")
+
 # Import HypothesisService for query analysis (Phase 5)
 try:
     from backend.services.hypothesis_service import HypothesisService
@@ -97,7 +105,8 @@ class ProcessExecutor:
     
     def __init__(self, max_workers: int = 4, retry_failed: bool = False, use_agents: bool = True, 
                  rag_service: Optional['RAGService'] = None,
-                 enable_hypothesis: bool = True):
+                 enable_hypothesis: bool = True,
+                 enable_reranking: bool = True):
         """
         Initialize ProcessExecutor.
         
@@ -107,12 +116,14 @@ class ProcessExecutor:
             use_agents: Whether to use real agents (True) or mock mode (False)
             rag_service: Optional RAG service for document retrieval
             enable_hypothesis: Whether to enable hypothesis generation (Phase 5 feature)
+            enable_reranking: Whether to enable semantic re-ranking (default: True)
         """
         self.max_workers = max_workers
         self.retry_failed = retry_failed
         self.use_agents = use_agents and AGENT_EXECUTOR_AVAILABLE
         self.streaming_available = STREAMING_AVAILABLE
         self.enable_hypothesis = enable_hypothesis and HYPOTHESIS_AVAILABLE
+        self.enable_reranking = enable_reranking and RERANKER_AVAILABLE
         
         # Initialize RAG Service
         self.rag_service = rag_service
@@ -126,6 +137,20 @@ class ProcessExecutor:
             except Exception as e:
                 logger.warning(f"⚠️ Failed to initialize RAG Service: {e}")
                 self.rag_service = None
+        
+        # Initialize RerankerService if enabled
+        self.reranker_service = None
+        if self.enable_reranking:
+            try:
+                self.reranker_service = RerankerService(
+                    model_name="llama3.1:8b",
+                    scoring_mode=ScoringMode.COMBINED,
+                    temperature=0.1
+                )
+                logger.info("✅ RerankerService enabled for semantic re-ranking")
+            except Exception as e:
+                logger.warning(f"⚠️ Failed to initialize RerankerService: {e}")
+                self.enable_reranking = False
         
         # Initialize AgentExecutor if available
         if self.use_agents:
@@ -784,6 +809,51 @@ class ProcessExecutor:
                 query=query,
                 filters=filters
             )
+            
+            # Apply semantic re-ranking if enabled
+            if self.enable_reranking and self.reranker_service and search_result.results:
+                try:
+                    # Prepare documents for reranking
+                    docs_for_rerank = []
+                    for result in search_result.results:
+                        docs_for_rerank.append({
+                            'document_id': result.document_id,
+                            'content': result.content,
+                            'relevance_score': result.relevance_score,
+                            'metadata': result.metadata
+                        })
+                    
+                    # Perform reranking
+                    reranking_results = self.reranker_service.rerank(
+                        query=query,
+                        documents=docs_for_rerank,
+                        top_k=max_results,
+                        batch_size=5
+                    )
+                    
+                    # Create mapping of document_id to reranking result
+                    rerank_map = {r.document_id: r for r in reranking_results}
+                    
+                    # Update relevance scores with reranked scores
+                    for result in search_result.results:
+                        if result.document_id in rerank_map:
+                            rerank = rerank_map[result.document_id]
+                            # Store original score in metadata
+                            if not hasattr(result.metadata, 'custom_fields'):
+                                result.metadata.custom_fields = {}
+                            result.metadata.custom_fields['original_score'] = result.relevance_score
+                            result.metadata.custom_fields['score_delta'] = rerank.score_delta
+                            result.metadata.custom_fields['rerank_confidence'] = rerank.confidence
+                            # Update with reranked score
+                            result.relevance_score = rerank.reranked_score
+                    
+                    # Re-sort by updated scores
+                    search_result.results.sort(key=lambda x: x.relevance_score, reverse=True)
+                    
+                    logger.info(f"Re-ranking applied: {len(reranking_results)} documents re-scored")
+                    
+                except Exception as e:
+                    logger.warning(f"Re-ranking failed, using original scores: {e}")
             
             # Convert search results to DocumentSource objects
             documents = []

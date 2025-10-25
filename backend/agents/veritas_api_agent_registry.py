@@ -66,13 +66,10 @@ DEFAULT_AGENT_CAPS = {
 }
 
 # Shared Resources (analog zu ingestion_core_worker_registry)
-try:
-    # RAG Database Integration
-    from database_api import MultiDatabaseAPI
-    from uds3.uds3_core import OptimizedUnifiedDatabaseStrategy
-    _database_api_available = True
-except Exception:
-    _database_api_available = False
+# ============================================================================
+# RAG Database Integration - REQUIRED (NO FALLBACK)
+# ============================================================================
+from uds3.core import UDS3PolyglotManager  # ✨ UDS3 v2.0.0 (Legacy stable)
 
 # Ollama Integration
 try:
@@ -250,8 +247,18 @@ class SharedResourcePool:
             if not self._database_api and _database_api_available:
                 try:
                     self._database_api = MultiDatabaseAPI()
-                    self._uds3_strategy = OptimizedUnifiedDatabaseStrategy()
-                    logger.info("✅ Database API für Agents verfügbar")
+                    # ✨ NEU: UDS3 v2.0.0 Polyglot Manager
+                    backend_config = {
+                        "vector": {"enabled": True, "backend": "chromadb"},
+                        "graph": {"enabled": False},
+                        "relational": {"enabled": False},
+                        "file_storage": {"enabled": False}
+                    }
+                    self._uds3_strategy = UDS3PolyglotManager(
+                        backend_config=backend_config,
+                        enable_rag=True
+                    )
+                    logger.info("✅ Database API + UDS3 Polyglot Manager für Agents verfügbar")
                 except Exception as e:
                     logger.error(f"❌ Database API Initialisierung fehlgeschlagen: {e}")
             

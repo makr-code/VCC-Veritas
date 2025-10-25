@@ -68,14 +68,10 @@ except ImportError as e:
     AGENT_PIPELINE_AVAILABLE = False
     logging.warning(f"⚠️ Agent Pipeline Manager noch nicht verfügbar: {e}")
 
-# RAG Integration
-try:
-    from database_api import MultiDatabaseAPI
-    from uds3.uds3_core import OptimizedUnifiedDatabaseStrategy
-    RAG_INTEGRATION_AVAILABLE = True
-except ImportError as e:
-    RAG_INTEGRATION_AVAILABLE = False
-    logging.info(f"ℹ️ RAG Integration läuft im Mock-Modus: {e}")
+# ============================================================================
+# RAG Integration - UDS3 Direct Integration (NO FALLBACK)
+# ============================================================================
+from uds3.core import UDS3PolyglotManager
 
 logger = logging.getLogger(__name__)
 

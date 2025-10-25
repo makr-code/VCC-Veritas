@@ -1,19 +1,17 @@
-"""
-VERITAS AGENT FRAMEWORK - DATABASE SCHEMA
-=========================================
-
-PostgreSQL Schema for Multi-Agent Research Plan Execution
-
-Based on: codespaces-blank mockup framework
-Adapted for: VERITAS Agent System
-Created: 2025-10-08
-
-TABLES:
-- research_plans: Main research plan storage
-- research_plan_steps: Individual execution steps
-- step_results: Results from each step execution
-- agent_registry: Agent metadata and capabilities
-"""
+-- VERITAS AGENT FRAMEWORK - DATABASE SCHEMA
+-- =========================================
+--
+-- PostgreSQL Schema for Multi-Agent Research Plan Execution
+--
+-- Based on: codespaces-blank mockup framework
+-- Adapted for: VERITAS Agent System
+-- Created: 2025-10-08
+--
+-- TABLES:
+-- - research_plans: Main research plan storage
+-- - research_plan_steps: Individual execution steps
+-- - step_results: Results from each step execution
+-- - agent_registry: Agent metadata and capabilities
 
 -- ========================================
 -- TABLE: research_plans

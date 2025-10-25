@@ -200,19 +200,22 @@ class HybridRetriever:
                 "⚠️ Sparse Retrieval nicht verfügbar - verwende Dense-Only Modus"
             )
         
-        # Check Dense Retriever capability (log once during initialization)
+        # Check Dense Retriever capability (UDS3 v2.0.0 compatibility)
+        # UDS3 v2.0.0 uses 'semantic_search' instead of 'vector_search'
+        self._semantic_search_available = hasattr(self.dense_retriever, 'semantic_search')
         self._vector_search_available = hasattr(self.dense_retriever, 'vector_search')
-        if not self._vector_search_available:
-            # Check for fallback method
-            self._has_search_documents = hasattr(self.dense_retriever, 'search_documents')
-            if self._has_search_documents:
-                logger.warning(
-                    "⚠️ Dense Retriever hat keine vector_search Methode - verwende search_documents Fallback"
-                )
-            else:
-                logger.warning(
-                    "⚠️ Dense Retriever hat keine vector_search Methode - Dense Retrieval deaktiviert"
-                )
+        self._has_search_documents = hasattr(self.dense_retriever, 'search_documents')
+        
+        if not (self._semantic_search_available or self._vector_search_available or self._has_search_documents):
+            logger.warning(
+                "⚠️ Dense Retriever hat keine semantic_search/vector_search/search_documents Methode - Dense Retrieval deaktiviert"
+            )
+        elif self._semantic_search_available:
+            logger.info("✅ UDS3 v2.0.0 semantic_search verfügbar für Dense Retrieval")
+        elif self._vector_search_available:
+            logger.info("✅ vector_search verfügbar für Dense Retrieval")
+        elif self._has_search_documents:
+            logger.info("✅ search_documents Fallback verfügbar für Dense Retrieval")
         
         # Query Expansion initialisieren (optional)
         self._query_expansion_available = (
@@ -385,21 +388,27 @@ class HybridRetriever:
         Returns:
             Liste von Dokumenten mit 'doc_id', 'content', 'score'
         """
-        # UDS3 Vector Search (Beispiel-Interface)
-        # Angepasst an tatsächliches UDS3-Interface
+        # UDS3 v2.0.0 Semantic Search (oder Legacy vector_search/search_documents)
         try:
             # Remove top_k from params if present to avoid conflict
             clean_params = {k: v for k, v in params.items() if k != 'top_k'}
             
-            # Use cached capability flags (checked during __init__)
-            if self._vector_search_available:
+            # Priority 1: UDS3 v2.0.0 semantic_search
+            if self._semantic_search_available:
+                results = await self.dense_retriever.semantic_search(
+                    query=query,
+                    top_k=self.config.dense_top_k,
+                    **clean_params
+                )
+            # Priority 2: Legacy vector_search
+            elif self._vector_search_available:
                 results = await self.dense_retriever.vector_search(
                     query=query,
                     top_k=self.config.dense_top_k,
                     **clean_params
                 )
+            # Priority 3: Generic search_documents fallback
             elif self._has_search_documents:
-                # Fallback: Use generic search_documents if available
                 results = await self.dense_retriever.search_documents(
                     query=query,
                     limit=self.config.dense_top_k,

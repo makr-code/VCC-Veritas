@@ -52,15 +52,13 @@ except ImportError as e:
     AGENT_SYSTEM_AVAILABLE = False
     logging.warning(f"⚠️ Agent System nicht verfügbar: {e}")
 
-# External Dependencies (Optional)
-try:
-    from database_api import MultiDatabaseAPI
-    DATABASE_AVAILABLE = True
-except ImportError:
-    DATABASE_AVAILABLE = False
+# ============================================================================
+# External Dependencies - UDS3 Direct Integration (NO FALLBACK)
+# ============================================================================
+from uds3.core import UDS3PolyglotManager
 
 try:
-    from uds3.uds3_core import OptimizedUnifiedDatabaseStrategy
+    from uds3.core import UDS3PolyglotManager  # ✨ UDS3 v2.0.0 (Legacy stable)
     UDS3_AVAILABLE = True
 except ImportError:
     UDS3_AVAILABLE = False
@@ -204,8 +202,18 @@ class BaseTemplateAgent(ABC):
         
         if UDS3_AVAILABLE:
             try:
-                self.uds3 = OptimizedUnifiedDatabaseStrategy()
-                self.logger.info("✅ UDS3 verfügbar")
+                # ✨ NEU: UDS3 v2.0.0 Polyglot Manager
+                backend_config = {
+                    "vector": {"enabled": True, "backend": "chromadb"},
+                    "graph": {"enabled": False},
+                    "relational": {"enabled": False},
+                    "file_storage": {"enabled": False}
+                }
+                self.uds3 = UDS3PolyglotManager(
+                    backend_config=backend_config,
+                    enable_rag=True
+                )
+                self.logger.info("✅ UDS3 Polyglot Manager verfügbar")
             except Exception as e:
                 self.logger.warning(f"⚠️ UDS3 init fehler: {e}")
                 self.uds3 = None

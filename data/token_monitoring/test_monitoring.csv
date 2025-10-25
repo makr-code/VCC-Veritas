@@ -1,0 +1,4 @@
+timestamp,query,query_length,allocated,actual_used,intent,intent_confidence,intent_method,complexity_score,agent_count,agent_factor,intent_weight,chunk_count,source_diversity,processing_time,agents_used,confidence_score,sources_found,overflow_detected
+2025-10-17T17:13:46.341632,Was ist ein Bauantrag?,22,250,,quick_answer,1.0,rule_based,3.5,6,1.9,0.5,0,1.0,28.671183824539185,6,0.887,8,False
+2025-10-17T17:14:16.014647,Wie beantrage ich eine Baugenehmigung in Stuttgart?,51,1029,,explanation,0.5,hybrid_llm,7.8,8,2.2,1.0,0,1.0,27.603891849517822,8,0.884,11,False
+2025-10-17T17:14:49.955919,Erkläre das Ermessen der Behörde im Verwaltungsverfahren,56,1140,,explanation,1.0,rule_based,10.0,6,1.9,1.0,0,1.0,31.868927478790283,6,0.887,8,False

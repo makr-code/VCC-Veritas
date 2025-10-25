@@ -103,7 +103,7 @@ class IMMIMapWidget(tk.Frame):
         'default': '#888888'
     }
     
-    def __init__(self, parent, backend_url: str = "http://localhost:5000"):
+    def __init__(self, parent, backend_url: str = "http://localhost:5000/api/v3"):
         """
         Args:
             parent: Tkinter Parent-Widget

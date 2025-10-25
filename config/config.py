@@ -108,7 +108,8 @@ class CovinaConfig:
         # === SERVER CONFIGURATION ===
         self.app_host = os.getenv('COVINA_APP_HOST', '127.0.0.1')
         self.app_port = int(os.getenv('COVINA_APP_PORT', '5000'))
-        self.api_base_url = os.getenv('COVINA_API_BASE_URL', f'http://{self.app_host}:{self.app_port}')
+        # API Base URL (Backend v4.0.0 läuft auf /api ohne /v3)
+        self.api_base_url = os.getenv('COVINA_API_BASE_URL', f'http://{self.app_host}:{self.app_port}/api')
         
         # === DIRECTORY CONFIGURATION ===
         # Zentrales Datenverzeichnis

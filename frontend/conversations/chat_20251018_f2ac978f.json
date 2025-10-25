@@ -1,0 +1,306 @@
+[
+  {
+    "role": "system",
+    "content": "Willkommen bei Veritas v3.15.0! 🚀\nBackend-API: http://127.0.0.1:5000/api/v3\nDrücken Sie \"➕ Neuer Chat\" um weitere Fenster zu öffnen.",
+    "timestamp": "2025-10-18T23:22:03.443527"
+  },
+  {
+    "role": "user",
+    "content": "Welche Gesetze muss ich beachten wenn ich eine Windkraftanlage bauen will (1MW Leistung)?",
+    "timestamp": "2025-10-18T23:22:41.396584"
+  },
+  {
+    "role": "assistant",
+    "content": "**Direkte Antwort:**\nWenn Sie eine Windkraftanlage mit 1 MW Leistung bauen möchten, sollten Sie sich an die folgenden Vorschriften halten:\n\n* Bauordnungsamt: Registrieren Sie Ihre Bauplanung und übermitteln Sie die notwendigen Unterlagen.\n* Umwelt- und Naturschutz: Beachten Sie die Bestimmungen zum Schutz von Natur und Landschaft.\n* Genehmigung: Erhalten Sie eine Genehmigung von den zuständigen Behörden.\n\n**Details:**\n\n• Bauordnungsamt: Registrieren Sie Ihre Bauplanung und übermitteln Sie die notwendigen Unterlagen, wie zum Beispiel:\n\t+ Bauantrag (amtliches Formular)\n\t+ Lageplan mit Grundstücksgrenzen\n\t+ Bauvorlagen (Grundrisse, Schnitte, Ansichten)\n\n• Umwelt- und Naturschutz: Beachten Sie die Bestimmungen zum Schutz von Natur und Landschaft:\n\t+ Überprüfen Sie den Einfluss auf das lokale Ökosystem.\n\t+ Erstellen Sie einen Umweltschutzplan.\n\n• Genehmigung: Erhalten Sie eine Genehmigung von den zuständigen Behörden:\n\t+ Registrieren Sie Ihre Bauplanung und übermitteln Sie die notwendigen Unterlagen.\n\t+ Überprüfen Sie, ob alle Vorschriften und Bestimmungen erfüllt sind.\n\n**Quellen:**\nDie hier genannten Informationen basieren auf den Vorschriften des BauGB (Baugesetz) und VwVfG (Verordnung über die Verwendung von Wasser).\n\n**Nächste Schritte:**\n1. Registrieren Sie Ihre Bauplanung und übermitteln Sie die notwendigen Unterlagen.\n2. Überprüfen Sie, ob alle Vorschriften und Bestimmungen erfüllt sind.\n3. Erstellen Sie einen Umweltschutzplan.\n\nBitte beachten Sie, dass dies nur eine allgemeine Übersicht ist und Sie sich an die spezifischen Vorschriften und Bestimmungen in Ihrem Bundesland halten sollten.\n\n💡 📚 11 Quellen | ⚡ 32.07s",
+    "timestamp": "2025-10-18T23:23:13.481469",
+    "sources": [
+      {
+        "id": "src_1",
+        "file": null,
+        "page": null,
+        "confidence": 0.0,
+        "author": null,
+        "title": "Standard-Quellen",
+        "year": null,
+        "publisher": null,
+        "url": null,
+        "type": "document"
+      },
+      {
+        "id": "src_2",
+        "file": null,
+        "page": null,
+        "confidence": 0.0,
+        "author": null,
+        "title": "BauGB",
+        "year": null,
+        "publisher": null,
+        "url": null,
+        "type": "document"
+      },
+      {
+        "id": "src_3",
+        "file": null,
+        "page": null,
+        "confidence": 0.0,
+        "author": null,
+        "title": "VwVfG",
+        "year": null,
+        "publisher": null,
+        "url": null,
+        "type": "document"
+      },
+      {
+        "id": "src_4",
+        "file": null,
+        "page": null,
+        "confidence": 0.0,
+        "author": null,
+        "title": "Standard-Quellen",
+        "year": null,
+        "publisher": null,
+        "url": null,
+        "type": "document"
+      },
+      {
+        "id": "src_5",
+        "file": null,
+        "page": null,
+        "confidence": 0.0,
+        "author": null,
+        "title": "Standard-Quellen",
+        "year": null,
+        "publisher": null,
+        "url": null,
+        "type": "document"
+      },
+      {
+        "id": "src_6",
+        "file": null,
+        "page": null,
+        "confidence": 0.0,
+        "author": null,
+        "title": "Verwaltungsportal",
+        "year": null,
+        "publisher": null,
+        "url": null,
+        "type": "document"
+      },
+      {
+        "id": "src_7",
+        "file": null,
+        "page": null,
+        "confidence": 0.0,
+        "author": null,
+        "title": "Formulardatenbank",
+        "year": null,
+        "publisher": null,
+        "url": null,
+        "type": "document"
+      },
+      {
+        "id": "src_8",
+        "file": null,
+        "page": null,
+        "confidence": 0.0,
+        "author": null,
+        "title": "Standard-Quellen",
+        "year": null,
+        "publisher": null,
+        "url": null,
+        "type": "document"
+      },
+      {
+        "id": "src_9",
+        "file": null,
+        "page": null,
+        "confidence": 0.0,
+        "author": null,
+        "title": "API-Services",
+        "year": null,
+        "publisher": null,
+        "url": null,
+        "type": "document"
+      },
+      {
+        "id": "src_10",
+        "file": null,
+        "page": null,
+        "confidence": 0.0,
+        "author": null,
+        "title": "Open-Data-Portale",
+        "year": null,
+        "publisher": null,
+        "url": null,
+        "type": "document"
+      },
+      {
+        "id": "src_11",
+        "file": null,
+        "page": null,
+        "confidence": 0.0,
+        "author": null,
+        "title": "Standard-Quellen",
+        "year": null,
+        "publisher": null,
+        "url": null,
+        "type": "document"
+      }
+    ],
+    "worker_results": {},
+    "metadata": {
+      "model": "llama3.1:8b",
+      "mode": "veritas",
+      "duration": 32.049578,
+      "tokens_used": null,
+      "sources_count": 11,
+      "sources_metadata": [
+        {
+          "id": "src_1",
+          "file": null,
+          "page": null,
+          "confidence": 0.0,
+          "author": null,
+          "title": "Standard-Quellen",
+          "year": null,
+          "publisher": null,
+          "url": null,
+          "type": "document"
+        },
+        {
+          "id": "src_2",
+          "file": null,
+          "page": null,
+          "confidence": 0.0,
+          "author": null,
+          "title": "BauGB",
+          "year": null,
+          "publisher": null,
+          "url": null,
+          "type": "document"
+        },
+        {
+          "id": "src_3",
+          "file": null,
+          "page": null,
+          "confidence": 0.0,
+          "author": null,
+          "title": "VwVfG",
+          "year": null,
+          "publisher": null,
+          "url": null,
+          "type": "document"
+        },
+        {
+          "id": "src_4",
+          "file": null,
+          "page": null,
+          "confidence": 0.0,
+          "author": null,
+          "title": "Standard-Quellen",
+          "year": null,
+          "publisher": null,
+          "url": null,
+          "type": "document"
+        },
+        {
+          "id": "src_5",
+          "file": null,
+          "page": null,
+          "confidence": 0.0,
+          "author": null,
+          "title": "Standard-Quellen",
+          "year": null,
+          "publisher": null,
+          "url": null,
+          "type": "document"
+        },
+        {
+          "id": "src_6",
+          "file": null,
+          "page": null,
+          "confidence": 0.0,
+          "author": null,
+          "title": "Verwaltungsportal",
+          "year": null,
+          "publisher": null,
+          "url": null,
+          "type": "document"
+        },
+        {
+          "id": "src_7",
+          "file": null,
+          "page": null,
+          "confidence": 0.0,
+          "author": null,
+          "title": "Formulardatenbank",
+          "year": null,
+          "publisher": null,
+          "url": null,
+          "type": "document"
+        },
+        {
+          "id": "src_8",
+          "file": null,
+          "page": null,
+          "confidence": 0.0,
+          "author": null,
+          "title": "Standard-Quellen",
+          "year": null,
+          "publisher": null,
+          "url": null,
+          "type": "document"
+        },
+        {
+          "id": "src_9",
+          "file": null,
+          "page": null,
+          "confidence": 0.0,
+          "author": null,
+          "title": "API-Services",
+          "year": null,
+          "publisher": null,
+          "url": null,
+          "type": "document"
+        },
+        {
+          "id": "src_10",
+          "file": null,
+          "page": null,
+          "confidence": 0.0,
+          "author": null,
+          "title": "Open-Data-Portale",
+          "year": null,
+          "publisher": null,
+          "url": null,
+          "type": "document"
+        },
+        {
+          "id": "src_11",
+          "file": null,
+          "page": null,
+          "confidence": 0.0,
+          "author": null,
+          "title": "Standard-Quellen",
+          "year": null,
+          "publisher": null,
+          "url": null,
+          "type": "document"
+        }
+      ],
+      "complexity": null,
+      "agents_involved": [
+        "geo_context",
+        "legal_framework",
+        "query_preprocessor",
+        "building",
+        "document_retrieval",
+        "response_aggregator",
+        "external_api",
+        "quality_assessor"
+      ],
+      "suggestions": []
+    },
+    "confidence_score": 0.0
+  }
+]

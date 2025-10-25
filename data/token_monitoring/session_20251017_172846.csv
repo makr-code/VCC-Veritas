@@ -1,0 +1,21 @@
+timestamp,query,allocated,intent,intent_confidence,intent_method,complexity_score,agent_count,agent_factor,intent_weight,chunk_count,source_diversity,processing_time,overflow_detected,response_length,detected_domains,expected_domain,expected_budget
+2025-10-17T17:29:18.651176,Was ist ein Bauantrag?,250,quick_answer,1.0,rule_based,3.5,6,1.9,0.5,0,1.0,31.71,False,0,Baurecht,Baurecht,~250
+2025-10-17T17:29:48.049618,Wo beantrage ich eine Baugenehmigung?,349,quick_answer,1.0,rule_based,5.3,8,2.2,0.5,0,1.0,29.4,False,0,Baurecht,Baurecht,~300
+2025-10-17T17:30:19.926920,Was bedeutet Lärmschutz?,399,explanation,0.6666666666666666,hybrid_rules,3.5,6,1.9,1.0,0,1.0,31.88,False,0,Umweltrecht,Umweltrecht,~250
+2025-10-17T17:30:47.779662,Wer ist für Verkehrsschilder zuständig?,250,quick_answer,1.0,rule_based,3.5,6,1.9,0.5,0,1.0,27.85,False,0,Verkehrsrecht,Verkehrsrecht,~300
+2025-10-17T17:31:17.188491,Was ist ein Verwaltungsakt?,285,quick_answer,1.0,rule_based,5.0,6,1.9,0.5,0,1.0,29.41,False,0,Verwaltungsrecht,Verwaltungsrecht,~350
+2025-10-17T17:31:46.010837,Wie beantrage ich eine Baugenehmigung in Stuttgart?,1029,explanation,0.5,hybrid_llm,7.8,8,2.2,1.0,0,1.0,28.82,False,0,Baurecht,Baurecht,~800
+2025-10-17T17:32:15.584102,Welche Unterlagen brauche ich für einen Bauantrag?,462,explanation,0.5,hybrid_llm,3.5,8,2.2,1.0,0,1.0,29.57,False,0,Baurecht,Baurecht,~700
+2025-10-17T17:32:47.575053,Wie funktioniert die Lärmschutzverordnung?,718,explanation,0.6666666666666666,hybrid_rules,6.3,6,1.9,1.0,0,1.0,31.99,False,0,Umweltrecht,Umweltrecht,~850
+2025-10-17T17:33:17.188149,Wie kann ich gegen einen Bußgeldbescheid vorgehen?,763,explanation,1.0,rule_based,6.7,6,1.9,1.0,0,1.0,29.61,False,0,Verkehrsrecht,Verkehrsrecht,~750
+2025-10-17T17:33:52.264501,Wie läuft ein Widerspruchsverfahren ab?,884,explanation,0.6666666666666666,hybrid_rules,6.7,8,2.2,1.0,0,1.0,35.08,False,0,Verwaltungsrecht,Verwaltungsrecht,~900
+2025-10-17T17:34:26.311754,Erkläre das Ermessen der Behörde im Verwaltungsverfahren,1140,explanation,1.0,rule_based,10.0,6,1.9,1.0,0,1.0,34.05,False,0,Verwaltungsrecht,Verwaltungsrecht,~1200
+2025-10-17T17:34:56.806968,Was bedeutet Verhältnismäßigkeitsprinzip in der Verwaltung?,627,explanation,1.0,rule_based,5.5,6,1.9,1.0,0,1.0,30.49,False,0,Verwaltungsrecht,Verwaltungsrecht,~1300
+2025-10-17T17:35:28.667577,Wie wird die Abwägung bei Bebauungsplänen durchgeführt?,820,explanation,1.0,rule_based,7.2,6,1.9,1.0,0,1.0,31.86,False,0,Baurecht,Baurecht,~1400
+2025-10-17T17:36:00.295751,Erkläre die Lärmgrenzwerte für Wohngebiete und Gewerbegebiete,399,explanation,1.0,rule_based,3.5,6,1.9,1.0,0,1.0,31.63,False,0,Umweltrecht,Umweltrecht,~1100
+2025-10-17T17:36:32.132605,Was sind die Voraussetzungen für eine Fahrerlaubnisentziehung?,456,explanation,0.5,hybrid_llm,4.0,6,1.9,1.0,0,1.0,31.84,False,0,Verkehrsrecht,Verkehrsrecht,~1000
+2025-10-17T17:37:01.294358,Erkläre mir ausführlich die gesamte Verwaltungsgerichtsordnung mit allen Verfahrensarten,855,explanation,1.0,rule_based,7.5,6,1.9,1.0,0,1.0,29.16,False,0,Verwaltungsrecht,Verwaltungsrecht,Overflow?
+2025-10-17T17:37:32.330961,"Vergleiche Baurecht, Umweltrecht und Verkehrsrecht",1710,analysis,1.0,rule_based,10.0,6,1.9,1.5,0,1.0,31.04,False,0,"Baurecht,Umweltrecht,Verkehrsrecht",Multi-Domain,Analysis?
+2025-10-17T17:38:02.516945,Was ist der Unterschied zwischen Ermessen und Beurteilungsspielraum?,313,quick_answer,0.5,hybrid_rules,5.5,6,1.9,0.5,0,1.0,30.18,False,0,Verwaltungsrecht,Verwaltungsrecht,~1200
+2025-10-17T17:38:30.615139,Liste alle Behörden in Stuttgart auf,250,quick_answer,1.0,rule_based,3.0,6,1.9,0.5,0,1.0,28.1,False,0,Verwaltungsrecht,General,Unknown?
+2025-10-17T17:39:02.855224,Wie funktioniert der Bebauungsplan?,763,explanation,0.6666666666666666,hybrid_rules,6.7,6,1.9,1.0,0,1.0,32.24,False,0,Baurecht,Baurecht,~800

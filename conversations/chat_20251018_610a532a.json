@@ -1,0 +1,38 @@
+[
+  {
+    "role": "system",
+    "content": "Willkommen bei Veritas v3.15.0! 🚀\nBackend-API: http://127.0.0.1:5000/api/v3\nDrücken Sie \"➕ Neuer Chat\" um weitere Fenster zu öffnen.",
+    "timestamp": "2025-10-18T23:54:40.028441"
+  },
+  {
+    "role": "user",
+    "content": "Was ist das BImSchG?",
+    "timestamp": "2025-10-18T23:54:58.269889"
+  },
+  {
+    "role": "error",
+    "content": "HTTP 404: Not Found",
+    "timestamp": "2025-10-18T23:54:58.302448",
+    "original_query": "Was ist das BImSchG?",
+    "error_type": "api_error",
+    "retryable": true
+  },
+  {
+    "role": "user",
+    "content": "Was ist das BImSchG?",
+    "timestamp": "2025-10-18T23:55:04.354112"
+  },
+  {
+    "role": "error",
+    "content": "HTTP 404: Not Found",
+    "timestamp": "2025-10-18T23:55:04.399649",
+    "original_query": "Was ist das BImSchG?",
+    "error_type": "api_error",
+    "retryable": true
+  },
+  {
+    "role": "user",
+    "content": "Was ist das BImSchG?",
+    "timestamp": "2025-10-18T23:55:06.688328"
+  }
+]

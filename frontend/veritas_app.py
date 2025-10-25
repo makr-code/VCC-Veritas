@@ -98,12 +98,26 @@ except ImportError as e:
     logger.warning(f"⚠️ Office Export nicht verfügbar: {e}")
     OFFICE_EXPORT_AVAILABLE = False
 
+# Chat Bubbles & UX Best Practices
+try:
+    from frontend.ui.veritas_ui_chat_bubbles import (
+        UserMessageBubble,
+        AssistantFullWidthLayout,
+        MetadataCompactWrapper,
+        TkinterBestPractices
+    )
+    CHAT_BUBBLES_AVAILABLE = True
+    logger.info("✅ Chat Bubbles & UX Best Practices geladen")
+except ImportError as e:
+    logger.warning(f"⚠️ Chat Bubbles nicht verfügbar: {e}")
+    CHAT_BUBBLES_AVAILABLE = False
+
 # Konfiguration
 try:
     from config import Config
     API_BASE_URL = Config().API_BASE_URL
 except ImportError:
-    API_BASE_URL = "http://127.0.0.1:5000"  # Server läuft auf Port 5000
+    API_BASE_URL = "http://127.0.0.1:5000/api"  # Backend v4.0.0 läuft auf /api
 
 # Streaming Integration
 try:
@@ -260,6 +274,195 @@ __history__ = [
     {"version": "3.4.0", "date": "2025-08-21", "changes": ["OOP-Architektur implementiert", "Thread-Manager für Multi-Window-Support", "Queue-basierte Nachrichten-System", "Moderne GUI mit korrekter Architektur"]},
     {"version": "3.2.0", "date": "2025-08-21", "changes": ["Moderne Chat GUI integriert", "Einheitliches Design System", "Kompakte Steuerung"]},
 ]
+
+# ✨ v3.16.0: Theme & Dark Mode Support
+COLORS_LIGHT = {
+    # Primary Colors
+    'primary': '#2E86AB',
+    'success': '#28A745',
+    'warning': '#F18F01',
+    'danger': '#C73E1D',
+    'secondary': '#6C757D',
+    'light': '#F8F9FA',
+    'dark': '#343A40',
+    
+    # Background Colors
+    'bg_main': '#FFFFFF',
+    'bg_secondary': '#F7F7F7',
+    'chat_bg': '#FFFFFF',
+    'input_bg': '#F7F7F7',
+    'bubble_user': '#E3F2FD',
+    'bubble_assistant': '#FFFFFF',
+    'bubble_system': '#F5F5F5',
+    'user_bubble_bg': '#E3F2FD',  # Für Chat-Bubbles
+    'assistant_bubble_bg': '#FFFFFF',
+    
+    # Text Colors
+    'text_primary': '#212121',
+    'text_secondary': '#616161',
+    'text_disabled': '#9E9E9E',
+    'text_user': '#1E3A5F',
+    'text_assistant': '#212121',
+    
+    # Border Colors
+    'border_main': '#E0E0E0',
+    'border_light': '#EEEEEE',
+    'border_user_bubble': '#BBDEFB',
+    'border_assistant': '#E0E0E0',
+    
+    # Quality Enhancement Colors
+    'quality_high': '#4CAF50',
+    'quality_medium': '#FF9800',
+    'quality_low': '#F44336',
+    'quality_bg': '#F8FFF8',
+    'sources_bg': '#F0F8FF',
+    'suggestions_bg': '#FFFAF0',
+    
+    # Feedback Colors
+    'feedback_positive': '#4CAF50',
+    'feedback_negative': '#F44336',
+    'feedback_idle': '#BDBDBD',
+}
+
+COLORS_DARK = {
+    # Primary Colors
+    'primary': '#4A9ECC',
+    'success': '#4CAF50',
+    'warning': '#FFA726',
+    'danger': '#EF5350',
+    'secondary': '#9E9E9E',
+    'light': '#424242',
+    'dark': '#E0E0E0',
+    
+    # Background Colors
+    'bg_main': '#1E1E1E',
+    'bg_secondary': '#2C2C2C',
+    'chat_bg': '#1E1E1E',
+    'input_bg': '#2C2C2C',
+    'bubble_user': '#1E3A5F',
+    'bubble_assistant': '#2C2C2C',
+    'bubble_system': '#373737',
+    'user_bubble_bg': '#1E3A5F',  # Für Chat-Bubbles
+    'assistant_bubble_bg': '#2C2C2C',
+    
+    # Text Colors
+    'text_primary': '#E0E0E0',
+    'text_secondary': '#B0B0B0',
+    'text_disabled': '#757575',
+    'text_user': '#E3F2FD',
+    'text_assistant': '#E0E0E0',
+    
+    # Border Colors
+    'border_main': '#424242',
+    'border_light': '#373737',
+    'border_user_bubble': '#2C5282',
+    'border_assistant': '#424242',
+    
+    # Quality Enhancement Colors
+    'quality_high': '#66BB6A',
+    'quality_medium': '#FFA726',
+    'quality_low': '#EF5350',
+    'quality_bg': '#1F2A1F',
+    'sources_bg': '#1A2332',
+    'suggestions_bg': '#2A251A',
+    
+    # Feedback Colors
+    'feedback_positive': '#66BB6A',
+    'feedback_negative': '#EF5350',
+    'feedback_idle': '#757575',
+}
+
+# ✨ v3.17.0: Theme Manager Integration
+# DEPRECATED: COLORS_LIGHT, COLORS_DARK, CURRENT_THEME werden durch ThemeManager ersetzt
+# Für Rückwärtskompatibilität bleiben Definitionen hier, aber ThemeManager ist die neue API
+
+# Global Theme Variable (DEPRECATED - use ThemeManager.get_instance())
+CURRENT_THEME = 'light'  # 'light' oder 'dark'
+
+# ✨ v3.17.0: Service Layer importieren
+try:
+    from frontend.services.theme_manager import ThemeManager, get_theme_manager, get_colors as tm_get_colors
+    THEME_MANAGER_AVAILABLE = True
+    logger.info("✅ ThemeManager erfolgreich importiert")
+except ImportError as e:
+    logger.warning(f"⚠️ ThemeManager nicht verfügbar: {e}")
+    THEME_MANAGER_AVAILABLE = False
+
+try:
+    from frontend.services.backend_api_client import BackendAPIClient, QueryResponse
+    BACKEND_CLIENT_AVAILABLE = True
+    logger.info("✅ BackendAPIClient erfolgreich importiert")
+except ImportError as e:
+    logger.warning(f"⚠️ BackendAPIClient nicht verfügbar: {e}")
+    BACKEND_CLIENT_AVAILABLE = False
+
+try:
+    from frontend.components.error_handler import ErrorHandler, ErrorType, create_error_handler
+    ERROR_HANDLER_AVAILABLE = True
+    logger.info("✅ ErrorHandler erfolgreich importiert")
+except ImportError as e:
+    logger.warning(f"⚠️ ErrorHandler nicht verfügbar: {e}")
+    ERROR_HANDLER_AVAILABLE = False
+
+try:
+    from frontend.components.input_manager import InputManager, create_input_manager
+    INPUT_MANAGER_AVAILABLE = True
+    logger.info("✅ InputManager erfolgreich importiert")
+except ImportError as e:
+    logger.warning(f"⚠️ InputManager nicht verfügbar: {e}")
+    INPUT_MANAGER_AVAILABLE = False
+
+try:
+    from frontend.components.scroll_manager import ScrollManager, create_scroll_manager
+    SCROLL_MANAGER_AVAILABLE = True
+    logger.info("✅ ScrollManager erfolgreich importiert")
+except ImportError as e:
+    logger.warning(f"⚠️ ScrollManager nicht verfügbar: {e}")
+    SCROLL_MANAGER_AVAILABLE = False
+
+try:
+    from frontend.components.file_attachment_manager import FileAttachmentManager, create_file_attachment_manager
+    FILE_ATTACHMENT_MANAGER_AVAILABLE = True
+    logger.info("✅ FileAttachmentManager erfolgreich importiert")
+except ImportError as e:
+    logger.warning(f"⚠️ FileAttachmentManager nicht verfügbar: {e}")
+    FILE_ATTACHMENT_MANAGER_AVAILABLE = False
+
+try:
+    from frontend.components.settings_manager import SettingsManager, create_settings_manager
+    SETTINGS_MANAGER_AVAILABLE = True
+    logger.info("✅ SettingsManager erfolgreich importiert")
+except ImportError as e:
+    logger.warning(f"⚠️ SettingsManager nicht verfügbar: {e}")
+    SETTINGS_MANAGER_AVAILABLE = False
+
+try:
+    from frontend.components.typing_indicator import TypingIndicator, create_typing_indicator
+    TYPING_INDICATOR_AVAILABLE = True
+    logger.info("✅ TypingIndicator erfolgreich importiert")
+except ImportError as e:
+    logger.warning(f"⚠️ TypingIndicator nicht verfügbar: {e}")
+    TYPING_INDICATOR_AVAILABLE = False
+
+try:
+    from frontend.components.answer_toolbar import AnswerToolbar, create_answer_toolbar
+    ANSWER_TOOLBAR_AVAILABLE = True
+    logger.info("✅ AnswerToolbar erfolgreich importiert")
+except ImportError as e:
+    logger.warning(f"⚠️ AnswerToolbar nicht verfügbar: {e}")
+    ANSWER_TOOLBAR_AVAILABLE = False
+
+def get_colors():
+    """
+    Gibt aktuelles Farbschema zurück
+    
+    Returns:
+        Dict mit Farben (verwendet ThemeManager wenn verfügbar)
+    """
+    if THEME_MANAGER_AVAILABLE:
+        return tm_get_colors()
+    # Fallback: Legacy-Implementierung
+    return COLORS_DARK if CURRENT_THEME == 'dark' else COLORS_LIGHT
 
 # === OOP-ARCHITEKTUR: CORE ENGINE INTEGRATION ===
 
@@ -459,8 +662,18 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
         self.chat_messages = []
         self.is_main_window = False
         
-        # Session-ID für API-Kommunikation
-        self.session_id = f"session_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{window_id}"
+        # ✨ v3.17.0: Backend API Client initialisieren
+        if BACKEND_CLIENT_AVAILABLE:
+            self.backend_client = BackendAPIClient(base_url=API_BASE_URL)
+            self.backend_client.create_session(user_id=window_id)
+            self.session_id = self.backend_client.get_session_id()
+            logger.info(f"✅ BackendAPIClient für {window_id} initialisiert")
+        else:
+            # Fallback: Manuelle Session-ID
+            self.backend_client = None
+            self.session_id = f"session_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{window_id}"
+            logger.warning(f"⚠️ BackendAPIClient nicht verfügbar - verwende Legacy-Modus")
+        
         self.selected_llm = None  # Wird dynamisch vom Backend geladen
         
         # Thread-spezifische Queue erstellen - Verwende direkte Queue-Referenz
@@ -501,27 +714,30 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
         pass
     
     def start_message_loop(self):
-        """Startet die Message-Loop für diese Window"""
-        thread = threading.Thread(
-            target=self._message_loop,
-            daemon=True,
-            name=f"ChatWindow-{self.window_id}"
-        )
-        self.thread_manager.register_thread(self.window_id, thread)
-        thread.start()
-        logger.info(f"Message-Loop für {self.window_id} gestartet")
+        """Startet die Message-Loop für diese Window (verwendet Tkinter after() für Thread-Sicherheit)"""
+        logger.info(f"Message-Loop für {self.window_id} gestartet (Tkinter after-basiert)")
+        self._process_message_queue()
     
-    def _message_loop(self):
-        """Interne Message-Loop - läuft in separatem Thread"""
-        while not self.thread_manager.shutdown_event.is_set():
-            try:
-                message = self.message_queue.get(timeout=0.1)
-                self._handle_message(message)
-                self.message_queue.task_done()
-            except queue.Empty:
-                continue
-            except Exception as e:
-                logger.error(f"Fehler in Message-Loop {self.window_id}: {e}")
+    def _process_message_queue(self):
+        """Verarbeitet Message-Queue in Main-Thread via after()"""
+        if self.thread_manager.shutdown_event.is_set():
+            return
+        
+        try:
+            # Verarbeite alle verfügbaren Messages
+            while True:
+                try:
+                    message = self.message_queue.get_nowait()
+                    self._handle_message(message)
+                    self.message_queue.task_done()
+                except queue.Empty:
+                    break
+        except Exception as e:
+            logger.error(f"Fehler in Message-Queue-Verarbeitung {self.window_id}: {e}")
+        
+        # Plane nächste Queue-Überprüfung (100ms)
+        if self.window and hasattr(self.window, 'winfo_exists') and self.window.winfo_exists():
+            self.window.after(100, self._process_message_queue)
     
     def _handle_message(self, message: QueueMessage):
         """Behandelt eingehende Nachrichten"""
@@ -601,12 +817,17 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
                 for result in worker_results.values()
             )
         
-        # Erweitere mit zusätzlichen Informationen
+        # ✨ v3.18.0: Erweitere Content NUR wenn Backend nicht bereits Sections hinzugefügt hat
         formatted_content = base_content
         
-        # Füge Quellen hinzu (wenn vorhanden und noch nicht im content)
+        # Prüfe ob Backend bereits formatierte Sections hat (z.B. **Quellen:** oder **Details:**)
+        has_backend_sections = any(keyword in base_content for keyword in [
+            '**Quellen:**', '**Details:**', '**Nächste Schritte:**', '**Direkte Antwort:**'
+        ])
+        
+        # Füge Quellen NUR hinzu wenn Backend keine Sections hat
         sources = response_data.get('sources', [])
-        if sources and '📚' not in base_content:
+        if sources and not has_backend_sections:
             formatted_content += "\n\n📚 **Quellen:**"
             for i, source in enumerate(sources[:5], 1):  # Max 5 Quellen
                 title = source.get('title', f'Quelle {i}')
@@ -616,9 +837,9 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
                 else:
                     formatted_content += f"\n  {i}. {title}"
         
-        # Füge Worker-Results Details hinzu (wenn vorhanden und noch nicht im content)
+        # Füge Worker-Results NUR hinzu wenn Backend keine Sections hat
         worker_results = response_data.get('worker_results', {})
-        if worker_results and '🤖' not in base_content and len(worker_results) > 0:
+        if worker_results and not has_backend_sections and len(worker_results) > 0:
             formatted_content += f"\n\n🤖 **Verarbeitet von {len(worker_results)} Agenten:**"
             for agent_name, agent_data in list(worker_results.items())[:3]:  # Max 3 Agents
                 confidence = agent_data.get('confidence_score', 0)
@@ -736,6 +957,62 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
         except Exception as e:
             logger.error(f"[SUGGESTION] Fehler beim Senden der Query: {e}")
     
+    # ✨ UX Enhancement: Keyboard Shortcut Callbacks (v3.16.0)
+    
+    def _clear_chat_shortcut(self):
+        """Ctrl+K: Clear Chat"""
+        if hasattr(self, 'clear_chat'):
+            self.clear_chat()
+            logger.info("[SHORTCUT] Chat cleared (Ctrl+K)")
+    
+    def _save_chat_shortcut(self):
+        """Ctrl+S: Save Session"""
+        if hasattr(self, 'save_session'):
+            self.save_session()
+            logger.info("[SHORTCUT] Session saved (Ctrl+S)")
+        elif hasattr(self, 'save_chat'):
+            self.save_chat()
+            logger.info("[SHORTCUT] Chat saved (Ctrl+S)")
+        elif hasattr(self, 'export_conversation'):
+            self.export_conversation()
+            logger.info("[SHORTCUT] Chat exported (Ctrl+S)")
+    
+    def _load_session_shortcut(self):
+        """Ctrl+O: Load Session"""
+        if hasattr(self, 'load_session'):
+            self.load_session()
+            logger.info("[SHORTCUT] Session load triggered (Ctrl+O)")
+    
+    def _send_message_shortcut(self):
+        """Ctrl+Enter: Send Message"""
+        if hasattr(self, 'send_message'):
+            self.send_message()
+            logger.info("[SHORTCUT] Message sent (Ctrl+Enter)")
+        elif hasattr(self, 'send_query'):
+            self.send_query()
+            logger.info("[SHORTCUT] Query sent (Ctrl+Enter)")
+    
+    def _on_feedback_received(self, rating: str):
+        """
+        Callback für Feedback (👍/👎) aus Metadaten-Wrapper
+        
+        Args:
+            rating: 'positive' oder 'negative'
+        """
+        logger.info(f"[FEEDBACK] User Feedback: {rating}")
+        
+        # TODO: An Backend senden
+        # POST /api/v3/feedback mit {message_id, rating, timestamp}
+        
+        # Visuelles Feedback
+        if hasattr(self, 'status_var') and self.status_var:
+            emoji = "👍" if rating == "positive" else "👎"
+            self.status_var.set(f"{emoji} Feedback erhalten - Danke!")
+            
+            # Reset nach 3 Sekunden
+            if hasattr(self, 'window'):
+                self.window.after(3000, lambda: self.status_var.set("Bereit"))
+    
     def _handle_shutdown(self):
         """Behandelt Shutdown-Signal thread-sicher"""
         try:
@@ -757,12 +1034,39 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
             logger.debug(f"Fehler beim Zerstören von {self.window_id}: {e}")
     
     def _auto_save_conversation(self):
-        """Speichert Conversation automatisch"""
+        """
+        ✨ v3.18.0: Speichert Conversation automatisch mit Chat-Persistierung
+        
+        Nutzt die moderne ChatPersistenceService wenn verfügbar,
+        sonst Legacy-JSON-Speicherung
+        """
         try:
             if not self.chat_messages:
                 return
             
-            # Erstelle Conversations-Ordner falls nicht vorhanden
+            # ✨ v3.18.0: Nutze Chat-Persistierung (moderne Methode)
+            if hasattr(self, 'chat_persistence') and self.chat_persistence and hasattr(self, 'chat_session') and self.chat_session:
+                try:
+                    # Synchronisiere Messages zu Session
+                    self._sync_messages_to_session()
+                    
+                    # Speichere LLM-Settings
+                    self.chat_session.settings = {
+                        'temperature': self.temperature_var.get() if hasattr(self, 'temperature_var') else 0.7,
+                        'max_tokens': self.max_tokens_var.get() if hasattr(self, 'max_tokens_var') else 1500,
+                        'top_p': self.top_p_var.get() if hasattr(self, 'top_p_var') else 0.9,
+                        'llm_model': self.selected_llm
+                    }
+                    
+                    # Auto-Save mit Chat-Persistierung
+                    self.chat_persistence.save_chat_session(self.chat_session)
+                    logger.debug(f"💾 Chat-Session auto-gespeichert: {self.current_session_id[:8]}... ({len(self.chat_messages)} Messages)")
+                    return
+                    
+                except Exception as e:
+                    logger.debug(f"Chat-Persistierung Auto-Save fehlgeschlagen, nutze Legacy: {e}")
+            
+            # Legacy-Methode: Speichere als JSON
             import os
             conversations_dir = os.path.join(os.getcwd(), "conversations")
             os.makedirs(conversations_dir, exist_ok=True)
@@ -778,7 +1082,7 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
             with open(filepath, 'w', encoding='utf-8') as f:
                 json.dump(self.chat_messages, f, indent=2, ensure_ascii=False)
             
-            logger.debug(f"Conversation auto-gespeichert: {filename}")
+            logger.debug(f"Conversation auto-gespeichert (Legacy): {filename}")
             
         except Exception as e:
             logger.debug(f"Auto-Save-Fehler für {self.window_id}: {e}")
@@ -807,11 +1111,150 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
         ).start()
     
     def _send_to_backend(self, message: str):
-        """Sendet Nachricht an Backend (läuft in separatem Thread)"""
+        """
+        Sendet Nachricht an Backend (läuft in separatem Thread)
+        
+        ✨ v3.17.0: Verwendet BackendAPIClient wenn verfügbar
+        """
         try:
-            # Primär: Backend-API verwenden (empfohlen)
-            # Das Backend entscheidet, ob UDS3 oder andere Methoden verwendet werden
+            # ✨ v3.17.0: Verwende BackendAPIClient
+            if BACKEND_CLIENT_AVAILABLE and self.backend_client:
+                self._send_to_backend_via_client(message)
+                return
             
+            # Fallback: Legacy-Implementierung
+            self._send_to_backend_legacy(message)
+            
+        except Exception as e:
+            error_msg = f"💥 Unerwarteter Fehler: {str(e)}"
+            logger.error(f"Backend-Fehler: {e}")
+            self._display_error_with_retry(error_msg, message, "unknown")
+    
+    def _send_to_backend_via_client(self, message: str):
+        """
+        ✨ v3.17.0: Backend-Kommunikation via BackendAPIClient
+        
+        Args:
+            message: Query-Text
+        """
+        try:
+            # Bestimme Modus
+            mode_key = "veritas"
+            if hasattr(self, 'current_question_mode') and self.current_question_mode:
+                mode_key = self.current_question_mode.get('key', 'veritas')
+            
+            # Bereite Conversation-History vor
+            conversation_history = None
+            if hasattr(self, 'chat_messages') and len(self.chat_messages) > 0:
+                recent_messages = self.chat_messages[-10:]
+                conversation_history = [
+                    {
+                        'role': msg.get('role', 'user'),
+                        'content': msg.get('content', '')
+                    }
+                    for msg in recent_messages
+                    if msg.get('role') in ['user', 'assistant']
+                ]
+                logger.info(f"📚 Sende {len(conversation_history)} Nachrichten als Kontext")
+            
+            # LLM-Parameter sammeln
+            model = getattr(self, 'llm_var', tk.StringVar(value='llama3.1:8b')).get()
+            temperature = getattr(self, 'temperature_var', tk.DoubleVar(value=0.7)).get()
+            max_tokens = getattr(self, 'max_tokens_var', tk.IntVar(value=500)).get() if hasattr(self, 'max_tokens_var') else 500
+            
+            # ✨ v3.18.0: Zeige "KI arbeitet..." Animation
+            if TYPING_INDICATOR_AVAILABLE and self.typing_indicator:
+                self.typing_indicator.show()
+            
+            # ✨ Sende Query via BackendAPIClient
+            response = self.backend_client.send_query(
+                query=message,
+                mode=mode_key,
+                model=model,
+                temperature=temperature,
+                max_tokens=max_tokens,
+                conversation_history=conversation_history
+            )
+            
+            # Handle Response
+            if response.success:
+                # Format response text mit zusätzlichen Infos
+                response_text = response.response_text
+                
+                # Zusätzliche Informationen anhängen
+                additional_info = []
+                if response.confidence_score > 0:
+                    additional_info.append(f"🎯 Confidence: {response.confidence_score:.1%}")
+                if response.sources:
+                    additional_info.append(f"📚 {len(response.sources)} Quellen")
+                if response.processing_time > 0:
+                    additional_info.append(f"⚡ {response.processing_time:.2f}s")
+                if response.worker_results:
+                    additional_info.append(f"🤖 {len(response.worker_results)} Agents")
+                
+                if additional_info:
+                    response_text += f"\n\n💡 {' | '.join(additional_info)}"
+                
+                # Follow-up Vorschläge
+                if response.suggestions:
+                    response_text += f"\n\n🔍 **Vorschläge:**\n" + "\n".join([f"• {s}" for s in response.suggestions[:3]])
+                
+                # Backend-Response-Message erstellen
+                response_msg = QueueMessage(
+                    MessageType.BACKEND_RESPONSE,
+                    "Backend API",
+                    datetime.now().timestamp(),
+                    {
+                        'content': response_text,
+                        'sources': response.sources,
+                        'confidence_score': response.confidence_score,
+                        'suggestions': response.suggestions,
+                        'worker_results': response.worker_results,
+                        'metadata': response.metadata,
+                        'session_id': response.session_id,
+                        'processing_time': response.processing_time
+                    }
+                )
+                
+                # Response an Queue senden
+                self.queue.put(response_msg)
+                logger.info(f"✅ Query erfolgreich via BackendAPIClient")
+                
+                # ✨ v3.18.0: Verstecke "KI arbeitet..." Animation
+                if TYPING_INDICATOR_AVAILABLE and self.typing_indicator:
+                    self.typing_indicator.hide()
+                
+                # Upload-Dateien zurücksetzen
+                if hasattr(self, 'uploaded_files'):
+                    self._clear_all_attachments()
+            else:
+                # Error-Response
+                logger.error(f"❌ Query fehlgeschlagen: {response.error}")
+                
+                # ✨ v3.18.0: Verstecke "KI arbeitet..." Animation bei Fehler
+                if TYPING_INDICATOR_AVAILABLE and self.typing_indicator:
+                    self.typing_indicator.hide()
+                
+                self._display_error_with_retry(response.error, message, "api_error")
+        
+        except Exception as e:
+            error_msg = f"💥 BackendAPIClient-Fehler: {str(e)}"
+            logger.error(error_msg, exc_info=True)
+            
+            # ✨ v3.18.0: Verstecke "KI arbeitet..." Animation bei Exception
+            if TYPING_INDICATOR_AVAILABLE and self.typing_indicator:
+                self.typing_indicator.hide()
+            
+            self._display_error_with_retry(error_msg, message, "client_error")
+    
+    def _send_to_backend_legacy(self, message: str):
+        """
+        Legacy Backend-Kommunikation (Fallback wenn BackendAPIClient nicht verfügbar)
+        
+        Args:
+            message: Query-Text
+        """
+        try:
             # Session erstellen falls nicht vorhanden
             if not hasattr(self, 'session_id') or not self.session_id:
                 if not self._create_api_session():
@@ -819,33 +1262,24 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
                     return
             
             # Bestimme Modus
-            mode_key = "veritas"  # Standard
-            
+            mode_key = "veritas"
             if hasattr(self, 'current_question_mode') and self.current_question_mode:
                 mode_key = self.current_question_mode.get('key', 'veritas')
-                logger.info(f"🔄 Verwende Modus: '{mode_key}'")
+                logger.info(f"🔄 Verwende Modus: '{mode_key}' (Legacy)")
             
-            # Check if streaming is available and initialized
-            use_streaming = STREAMING_AVAILABLE and hasattr(self, 'streaming_service') and self.streaming_service is not None
-            
-            # If streaming available, use streaming endpoint
-            if use_streaming:
-                logger.info(f"🚀 Using Streaming Query for: {message[:50]}...")
-                
-                # 🆕 Bereite conversation_history vor (letzte 5 Nachrichten für Kontext)
-                conversation_history = None
-                if hasattr(self, 'chat_messages') and len(self.chat_messages) > 0:
-                    # Nehme die letzten 5 Nachrichten (max 10 wegen User+Assistant Paaren)
-                    recent_messages = self.chat_messages[-10:]
-                    conversation_history = [
-                        {
-                            'role': msg.get('role', 'user'),
-                            'content': msg.get('content', '')
-                        }
-                        for msg in recent_messages
-                        if msg.get('role') in ['user', 'assistant']
-                    ]
-                    logger.info(f"📚 Sende {len(conversation_history)} Nachrichten als Kontext")
+            # Bereite Conversation-History vor
+            conversation_history = None
+            if hasattr(self, 'chat_messages') and len(self.chat_messages) > 0:
+                recent_messages = self.chat_messages[-10:]
+                conversation_history = [
+                    {
+                        'role': msg.get('role', 'user'),
+                        'content': msg.get('content', '')
+                    }
+                    for msg in recent_messages
+                    if msg.get('role') in ['user', 'assistant']
+                ]
+                logger.info(f"📚 Sende {len(conversation_history)} Nachrichten als Kontext")
                 
                 result = self.streaming_service.start_streaming_query(
                     query=message,
@@ -874,12 +1308,14 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
                 "enable_streaming": False  # Fallback non-streaming mode
             }
             
-            # Sende an v2/query Endpoint
-            logger.info(f"🚀 Sende Query an /v2/query (Modus: {mode_key})")
+            # Dynamisch Endpoint aus Capabilities oder Modi ermitteln
+            endpoint = self.parent._get_endpoint_for_mode(mode_key) if self.parent else '/query/standard'
+            
+            logger.info(f"🚀 Sende Query an {endpoint} (Modus: {mode_key})")
             logger.debug(f"Payload: {request_payload}")
             
             api_response = requests.post(
-                f"{API_BASE_URL}/v2/query",
+                f"{API_BASE_URL}{endpoint}",
                 json=request_payload,
                 timeout=60
             )
@@ -887,8 +1323,8 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
             if api_response.status_code == 200:
                 response_data = api_response.json()
                 
-                # Backend gibt 'response_text' zurück
-                response_text = response_data.get('response_text', 'Keine Antwort erhalten.')
+                # Backend API v4 gibt 'content' zurück (UnifiedResponse)
+                response_text = response_data.get('content', response_data.get('response_text', 'Keine Antwort erhalten.'))
                 
                 # Erweiterte Informationen hinzufügen
                 additional_info = []
@@ -966,44 +1402,46 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
         except requests.exceptions.Timeout:
             error_msg = "⏱️ Timeout: Server antwortet nicht (30s)"
             logger.error(f"API Timeout: {error_msg}")
-            self._send_error_response(error_msg)
+            self._display_error_with_retry(error_msg, content, "timeout")
             
         except requests.exceptions.ConnectionError:
             error_msg = "🔌 Verbindungsfehler: Server nicht erreichbar"
             logger.error(f"API Connection Error: {error_msg}")
-            self._send_error_response(error_msg)
+            self._display_error_with_retry(error_msg, content, "connection")
             
         except requests.exceptions.RequestException as e:
             error_msg = f"📡 Request-Fehler: {str(e)}"
             logger.error(f"API Request Error: {e}")
-            self._send_error_response(error_msg)
+            self._display_error_with_retry(error_msg, content, "request")
             
         except Exception as e:
             error_msg = f"💥 Unerwarteter Fehler: {str(e)}"
             logger.error(f"Backend-Fehler: {e}")
-            self._send_error_response(error_msg)
+            self._display_error_with_retry(error_msg, content, "unknown")
     
     def _create_api_session(self) -> bool:
         """Erstellt eine neue API-Session. Gibt True zurück wenn erfolgreich."""
         try:
-            payload = {
-                "user_id": f"veritas_user_{self.window_id}"
-            }
+            # v3 API: Sessions sind nicht erforderlich, generiere lokale Session-ID
+            import uuid
+            self.session_id = f"session_{uuid.uuid4().hex[:12]}"
+            logger.info(f"Lokale Session erstellt für {self.window_id}: {self.session_id}")
+            return True
             
-            response = requests.post(
-                f"{API_BASE_URL}/start_session",
-                json=payload,
-                timeout=10
-            )
-            
-            if response.status_code == 200:
-                data = response.json()
-                self.session_id = data.get("session_id")
-                logger.info(f"API-Session erstellt für {self.window_id}: {self.session_id}")
-                return True
-            else:
-                logger.error(f"Session-Erstellung fehlgeschlagen: HTTP {response.status_code} - {response.text}")
-                return False
+            # Alte Session-Erstellung (v2 API - deaktiviert)
+            # payload = {
+            #     "user_id": f"veritas_user_{self.window_id}"
+            # }
+            # response = requests.post(
+            #     f"{API_BASE_URL}/start_session",
+            #     json=payload,
+            #     timeout=10
+            # )
+            # if response.status_code == 200:
+            #     data = response.json()
+            #     self.session_id = data.get("session_id")
+            #     logger.info(f"API-Session erstellt: {self.session_id}")
+            #     return True
                 
         except requests.exceptions.RequestException as e:
             logger.error(f"Session-Erstellung - Verbindungsfehler: {e}")
@@ -1021,6 +1459,227 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
             {'content': error_message}
         )
         self.queue.put(error_msg)
+    
+    def _display_error_with_retry(self, error_message: str, original_query: str, error_type: str = "unknown"):
+        """
+        ✨ Feature #8: Zeigt Fehler mit Retry-Button an
+        ✨ v3.17.0: Verwendet ErrorHandler wenn verfügbar
+        
+        Args:
+            error_message: Fehlermeldung für User
+            original_query: Ursprüngliche Query (für Retry)
+            error_type: Art des Fehlers (timeout, connection, request, unknown)
+        """
+        try:
+            # ✨ v3.17.0: Verwende ErrorHandler
+            if ERROR_HANDLER_AVAILABLE and hasattr(self, 'error_handler') and self.error_handler:
+                # Convert error_type string to ErrorType enum
+                error_type_enum = ErrorType.UNKNOWN
+                try:
+                    error_type_enum = ErrorType(error_type)
+                except ValueError:
+                    logger.warning(f"⚠️ Unbekannter error_type: {error_type}, verwende UNKNOWN")
+                
+                self.error_handler.display_error_with_retry(
+                    error_message=error_message,
+                    original_query=original_query,
+                    error_type=error_type_enum
+                )
+                
+                # Add to chat_messages for history
+                error_msg = {
+                    'role': 'error',
+                    'content': error_message,
+                    'timestamp': datetime.now().isoformat(),
+                    'original_query': original_query,
+                    'error_type': error_type,
+                    'retryable': True
+                }
+                self.chat_messages.append(error_msg)
+                
+                return
+            
+            # Fallback: Legacy-Implementierung
+            self._display_error_with_retry_legacy(error_message, original_query, error_type)
+            
+        except Exception as e:
+            logger.error(f"Fehler beim Anzeigen der Error-Message: {e}")
+            self._send_error_response(error_message)
+    
+    def _display_error_with_retry_legacy(self, error_message: str, original_query: str, error_type: str = "unknown"):
+        """
+        Legacy Error-Display (Fallback wenn ErrorHandler nicht verfügbar)
+        
+        Args:
+            error_message: Fehlermeldung
+            original_query: Original Query
+            error_type: Error-Type
+        """
+        try:
+            # Error-Message zu Chat hinzufügen
+            error_msg = {
+                'role': 'error',
+                'content': error_message,
+                'timestamp': datetime.now().isoformat(),
+                'original_query': original_query,
+                'error_type': error_type,
+                'retryable': True
+            }
+            
+            self.chat_messages.append(error_msg)
+            
+            # Update Chat-Display in UI-Thread
+            if hasattr(self, 'window') and self.window:
+                self.window.after(0, lambda: self._render_error_message(error_msg))
+            
+            logger.info(f"❌ Error angezeigt (Legacy): {error_type}")
+            
+        except Exception as e:
+            logger.error(f"Fehler beim Anzeigen der Error-Message: {e}")
+            self._send_error_response(error_message)
+    
+    def _render_error_message(self, error_data: Dict):
+        """
+        ✨ Feature #8: Rendert Error-Message mit Retry-Button
+        
+        Args:
+            error_data: Error-Details (message, query, type)
+        """
+        try:
+            if not hasattr(self, 'chat_text') or not self.chat_text:
+                return
+            
+            self.chat_text.config(state='normal')
+            
+            # Error-Box Frame erstellen
+            error_frame = tk.Frame(
+                self.chat_text,
+                bg='#FFEBEE',  # Helles Rot
+                relief=tk.SOLID,
+                borderwidth=2,
+                padx=15,
+                pady=10
+            )
+            
+            # Error-Icon + Message
+            error_icon = tk.Label(
+                error_frame,
+                text="❌",
+                font=('Segoe UI', 16),
+                bg='#FFEBEE',
+                fg='#C62828'
+            )
+            error_icon.pack(side=tk.TOP, pady=(0, 5))
+            
+            error_text = tk.Label(
+                error_frame,
+                text=error_data.get('content', 'Unbekannter Fehler'),
+                font=('Segoe UI', 10),
+                bg='#FFEBEE',
+                fg='#333333',
+                wraplength=400,
+                justify=tk.LEFT
+            )
+            error_text.pack(side=tk.TOP, pady=(0, 10))
+            
+            # Button-Container
+            button_frame = tk.Frame(error_frame, bg='#FFEBEE')
+            button_frame.pack(side=tk.TOP, fill=tk.X)
+            
+            # Retry-Button
+            retry_btn = tk.Button(
+                button_frame,
+                text="🔄 Erneut versuchen",
+                font=('Segoe UI', 9, 'bold'),
+                bg='#F57C00',
+                fg='white',
+                activebackground='#E65100',
+                activeforeground='white',
+                cursor='hand2',
+                relief=tk.RAISED,
+                borderwidth=1,
+                padx=15,
+                pady=5,
+                command=lambda: self._retry_failed_query(error_data)
+            )
+            retry_btn.pack(side=tk.LEFT, padx=(0, 5))
+            
+            # Hover-Effekt
+            retry_btn.bind('<Enter>', lambda e: retry_btn.config(bg='#E65100'))
+            retry_btn.bind('<Leave>', lambda e: retry_btn.config(bg='#F57C00'))
+            
+            # Dismiss-Button
+            dismiss_btn = tk.Button(
+                button_frame,
+                text="✕ Schließen",
+                font=('Segoe UI', 9),
+                bg='#BDBDBD',
+                fg='#333333',
+                activebackground='#9E9E9E',
+                cursor='hand2',
+                relief=tk.RAISED,
+                borderwidth=1,
+                padx=15,
+                pady=5,
+                command=lambda: self._dismiss_error(error_frame)
+            )
+            dismiss_btn.pack(side=tk.LEFT)
+            
+            # Hover-Effekt
+            dismiss_btn.bind('<Enter>', lambda e: dismiss_btn.config(bg='#9E9E9E'))
+            dismiss_btn.bind('<Leave>', lambda e: dismiss_btn.config(bg='#BDBDBD'))
+            
+            # Error-Frame in Chat-Text einfügen
+            self.chat_text.window_create(tk.END, window=error_frame)
+            self.chat_text.insert(tk.END, "\n\n")
+            
+            self.chat_text.config(state='disabled')
+            self.chat_text.see(tk.END)
+            
+            logger.debug("✅ Error-Widget mit Retry-Button gerendert")
+            
+        except Exception as e:
+            logger.error(f"❌ Fehler beim Rendern der Error-Message: {e}")
+    
+    def _retry_failed_query(self, error_data: Dict):
+        """
+        ✨ Feature #8: Führt fehlgeschlagene Query erneut aus
+        
+        Args:
+            error_data: Error-Details mit original_query
+        """
+        try:
+            original_query = error_data.get('original_query', '')
+            
+            if original_query:
+                logger.info(f"🔄 Retry für Query: {original_query[:50]}...")
+                
+                # Status-Update
+                if hasattr(self, 'status_var'):
+                    self.status_var.set("🔄 Erneuter Versuch...")
+                
+                # Query erneut senden
+                self.send_chat_message(original_query)
+                
+            else:
+                logger.warning("⚠️ Keine original_query für Retry gefunden")
+                
+        except Exception as e:
+            logger.error(f"❌ Fehler beim Retry: {e}")
+    
+    def _dismiss_error(self, error_frame: tk.Frame):
+        """
+        ✨ Feature #8: Schließt Error-Widget
+        
+        Args:
+            error_frame: Frame-Widget zum Entfernen
+        """
+        try:
+            error_frame.destroy()
+            logger.debug("✅ Error-Widget geschlossen")
+            
+        except Exception as e:
+            logger.error(f"❌ Fehler beim Schließen des Error-Widgets: {e}")
     
     def _add_feedback_widget(self, message_id: str, message_data: Dict):
         """Fügt ein Feedback-Widget für eine Assistant-Nachricht hinzu"""
@@ -1104,8 +1763,12 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
     
     def _create_chat_display(self, parent, height=20):
         """Erstellt die Chat-Anzeige (gemeinsam für alle Windows)"""
+        # Chat-Container für Overlay-Elemente
+        chat_container = tk.Frame(parent, bg='#ffffff')
+        chat_container.pack(fill=tk.BOTH, expand=True, pady=(0, 5))
+        
         self.chat_text = scrolledtext.ScrolledText(
-            parent,
+            chat_container,
             wrap=tk.WORD,
             height=height,
             font=('Segoe UI', 10),
@@ -1114,8 +1777,25 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
             selectbackground='#0078d4',
             selectforeground='white'
         )
-        self.chat_text.pack(fill=tk.BOTH, expand=True, pady=(0, 5))
+        self.chat_text.pack(fill=tk.BOTH, expand=True)
         self.chat_text.config(state=tk.DISABLED)
+        
+        # ✨ Feature #7: Scroll-to-Top Button (initially hidden)
+        self._create_scroll_to_top_button(chat_container)
+        
+        # ✨ Feature #7: Monitor Scroll Position
+        self.chat_text.bind('<Configure>', self._on_chat_scroll)
+        self.chat_text.bind('<MouseWheel>', self._on_chat_scroll)
+        # Scrollbar-Binding (für Click-Scroll)
+        try:
+            scrollbar = self.chat_text.vbar
+            if scrollbar:
+                scrollbar.bind('<ButtonRelease-1>', self._on_chat_scroll)
+        except:
+            pass
+        
+        # ✨ v3.16.0: Rechtsklick Context Menu
+        self.chat_text.bind('<Button-3>', self._show_message_context_menu)
         
         # Text-Tags für moderne Formatierung
         self.chat_text.tag_configure("user", foreground="#0066CC", font=('Segoe UI', 10, 'bold'))
@@ -1235,10 +1915,13 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
             self.attachments_display = ttk.Frame(attachment_frame)
             self.attachments_display.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(10, 0))
         
-        # Eingabe-Text
+        # ✨ v3.16.0: Auto-Growing Eingabe-Text
+        input_container = ttk.Frame(input_frame)
+        input_container.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 5))
+        
         self.input_text = tk.Text(
-            input_frame,
-            height=3,
+            input_container,
+            height=1,  # Start mit 1 Zeile (wächst automatisch bis 5)
             wrap=tk.WORD,
             font=('Segoe UI', 10),
             bg='#ffffff',
@@ -1246,7 +1929,30 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
             selectbackground='#0078d4',
             selectforeground='white'
         )
-        self.input_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 5))
+        self.input_text.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+        
+        # ✨ v3.16.0: Character Counter Label
+        self.char_counter_var = tk.StringVar(value="0 / 5000")
+        self.char_counter_label = ttk.Label(
+            input_container,
+            textvariable=self.char_counter_var,
+            font=('Segoe UI', 8),
+            foreground='#9E9E9E'
+        )
+        self.char_counter_label.pack(side=tk.BOTTOM, anchor=tk.E, padx=5, pady=2)
+        
+        # Auto-Grow und Counter-Update bei Textänderung
+        self.input_text.bind('<KeyRelease>', self._on_input_text_changed)
+        self.input_text.bind('<<Modified>>', self._on_input_text_changed)
+        
+        # ✨ v3.16.0: Placeholder-Funktionalität
+        self.input_placeholder = "Stelle eine Frage an VERITAS..."
+        self.input_has_placeholder = False
+        self._show_input_placeholder()
+        
+        # Placeholder-Events
+        self.input_text.bind('<FocusIn>', self._on_input_focus_in)
+        self.input_text.bind('<FocusOut>', self._on_input_focus_out)
         
         # Send-Button
         self.send_button = ttk.Button(
@@ -1256,6 +1962,15 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
             width=12
         )
         self.send_button.pack(side=tk.RIGHT, anchor=tk.N)
+        
+        # ✨ v3.18.0: Initialisiere InputManager hier (NACHDEM input_text erstellt wurde)
+        if INPUT_MANAGER_AVAILABLE and not hasattr(self, 'input_manager'):
+            self.input_manager = create_input_manager(
+                input_text=self.input_text,
+                placeholder_text="Ihre Frage hier eingeben... (Ctrl+Enter zum Senden)",
+                on_submit_callback=self.send_chat_message
+            )
+            logger.info("✅ InputManager initialisiert in _create_input_area")
         
         return input_frame
     
@@ -1481,11 +2196,34 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
         if hasattr(self, '_update_response_time_estimate'):
             self._update_response_time_estimate()
         
+        # ✨ v3.18.0: Initialisiere SettingsManager hier (BEVOR Preset-Buttons)
+        if SETTINGS_MANAGER_AVAILABLE and not hasattr(self, 'settings_manager'):
+            self.settings_manager = create_settings_manager(
+                temperature_var=self.temperature_var,
+                max_tokens_var=self.max_tokens_var,
+                top_p_var=self.top_p_var,
+                temperature_label=self.temp_label if hasattr(self, 'temp_label') else None,
+                tokens_label=self.token_info_label if hasattr(self, 'token_info_label') else None,
+                topp_label=self.topp_label if hasattr(self, 'topp_label') else None,
+                add_system_message_callback=self.add_system_message if hasattr(self, 'add_system_message') else None
+            )
+            logger.info("✅ SettingsManager initialisiert in _create_settings_bar")
+        
         # Preset-Buttons (optional Feature)
         self._create_preset_buttons(parent)
     
     def _create_preset_buttons(self, parent):
         """Erstellt Preset-Buttons für schnelle Parameter-Konfiguration"""
+        if SETTINGS_MANAGER_AVAILABLE and self.settings_manager:
+            # Use SettingsManager
+            tooltip_callback = Tooltip if UI_COMPONENTS_AVAILABLE else None
+            self.settings_manager.create_preset_buttons(parent, tooltip_callback=tooltip_callback)
+        else:
+            # Legacy fallback
+            self._create_preset_buttons_legacy(parent)
+    
+    def _create_preset_buttons_legacy(self, parent):
+        """Legacy preset buttons implementation"""
         preset_frame = ttk.Frame(parent)
         preset_frame.pack(fill=tk.X, padx=5, pady=3)
         
@@ -1530,6 +2268,15 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
     
     def _apply_preset(self, temperature, max_tokens, top_p, preset_name):
         """Wendet ein Parameter-Preset an"""
+        if SETTINGS_MANAGER_AVAILABLE and self.settings_manager:
+            # Use SettingsManager
+            self.settings_manager._apply_preset_values(preset_name, temperature, max_tokens, top_p)
+        else:
+            # Legacy fallback
+            self._apply_preset_legacy(temperature, max_tokens, top_p, preset_name)
+    
+    def _apply_preset_legacy(self, temperature, max_tokens, top_p, preset_name):
+        """Legacy preset application implementation"""
         try:
             # Parameter setzen
             self.temperature_var.set(temperature)
@@ -1541,16 +2288,23 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
             self._update_topp_label(top_p)
             self._update_tokens_label()
             
-            # System-Message im Chat
+            # System-Message im Chat (mit Fallback falls Methode nicht verfügbar)
             preset_msg = f"🎛️ Preset angewandt: {preset_name} (Temp={temperature}, Tokens={max_tokens}, Top-p={top_p})"
-            self.add_system_message(preset_msg)
+            if hasattr(self, 'add_system_message') and callable(self.add_system_message):
+                self.add_system_message(preset_msg)
+            else:
+                logger.info(preset_msg)
             
             # Log
             logger.info(f"Preset angewandt: {preset_name} | T={temperature}, Tokens={max_tokens}, p={top_p}")
             
         except Exception as e:
             logger.error(f"Fehler beim Anwenden des Presets '{preset_name}': {e}")
-            self.add_system_message(f"❌ Fehler beim Anwenden des Presets: {e}")
+            if hasattr(self, 'add_system_message') and callable(self.add_system_message):
+                try:
+                    self.add_system_message(f"❌ Fehler beim Anwenden des Presets: {e}")
+                except:
+                    pass  # Verhindert Endlosschleife
     
     def _create_status_bar(self, parent, show_uds3=True):
         """Erstellt die Status-Bar"""
@@ -1575,6 +2329,18 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
     
     def _upload_file(self):
         """Datei für Kontext hochladen"""
+        if FILE_ATTACHMENT_MANAGER_AVAILABLE and self.file_attachment_manager:
+            # Use FileAttachmentManager
+            self.file_attachment_manager.upload_file()
+            # Sync uploaded_files list
+            if hasattr(self.file_attachment_manager, 'uploaded_files'):
+                self.uploaded_files = self.file_attachment_manager.get_uploaded_files()
+        else:
+            # Legacy fallback
+            self._upload_file_legacy()
+    
+    def _upload_file_legacy(self):
+        """Legacy file upload implementation"""
         filetypes = [
             ("PDF-Dateien", "*.pdf"),
             ("Word-Dokumente", "*.docx *.doc"),
@@ -1625,6 +2391,17 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
     
     def _remove_attachment(self, file_path):
         """Entfernt eine angehängte Datei"""
+        if FILE_ATTACHMENT_MANAGER_AVAILABLE and self.file_attachment_manager:
+            # Use FileAttachmentManager
+            self.file_attachment_manager.remove_attachment(file_path)
+            # Sync uploaded_files list
+            self.uploaded_files = self.file_attachment_manager.get_uploaded_files()
+        else:
+            # Legacy fallback
+            self._remove_attachment_legacy(file_path)
+    
+    def _remove_attachment_legacy(self, file_path):
+        """Legacy attachment removal implementation"""
         try:
             if hasattr(self, 'uploaded_files') and file_path in self.uploaded_files:
                 self.uploaded_files.remove(file_path)
@@ -1641,6 +2418,16 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
     
     def _clear_all_attachments(self):
         """Entfernt alle Datei-Anhänge"""
+        if FILE_ATTACHMENT_MANAGER_AVAILABLE and self.file_attachment_manager:
+            # Use FileAttachmentManager
+            self.file_attachment_manager.clear_all_attachments()
+            self.uploaded_files = []
+        else:
+            # Legacy fallback
+            self._clear_all_attachments_legacy()
+    
+    def _clear_all_attachments_legacy(self):
+        """Legacy clear attachments implementation"""
         try:
             if hasattr(self, 'uploaded_files'):
                 self.uploaded_files = []
@@ -1652,6 +2439,580 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
                 
         except Exception as e:
             logger.error(f"Fehler beim Löschen aller Anhänge: {e}")
+    
+    # ✨ v3.16.0: Auto-Growing Input Field & Character Counter
+    
+    def _on_input_text_changed(self, event=None):
+        """
+        Callback für Textänderungen im Input-Field
+        
+        Features:
+        - Auto-Growing von 1 bis 5 Zeilen
+        - Character Counter Update
+        - Warnung bei >4800 Zeichen
+        """
+        try:
+            # Hole aktuellen Text
+            text = self.input_text.get('1.0', tk.END)
+            char_count = len(text.strip())
+            
+            # Update Character Counter
+            if hasattr(self, 'char_counter_var'):
+                counter_text = f"{char_count} / 5000"
+                self.char_counter_var.set(counter_text)
+                
+                # Farbe ändern wenn nah am Limit
+                if hasattr(self, 'char_counter_label'):
+                    if char_count > 4800:
+                        self.char_counter_label.configure(foreground='#F44336')  # Rot
+                    elif char_count > 4000:
+                        self.char_counter_label.configure(foreground='#FF9800')  # Orange
+                    else:
+                        self.char_counter_label.configure(foreground='#9E9E9E')  # Grau
+            
+            # Auto-Growing: Zeilen-Anzahl berechnen
+            line_count = int(self.input_text.index('end-1c').split('.')[0])
+            
+            # Begrenze auf 1-5 Zeilen
+            new_height = max(1, min(5, line_count))
+            current_height = self.input_text.cget('height')
+            
+            # Update Height wenn geändert
+            if new_height != current_height:
+                self.input_text.configure(height=new_height)
+                logger.debug(f"Input height angepasst: {current_height} → {new_height} Zeilen")
+            
+            # Reset Modified-Flag (wichtig für <<Modified>> Event)
+            if event and str(event.type) == 'VirtualEvent':
+                self.input_text.edit_modified(False)
+                
+        except Exception as e:
+            logger.debug(f"Fehler bei Input-Text-Update: {e}")
+    
+    def _show_input_placeholder(self):
+        """Zeigt Placeholder-Text im Input-Field"""
+        try:
+            if not hasattr(self, 'input_text') or not self.input_text:
+                return
+            
+            # Nur wenn Field leer ist
+            current_text = self.input_text.get('1.0', tk.END).strip()
+            if not current_text:
+                self.input_text.delete('1.0', tk.END)
+                self.input_text.insert('1.0', self.input_placeholder)
+                self.input_text.configure(fg='#9E9E9E')  # Grau für Placeholder
+                self.input_has_placeholder = True
+                
+        except Exception as e:
+            logger.debug(f"Fehler beim Anzeigen des Placeholders: {e}")
+    
+    def _hide_input_placeholder(self):
+        """Entfernt Placeholder-Text"""
+        try:
+            if self.input_has_placeholder:
+                self.input_text.delete('1.0', tk.END)
+                colors = get_colors()
+                self.input_text.configure(fg=colors.get('text_primary', '#333333'))
+                self.input_has_placeholder = False
+                
+        except Exception as e:
+            logger.debug(f"Fehler beim Verstecken des Placeholders: {e}")
+    
+    def _on_input_focus_in(self, event=None):
+        """Callback wenn Input-Field Focus erhält"""
+        self._hide_input_placeholder()
+    
+    def _on_input_focus_out(self, event=None):
+        """Callback wenn Input-Field Focus verliert"""
+        current_text = self.input_text.get('1.0', tk.END).strip()
+        if not current_text:
+            self._show_input_placeholder()
+    
+    def _get_input_text(self) -> str:
+        """
+        Holt Text aus Input-Field (ohne Placeholder)
+        
+        Returns:
+            Tatsächlicher User-Text (leer wenn nur Placeholder)
+        """
+        if self.input_has_placeholder:
+            return ""
+        return self.input_text.get('1.0', tk.END).strip()
+    
+    # === SCROLL-TO-TOP BUTTON METHODS (Feature #7) ===
+    
+    def _create_scroll_to_top_button(self, parent):
+        """
+        Erstellt den Scroll-to-Top Button als Overlay
+        
+        Args:
+            parent: Container-Frame für Chat-Display
+        """
+        try:
+            # Button-Frame (floating, overlay)
+            self.scroll_top_btn = tk.Button(
+                parent,
+                text="⬆",  # Up-Arrow-Emoji
+                font=('Segoe UI', 18, 'bold'),
+                bg='#0078d4',
+                fg='white',
+                activebackground='#005a9e',
+                activeforeground='white',
+                relief=tk.RAISED,
+                borderwidth=2,
+                cursor='hand2',
+                command=self._scroll_to_top,
+                width=3,  # Feste Breite
+                height=1,  # Feste Höhe
+                padx=5,
+                pady=5
+            )
+            
+            # Positioniere Button rechts unten (über Chat-Display)
+            self.scroll_top_btn.place(relx=0.95, rely=0.9, anchor='se')
+            
+            # Initial versteckt
+            self.scroll_top_btn.place_forget()
+            
+            # Hover-Effekte
+            self.scroll_top_btn.bind('<Enter>', lambda e: self.scroll_top_btn.config(bg='#005a9e'))
+            self.scroll_top_btn.bind('<Leave>', lambda e: self.scroll_top_btn.config(bg='#0078d4'))
+            
+            # Tooltip hinzufügen
+            if UI_COMPONENTS_AVAILABLE:
+                from frontend.ui.veritas_ui_components import Tooltip
+                Tooltip(self.scroll_top_btn, "Zum Chat-Anfang scrollen")
+            
+            logger.debug("✅ Scroll-to-Top Button erstellt")
+            
+        except Exception as e:
+            logger.error(f"❌ Fehler beim Erstellen des Scroll-to-Top Buttons: {e}")
+    
+    def _on_chat_scroll(self, event=None):
+        """
+        Callback für Scroll-Events - zeigt/versteckt Scroll-to-Top Button
+        
+        Args:
+            event: Tkinter Event (optional)
+        """
+        try:
+            if not hasattr(self, 'scroll_top_btn') or not hasattr(self, 'chat_text'):
+                return
+            
+            # Hole Scroll-Position (0.0 = oben, 1.0 = unten)
+            scroll_pos = self.chat_text.yview()
+            
+            # Zeige Button nur wenn User nach oben gescrollt hat (nicht bei 100%)
+            # Threshold: Button erscheint wenn nicht in den unteren 20%
+            if scroll_pos[1] < 0.95:  # Nicht ganz unten
+                self.scroll_top_btn.place(relx=0.95, rely=0.9, anchor='se')
+            else:
+                self.scroll_top_btn.place_forget()
+                
+        except Exception as e:
+            logger.debug(f"Fehler beim Scroll-Event-Handling: {e}")
+    
+    def _scroll_to_top(self):
+        """Scrollt Chat-Display zum Anfang"""
+        try:
+            if hasattr(self, 'chat_text'):
+                self.chat_text.see('1.0')  # Scrolle zu Zeile 1
+                logger.debug("📜 Zu Chat-Anfang gescrollt")
+                
+                # Button verstecken nach Scroll
+                if hasattr(self, 'scroll_top_btn'):
+                    self.scroll_top_btn.place_forget()
+                    
+        except Exception as e:
+            logger.error(f"❌ Fehler beim Scroll-to-Top: {e}")
+    
+    # ✨ v3.16.0: Message Context Menu (Rechtsklick)
+    
+    def _show_message_context_menu(self, event):
+        """
+        Zeigt Context-Menu bei Rechtsklick auf eine Message
+        
+        Args:
+            event: Tkinter Event mit x, y Koordinaten
+        """
+        try:
+            # Hole Text an Click-Position
+            index = self.chat_text.index(f"@{event.x},{event.y}")
+            line_start = f"{index} linestart"
+            line_end = f"{index} lineend"
+            
+            # Hole Text der aktuellen Zeile
+            line_text = self.chat_text.get(line_start, line_end).strip()
+            
+            # Hole gesamte Message (mehrere Zeilen)
+            # Suche nach vorheriger leerer Zeile (Message-Separator)
+            current_line = int(index.split('.')[0])
+            message_start_line = current_line
+            
+            # Suche Message-Start (erste Zeile nach leerem Separator)
+            for i in range(current_line - 1, 0, -1):
+                line_content = self.chat_text.get(f"{i}.0", f"{i}.0 lineend").strip()
+                if not line_content:
+                    message_start_line = i + 1
+                    break
+            
+            # Suche Message-End (letzte Zeile vor leerem Separator)
+            end_line_num = int(self.chat_text.index('end-1c').split('.')[0])
+            message_end_line = current_line
+            
+            for i in range(current_line + 1, end_line_num + 1):
+                line_content = self.chat_text.get(f"{i}.0", f"{i}.0 lineend").strip()
+                if not line_content:
+                    message_end_line = i - 1
+                    break
+                message_end_line = i
+            
+            # Hole vollständige Message
+            message_content = self.chat_text.get(f"{message_start_line}.0", f"{message_end_line}.0 lineend")
+            
+            # Erstelle Context Menu
+            context_menu = tk.Menu(self.chat_text, tearoff=0)
+            
+            context_menu.add_command(
+                label="📋 Kopieren",
+                command=lambda: self._copy_message_to_clipboard(message_content)
+            )
+            
+            context_menu.add_separator()
+            
+            # Nur für User-Messages: Edit & Resend
+            if "User:" in line_text or message_start_line == current_line:
+                context_menu.add_command(
+                    label="✏️ Bearbeiten & Neu senden",
+                    command=lambda: self._edit_and_resend_message(message_content)
+                )
+            
+            # Nur für Assistant-Messages: Regenerate
+            if "VERITAS:" in message_content or "Assistant:" in message_content:
+                context_menu.add_command(
+                    label="🔄 Antwort regenerieren",
+                    command=lambda: self._regenerate_response()
+                )
+            
+            context_menu.add_separator()
+            
+            context_menu.add_command(
+                label="💾 Message exportieren",
+                command=lambda: self._export_single_message(message_content)
+            )
+            
+            # Zeige Menu an Click-Position
+            context_menu.tk_popup(event.x_root, event.y_root)
+            
+        except Exception as e:
+            logger.debug(f"Fehler beim Anzeigen des Context-Menüs: {e}")
+        finally:
+            try:
+                context_menu.grab_release()
+            except:
+                pass
+    
+    def _copy_message_to_clipboard(self, content: str):
+        """Kopiert Message-Content in Clipboard"""
+        try:
+            # Bereinige Content (entferne Timestamps, etc.)
+            cleaned = content.strip()
+            
+            # Versuche pyperclip
+            try:
+                import pyperclip
+                pyperclip.copy(cleaned)
+                logger.info("✅ Message in Clipboard kopiert")
+            except ImportError:
+                # Fallback auf Tkinter Clipboard
+                self.chat_text.clipboard_clear()
+                self.chat_text.clipboard_append(cleaned)
+                logger.info("✅ Message in Clipboard kopiert (Tkinter)")
+            
+            # Visual Feedback
+            if hasattr(self, 'status_var'):
+                self.status_var.set("📋 Message kopiert!")
+                if hasattr(self, 'window'):
+                    self.window.after(2000, lambda: self.status_var.set("Bereit"))
+                    
+        except Exception as e:
+            logger.error(f"❌ Fehler beim Kopieren: {e}")
+            if hasattr(self, 'status_var'):
+                self.status_var.set("❌ Kopieren fehlgeschlagen")
+    
+    def _edit_and_resend_message(self, content: str):
+        """Lädt Message in Input-Field zum Bearbeiten"""
+        try:
+            # Bereinige Content
+            cleaned = content.replace("User:", "").replace("VERITAS:", "").strip()
+            
+            # Fülle Input-Field
+            if hasattr(self, 'input_text'):
+                self.input_text.delete('1.0', tk.END)
+                self.input_text.insert('1.0', cleaned)
+                if hasattr(self, 'input_has_placeholder'):
+                    self.input_has_placeholder = False
+                self.input_text.focus_set()
+                logger.info("✏️ Message zum Bearbeiten geladen")
+                
+                # Visual Feedback
+                if hasattr(self, 'status_var'):
+                    self.status_var.set("✏️ Message bearbeiten...")
+                    
+        except Exception as e:
+            logger.error(f"❌ Fehler beim Laden der Message: {e}")
+    
+    def _regenerate_response(self):
+        """Regeneriert die letzte Assistant-Antwort"""
+        try:
+            # Hole letzte User-Query
+            if hasattr(self, 'chat_messages') and len(self.chat_messages) >= 2:
+                # Letzte User-Message finden
+                for msg in reversed(self.chat_messages):
+                    if msg.get('role') == 'user':
+                        last_query = msg.get('content', '')
+                        if last_query:
+                            logger.info(f"🔄 Regeneriere Antwort für: {last_query[:50]}...")
+                            self.send_chat_message(last_query)
+                            return
+            
+            logger.warning("⚠️ Keine vorherige Query zum Regenerieren gefunden")
+            if hasattr(self, 'status_var'):
+                self.status_var.set("⚠️ Keine Query zum Regenerieren")
+                
+        except Exception as e:
+            logger.error(f"❌ Fehler beim Regenerieren: {e}")
+    
+    def _export_single_message(self, content: str):
+        """Exportiert einzelne Message als Textdatei"""
+        try:
+            from tkinter import filedialog
+            from datetime import datetime
+            
+            # Frage nach Speicherort
+            filename = filedialog.asksaveasfilename(
+                title="Message exportieren",
+                defaultextension=".txt",
+                filetypes=[
+                    ("Text-Dateien", "*.txt"),
+                    ("Markdown-Dateien", "*.md"),
+                    ("Alle Dateien", "*.*")
+                ],
+                initialfile=f"veritas_message_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+            )
+            
+            if filename:
+                with open(filename, 'w', encoding='utf-8') as f:
+                    f.write(content)
+                
+                logger.info(f"✅ Message exportiert: {filename}")
+                if hasattr(self, 'status_var'):
+                    self.status_var.set(f"💾 Message exportiert!")
+                    if hasattr(self, 'window'):
+                        self.window.after(3000, lambda: self.status_var.set("Bereit"))
+                        
+        except Exception as e:
+            logger.error(f"❌ Fehler beim Exportieren: {e}")
+            if hasattr(self, 'status_var'):
+                self.status_var.set("❌ Export fehlgeschlagen")
+    
+    # === SESSION PERSISTENCE METHODS ===
+    
+    def save_session(self, filepath: str = None) -> bool:
+        """
+        Speichert die aktuelle Chat-Session in JSON-Format
+        
+        Args:
+            filepath: Optionaler Pfad zur Speicherdatei (sonst Dialog)
+        
+        Returns:
+            True bei Erfolg, False bei Fehler
+        """
+        try:
+            # Wenn kein Pfad angegeben, Dialog öffnen
+            if not filepath:
+                from tkinter import filedialog
+                filepath = filedialog.asksaveasfilename(
+                    title="Chat-Session speichern",
+                    defaultextension=".json",
+                    filetypes=[
+                        ("JSON-Dateien", "*.json"),
+                        ("Alle Dateien", "*.*")
+                    ],
+                    initialfile=f"veritas_session_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+                )
+            
+            if not filepath:
+                return False
+            
+            # Session-Daten zusammenstellen
+            session_data = {
+                'metadata': {
+                    'session_id': self.session_id,
+                    'window_id': self.window_id,
+                    'created_at': datetime.now().isoformat(),
+                    'message_count': len(self.chat_messages),
+                    'llm_model': self.llm_var.get() if hasattr(self, 'llm_var') else None,
+                    'settings': {
+                        'temperature': self.temperature_var.get() if hasattr(self, 'temperature_var') else 0.7,
+                        'max_tokens': self.max_tokens_var.get() if hasattr(self, 'max_tokens_var') else 1500,
+                        'top_p': self.top_p_var.get() if hasattr(self, 'top_p_var') else 0.9
+                    }
+                },
+                'messages': self.chat_messages,
+                'version': '1.0'
+            }
+            
+            # In Datei schreiben
+            with open(filepath, 'w', encoding='utf-8') as f:
+                json.dump(session_data, f, indent=2, ensure_ascii=False)
+            
+            logger.info(f"✅ Session gespeichert: {filepath} ({len(self.chat_messages)} Messages)")
+            if hasattr(self, 'status_var'):
+                self.status_var.set(f"💾 Session gespeichert!")
+                if hasattr(self, 'window'):
+                    self.window.after(3000, lambda: self.status_var.set("Bereit"))
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"❌ Fehler beim Speichern der Session: {e}")
+            if hasattr(self, 'status_var'):
+                self.status_var.set("❌ Session-Speichern fehlgeschlagen")
+            return False
+    
+    def load_session(self, filepath: str = None) -> bool:
+        """
+        Lädt eine Chat-Session aus JSON-Datei
+        
+        Args:
+            filepath: Optionaler Pfad zur Session-Datei (sonst Dialog)
+        
+        Returns:
+            True bei Erfolg, False bei Fehler
+        """
+        try:
+            # Wenn kein Pfad angegeben, Dialog öffnen
+            if not filepath:
+                from tkinter import filedialog
+                filepath = filedialog.askopenfilename(
+                    title="Chat-Session laden",
+                    filetypes=[
+                        ("JSON-Dateien", "*.json"),
+                        ("Alle Dateien", "*.*")
+                    ]
+                )
+            
+            if not filepath or not os.path.exists(filepath):
+                return False
+            
+            # Session-Daten laden
+            with open(filepath, 'r', encoding='utf-8') as f:
+                session_data = json.load(f)
+            
+            # Validierung
+            if 'messages' not in session_data:
+                raise ValueError("Ungültiges Session-Format: 'messages' fehlt")
+            
+            # Bestätigungs-Dialog
+            metadata = session_data.get('metadata', {})
+            msg_count = len(session_data['messages'])
+            created = metadata.get('created_at', 'Unbekannt')
+            
+            from tkinter import messagebox
+            confirm = messagebox.askyesno(
+                "Session laden",
+                f"Session laden?\n\n"
+                f"📅 Erstellt: {created}\n"
+                f"💬 Nachrichten: {msg_count}\n"
+                f"🤖 Modell: {metadata.get('llm_model', 'N/A')}\n\n"
+                f"⚠️ Aktuelle Chat-History wird ersetzt!"
+            )
+            
+            if not confirm:
+                return False
+            
+            # Chat-Messages laden
+            self.chat_messages = session_data['messages']
+            
+            # Settings wiederherstellen (optional)
+            settings = metadata.get('settings', {})
+            if hasattr(self, 'temperature_var') and 'temperature' in settings:
+                self.temperature_var.set(settings['temperature'])
+            if hasattr(self, 'max_tokens_var') and 'max_tokens' in settings:
+                self.max_tokens_var.set(settings['max_tokens'])
+            if hasattr(self, 'top_p_var') and 'top_p' in settings:
+                self.top_p_var.set(settings['top_p'])
+            
+            # Chat-Display aktualisieren
+            if hasattr(self, 'update_chat_display'):
+                self.update_chat_display()
+            
+            logger.info(f"✅ Session geladen: {filepath} ({msg_count} Messages)")
+            if hasattr(self, 'status_var'):
+                self.status_var.set(f"📂 Session geladen: {msg_count} Messages")
+                if hasattr(self, 'window'):
+                    self.window.after(3000, lambda: self.status_var.set("Bereit"))
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"❌ Fehler beim Laden der Session: {e}")
+            if hasattr(self, 'status_var'):
+                self.status_var.set("❌ Session-Laden fehlgeschlagen")
+            messagebox.showerror(
+                "Fehler",
+                f"Session konnte nicht geladen werden:\n{str(e)}"
+            )
+            return False
+    
+    def auto_save_session(self):
+        """Speichert Session automatisch im data/-Verzeichnis"""
+        try:
+            # Auto-Save-Verzeichnis erstellen
+            data_dir = os.path.join(project_root, 'data', 'sessions')
+            os.makedirs(data_dir, exist_ok=True)
+            
+            # Automatischer Dateiname
+            filename = f"auto_save_{self.window_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+            filepath = os.path.join(data_dir, filename)
+            
+            # Speichern
+            success = self.save_session(filepath)
+            
+            if success:
+                logger.info(f"🔄 Auto-Save erfolgreich: {filepath}")
+                
+                # Alte Auto-Saves aufräumen (behalte nur letzte 5)
+                self._cleanup_old_autosaves(data_dir, keep=5)
+                
+            return success
+            
+        except Exception as e:
+            logger.error(f"❌ Fehler beim Auto-Save: {e}")
+            return False
+    
+    def _cleanup_old_autosaves(self, directory: str, keep: int = 5):
+        """Löscht alte Auto-Save-Dateien (behält nur die neuesten)"""
+        try:
+            # Finde alle Auto-Save-Dateien für dieses Fenster
+            pattern = f"auto_save_{self.window_id}_*.json"
+            import glob
+            files = glob.glob(os.path.join(directory, pattern))
+            
+            # Sortiere nach Änderungszeit (neueste zuerst)
+            files.sort(key=os.path.getmtime, reverse=True)
+            
+            # Lösche alte Dateien
+            for old_file in files[keep:]:
+                try:
+                    os.remove(old_file)
+                    logger.info(f"🗑️ Alte Auto-Save-Datei gelöscht: {old_file}")
+                except Exception as e:
+                    logger.error(f"⚠️ Konnte Auto-Save nicht löschen: {old_file} - {e}")
+                    
+        except Exception as e:
+            logger.error(f"❌ Fehler beim Aufräumen der Auto-Saves: {e}")
     
     # === GEMEINSAME ACTION METHODEN ===
     
@@ -1844,7 +3205,7 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
         
         # Fallback: Direkter API-Call
         try:
-            response = requests.get(f"{API_BASE_URL}/get_models", timeout=5)
+            response = requests.get(f"{API_BASE_URL}/system/models", timeout=5)
             if response.status_code == 200:
                 data = response.json()
                 models = data.get('models', [])
@@ -1955,11 +3316,12 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
         """Ruft verfügbare Frage-Modi vom API-Endpunkt ab"""
         logger.info("🔍 Lade verfügbare Frage-Modi vom API...")
         try:
-            response = requests.get(f"{API_BASE_URL}/modes", timeout=10)
+            response = requests.get(f"{API_BASE_URL}/system/modes", timeout=10)
             logger.debug(f"API Response Status: {response.status_code}")
             if response.status_code == 200:
                 data = response.json()
-                modes = data.get('modes', {})
+                # v3 API Format: data.modes (nicht direkt modes)
+                modes = data.get('data', {}).get('modes', data.get('modes', {}))
                 available_modes = []
                 
                 logger.debug(f"Gefundene Modi: {list(modes.keys())}")
@@ -2065,11 +3427,13 @@ class MainChatWindow(ChatWindowBase):
         self.current_question_mode = {'key': 'veritas', 'endpoints': ['/ask']}
         self.question_methods_data = {}
         
+        # WICHTIG: Erst GUI erstellen, dann Message-Loop starten
         self.create_gui()
         self.setup_bindings()
         
-        # WICHTIG: Starte Message-Loop für Queue-basierte Kommunikation
-        self.start_message_loop()
+        # Message-Loop starten NACHDEM alle Widgets initialisiert sind
+        # Verwende after() um sicherzustellen, dass GUI vollständig geladen ist
+        self.window.after(100, self.start_message_loop)
         
         logger.info("MainChatWindow erstellt")
     
@@ -2111,6 +3475,24 @@ class MainChatWindow(ChatWindowBase):
     def _init_ui_modules(self):
         """Initialisiert die ausgelagerten UI-Module"""
         try:
+            # ✨ v3.17.0: Theme-Manager Setup
+            if THEME_MANAGER_AVAILABLE:
+                self.theme_manager = get_theme_manager()
+                logger.info(f"✅ ThemeManager initialisiert: {self.theme_manager.get_theme().value}")
+            else:
+                self.theme_manager = None
+            
+            # ✨ v3.16.0: Theme-Farben in UI-Module injizieren (WICHTIG: vor Import!)
+            if CHAT_BUBBLES_AVAILABLE:
+                from ui.veritas_ui_chat_bubbles import set_colors
+                if self.theme_manager:
+                    # Use ThemeManager
+                    self.theme_manager.inject_colors_into_module(set_colors)
+                else:
+                    # Fallback: Legacy get_colors()
+                    set_colors(get_colors())
+                logger.info("✅ Theme-Farben in Chat-Bubbles-Modul injiziert")
+            
             # Markdown-Renderer
             self.markdown_renderer = MarkdownRenderer(self.chat_text)
             
@@ -2123,7 +3505,8 @@ class MainChatWindow(ChatWindowBase):
                 self.window,
                 markdown_renderer=self.markdown_renderer,
                 source_link_handler=self.source_link_handler,
-                suggestion_click_callback=self._on_suggestion_clicked  # ✨ NEW
+                suggestion_click_callback=self._on_suggestion_clicked,  # ✨ v3.19.0
+                enable_modern_ui=True  # ✨ v3.16.0: Kompakte Metadaten + IEEE-Citations
             )
             
             # Dialog-Manager
@@ -2134,12 +3517,107 @@ class MainChatWindow(ChatWindowBase):
                 update_chat_callback=lambda: self.chat_formatter.update_chat_display(self.chat_messages)
             )
             
+            # ✨ v3.17.0: Error Handler
+            if ERROR_HANDLER_AVAILABLE:
+                self.error_handler = create_error_handler(
+                    chat_text=self.chat_text,
+                    window=self.window,
+                    retry_callback=self.send_chat_message,
+                    status_callback=lambda msg: self.status_var.set(msg) if hasattr(self, 'status_var') else None
+                )
+                logger.info("✅ ErrorHandler initialisiert")
+            else:
+                self.error_handler = None
+            
+            # ✨ v3.18.0: Input Manager wird in _create_input_area() initialisiert (nicht hier!)
+            # Grund: InputManager braucht self.input_text, welches erst in _create_input_area() erstellt wird
+            if not hasattr(self, 'input_manager'):
+                self.input_manager = None
+            
+            # ✨ v3.18.0: Scroll Manager
+            if SCROLL_MANAGER_AVAILABLE:
+                self.scroll_manager = create_scroll_manager(
+                    chat_text=self.chat_text,
+                    parent_frame=self.window
+                )
+                logger.info("✅ ScrollManager initialisiert")
+            else:
+                self.scroll_manager = None
+            
+            # ✨ v3.18.0: File Attachment Manager
+            if FILE_ATTACHMENT_MANAGER_AVAILABLE and hasattr(self, 'attachments_display'):
+                self.file_attachment_manager = create_file_attachment_manager(
+                    attachments_display=self.attachments_display,
+                    max_file_size_mb=10,
+                    on_attachment_added=lambda path: logger.info(f"Anhang hinzugefügt: {os.path.basename(path)}"),
+                    on_attachment_removed=lambda path: logger.info(f"Anhang entfernt: {os.path.basename(path)}")
+                )
+                logger.info("✅ FileAttachmentManager initialisiert")
+            else:
+                self.file_attachment_manager = None
+            
+            # ✨ v3.18.0: Settings Manager wird in _create_settings_bar() initialisiert (nicht hier!)
+            # Grund: SettingsManager muss vor _create_preset_buttons() existieren
+            if not hasattr(self, 'settings_manager'):
+                self.settings_manager = None
+            
+            # ✨ v3.18.0: Typing Indicator für "KI arbeitet..." Animation
+            if TYPING_INDICATOR_AVAILABLE:
+                self.typing_indicator = create_typing_indicator(
+                    text_widget=self.chat_text,
+                    bg_color="#F5F5F5",
+                    fg_color="#757575",
+                    dot_color="#2196F3",
+                    animation_speed=500
+                )
+                logger.info("✅ TypingIndicator initialisiert")
+            else:
+                self.typing_indicator = None
+            
             # Link-Callback setzen
             self.markdown_renderer.set_link_callback(self.source_link_handler.open_source_link)
             
             # Tags konfigurieren
             setup_markdown_tags(self.chat_text)
             setup_chat_tags(self.chat_text)
+            
+            # ✨ UX/UI Enhancement: Chat Bubbles & Best Practices (v3.16.0)
+            if CHAT_BUBBLES_AVAILABLE:
+                # Metadata Handler für kompakte Metadaten-Wrapper
+                self.metadata_handler = MetadataCompactWrapper(
+                    text_widget=self.chat_text,
+                    feedback_callback=self._on_feedback_received,
+                    initially_collapsed=True
+                )
+                
+                # Assistant Layout Handler für Full-Width Messages
+                self.assistant_layout = AssistantFullWidthLayout(
+                    text_widget=self.chat_text,
+                    markdown_renderer=self.markdown_renderer,
+                    metadata_handler=self.metadata_handler
+                )
+                
+                # Performance-Optimierungen aktivieren
+                TkinterBestPractices.optimize_text_widget(self.chat_text)
+                TkinterBestPractices.enable_smooth_scrolling(self.chat_text)
+                
+                # Smart Auto-Scroll Handler
+                self.auto_scroll_handler = TkinterBestPractices.add_auto_scroll_to_bottom(self.chat_text)
+                
+                # Keyboard Shortcuts
+                shortcuts = {
+                    '<Control-k>': self._clear_chat_shortcut,
+                    '<Control-s>': self._save_chat_shortcut,
+                    '<Escape>': lambda: self.input_text.focus_set(),
+                    '<Control-Return>': self._send_message_shortcut
+                }
+                TkinterBestPractices.add_keyboard_shortcuts(self.window, shortcuts)
+                
+                logger.info("✅ Chat Bubbles & UX Best Practices aktiviert (Smooth Scrolling, Shortcuts, Performance)")
+            else:
+                self.metadata_handler = None
+                self.assistant_layout = None
+                self.auto_scroll_handler = None
             
             logger.info("✅ UI-Module initialisiert (Markdown, SourceLinks, ChatFormatter, DialogManager)")
             
@@ -2150,6 +3628,9 @@ class MainChatWindow(ChatWindowBase):
             self.source_link_handler = None
             self.chat_formatter = None
             self.dialog_manager = None
+            self.metadata_handler = None
+            self.assistant_layout = None
+            self.auto_scroll_handler = None
     
     def _create_main_toolbar(self, parent):
         """Erstellt die Hauptfenster-spezifische Toolbar"""
@@ -2169,6 +3650,20 @@ class MainChatWindow(ChatWindowBase):
         # Toolbar-Buttons (zentral)
         toolbar_frame = ttk.Frame(header_frame)
         toolbar_frame.pack(side=tk.LEFT, padx=(10, 0))
+        
+        # Session Management Buttons
+        save_btn = ttk.Button(toolbar_frame, text="💾 Speichern", 
+                  command=self.save_session, width=13)
+        save_btn.pack(side=tk.LEFT, padx=(0, 5))
+        Tooltip(save_btn, "Session speichern (Strg+S)")
+        
+        load_btn = ttk.Button(toolbar_frame, text="📂 Laden", 
+                  command=self.load_session, width=13)
+        load_btn.pack(side=tk.LEFT, padx=(0, 5))
+        Tooltip(load_btn, "Session laden (Strg+O)")
+        
+        # Separator
+        ttk.Separator(toolbar_frame, orient=tk.VERTICAL).pack(side=tk.LEFT, padx=5, fill=tk.Y)
         
         clear_btn = ttk.Button(toolbar_frame, text="🗑️ Chat löschen", 
                   command=self._clear_chat, width=13)
@@ -2208,6 +3703,17 @@ class MainChatWindow(ChatWindowBase):
         veritas_btn.bind('<Enter>', on_enter)
         veritas_btn.bind('<Leave>', on_leave)
         
+        # ✨ v3.16.0: Theme Toggle Button (rechtsbündig)
+        theme_icon = "🌙" if self.parent.get_current_theme() == 'light' else "☀️"
+        self.theme_btn = ttk.Button(
+            header_frame,
+            text=theme_icon,
+            command=self._toggle_theme,
+            width=3
+        )
+        self.theme_btn.pack(side=tk.RIGHT, padx=(5, 0))
+        Tooltip(self.theme_btn, "Dark Mode umschalten")
+        
         # Neuer Chat Button (rechtsbündig)
         new_chat_btn = ttk.Button(
             header_frame,
@@ -2227,8 +3733,8 @@ class MainChatWindow(ChatWindowBase):
         # ✨ Feature #11: Keyboard Shortcuts
         # Globale Shortcuts für Hauptfenster
         self.window.bind('<Control-n>', lambda e: self._create_child_window())  # Neuer Chat
-        self.window.bind('<Control-s>', lambda e: self._save_chat())  # Chat speichern
-        self.window.bind('<Control-o>', lambda e: self._load_chat())  # Chat laden
+        self.window.bind('<Control-s>', lambda e: self.save_session())  # Session speichern
+        self.window.bind('<Control-o>', lambda e: self.load_session())  # Session laden
         self.window.bind('<Control-k>', lambda e: self._clear_chat())  # Chat löschen
         self.window.bind('<Control-slash>', lambda e: self._show_shortcuts_help())  # Shortcuts anzeigen
         self.window.bind('<Escape>', lambda e: self.input_text.focus_set())  # Focus zu Input
@@ -2247,11 +3753,15 @@ class MainChatWindow(ChatWindowBase):
     
     def _send_message(self):
         """Sendet eine Nachricht"""
-        message = self.input_text.get('1.0', tk.END).strip()
+        # ✨ v3.16.0: Verwende _get_input_text() für Placeholder-Support
+        message = self._get_input_text() if hasattr(self, '_get_input_text') else self.input_text.get('1.0', tk.END).strip()
         if not message:
             return
         
         self.input_text.delete('1.0', tk.END)
+        if hasattr(self, 'input_has_placeholder'):
+            self.input_has_placeholder = False  # Reset Placeholder-Flag
+        self._show_input_placeholder()  # Zeige Placeholder wieder
         self.send_chat_message(message)
     
     def _create_child_window(self):
@@ -2420,9 +3930,30 @@ Moderne Chat-Anwendung mit:
         else:
             self._show_readme_legacy()
     
+    def _toggle_theme(self):
+        """
+        ✨ v3.16.0: Wechselt zwischen Light und Dark Mode
+        """
+        if self.veritas_app:
+            self.veritas_app.toggle_theme()
+            
+            # Update Button-Icon
+            theme = self.veritas_app.get_current_theme()
+            new_icon = "🌙" if theme == 'light' else "☀️"
+            if hasattr(self, 'theme_btn'):
+                self.theme_btn.configure(text=new_icon)
+            
+            logger.info(f"🎨 Theme umgeschaltet: {theme}")
+    
     def _on_main_window_closing(self):
         """Behandelt das Schließen des Hauptfensters thread-sicher"""
         try:
+            # Auto-Save der Session vor dem Schließen
+            if hasattr(self, 'chat_messages') and len(self.chat_messages) > 0:
+                logger.info("💾 Auto-Save beim Fenster-Schließen...")
+                if hasattr(self, 'auto_save_session'):
+                    self.auto_save_session()
+            
             if self.veritas_app:
                 self.veritas_app.handle_main_window_closing()
             else:
@@ -2455,7 +3986,9 @@ class ChildChatWindow(ChatWindowBase):
         
         self.create_gui()
         self.setup_bindings()
-        self.start_message_loop()
+        
+        # Message-Loop starten NACHDEM alle Widgets initialisiert sind
+        self.window.after(100, self.start_message_loop)
         
         logger.info(f"ChildChatWindow {window_id} erstellt")
     
@@ -2617,84 +4150,103 @@ class VeritasApp:
         self._shutdown_initiated = False
         self._window_counter = 0
         
+        # UX/UI Handler (werden pro Window initialisiert)
+        self.use_chat_bubbles = CHAT_BUBBLES_AVAILABLE
+        
         logger.info(f"VeritasApp v{__version__} initialisiert")
+        if self.use_chat_bubbles:
+            logger.info("✅ Chat Bubbles UI aktiviert")
     
     def _load_backend_capabilities(self):
         """
-        Lädt Backend-Capabilities vom /capabilities Endpoint
-        Ermöglicht dynamische Feature-Anpassung im Frontend
+        Lädt Backend-Capabilities vom Backend (v4.0.0 Format)
+        
+        Flow:
+        1. Health Check: Ist Backend verfügbar?
+        2. Capabilities: Welche Features sind verfügbar?
+        3. Endpoints: Welche Endpoints kann Frontend nutzen?
         """
         try:
-            logger.info("🔍 Lade Backend Capabilities...")
-            response = requests.get(f"{API_BASE_URL}/capabilities", timeout=10)
+            # ============================================================================
+            # 1. HEALTH CHECK - Ist Backend erreichbar?
+            # ============================================================================
+            logger.info("🔍 Prüfe Backend Health...")
+            health_response = requests.get(f"{API_BASE_URL}/system/health", timeout=5)
             
-            if response.status_code == 200:
-                self.capabilities = response.json()
+            if health_response.status_code != 200:
+                logger.error(f"❌ Backend Health Check fehlgeschlagen: {health_response.status_code}")
+                logger.error("   Backend ist nicht verfügbar!")
+                self.capabilities = {"available": False, "error": "Backend not reachable"}
+                return
+            
+            health_data = health_response.json()
+            backend_status = health_data.get("status", "unknown")
+            
+            if backend_status != "healthy":
+                logger.warning(f"⚠️ Backend Status: {backend_status}")
+                logger.warning("   Einige Backend-Komponenten sind möglicherweise nicht verfügbar")
+            else:
+                logger.info(f"✅ Backend Health: {backend_status}")
+            
+            # ============================================================================
+            # 2. CAPABILITIES - Welche Features sind verfügbar?
+            # ============================================================================
+            logger.info("🔍 Lade Backend Capabilities...")
+            cap_response = requests.get(f"{API_BASE_URL}/system/capabilities", timeout=10)
+            
+            if cap_response.status_code == 200:
+                self.capabilities = cap_response.json()
                 
-                # Log wichtige Informationen
-                system_info = self.capabilities.get('system', {})
+                # Extrahiere Query-Modi (v4.0.0 Format)
+                query_modes = self.capabilities.get('query_modes', [])
                 features = self.capabilities.get('features', {})
-                modes = self.capabilities.get('modes', {})
-                recommendations = self.capabilities.get('recommendations', [])
+                endpoints = self.capabilities.get('endpoints', {})
                 
                 logger.info(f"✅ Backend Capabilities geladen:")
-                logger.info(f"   Version: {system_info.get('version', 'unknown')}")
-                logger.info(f"   Environment: {system_info.get('environment', 'unknown')}")
+                logger.info(f"   Query-Modi: {', '.join(query_modes)}")
                 
-                # Ollama Status
-                ollama = features.get('ollama', {})
-                if ollama.get('available'):
-                    logger.info(f"   Ollama: {ollama.get('model_count', 0)} Modelle verfügbar")
-                    logger.info(f"   Default Model: {ollama.get('default_model', 'unknown')}")
-                else:
-                    logger.warning(f"   ⚠️ Ollama nicht verfügbar")
+                # Features anzeigen
+                if features.get('uds3_v2'):
+                    logger.info(f"   ✅ UDS3 v2.0 verfügbar")
+                if features.get('intelligent_pipeline'):
+                    logger.info(f"   ✅ Intelligent Pipeline verfügbar")
+                if features.get('streaming_progress'):
+                    logger.info(f"   ✅ Streaming verfügbar")
                 
-                # Pipeline Status
-                pipeline = features.get('intelligent_pipeline', {})
-                if pipeline.get('available'):
-                    logger.info(f"   Pipeline: {len(pipeline.get('available_agents', []))} Agents")
-                else:
-                    logger.warning(f"   ⚠️ Intelligent Pipeline nicht verfügbar")
+                # Endpoints anzeigen
+                query_endpoints = endpoints.get('query', [])
+                logger.info(f"   📍 Query-Endpoints: {len(query_endpoints)} verfügbar")
+                for endpoint in query_endpoints:
+                    logger.info(f"      - {endpoint}")
                 
-                # UDS3 Status
-                uds3 = features.get('uds3', {})
-                if uds3.get('available'):
-                    logger.info(f"   UDS3: Multi-DB mit {len(uds3.get('databases', []))} DBs")
-                else:
-                    logger.info(f"   UDS3: Nicht verfügbar (optional)")
-                
-                # Modi Status
-                optimal_modes = [k for k, v in modes.items() if v.get('optimal', False)]
-                logger.info(f"   Optimale Modi: {', '.join(optimal_modes)}")
-                
-                # Recommendations
-                for rec in recommendations:
-                    rec_type = rec.get('type', 'info')
-                    message = rec.get('message', '')
-                    if rec_type == 'warning':
-                        logger.warning(f"   ⚠️ {message}")
-                    elif rec_type == 'error':
-                        logger.error(f"   ❌ {message}")
-                    elif rec_type == 'success':
-                        logger.info(f"   ✅ {message}")
-                    else:
-                        logger.info(f"   ℹ️ {message}")
-                
-                return True
+                # Speichere verfügbare Endpoints für dynamisches Routing
+                self.capabilities['available'] = True
+                self.capabilities['health_status'] = backend_status
                 
             else:
-                logger.error(f"❌ Capabilities-Fehler: Status {response.status_code}")
-                self.capabilities = self._get_fallback_capabilities()
-                return False
+                logger.warning(f"⚠️ Capabilities Endpoint nicht verfügbar: {cap_response.status_code}")
+                self.capabilities = {
+                    "available": True,  # Health war OK
+                    "query_modes": ["rag"],  # Fallback
+                    "features": {},
+                    "endpoints": {}
+                }
                 
-        except requests.exceptions.RequestException as e:
-            logger.error(f"❌ Verbindungsfehler bei Capabilities: {e}")
-            self.capabilities = self._get_fallback_capabilities()
-            return False
+        except requests.exceptions.ConnectionError:
+            logger.error("❌ Backend nicht erreichbar!")
+            logger.error(f"   URL: {API_BASE_URL}")
+            logger.error("   Bitte starten Sie das Backend zuerst:")
+            logger.error("   python start_backend.py")
+            self.capabilities = {"available": False, "error": "Connection refused"}
+            
+        except requests.exceptions.Timeout:
+            logger.error("❌ Backend-Timeout!")
+            logger.error("   Backend reagiert nicht rechtzeitig")
+            self.capabilities = {"available": False, "error": "Timeout"}
+            
         except Exception as e:
-            logger.error(f"❌ Unerwarteter Fehler bei Capabilities: {e}")
-            self.capabilities = self._get_fallback_capabilities()
-            return False
+            logger.error(f"❌ Fehler beim Laden der Backend Capabilities: {e}")
+            self.capabilities = {"available": False, "error": str(e)}
     
     def _get_fallback_capabilities(self) -> Dict[str, Any]:
         """Fallback Capabilities wenn Backend nicht erreichbar"""
@@ -2766,24 +4318,161 @@ class VeritasApp:
         
         return current
     
+    # ✨ v3.16.0: Theme & Dark Mode Support
+    
+    def get_current_theme(self) -> str:
+        """Gibt aktuelles Theme zurück ('light' oder 'dark')"""
+        global CURRENT_THEME
+        return CURRENT_THEME
+    
+    def get_theme_colors(self) -> Dict[str, str]:
+        """Gibt aktuelles Farbschema zurück"""
+        return get_colors()
+    
+    def toggle_theme(self):
+        """
+        Wechselt zwischen Light und Dark Mode
+        
+        Aktualisiert:
+        - Globale Theme-Variable
+        - Alle offenen Fenster
+        - Speichert Preference
+        """
+        global CURRENT_THEME
+        
+        # Toggle Theme
+        CURRENT_THEME = 'dark' if CURRENT_THEME == 'light' else 'light'
+        logger.info(f"🎨 Theme gewechselt zu: {CURRENT_THEME}")
+        
+        # Update Main Window
+        if self.main_window:
+            self._apply_theme_to_window(self.main_window)
+        
+        # Update alle Child Windows
+        for child_window in self.child_windows.values():
+            self._apply_theme_to_window(child_window)
+        
+        # TODO: Preference speichern in Config-Datei
+        # self._save_preference('theme', CURRENT_THEME)
+        
+        logger.info(f"✅ Theme angewendet auf {1 + len(self.child_windows)} Fenster")
+    
+    def _apply_theme_to_window(self, window):
+        """
+        Wendet aktuelles Theme auf ein Fenster an
+        
+        Args:
+            window: MainChatWindow oder ChildChatWindow Instanz
+        """
+        try:
+            colors = get_colors()
+            
+            if not hasattr(window, 'window') or not window.window:
+                return
+            
+            # Hauptfenster Background
+            window.window.configure(bg=colors['bg_main'])
+            
+            # Chat-Text-Widget
+            if hasattr(window, 'chat_text'):
+                window.chat_text.configure(
+                    bg=colors['chat_bg'],
+                    fg=colors['text_primary'],
+                    insertbackground=colors['text_primary']
+                )
+            
+            # Input-Text-Widget
+            if hasattr(window, 'input_text'):
+                window.input_text.configure(
+                    bg=colors['input_bg'],
+                    fg=colors['text_primary'],
+                    insertbackground=colors['text_primary']
+                )
+            
+            # Status-Bar (wenn vorhanden)
+            if hasattr(window, 'status_var'):
+                # Status-Label-Farben über Tags aktualisieren
+                pass
+            
+            # Aktualisiere Chat-Display (neu rendern für Bubble-Farben)
+            if hasattr(window, 'chat_formatter') and window.chat_formatter:
+                # Chat neu rendern mit neuen Farben
+                if hasattr(window, 'chat_messages'):
+                    window.chat_formatter.update_chat_display(window.chat_messages)
+            
+            logger.debug(f"Theme angewendet auf Fenster: {window.window_id}")
+            
+        except Exception as e:
+            logger.error(f"Fehler beim Anwenden des Themes auf {window.window_id}: {e}")
+    
+    def _get_endpoint_for_mode(self, mode_key: str) -> str:
+        """
+        Ermittelt den richtigen Endpoint für einen Modus aus den Capabilities
+        
+        Args:
+            mode_key: Der Modus-Schlüssel (z.B. 'veritas', 'chat', 'vpb')
+        
+        Returns:
+            Der API-Endpoint (z.B. '/query/intelligent')
+        """
+        # Prüfe verfügbare Endpunkte aus Capabilities
+        endpoints = self.capabilities.get('endpoints', [])
+        
+        # Mapping: Modus -> bevorzugter Endpoint
+        mode_endpoint_preferences = {
+            'veritas': ['/query/intelligent', '/query/standard'],
+            'intelligent': ['/query/intelligent'],
+            'chat': ['/query/standard'],
+            'vpb': ['/vpb/query'],
+            'covina': ['/covina/query']
+        }
+        
+        # Hole bevorzugte Endpoints für diesen Modus
+        preferred = mode_endpoint_preferences.get(mode_key, ['/query/standard'])
+        
+        # Finde ersten verfügbaren Endpoint
+        for endpoint_pattern in preferred:
+            # Prüfe ob Endpoint in Capabilities verfügbar ist
+            for available_endpoint in endpoints:
+                if endpoint_pattern in available_endpoint:
+                    # Entferne /api/v3 Prefix falls vorhanden (wird später hinzugefügt)
+                    clean_endpoint = available_endpoint.replace('/api/v3', '')
+                    logger.debug(f"Endpoint für Modus '{mode_key}': {clean_endpoint}")
+                    return clean_endpoint
+        
+        # Fallback: Standard-Endpoint
+        fallback = '/query/standard'
+        logger.warning(f"Kein spezifischer Endpoint für Modus '{mode_key}' gefunden, verwende Fallback: {fallback}")
+        return fallback
+    
     def get_available_llm_models(self):
         """Ruft verfügbare LLM-Modelle aus den Capabilities ab"""
-        # Prüfe zuerst Capabilities
+        # Prüfe zuerst Capabilities (v3 API hat models direkt im root)
         if self.capabilities:
-            models = self.get_capability_value('features.ollama.models', [])
+            # v3 API Format: models sind direkt im root
+            models = self.capabilities.get('models', [])
+            if not models:
+                # Fallback: verschachteltes Format
+                models = self.get_capability_value('features.ollama.models', [])
             if models:
                 logger.info(f"✅ {len(models)} LLM-Modelle aus Capabilities geladen")
                 return models
         
         # Fallback: API-Call (für Rückwärtskompatibilität)
         try:
-            response = requests.get(f"{API_BASE_URL}/get_models", timeout=10)
+            response = requests.get(f"{API_BASE_URL}/system/models", timeout=10)
             if response.status_code == 200:
                 data = response.json()
-                models = data.get('models', [])
+                # v3 API Format: data.models (nicht direkt models)
+                models = data.get('data', {}).get('models', data.get('models', []))
                 if models:
-                    # Extrahiere nur die Modellnamen
-                    model_names = [model.get('name', 'unknown') for model in models]
+                    # Extrahiere nur die Modellnamen (models können Strings oder Objekte sein)
+                    model_names = []
+                    for model in models:
+                        if isinstance(model, dict):
+                            model_names.append(model.get('name', 'unknown'))
+                        else:
+                            model_names.append(str(model))
                     logger.info(f"✅ {len(model_names)} LLM-Modelle vom API abgerufen")
                     return model_names
                 else:
@@ -2851,7 +4540,7 @@ class VeritasApp:
         
         # Fallback: API-Call (für Rückwärtskompatibilität)
         try:
-            response = requests.get(f"{API_BASE_URL}/modes", timeout=10)
+            response = requests.get(f"{API_BASE_URL}/system/modes", timeout=10)
             if response.status_code == 200:
                 data = response.json()
                 modes = data.get('modes', {})
@@ -3106,6 +4795,9 @@ class ModernVeritasApp:
         self.create_layout()
         self.setup_bindings()
         
+        # ✨ v3.18.0: Wende gespeicherte Einstellungen an
+        self._apply_saved_settings()
+        
         # Startup
         self.load_last_chat()
         self.update_recent_chats_dropdown()
@@ -3203,9 +4895,14 @@ class ModernVeritasApp:
             from shared.chat_schema import ChatSession
             
             self.chat_persistence = ChatPersistenceService()
+            
+            # ✨ v3.18.0: Lade gespeicherte Benutzereinstellungen
+            saved_settings = self._load_user_settings()
+            
             self.chat_session = ChatSession(
                 session_id=self.current_session_id,
-                llm_model=self.selected_llm or "llama3.1:8b"
+                llm_model=saved_settings.get('llm_model') or self.selected_llm or "llama3.1:8b",
+                settings=saved_settings
             )
             
             logger.info(f"✅ Chat-Persistierung initialisiert (Session: {self.current_session_id[:8]}...)")
@@ -3218,48 +4915,204 @@ class ModernVeritasApp:
             self.chat_persistence = None
             self.chat_session = None
     
+    def _load_user_settings(self) -> Dict[str, Any]:
+        """
+        ✨ v3.18.0: Lädt gespeicherte Benutzereinstellungen
+        
+        Returns:
+            Dictionary mit Einstellungen (temperature, max_tokens, top_p, llm_model)
+        """
+        try:
+            import os
+            import json
+            
+            settings_file = os.path.join("data", "user_settings.json")
+            
+            if os.path.exists(settings_file):
+                with open(settings_file, 'r', encoding='utf-8') as f:
+                    settings = json.load(f)
+                    logger.info(f"✅ Benutzereinstellungen geladen: {len(settings)} Einträge")
+                    return settings
+            else:
+                logger.debug("Keine gespeicherten Benutzereinstellungen gefunden, nutze Defaults")
+                
+        except Exception as e:
+            logger.error(f"Fehler beim Laden der Benutzereinstellungen: {e}")
+        
+        # Default-Einstellungen
+        return {
+            'temperature': 0.7,
+            'max_tokens': 1500,
+            'top_p': 0.9,
+            'llm_model': 'llama3.1:8b',
+            'auto_restore': True  # ✨ v3.18.0: Automatische Wiederherstellung aktiviert
+        }
+    
+    def _save_user_settings(self):
+        """
+        ✨ v3.18.0: Speichert Benutzereinstellungen
+        
+        Speichert aktuelle LLM-Parameter und Preferences
+        """
+        try:
+            import os
+            import json
+            
+            # Erstelle data-Verzeichnis falls nicht vorhanden
+            os.makedirs("data", exist_ok=True)
+            
+            # Sammle aktuelle Einstellungen
+            settings = {
+                'temperature': self.temperature_var.get() if hasattr(self, 'temperature_var') else 0.7,
+                'max_tokens': self.max_tokens_var.get() if hasattr(self, 'max_tokens_var') else 1500,
+                'top_p': self.top_p_var.get() if hasattr(self, 'top_p_var') else 0.9,
+                'llm_model': self.selected_llm or 'llama3.1:8b',
+                'auto_restore': getattr(self, 'auto_restore_enabled', True),  # ✨ Default: True
+                'last_updated': datetime.now().isoformat()
+            }
+            
+            settings_file = os.path.join("data", "user_settings.json")
+            
+            with open(settings_file, 'w', encoding='utf-8') as f:
+                json.dump(settings, f, indent=2, ensure_ascii=False)
+            
+            logger.debug(f"💾 Benutzereinstellungen gespeichert: {settings_file}")
+            
+        except Exception as e:
+            logger.error(f"Fehler beim Speichern der Benutzereinstellungen: {e}")
+    
+    def _apply_saved_settings(self):
+        """
+        ✨ v3.18.0: Wendet gespeicherte Benutzereinstellungen an
+        
+        Lädt und wendet LLM-Parameter aus data/user_settings.json an
+        """
+        try:
+            settings = self._load_user_settings()
+            
+            # Wende Temperature an
+            if 'temperature' in settings and hasattr(self, 'temperature_var'):
+                self.temperature_var.set(settings['temperature'])
+                logger.debug(f"✅ Temperature angewendet: {settings['temperature']}")
+            
+            # Wende Max Tokens an
+            if 'max_tokens' in settings and hasattr(self, 'max_tokens_var'):
+                self.max_tokens_var.set(settings['max_tokens'])
+                logger.debug(f"✅ Max Tokens angewendet: {settings['max_tokens']}")
+            
+            # Wende Top P an
+            if 'top_p' in settings and hasattr(self, 'top_p_var'):
+                self.top_p_var.set(settings['top_p'])
+                logger.debug(f"✅ Top P angewendet: {settings['top_p']}")
+            
+            # Wende LLM Model an
+            if 'llm_model' in settings:
+                self.selected_llm = settings['llm_model']
+                if hasattr(self, 'llm_var'):
+                    self.llm_var.set(settings['llm_model'])
+                logger.debug(f"✅ LLM Model angewendet: {settings['llm_model']}")
+            
+            # Auto-Restore Preference
+            if 'auto_restore' in settings:
+                self.auto_restore_enabled = settings['auto_restore']
+            
+            logger.info(f"✅ Benutzereinstellungen angewendet")
+            
+        except Exception as e:
+            logger.error(f"Fehler beim Anwenden der Benutzereinstellungen: {e}")
+    
     def _show_session_restore_dialog(self):
-        """Zeigt Session-Restore-Dialog beim Start"""
+        """
+        ✨ v3.18.0: Automatische Session-Wiederherstellung beim Start
+        
+        Stellt automatisch die letzte Session wieder her, wenn verfügbar.
+        Nutzt auto_restore aus user_settings.json.
+        """
         try:
             # Prüfe ob Chat-Persistence verfügbar
             if not hasattr(self, 'chat_persistence') or not self.chat_persistence:
                 logger.info("Chat-Persistence nicht verfügbar, überspringe Session-Restore")
                 return
             
-            # Lade Settings
-            import os
-            import json
-            settings_file = os.path.join("data", "session_restore_settings.json")
-            auto_restore = False
+            # ✨ v3.18.0: Automatische Wiederherstellung aktiviert
+            # Nutze auto_restore aus user_settings (Standard: True für automatische Wiederherstellung)
+            auto_restore = getattr(self, 'auto_restore_enabled', True)  # Default: True
             
-            if os.path.exists(settings_file):
-                try:
-                    with open(settings_file, 'r') as f:
-                        settings = json.load(f)
-                        auto_restore = settings.get('auto_restore', False)
-                except:
-                    pass
+            # Hole letzte Session
+            sessions = self.chat_persistence.list_chat_sessions(limit=1, sort_by='updated_at', reverse=True)
             
-            # Auto-Restore: Lade letzte Session ohne Dialog
+            if not sessions:
+                logger.info("ℹ️ Keine vorherigen Sessions gefunden - starte mit leerem Chat")
+                return
+            
+            last_session = sessions[0]
+            session_id = last_session['session_id']
+            session_title = last_session.get('title', 'Unbenannte Session')
+            message_count = last_session.get('message_count', 0)
+            
+            # ✨ Automatische Wiederherstellung (Standard-Verhalten)
             if auto_restore:
-                sessions = self.chat_persistence.list_chat_sessions(limit=1, sort_by='updated_at', reverse=True)
-                if sessions:
-                    session_id = sessions[0]['session_id']
-                    self._restore_session(session_id)
-                    logger.info(f"✅ Auto-Restore: Session {session_id[:8]}... wiederhergestellt")
-                    return
+                # Verzögere Restore um 300ms (damit GUI vollständig geladen ist)
+                self.root.after(300, lambda: self._restore_session_auto(session_id, session_title, message_count))
+                return
             
-            # Zeige Dialog
-            from frontend.ui.veritas_ui_session_dialog import show_session_restore_dialog
-            
-            # Dialog nach kurzem Delay anzeigen (damit GUI vollständig geladen ist)
-            self.root.after(500, lambda: self._show_restore_dialog_delayed())
+            # Optional: Dialog anzeigen wenn auto_restore=False
+            # (Derzeit deaktiviert, da automatische Wiederherstellung gewünscht)
+            # self.root.after(500, lambda: self._show_restore_dialog_delayed())
             
         except Exception as e:
-            logger.error(f"Fehler beim Anzeigen des Session-Restore-Dialogs: {e}")
+            logger.error(f"Fehler beim Session-Restore: {e}")
+    
+    def _restore_session_auto(self, session_id: str, session_title: str, message_count: int):
+        """
+        ✨ v3.18.0: Automatische Session-Wiederherstellung (ohne Dialog)
+        
+        Args:
+            session_id: Session-ID
+            session_title: Session-Titel
+            message_count: Anzahl Messages
+        """
+        try:
+            self._restore_session(session_id)
+            
+            # Status-Update mit Info
+            status_msg = f"✅ Session wiederhergestellt: {session_title} ({message_count} Nachrichten)"
+            if hasattr(self, 'status_var'):
+                self.status_var.set(status_msg)
+                # Nach 5 Sekunden Status zurücksetzen
+                self.root.after(5000, lambda: self.status_var.set("Bereit"))
+            
+            logger.info(f"✅ Auto-Restore: Session '{session_title}' wiederhergestellt ({message_count} Messages)")
+            
+        except Exception as e:
+            logger.error(f"Fehler bei automatischer Session-Wiederherstellung: {e}")
+    
+    def toggle_auto_restore(self):
+        """
+        ✨ v3.18.0: Schaltet automatische Session-Wiederherstellung um
+        
+        Kann über Menü aufgerufen werden
+        """
+        try:
+            # Toggle Status
+            self.auto_restore_enabled = not getattr(self, 'auto_restore_enabled', True)
+            
+            # Speichere Einstellung
+            self._save_user_settings()
+            
+            # Feedback
+            status = "aktiviert" if self.auto_restore_enabled else "deaktiviert"
+            if hasattr(self, 'status_var'):
+                self.status_var.set(f"Auto-Restore {status}")
+                self.root.after(3000, lambda: self.status_var.set("Bereit"))
+            
+            logger.info(f"✅ Auto-Restore {status}")
+            
+        except Exception as e:
+            logger.error(f"Fehler beim Umschalten von Auto-Restore: {e}")
     
     def _show_restore_dialog_delayed(self):
-        """Zeigt Session-Restore-Dialog (delayed)"""
+        """Zeigt Session-Restore-Dialog (delayed) - Optional"""
         try:
             from frontend.ui.veritas_ui_session_dialog import show_session_restore_dialog
             
@@ -3276,8 +5129,72 @@ class ModernVeritasApp:
         except Exception as e:
             logger.error(f"Fehler im Session-Restore-Dialog: {e}")
     
+    def _sync_messages_to_session(self):
+        """
+        ✨ v3.18.0: Synchronisiert chat_messages zu ChatSession
+        
+        Konvertiert das GUI-Message-Format zu ChatMessage-Objekten
+        """
+        try:
+            if not hasattr(self, 'chat_session') or not self.chat_session:
+                return
+            
+            from shared.chat_schema import ChatMessage
+            from datetime import datetime
+            
+            # Lösche alte Messages
+            self.chat_session.messages.clear()
+            
+            # Konvertiere alle Messages
+            for msg in self.chat_messages:
+                role = msg.get('role', 'user')
+                content = msg.get('content', '')
+                timestamp_str = msg.get('timestamp', '')
+                metadata = msg.get('metadata', {})
+                
+                # Parse Timestamp
+                try:
+                    # Format: HH:MM:SS
+                    if timestamp_str:
+                        time_parts = timestamp_str.split(':')
+                        now = datetime.now()
+                        timestamp = now.replace(
+                            hour=int(time_parts[0]),
+                            minute=int(time_parts[1]),
+                            second=int(time_parts[2]) if len(time_parts) > 2 else 0,
+                            microsecond=0
+                        )
+                    else:
+                        timestamp = datetime.now()
+                except:
+                    timestamp = datetime.now()
+                
+                # Erstelle ChatMessage
+                chat_msg = ChatMessage(
+                    role=role,
+                    content=content,
+                    timestamp=timestamp,
+                    metadata=metadata
+                )
+                
+                self.chat_session.messages.append(chat_msg)
+            
+            # Aktualisiere Session-Metadaten
+            self.chat_session.message_count = len(self.chat_session.messages)
+            self.chat_session.updated_at = datetime.now()
+            
+            logger.debug(f"✅ {len(self.chat_session.messages)} Messages zu Session synchronisiert")
+            
+        except Exception as e:
+            logger.error(f"Fehler beim Synchronisieren der Messages: {e}")
+    
     def _restore_session(self, session_id: str):
-        """Stellt eine Session wieder her"""
+        """
+        ✨ v3.18.0: Stellt eine Session wieder her (inkl. LLM-Settings)
+        
+        Args:
+            session_id: Session-ID zum Laden
+        """
         try:
             # Lade Session
             loaded_session = self.chat_persistence.load_chat_session(session_id)
@@ -3300,14 +5217,46 @@ class ModernVeritasApp:
                     'metadata': msg.metadata
                 })
             
+            # ✨ v3.18.0: Stelle LLM-Settings wieder her
+            if loaded_session.settings:
+                settings = loaded_session.settings
+                
+                # Temperature
+                if 'temperature' in settings and hasattr(self, 'temperature_var'):
+                    self.temperature_var.set(settings['temperature'])
+                    logger.debug(f"✅ Temperature wiederhergestellt: {settings['temperature']}")
+                
+                # Max Tokens
+                if 'max_tokens' in settings and hasattr(self, 'max_tokens_var'):
+                    self.max_tokens_var.set(settings['max_tokens'])
+                    logger.debug(f"✅ Max Tokens wiederhergestellt: {settings['max_tokens']}")
+                
+                # Top P
+                if 'top_p' in settings and hasattr(self, 'top_p_var'):
+                    self.top_p_var.set(settings['top_p'])
+                    logger.debug(f"✅ Top P wiederhergestellt: {settings['top_p']}")
+                
+                # LLM Model
+                if 'llm_model' in settings:
+                    self.selected_llm = settings['llm_model']
+                    if hasattr(self, 'llm_var'):
+                        self.llm_var.set(settings['llm_model'])
+                    logger.debug(f"✅ LLM Model wiederhergestellt: {settings['llm_model']}")
+            
             # Update Display
             self.update_chat_display()
             self.update_message_count()
             
             # Status-Update
-            self.status_var.set(f"Session wiederhergestellt: {loaded_session.title}")
+            settings_info = ""
+            if loaded_session.settings:
+                model = loaded_session.settings.get('llm_model', 'N/A')
+                temp = loaded_session.settings.get('temperature', 'N/A')
+                settings_info = f" (Model: {model}, T={temp})"
             
-            logger.info(f"✅ Session wiederhergestellt: {loaded_session.title} ({len(loaded_session.messages)} Nachrichten)")
+            self.status_var.set(f"Session wiederhergestellt: {loaded_session.title}{settings_info}")
+            
+            logger.info(f"✅ Session wiederhergestellt: {loaded_session.title} ({len(loaded_session.messages)} Nachrichten){settings_info}")
             
         except Exception as e:
             logger.error(f"Fehler beim Wiederherstellen der Session: {e}")
@@ -4498,7 +6447,7 @@ class ModernVeritasApp:
         """
         try:
             logger.info("🔍 Lade Backend Capabilities...")
-            response = requests.get(f"{API_BASE_URL}/capabilities", timeout=10)
+            response = requests.get(f"{API_BASE_URL}/system/capabilities", timeout=10)
             
             if response.status_code == 200:
                 self.capabilities = response.json()
@@ -4580,11 +6529,11 @@ class ModernVeritasApp:
             
             # Versuche zuerst POST Health-Check
             health_data = {"level": "basic", "include_metrics": False}
-            response = requests.post(f"{API_BASE_URL}/health", json=health_data, timeout=3)
+            response = requests.post(f"http://127.0.0.1:5000/health", json=health_data, timeout=3)
             
             if response.status_code != 200:
                 # Fallback auf GET
-                response = requests.get(f"{API_BASE_URL}/health", timeout=5)
+                response = requests.get(f"http://127.0.0.1:5000/health", timeout=5)
             
             if response.status_code == 200:
                 self.connection_status.config(text="🟢 Verbunden")
@@ -4615,25 +6564,34 @@ class ModernVeritasApp:
     
     def get_available_llm_models(self):
         """Ruft verfügbare LLM-Modelle aus den Capabilities ab"""
-        # Prüfe zuerst Capabilities
+        # Prüfe zuerst Capabilities (v3 API hat models direkt im root)
         if self.capabilities:
-            models = self.get_capability_value('features.ollama.models', [])
+            # v3 API Format: models sind direkt im root
+            models = self.capabilities.get('models', [])
+            if not models:
+                # Fallback: verschachteltes Format
+                models = self.get_capability_value('features.ollama.models', [])
             if models:
                 logger.info(f"✅ {len(models)} LLM-Modelle aus Capabilities geladen")
                 return models
         
         # Fallback: API-Call (für Rückwärtskompatibilität)
         try:
-            response = requests.get(f"{API_BASE_URL}/get_models", timeout=10)
+            response = requests.get(f"{API_BASE_URL}/system/models", timeout=10)
             if response.status_code == 200:
                 data = response.json()
-                models_data = data.get('models', [])
+                # v3 API Format: data.models (nicht direkt models)
+                models_data = data.get('data', {}).get('models', data.get('models', []))
                 
                 if models_data:
                     # Extrahiere Model-Namen aus der API-Response
                     model_names = []
                     for model in models_data:
-                        model_name = model.get('name', 'unknown')
+                        if isinstance(model, dict):
+                            model_name = model.get('name', 'unknown')
+                        else:
+                            model_name = str(model)
+                        
                         if model_name != 'unknown':
                             model_names.append(model_name)
                     
@@ -4659,26 +6617,32 @@ class ModernVeritasApp:
     def _create_api_session(self) -> bool:
         """Erstellt eine neue API-Session für ModernVeritasApp."""
         try:
-            payload = {
-                "user_id": f"veritas_modern_app_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-            }
+            # v3 API: Sessions sind nicht erforderlich, generiere lokale Session-ID
+            import uuid
+            self.session_id = f"session_{uuid.uuid4().hex[:12]}"
+            logger.info(f"Lokale Session erstellt für ModernVeritasApp: {self.session_id}")
+            return True
             
-            response = requests.post(
-                f"{API_BASE_URL}/start_session",
-                json=payload,
-                timeout=10
-            )
-            
-            if response.status_code == 200:
-                data = response.json()
-                self.session_id = data.get("session_id")
-                logger.info(f"API-Session für ModernVeritasApp erstellt: {self.session_id}")
-                return True
-            else:
-                logger.error(f"Session-Erstellung fehlgeschlagen: HTTP {response.status_code} - {response.text}")
-                return False
+            # Alte Session-Erstellung (v2 API - deaktiviert)
+            # payload = {
+            #     "user_id": f"veritas_modern_app_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            # }
+            # Alte Session-Erstellung (v2 API - deaktiviert)
+            # response = requests.post(
+            #     f"{API_BASE_URL}/start_session",
+            #     json=payload,
+            #     timeout=10
+            # )
+            # if response.status_code == 200:
+            #     data = response.json()
+            #     self.session_id = data.get("session_id")
+            #     logger.info(f"API-Session erstellt: {self.session_id}")
+            #     return True
+            # else:
+            #     logger.error(f"Session-Erstellung fehlgeschlagen")
+            #     return False
                 
-        except requests.exceptions.RequestException as e:
+        except Exception as e:
             logger.error(f"Netzwerkfehler bei Session-Erstellung: {e}")
             return False
         except Exception as e:
@@ -4998,13 +6962,39 @@ UDS3 v3.0 Features:
     
     def on_closing(self):
         """Behandelt Schließen der Anwendung"""
-        if self.auto_save_enabled and self.chat_messages:
-            try:
-                self.save_chat()
-            except:
-                pass
+        try:
+            # ✨ v3.18.0: Speichere Benutzereinstellungen
+            self._save_user_settings()
+            
+            # ✨ v3.18.0: Speichere mit Chat-Persistierung (moderne Methode)
+            if hasattr(self, 'chat_persistence') and self.chat_persistence and self.chat_session:
+                # Aktualisiere Session mit aktuellen Messages
+                if self.chat_messages:
+                    self._sync_messages_to_session()
+                    
+                    # Speichere LLM-Settings
+                    self.chat_session.settings = {
+                        'temperature': self.temperature_var.get() if hasattr(self, 'temperature_var') else 0.7,
+                        'max_tokens': self.max_tokens_var.get() if hasattr(self, 'max_tokens_var') else 1500,
+                        'top_p': self.top_p_var.get() if hasattr(self, 'top_p_var') else 0.9,
+                        'llm_model': self.selected_llm
+                    }
+                    
+                    # Persistiere Session
+                    self.chat_persistence.save_chat_session(self.chat_session)
+                    logger.info(f"✅ Chat-Session beim Beenden gespeichert: {self.current_session_id[:8]}...")
+            
+            # Fallback: Alte Methode für Legacy-Support
+            elif self.auto_save_enabled and self.chat_messages:
+                try:
+                    self.save_chat()
+                except Exception as e:
+                    logger.debug(f"Legacy save_chat() fehlgeschlagen: {e}")
         
-        # Letzten Chat speichern
+        except Exception as e:
+            logger.error(f"Fehler beim Speichern vor dem Beenden: {e}")
+        
+        # Letzten Chat speichern (für Legacy-Support)
         if self.current_chat_file:
             try:
                 with open(self.last_chat_file, 'w', encoding='utf-8') as f:
@@ -5179,3 +7169,7 @@ module_file_key = "c73bb1f484ccf652d08fd04474db173ec3702cecb211b1bb9ceebe55ea66b
 module_version = "1.0"
 module_protection_level = 2
 # === END PROTECTION KEYS ===
+
+
+
+

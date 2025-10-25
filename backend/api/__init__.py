@@ -1,1 +1,48 @@
-"""API-Komponenten des VERITAS Backends"""
+"""
+VERITAS API Router
+==================
+
+Konsolidierte API-Router (FLACH - kein v3/ Unterordner!)
+
+Router werden in backend/backend.py gemountet.
+"""
+
+from fastapi import APIRouter
+from .query_router import query_router
+from .agent_router import agent_router
+from .system_router import system_router
+
+# API Info
+API_VERSION = "4.0.0"
+API_MODULES = [
+    "query",      # Query Processing
+    "agent",      # Agent System
+    "system",     # System Info
+]
+
+# Haupt-Router
+api_router = APIRouter(prefix="/api")
+
+# Mount Sub-Router
+api_router.include_router(query_router, tags=["Query"])
+api_router.include_router(agent_router, tags=["Agents"])
+api_router.include_router(system_router, tags=["System"])
+
+
+def get_api_info():
+    """Get API Information"""
+    return {
+        "version": API_VERSION,
+        "modules": API_MODULES,
+        "base_path": "/api",
+        "documentation": "/docs"
+    }
+
+
+__all__ = [
+    "api_router",
+    "get_api_info",
+    "query_router",
+    "agent_router",
+    "system_router"
+]

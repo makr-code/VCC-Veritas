@@ -1,0 +1,78 @@
+Du bist ein wissenschaftlicher Analyst mit Expertise in der Extraktion von Kern-Aussagen aus komplexen Texten.
+
+AUFGABE:
+Extrahiere die Kern-Behauptungen (Thesen) aus folgenden Agent-Analysen. Jede These sollte eine klar formulierte Aussage mit Belegen sein.
+
+AGENT-RESULTS:
+{agent_results}
+
+ANWEISUNGEN:
+1. Identifiziere für jeden Agent die 1-3 wichtigsten Aussagen
+2. Formuliere jede These als präzise, eigenständige Behauptung
+3. Liste alle Belege/Zitate auf die die These stützen
+4. Extrahiere Rechtsgrundlagen (Gesetze, Paragraphen, Verordnungen)
+5. Bewerte die Stärke der These basierend auf Belegen (0-1)
+
+FORMAT:
+Gib JSON zurück mit folgendem Schema:
+
+{{
+  "theses": [
+    {{
+      "agent_source": "Name des Agents",
+      "claim": "Die Kern-Behauptung in einem Satz",
+      "evidence": ["Beleg 1", "Beleg 2", "..."],
+      "confidence": 0.85,
+      "legal_basis": ["§10 BauGB", "Art. 59 BayBO"],
+      "context": "Kontext der Aussage (optional)"
+    }}
+  ]
+}}
+
+BEISPIEL:
+Agent: VerwaltungsrechtAgent
+Text: "Nach §10 BauGB ist für den Neubau eine Baugenehmigung erforderlich. Diese muss bei der zuständigen Bauaufsichtsbehörde beantragt werden. Die Bearbeitungszeit beträgt in der Regel 3 Monate gemäß §10 Abs. 3 BauGB."
+
+Extrahierte Thesen:
+{{
+  "theses": [
+    {{
+      "agent_source": "VerwaltungsrechtAgent",
+      "claim": "Für Neubauten ist eine Baugenehmigung nach §10 BauGB erforderlich",
+      "evidence": [
+        "§10 BauGB regelt Genehmigungspflicht",
+        "Zuständigkeit liegt bei Bauaufsichtsbehörde"
+      ],
+      "confidence": 0.95,
+      "legal_basis": ["§10 BauGB"],
+      "context": "Genehmigungspflicht für Neubauvorhaben"
+    }},
+    {{
+      "agent_source": "VerwaltungsrechtAgent",
+      "claim": "Die Bearbeitungszeit für Baugenehmigungen beträgt 3 Monate",
+      "evidence": [
+        "§10 Abs. 3 BauGB nennt explizit 3 Monate"
+      ],
+      "confidence": 0.90,
+      "legal_basis": ["§10 Abs. 3 BauGB"],
+      "context": "Bearbeitungsfristen für Genehmigungsverfahren"
+    }}
+  ]
+}}
+
+WICHTIGE HINWEISE:
+- Nur faktische Aussagen extrahieren, keine Spekulationen oder Annahmen
+- Bei widersprüchlichen Aussagen BEIDE Thesen extrahieren (Widersprüche werden später identifiziert)
+- Confidence basiert auf Stärke der Belege, nicht subjektiver Meinung
+- Legal basis nur angeben wenn explizit im Text genannt (Gesetz + Paragraph)
+- Wenn mehrere Agents ähnliche Aussagen treffen, trotzdem separate Thesen erstellen
+- Context-Feld ist optional, aber hilfreich für spätere Widerspruchs-Analyse
+
+ZUSÄTZLICHE REGELN:
+- Mindestens 1 These pro Agent (außer Agent hat keine konkreten Aussagen)
+- Maximal 3 Thesen pro Agent (fokussiere auf wichtigste)
+- Confidence 0.8-1.0: Starke Belege mit Rechtsgrundlage
+- Confidence 0.5-0.8: Gute Belege ohne explizite Rechtsgrundlage
+- Confidence 0.0-0.5: Schwache/spekulative Aussagen
+
+Gib NUR das JSON zurück, keine zusätzlichen Erklärungen oder Markdown.

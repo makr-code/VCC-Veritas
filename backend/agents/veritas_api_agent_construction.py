@@ -8,7 +8,19 @@ import asyncio
 import aiohttp
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
-from covina_base import BaseWorker, ExternalAPIWorker
+
+# Import base classes from framework
+try:
+    from backend.agents.framework.base_agent import BaseAgent as BaseWorker
+except ImportError:
+    # Fallback for standalone execution
+    import sys
+    import os
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from backend.agents.framework.base_agent import BaseAgent as BaseWorker
+
+# ExternalAPIWorker is same as BaseWorker for now
+ExternalAPIWorker = BaseWorker
 
 class BuildingPermitWorker(ExternalAPIWorker):
     """Worker für Baugenehmigungen und Baurecht"""

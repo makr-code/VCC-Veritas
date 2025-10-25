@@ -1,0 +1,307 @@
+{
+  "database": "C:\\VCC\\veritas\\data\\bimschg\\BImSchG.sqlite",
+  "size_mb": 2.25,
+  "tables": [
+    {
+      "name": "bimschg",
+      "columns": [
+        {
+          "id": 0,
+          "name": "bst_nr",
+          "type": "REAL",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 1,
+          "name": "bst_name",
+          "type": "TEXT",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 2,
+          "name": "ort",
+          "type": "TEXT",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 3,
+          "name": "ortsteil",
+          "type": "TEXT",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 4,
+          "name": "anl_nr",
+          "type": "TEXT",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 5,
+          "name": "anl_bez",
+          "type": "TEXT",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 6,
+          "name": "nr_4bv",
+          "type": "TEXT",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 7,
+          "name": "anlart_4bv",
+          "type": "TEXT",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 8,
+          "name": "anlgr_4bv",
+          "type": "TEXT",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 9,
+          "name": "nr_ied",
+          "type": "TEXT",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 10,
+          "name": "anlart_ied",
+          "type": "TEXT",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 11,
+          "name": "anlgr_ied",
+          "type": "TEXT",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 12,
+          "name": "nr_prtr",
+          "type": "TEXT",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 13,
+          "name": "art_prtr",
+          "type": "TEXT",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 14,
+          "name": "anlgr_prtr",
+          "type": "TEXT",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 15,
+          "name": "nace_kode",
+          "type": "REAL",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 16,
+          "name": "art_nace",
+          "type": "TEXT",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 17,
+          "name": "ostwert",
+          "type": "REAL",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 18,
+          "name": "nordwert",
+          "type": "REAL",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 19,
+          "name": "inbetriebn",
+          "type": "TEXT",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 20,
+          "name": "alt_an_anz",
+          "type": "TEXT",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 21,
+          "name": "leistung",
+          "type": "REAL",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 22,
+          "name": "einheit",
+          "type": "TEXT",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 23,
+          "name": "bezug",
+          "type": "TEXT",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 24,
+          "name": "bimschg_id",
+          "type": "TEXT",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "id": 25,
+          "name": "inspire_id",
+          "type": "TEXT",
+          "not_null": false,
+          "default": null,
+          "primary_key": false
+        }
+      ],
+      "indexes": [],
+      "row_count": 4062,
+      "sample_data": [
+        {
+          "bst_nr": 10650100000.0,
+          "bst_name": "Falkenthaler Rinderhof GmbH",
+          "ort": "LÃ¶wenberger Land",
+          "ortsteil": "Falkenthal",
+          "anl_nr": "0001",
+          "anl_bez": "gemischte Tierhaltungsanlage",
+          "nr_4bv": "7.1.11.3V",
+          "anlart_4bv": "Gemischte BestÃ¤nde mit einem Wert von 100 oder mehr der Summe der Vom Hundert-Anteile, in den Nummern 7.1.1.2, 7.1.2.2, 7.1.3.2, 7.1.4.2, 7.1.5, 7.1.6, 7.1.7.2, 7.1.8.2, 7.1.9.2 oder 7.1.10.2, soweit nicht in 7.1.11.1 o. 7.1.11.2",
+          "anlgr_4bv": "Nahrungs-, Genuss- und Futtermittel, landwirtschaftliche Erzeugnisse",
+          "nr_ied": "",
+          "anlart_ied": "",
+          "anlgr_ied": "",
+          "nr_prtr": "",
+          "art_prtr": "",
+          "anlgr_prtr": "",
+          "nace_kode": 1420.0,
+          "art_nace": "Haltung von anderen Rindern",
+          "ostwert": 385682.0,
+          "nordwert": 5864059.0,
+          "inbetriebn": null,
+          "alt_an_anz": "2001-11-05",
+          "leistung": 900.0,
+          "einheit": "PlÃ¤tze",
+          "bezug": "Rinder",
+          "bimschg_id": "12-10650100000-0001",
+          "inspire_id": "16014555_13_0"
+        },
+        {
+          "bst_nr": 10650200000.0,
+          "bst_name": "WENTOWSEE Agrar- und Tierzucht GmbH",
+          "ort": "Gransee",
+          "ortsteil": "AltlÃ¼dersdorf",
+          "anl_nr": "4001",
+          "anl_bez": "Sauenanlage",
+          "nr_4bv": "7.1.8.1EG",
+          "anlart_4bv": "Anlagen zum Halten oder zur Aufzucht von Sauen einschlieÃlich dazugehÃ¶render FerkelaufzuchtplÃ¤tze (Ferkel bis < 30 Kilogramm Lebendgewicht) mit 750 oder mehr SauenplÃ¤tzen",
+          "anlgr_4bv": "Nahrungs-, Genuss- und Futtermittel, landwirtschaftliche Erzeugnisse",
+          "nr_ied": "6.6.c",
+          "anlart_ied": "Intensivhaltung oder -aufzucht von Schweinen mit mehr als 750 PlÃ¤tzen fÃ¼r SÃ¤ue",
+          "anlgr_ied": "Intensivtierhaltung",
+          "nr_prtr": "7.a.iii",
+          "art_prtr": "Anlagen zur Intensivhaltung oder -aufzucht von GeflÃ¼gel oder Schweinenmit 750 PlÃ¤tzen fÃ¼r Sauen",
+          "anlgr_prtr": "Intensive Viehhaltung und Aquakultur",
+          "nace_kode": 1460.0,
+          "art_nace": "Haltung von Schweinen",
+          "ostwert": 379448.0,
+          "nordwert": 5877545.0,
+          "inbetriebn": null,
+          "alt_an_anz": "1991-03-27",
+          "leistung": 1396.0,
+          "einheit": "PlÃ¤tze",
+          "bezug": "Sauen",
+          "bimschg_id": "12-10650200000-4001",
+          "inspire_id": "16014471_28_0"
+        },
+        {
+          "bst_nr": 10650200000.0,
+          "bst_name": "WENTOWSEE Agrar- und Tierzucht GmbH",
+          "ort": "Gransee",
+          "ortsteil": "AltlÃ¼dersdorf",
+          "anl_nr": "6004",
+          "anl_bez": "Biogasanlage AltlÃ¼dersdorf",
+          "nr_4bv": "8.6.3.2V",
+          "anlart_4bv": "Anlagen zur biologischen Behandlung, soweit nicht durch Nummer 8.5 oder 8.7 erfasst, von  GÃ¼lle, durch anaerobe VergÃ¤rung (Biogaserzeugung), mit einer Durchsatz von < 100 t/d, soweit >= 1,2 Mio. Normkubikmetern Rohgas je Jahr erzeugt werden",
+          "anlgr_4bv": "Verwertung und Beseitigung von AbfÃ¤llen und sonstigen Stoffen",
+          "nr_ied": "",
+          "anlart_ied": "",
+          "anlgr_ied": "",
+          "nr_prtr": "",
+          "art_prtr": "",
+          "anlgr_prtr": "",
+          "nace_kode": 1460.0,
+          "art_nace": "Haltung von Schweinen",
+          "ostwert": 379337.0,
+          "nordwert": 5877587.0,
+          "inbetriebn": "2004-01-31",
+          "alt_an_anz": null,
+          "leistung": 46.0,
+          "einheit": "t/d",
+          "bezug": "Durchsatz",
+          "bimschg_id": "12-10650200000-6004",
+          "inspire_id": "16014471_5369_0"
+        }
+      ]
+    }
+  ]
+}

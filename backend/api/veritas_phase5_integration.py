@@ -37,9 +37,9 @@ except ImportError as e:
 
 # Import UDS3
 try:
-    from uds3 import get_optimized_unified_strategy, UnifiedDatabaseStrategy
+    from uds3.core import UDS3PolyglotManager  # ✨ UDS3 v2.0.0 (Legacy stable)
     UDS3_DB_AVAILABLE = True
-    logger.info("✅ UDS3 erfolgreich importiert")
+    logger.info("✅ UDS3 v2.0.0 erfolgreich importiert")
 except ImportError as e:
     UDS3_DB_AVAILABLE = False
     logger.warning(f"⚠️ UDS3 nicht verfügbar: {e}")
@@ -118,12 +118,24 @@ async def initialize_phase5_hybrid_search(
         
         # UDS3 ist optional - wir verwenden Mock wenn nicht verfügbar
         try:
-            from uds3 import get_optimized_unified_strategy
+            from uds3.core import UDS3PolyglotManager  # ✨ UDS3 v2.0.0 (Legacy stable)
             
-            # Versuche UDS3 Strategy zu holen
+            # Versuche UDS3 Polyglot Manager zu erstellen
             uds3_strategy = None
-            if get_optimized_unified_strategy is not None:
-                uds3_strategy = get_optimized_unified_strategy()
+            try:
+                backend_config = {
+                    "vector": {"enabled": True, "backend": "chromadb"},
+                    "graph": {"enabled": False},
+                    "relational": {"enabled": False},
+                    "file_storage": {"enabled": False}
+                }
+                uds3_strategy = UDS3PolyglotManager(
+                    backend_config=backend_config,
+                    enable_rag=True
+                )
+                logger.info("✅ UDS3 Polyglot Manager erstellt")
+            except Exception as init_err:
+                logger.warning(f"⚠️ UDS3 Polyglot Manager Init fehlgeschlagen: {init_err}")
             
             if uds3_strategy is None:
                 logger.warning("⚠️ UDS3 strategy nicht verfügbar - verwende Mock Dense Retriever")
@@ -133,7 +145,7 @@ async def initialize_phase5_hybrid_search(
                 logger.info(f"   ✅ Mock Dense Retriever initialized (no real vector search)")
             else:
                 uds3_adapter = UDS3VectorSearchAdapter(uds3_strategy=uds3_strategy)
-                logger.info(f"   ✅ UDS3 Adapter initialized with UDS3 strategy")
+                logger.info(f"   ✅ UDS3 Adapter initialized with Polyglot Manager")
         except Exception as e:
             logger.warning(f"⚠️ UDS3 Initialisierung fehlgeschlagen: {e} - verwende Mock")
             from backend.agents.veritas_uds3_adapter import MockDenseRetriever

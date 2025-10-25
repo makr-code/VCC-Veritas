@@ -67,7 +67,7 @@ except ImportError:
 # RAG Integration
 try:
     from database.database_api import MultiDatabaseAPI
-    from uds3.uds3_core import OptimizedUnifiedDatabaseStrategy
+    from uds3.core import UDS3PolyglotManager  # ✨ UDS3 v2.0.0 (Legacy stable)
     RAG_INTEGRATION_AVAILABLE = True
 except ImportError:
     RAG_INTEGRATION_AVAILABLE = False
@@ -202,7 +202,18 @@ class AgentOrchestrator:
         if RAG_INTEGRATION_AVAILABLE:
             try:
                 self.database_api = MultiDatabaseAPI()
-                self.uds3_strategy = OptimizedUnifiedDatabaseStrategy()
+                # ✨ NEU: UDS3 v2.0.0 Polyglot Manager
+                backend_config = {
+                    "vector": {"enabled": True, "backend": "chromadb"},
+                    "graph": {"enabled": False},
+                    "relational": {"enabled": False},
+                    "file_storage": {"enabled": False}
+                }
+                self.uds3_strategy = UDS3PolyglotManager(
+                    backend_config=backend_config,
+                    enable_rag=True
+                )
+                logger.info("✅ UDS3 Polyglot Manager initialisiert (Agent Orchestrator)")
             except Exception as e:
                 logger.warning(f"⚠️ RAG Integration Fehler: {e}")
                 self.database_api = None
