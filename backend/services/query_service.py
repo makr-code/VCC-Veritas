@@ -85,11 +85,9 @@ class QueryService:
         self.rag_service = None
         if uds3:
             try:
-                self.rag_service = RAGService(
-                    chromadb=getattr(uds3, 'chromadb', None),
-                    neo4j=getattr(uds3, 'neo4j', None),
-                    postgresql=getattr(uds3, 'postgresql', None)
-                )
+                # RAGService nutzt UDS3 PolyglotManager intern (Auto-Config)
+                # Keine Parameter nötig - strikte Trennung der Zuständigkeiten
+                self.rag_service = RAGService()
                 logger.info("✅ RAGService initialized successfully")
             except Exception as e:
                 logger.warning(f"⚠️ RAGService initialization failed: {e}")
