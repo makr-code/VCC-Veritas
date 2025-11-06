@@ -1,0 +1,589 @@
+"""
+VERITAS MCP Server (Model Context Protocol)
+===========================================
+
+Zweck
+-----
+Dieser Server stellt VERITAS-Funktionen (Prompts, Resources, Tools) für
+Desktop-Clients bereit, die das Model Context Protocol (MCP) sprechen –
+z. B. Microsoft Office Add-ins, VS Code Extensions oder Claude Desktop.
+
+Design
+------
+- Separate Prozessausführung über stdio (JSON-RPC/MessagePack abhängig vom Client)
+- Keine Kopplung an FastAPI; nutzt intern VERITAS-Services
+- Defensive Fallbacks: Läuft auch ohne MCP-Python-SDK (nur CLI/Testmodus)
+
+Aktuell implementierte Tools (MVP)
+----------------------------------
+1) hybrid_search(query: str, top_k: int = 5)
+   → Ruft QueryService (Mode=HYBRID) auf und liefert Quellen/Ergebnisse
+2) list_agents()
+   → Liest verfügbare Agenten aus backend/agents/
+3) execute_agent(query: str, agent_types: list[str] = [])
+   → Minimaler Stub, verkabelbar mit Agent-Pipeline (Folgeschritt)
+
+Hinweis: Die eigentliche MCP-Transport-Schicht wird nur aktiviert, wenn das
+Python-Paket "mcp" installiert ist. Andernfalls startet der Server im
+"Trockenlauf" und bietet CLI-Tests an.
+"""
+
+from __future__ import annotations
+
+import asyncio
+import importlib
+import json
+import logging
+import os
+import sys
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
+
+# -----------------------------------------------------------------------------
+# Logging Setup
+# -----------------------------------------------------------------------------
+logger = logging.getLogger("veritas.mcp")
+handler = logging.StreamHandler(sys.stdout)
+formatter = logging.Formatter("%(asctime)s | %(levelname)s | %(name)s | %(message)s")
+handler.setFormatter(formatter)
+if not logger.handlers:
+    logger.addHandler(handler)
+logger.setLevel(logging.INFO)
+
+
+# -----------------------------------------------------------------------------
+# Lazy Imports – VERITAS Services
+# -----------------------------------------------------------------------------
+def _lazy_import_query_service():
+    """Lädt QueryService und benötigte Modelle lazy, um Import-Loops zu vermeiden."""
+    from backend.services.query_service import QueryService  # type: ignore
+    from backend.models.request import UnifiedQueryRequest  # type: ignore
+    from backend.models.enums import QueryMode  # type: ignore
+    return QueryService, UnifiedQueryRequest, QueryMode
+
+
+# -----------------------------------------------------------------------------
+# Tool: hybrid_search
+# -----------------------------------------------------------------------------
+async def tool_hybrid_search(query: str, top_k: int = 5) -> Dict[str, Any]:
+    """
+    Führt eine Hybrid-Suche (BM25 + Dense + RRF) aus und gibt die
+    normalisierten Quellen sowie die Kernmetadaten zurück.
+    """
+    QueryService, UnifiedQueryRequest, QueryMode = _lazy_import_query_service()
+
+    service = QueryService(uds3=None, pipeline=None, streaming=None)
+    request = UnifiedQueryRequest(
+        query=query,
+        mode=QueryMode.HYBRID,
+        top_k=top_k,
+    )
+
+    # QueryService.process_query ist async
+    response = await service.process_query(request)
+
+    # Reduziertes Ergebnis für MCP-Clients (leichtgewichtige Struktur)
+    return {
+        "content": response.content,
+        "sources": [s.dict() for s in response.sources],
+        "metadata": response.metadata.dict() if hasattr(response, "metadata") else {},
+        "session_id": response.session_id,
+    }
+
+
+# -----------------------------------------------------------------------------
+# Tool: list_agents
+# -----------------------------------------------------------------------------
+async def tool_list_agents() -> Dict[str, Any]:
+    """Liest verfügbare Agenten anhand der Module unter backend/agents/."""
+    base_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "agents")
+    agents = []
+    try:
+        for name in sorted(os.listdir(base_dir)):
+            if name.startswith("_"):
+                continue
+            path = os.path.join(base_dir, name)
+            if os.path.isdir(path) or name.endswith(".py"):
+                agents.append(os.path.splitext(name)[0])
+    except Exception as e:
+        logger.warning(f"Agent-Liste konnte nicht gelesen werden: {e}")
+    return {"agents": agents, "count": len(agents)}
+
+
+# -----------------------------------------------------------------------------
+# Tool: execute_agent (Stub)
+# -----------------------------------------------------------------------------
+async def tool_execute_agent(query: str, agent_types: Optional[List[str]] = None) -> Dict[str, Any]:
+    """
+    Minimaler Stub für Agent-Ausführung. Verkabelung mit der bestehenden
+    Multi-Agent-Pipeline folgt in einem separaten Schritt.
+    """
+    agent_types = agent_types or []
+    return {
+        "status": "not-implemented-yet",
+        "message": "Agent execution will be wired to IntelligentMultiAgentPipeline in the next step.",
+        "query": query,
+        "agent_types": agent_types,
+    }
+
+
+# -----------------------------------------------------------------------------
+# Resource: veritas://documents/{id}
+# -----------------------------------------------------------------------------
+async def resource_get_document(document_id: str) -> Dict[str, Any]:
+    """
+    Ruft ein Dokument aus VERITAS-Datenbanken ab (UDS3).
+    
+    URI-Schema: veritas://documents/{document_id}
+    
+    Rückgabe:
+    - uri: veritas://documents/{id}
+    - mimeType: text/plain oder application/json
+    - text: Dokumentinhalt (falls Volltext verfügbar)
+    - metadata: Metadaten (Titel, Quelle, Datum, etc.)
+    """
+    try:
+        # Lazy-Import der UDS3 PolyglotManager
+        from uds3.core.polyglot_manager import UDS3PolyglotManager
+        
+        # Initialisiere UDS3 Manager (minimale Config)
+        uds3 = UDS3PolyglotManager(
+            backend_config={
+                "relational": {"enabled": True},
+                "vector": {"enabled": True},
+                "graph": {"enabled": True},
+                "file": {"enabled": True},
+            },
+            enable_rag=False
+        )
+        
+        # Versuche Dokument aus verschiedenen Backends zu holen
+        # 1. PostgreSQL (strukturierte Metadaten)
+        pg_result = await _fetch_from_postgresql(uds3, document_id)
+        if pg_result:
+            return pg_result
+        
+        # 2. ChromaDB (Vektorsuche nach ID)
+        chroma_result = await _fetch_from_chromadb(uds3, document_id)
+        if chroma_result:
+            return chroma_result
+        
+        # 3. CouchDB (Volltext-Dokumente)
+        couch_result = await _fetch_from_couchdb(uds3, document_id)
+        if couch_result:
+            return couch_result
+        
+        # Dokument nicht gefunden
+        return {
+            "uri": f"veritas://documents/{document_id}",
+            "mimeType": "application/json",
+            "text": json.dumps({
+                "error": "Document not found",
+                "document_id": document_id,
+                "searched_backends": ["postgresql", "chromadb", "couchdb"]
+            }),
+        }
+        
+    except Exception as e:
+        logger.error(f"Resource fetch error for document {document_id}: {e}")
+        return {
+            "uri": f"veritas://documents/{document_id}",
+            "mimeType": "application/json",
+            "text": json.dumps({
+                "error": str(e),
+                "document_id": document_id
+            }),
+        }
+
+
+async def _fetch_from_postgresql(uds3: Any, doc_id: str) -> Optional[Dict[str, Any]]:  # noqa: ANN401
+    """Versucht Dokument aus PostgreSQL zu holen."""
+    try:
+        if not hasattr(uds3, 'relational_backend') or not uds3.relational_backend:
+            return None
+        
+        # Annahme: UDS3 hat eine read()-Methode oder ähnliches
+        # Fallback: Nutze direkte SQL-Query falls verfügbar
+        result = await asyncio.get_event_loop().run_in_executor(
+            None,
+            lambda: uds3.relational_backend.execute_query(
+                "SELECT id, title, content, metadata FROM documents WHERE id = %s LIMIT 1",
+                (doc_id,)
+            )
+        )
+        
+        if result and len(result) > 0:
+            row = result[0]
+            return {
+                "uri": f"veritas://documents/{doc_id}",
+                "mimeType": "text/plain",
+                "text": row.get("content", ""),
+                "metadata": {
+                    "id": row.get("id"),
+                    "title": row.get("title", "Untitled"),
+                    "source": "postgresql",
+                    "extra": row.get("metadata", {})
+                }
+            }
+    except Exception as e:
+        logger.debug(f"PostgreSQL fetch failed for {doc_id}: {e}")
+    return None
+
+
+async def _fetch_from_chromadb(uds3: Any, doc_id: str) -> Optional[Dict[str, Any]]:  # noqa: ANN401
+    """Versucht Dokument aus ChromaDB zu holen (Metadaten-basierte Suche)."""
+    try:
+        if not hasattr(uds3, 'vector_backend') or not uds3.vector_backend:
+            return None
+        
+        # ChromaDB: get() by ID falls verfügbar
+        # Fallback: query mit metadata filter
+        collection = uds3.vector_backend.get_collection("veritas_documents")
+        if not collection:
+            return None
+        
+        result = await asyncio.get_event_loop().run_in_executor(
+            None,
+            lambda: collection.get(ids=[doc_id])
+        )
+        
+        if result and result.get("documents") and len(result["documents"]) > 0:
+            doc_text = result["documents"][0]
+            metadata = result.get("metadatas", [{}])[0] if result.get("metadatas") else {}
+            
+            return {
+                "uri": f"veritas://documents/{doc_id}",
+                "mimeType": "text/plain",
+                "text": doc_text,
+                "metadata": {
+                    "id": doc_id,
+                    "title": metadata.get("title", "Untitled"),
+                    "source": "chromadb",
+                    "extra": metadata
+                }
+            }
+    except Exception as e:
+        logger.debug(f"ChromaDB fetch failed for {doc_id}: {e}")
+    return None
+
+
+async def _fetch_from_couchdb(uds3: Any, doc_id: str) -> Optional[Dict[str, Any]]:  # noqa: ANN401
+    """Versucht Dokument aus CouchDB zu holen."""
+    try:
+        if not hasattr(uds3, 'file_backend') or not uds3.file_backend:
+            return None
+        
+        # CouchDB: read_document() oder ähnliches
+        result = await asyncio.get_event_loop().run_in_executor(
+            None,
+            lambda: uds3.file_backend.read(doc_id)
+        )
+        
+        if result:
+            return {
+                "uri": f"veritas://documents/{doc_id}",
+                "mimeType": "application/json",
+                "text": json.dumps(result, ensure_ascii=False, indent=2),
+                "metadata": {
+                    "id": doc_id,
+                    "title": result.get("title", "Untitled"),
+                    "source": "couchdb",
+                    "extra": result
+                }
+            }
+    except Exception as e:
+        logger.debug(f"CouchDB fetch failed for {doc_id}: {e}")
+    return None
+
+
+# -----------------------------------------------------------------------------
+# MCP Server Bootstrap (optional, wenn mcp installiert)
+# -----------------------------------------------------------------------------
+def _import_mcp_sdk():
+    """Versucht das MCP-Python-SDK zu importieren; gibt None bei Nichtexistenz zurück."""
+    try:
+        return importlib.import_module("mcp")
+    except Exception:
+        return None
+
+
+@dataclass
+class ToolSpec:
+    name: str
+    description: str
+    parameters: Dict[str, Any]
+
+
+@dataclass
+class PromptTemplate:
+    """Flexible Prompt-Vorlage, kann aus Datei/DB geladen werden."""
+    name: str
+    description: str
+    system_message: str
+    user_template: str  # Kann {topic}, {jurisdiction}, etc. enthalten
+    parameters: Dict[str, Any]  # JSON-Schema für Parameter
+
+
+def build_tools_metadata() -> List[ToolSpec]:
+    """Beschreibt die angebotenen Tools (für Clients/Inspector nützlich)."""
+    return [
+        ToolSpec(
+            name="hybrid_search",
+            description="Hybrid-Suche über VERITAS (BM25 + Dense + RRF).",
+            parameters={
+                "type": "object",
+                "properties": {
+                    "query": {"type": "string", "description": "Suchanfrage"},
+                    "top_k": {"type": "integer", "default": 5, "minimum": 1, "maximum": 50},
+                },
+                "required": ["query"],
+            },
+        ),
+        ToolSpec(
+            name="list_agents",
+            description="Listet verfügbare Agenten (Module unter backend/agents).",
+            parameters={"type": "object", "properties": {}},
+        ),
+        ToolSpec(
+            name="execute_agent",
+            description="Führt einen oder mehrere Agenten aus (Stub, wird verkabelt).",
+            parameters={
+                "type": "object",
+                "properties": {
+                    "query": {"type": "string", "description": "Aufgabe/Beschreibung"},
+                    "agent_types": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "Liste gewünschter Agenten (optional)",
+                    },
+                },
+                "required": ["query"],
+            },
+        ),
+    ]
+
+
+def load_prompt_templates() -> List[PromptTemplate]:
+    """
+    Lädt Prompt-Vorlagen aus JSON/YAML-Datei oder gibt Default-Templates zurück.
+    
+    Flexible Konfiguration: Kann später auf Datei-basiert erweitert werden.
+    Aktuell: Built-in Default-Templates als Fallback.
+    """
+    # Versuche Prompt-Config aus Datei zu laden (optional)
+    prompts_file = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+        "config",
+        "mcp_prompts.json"
+    )
+    
+    if os.path.exists(prompts_file):
+        try:
+            with open(prompts_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                return [
+                    PromptTemplate(
+                        name=p["name"],
+                        description=p["description"],
+                        system_message=p["system_message"],
+                        user_template=p["user_template"],
+                        parameters=p.get("parameters", {}),
+                    )
+                    for p in data.get("prompts", [])
+                ]
+        except Exception as e:
+            logger.warning(f"Prompt-Config konnte nicht geladen werden: {e}")
+    
+    # Default-Templates (Fallback)
+    return [
+        PromptTemplate(
+            name="legal-research",
+            description="Juristische Recherche mit strukturierten Quellenhinweisen",
+            system_message="Du bist ein juristischer Assistent mit Zugriff auf VERITAS Datenbanken.",
+            user_template=(
+                "Analysiere die Rechtslage zum Thema '{topic}' in der Jurisdiktion {jurisdiction}. "
+                "Liefere strukturierte Quellenhinweise im IEEE-Format und klare Handlungsempfehlungen."
+            ),
+            parameters={
+                "type": "object",
+                "properties": {
+                    "topic": {"type": "string", "description": "Rechtsthema"},
+                    "jurisdiction": {"type": "string", "default": "DE", "description": "Jurisdiktion"},
+                },
+                "required": ["topic"],
+            },
+        ),
+        PromptTemplate(
+            name="baurecht-query",
+            description="Spezialisierte Abfrage für Baurecht und Genehmigungsverfahren",
+            system_message=(
+                "Du bist ein Experte für deutsches Baurecht mit Schwerpunkt auf "
+                "Baugenehmigungsverfahren, Bebauungsplänen und öffentlich-rechtlichen Vorschriften."
+            ),
+            user_template=(
+                "Prüfe die baurechtliche Zulässigkeit von: {bauvorhaben}. "
+                "Standort: {standort}. "
+                "Analysiere: 1) Planungsrecht (B-Plan, FNP), 2) Bauordnungsrecht, "
+                "3) Erforderliche Genehmigungen, 4) Mögliche Konflikte."
+            ),
+            parameters={
+                "type": "object",
+                "properties": {
+                    "bauvorhaben": {"type": "string", "description": "Beschreibung des Bauvorhabens"},
+                    "standort": {"type": "string", "description": "Standort/Adresse"},
+                },
+                "required": ["bauvorhaben", "standort"],
+            },
+        ),
+    ]
+
+
+async def _run_stdio_server_async():
+    """
+    Startet den MCP-Server über stdio, falls das MCP-SDK installiert ist.
+
+    Registriert die VERITAS-Tools sowie mindestens einen Prompt.
+    Fällt bei Import-/API-Problemen sauber in den CLI-Demo-Modus zurück.
+    """
+    mcp_sdk = _import_mcp_sdk()
+    if mcp_sdk is None:
+        logger.error(
+            "MCP-Python-SDK nicht installiert. Bitte installieren mit: pip install mcp\n"
+            "Alternativ: Nutzen Sie den CLI-Testmodus: python start_mcp_server.py --cli"
+        )
+        return
+
+    try:
+        # Versuche die gängige API der Python-MCP SDK zu verwenden
+        from mcp.server import Server  # type: ignore
+        from mcp.server.stdio import stdio_server  # type: ignore
+    except Exception as e:
+        logger.error(f"MCP SDK Import-Fehler: {e}")
+        logger.info("Starte stattdessen CLI-Demo (vorübergehend)")
+        await _cli_demo()
+        return
+
+    server = Server("veritas-mcp")
+
+    # --- Tool-Registrierungen -------------------------------------------------
+    try:
+        @server.tool("hybrid_search")  # type: ignore
+        async def _mcp_hybrid_search(query: str, top_k: int = 5) -> Any:  # noqa: ANN401
+            return await tool_hybrid_search(query, top_k)
+
+        @server.tool("list_agents")  # type: ignore
+        async def _mcp_list_agents() -> Any:  # noqa: ANN401
+            return await tool_list_agents()
+
+        @server.tool("execute_agent")  # type: ignore
+        async def _mcp_execute_agent(query: str, agent_types: Optional[List[str]] = None) -> Any:  # noqa: ANN401
+            return await tool_execute_agent(query, agent_types)
+
+        logger.info("✅ MCP-Tools registriert: hybrid_search, list_agents, execute_agent")
+    except Exception as e:
+        logger.warning(f"Tool-Registrierung fehlgeschlagen (SDK-Version?): {e}")
+
+    # --- Prompt-Registrierung (Flexibel über Templates) ----------------------
+    try:
+        prompt_templates = load_prompt_templates()
+        
+        for template in prompt_templates:
+            # Dynamische Prompt-Registrierung
+            async def _create_prompt_handler(tmpl: PromptTemplate):
+                async def _handler(**kwargs: Any) -> Any:  # noqa: ANN401
+                    """Dynamisch generierter Prompt-Handler."""
+                    # Ersetze Template-Variablen in user_template
+                    user_message = tmpl.user_template.format(**kwargs)
+                    
+                    return {
+                        "description": tmpl.description,
+                        "messages": [
+                            {"role": "system", "content": tmpl.system_message},
+                            {"role": "user", "content": user_message},
+                        ],
+                    }
+                return _handler
+            
+            # Registriere Prompt mit Name aus Template
+            handler = await _create_prompt_handler(template)
+            server.prompt(template.name)(handler)  # type: ignore
+            logger.info(f"   ✅ Prompt registriert: {template.name}")
+        
+        logger.info(f"✅ {len(prompt_templates)} MCP-Prompts registriert")
+    except Exception as e:
+        logger.warning(f"Prompt-Registrierung fehlgeschlagen (SDK-Version?): {e}")
+
+    # --- Resource-Registrierung (Dokumentenabruf) ----------------------------
+    try:
+        @server.resource("veritas://documents/{document_id}")  # type: ignore
+        async def _resource_document(document_id: str) -> Any:  # noqa: ANN401
+            """Dokumentenabruf aus VERITAS-Datenbanken."""
+            return await resource_get_document(document_id)
+        
+        logger.info("✅ MCP-Resource registriert: veritas://documents/{id}")
+    except Exception as e:
+        logger.warning(f"Resource-Registrierung fehlgeschlagen (SDK-Version?): {e}")
+
+    # --- stdio Event Loop -----------------------------------------------------
+    logger.info("🚀 Starte MCP stdio-Server… (Ctrl+C zum Beenden)")
+    try:
+        async with stdio_server() as (read, write):  # type: ignore
+            await server.run(read, write)  # type: ignore
+    except Exception as e:
+        logger.error(f"MCP stdio-Serverfehler: {e}")
+        logger.info("Starte stattdessen CLI-Demo (Fallback)")
+        await _cli_demo()
+
+
+def run_stdio_server() -> None:
+    """Synchroner Wrapper für den stdio-Serverstart."""
+    asyncio.run(_run_stdio_server_async())
+
+
+# -----------------------------------------------------------------------------
+# CLI-Testmodus (ohne MCP-SDK)
+# -----------------------------------------------------------------------------
+async def _cli_demo() -> None:
+    """Einfacher CLI-Test: führt eine Demo-Hybrid-Suche aus und zeigt Agentenliste."""
+    print("\n=== VERITAS MCP CLI-Demo ===")
+    
+    print("\n1) Hybrid-Suche ausführen")
+    result = await tool_hybrid_search("Baurechtliche Genehmigung Solaranlage", top_k=3)
+    print(json.dumps({
+        "tool": "hybrid_search",
+        "result_keys": list(result.keys()),
+        "sources_count": len(result.get("sources", [])),
+    }, ensure_ascii=False, indent=2))
+
+    print("\n2) Agenten auflisten")
+    agents = await tool_list_agents()
+    print(json.dumps(agents, ensure_ascii=False, indent=2))
+    
+    print("\n3) Dokument abrufen (Mock-Test)")
+    document = await resource_get_document("doc_test_123")
+    print(json.dumps({
+        "resource": "veritas://documents/doc_test_123",
+        "uri": document.get("uri"),
+        "mimeType": document.get("mimeType"),
+        "has_text": bool(document.get("text")),
+        "metadata_keys": list(document.get("metadata", {}).keys()) if "metadata" in document else [],
+    }, ensure_ascii=False, indent=2))
+
+
+def main(argv: Optional[List[str]] = None) -> None:
+    """
+    Entry-Point für den MCP-Server.
+
+    Aufrufvarianten:
+    - Ohne Argumente: Start über stdio (sofern MCP-SDK installiert)
+    - --cli: CLI-Demo ohne MCP-SDK
+    """
+    argv = argv or sys.argv[1:]
+    if "--cli" in argv:
+        asyncio.run(_cli_demo())
+        return
+    run_stdio_server()
+
+
+if __name__ == "__main__":
+    main()

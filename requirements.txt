@@ -1,0 +1,37 @@
+# VERITAS Backend Requirements
+# ============================
+
+# FastAPI Framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+
+# Server-Sent Events (SSE) - NEW!
+sse-starlette==1.8.2
+
+# Database Drivers
+psycopg2-binary==2.9.9
+neo4j==5.14.1
+chromadb==0.4.15
+
+# UDS3 Integration
+# (Install from ../uds3)
+
+# Utilities
+python-dotenv==1.0.0
+pydantic==2.5.0
+pydantic-settings==2.1.0
+pyyaml>=6.0
+
+# System Monitoring
+psutil==5.9.6
+
+# Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+httpx==0.25.1
+
+# MCP (Model Context Protocol) - Optional (separater Prozess)
+# Hinweis: Das exakte SDK kann je nach Version abweichen. Wir nutzen hier
+# eine generische Abhängigkeit; bei Bedarf kann später ein genauer Pin gesetzt werden.
+mcp>=0.1.0

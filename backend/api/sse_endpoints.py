@@ -1,0 +1,445 @@
+"""
+VERITAS SSE Endpoints
+====================
+
+Server-Sent Events for unidirectional streaming.
+
+Endpoints:
+- GET /api/sse/progress/{session_id}  - Agent progress updates
+- GET /api/sse/metrics                - System metrics
+- GET /api/sse/jobs/{job_id}          - Job progress (UDS3)
+- GET /api/sse/quality/{session_id}   - Quality gate notifications
+
+Features:
+- Auto-reconnect (Last-Event-ID)
+- Event replay
+- Session isolation
+- Event filtering
+
+Usage:
+    # Backend integration
+    from backend.api.sse_endpoints import router as sse_router, init_sse_endpoints
+    
+    init_sse_endpoints(streaming_manager)
+    app.include_router(sse_router)
+    
+    # Frontend (JavaScript)
+    const source = new EventSource('/api/sse/progress/session_123');
+    source.addEventListener('step_progress', (e) => {
+        const data = JSON.parse(e.data);
+        console.log(`${data.percentage}%: ${data.message}`);
+    });
+
+Created: 2025-10-31
+"""
+
+import asyncio
+import json
+import logging
+from typing import AsyncGenerator, Optional, Dict, Any
+from datetime import datetime
+import psutil
+
+from fastapi import APIRouter, Query, HTTPException
+
+try:
+    from sse_starlette.sse import EventSourceResponse
+    SSE_AVAILABLE = True
+except ImportError:
+    SSE_AVAILABLE = False
+    logging.warning("⚠️ sse-starlette not available - install with: pip install sse-starlette")
+
+# Import existing components (conditional - may not exist yet)
+try:
+    from backend.agents.framework.streaming_manager import StreamingManager, EventType
+    STREAMING_MANAGER_AVAILABLE = True
+except ImportError:
+    STREAMING_MANAGER_AVAILABLE = False
+    StreamingManager = None
+    EventType = None
+
+logger = logging.getLogger(__name__)
+
+# Router
+router = APIRouter(prefix="/api/sse", tags=["SSE Streaming"])
+
+# Global streaming manager (shared with WebSocket)
+streaming_manager: Optional[StreamingManager] = None
+
+
+def init_sse_endpoints(manager: Optional[StreamingManager] = None):
+    """
+    Initialize SSE endpoints with streaming manager.
+    
+    Args:
+        manager: StreamingManager instance (optional - can work standalone)
+    """
+    global streaming_manager
+    streaming_manager = manager
+    
+    if manager:
+        logger.info("✅ SSE Endpoints initialized with StreamingManager")
+    else:
+        logger.warning("⚠️ SSE Endpoints initialized without StreamingManager (limited functionality)")
+
+
+@router.get("/progress/{session_id}")
+async def stream_agent_progress(
+    session_id: str,
+    last_event_id: Optional[str] = Query(None, alias="Last-Event-ID")
+):
+    """
+    Stream agent execution progress via SSE.
+    
+    Args:
+        session_id: Unique session identifier
+        last_event_id: Last received event ID (for replay)
+    
+    Client Example:
+        const source = new EventSource('/api/sse/progress/session_123');
+        source.addEventListener('step_progress', (e) => {
+            const data = JSON.parse(e.data);
+            updateProgressBar(data.percentage);
+        });
+        
+        source.onerror = () => {
+            console.log('Reconnecting...');  // Auto-reconnect
+        };
+    
+    Events:
+        - plan_started: Research plan execution started
+        - step_started: Step execution started
+        - step_progress: Progress update
+        - step_completed: Step completed
+        - quality_check: Quality gate check result
+        - plan_completed: Research plan completed
+        - error: Error occurred
+    """
+    if not SSE_AVAILABLE:
+        raise HTTPException(503, "SSE not available - install sse-starlette")
+    
+    async def event_generator() -> AsyncGenerator:
+        """Generate SSE events from streaming manager."""
+        
+        # Replay missed events if Last-Event-ID provided
+        if last_event_id and streaming_manager:
+            try:
+                history = streaming_manager.get_event_history(session_id)
+                replay_events = [e for e in history if e.event_id > last_event_id]
+                
+                logger.info(f"Replaying {len(replay_events)} missed events for session {session_id}")
+                
+                for event in replay_events:
+                    yield {
+                        "event": event.event_type,
+                        "data": json.dumps(event.data),
+                        "id": event.event_id,
+                        "retry": 5000  # Auto-reconnect after 5s
+                    }
+            except Exception as e:
+                logger.error(f"Event replay error: {e}")
+        
+        # Stream live events
+        if streaming_manager and STREAMING_MANAGER_AVAILABLE:
+            try:
+                # Subscribe to session events
+                async for event in streaming_manager.subscribe_session(session_id):
+                    yield {
+                        "event": event.event_type,
+                        "data": json.dumps(event.data),
+                        "id": event.event_id,
+                        "retry": 5000
+                    }
+                    
+            except asyncio.CancelledError:
+                logger.info(f"SSE stream cancelled for session {session_id}")
+            except Exception as e:
+                logger.error(f"SSE stream error: {e}")
+                yield {
+                    "event": "error",
+                    "data": json.dumps({"error": str(e), "session_id": session_id}),
+                    "retry": 10000
+                }
+        else:
+            # Fallback: Mock events for testing without StreamingManager
+            logger.warning("StreamingManager not available - generating mock events")
+            for i in range(5):
+                await asyncio.sleep(1)
+                yield {
+                    "event": "step_progress",
+                    "data": json.dumps({
+                        "session_id": session_id,
+                        "percentage": (i + 1) * 20,
+                        "message": f"Mock step {i+1}/5",
+                        "timestamp": datetime.utcnow().isoformat()
+                    }),
+                    "id": str(i),
+                    "retry": 5000
+                }
+    
+    return EventSourceResponse(event_generator())
+
+
+@router.get("/metrics")
+async def stream_system_metrics(interval: int = Query(2, ge=1, le=10)):
+    """
+    Stream system metrics (CPU, Memory, Database) via SSE.
+    
+    Args:
+        interval: Update interval in seconds (default: 2, min: 1, max: 10)
+    
+    Client Example:
+        const source = new EventSource('/api/sse/metrics?interval=2');
+        source.addEventListener('metrics_update', (e) => {
+            const metrics = JSON.parse(e.data);
+            updateDashboard({
+                cpu: metrics.cpu_percent,
+                memory: metrics.memory_mb,
+                sessions: metrics.active_sessions
+            });
+        });
+    
+    Events:
+        - metrics_update: System metrics update (CPU, Memory, DB status)
+    """
+    if not SSE_AVAILABLE:
+        raise HTTPException(503, "SSE not available - install sse-starlette")
+    
+    async def metrics_generator() -> AsyncGenerator:
+        """Generate periodic system metrics."""
+        
+        while True:
+            try:
+                # Collect system metrics
+                cpu_percent = psutil.cpu_percent(interval=0.1)
+                memory = psutil.virtual_memory()
+                
+                metrics = {
+                    "timestamp": datetime.utcnow().isoformat(),
+                    "cpu_percent": round(cpu_percent, 1),
+                    "memory_mb": round(memory.used / 1024 / 1024, 0),
+                    "memory_percent": round(memory.percent, 1),
+                    "active_sessions": streaming_manager.get_client_count() if streaming_manager else 0,
+                }
+                
+                # Add database status if StreamingManager available
+                if streaming_manager and hasattr(streaming_manager, 'get_db_status'):
+                    metrics["database"] = {
+                        "chromadb": streaming_manager.get_db_status("chromadb"),
+                        "neo4j": streaming_manager.get_db_status("neo4j"),
+                        "postgresql": streaming_manager.get_db_status("postgresql")
+                    }
+                
+                yield {
+                    "event": "metrics_update",
+                    "data": json.dumps(metrics),
+                    "id": str(int(datetime.utcnow().timestamp())),
+                    "retry": 5000
+                }
+                
+                await asyncio.sleep(interval)
+                
+            except asyncio.CancelledError:
+                logger.info("Metrics stream cancelled")
+                break
+            except Exception as e:
+                logger.error(f"Metrics collection error: {e}")
+                yield {
+                    "event": "error",
+                    "data": json.dumps({"error": str(e)}),
+                    "retry": 10000
+                }
+                await asyncio.sleep(interval)
+    
+    return EventSourceResponse(metrics_generator())
+
+
+@router.get("/jobs/{job_id}")
+async def stream_job_progress(job_id: str):
+    """
+    Stream UDS3 job progress (file upload/processing) via SSE.
+    
+    Args:
+        job_id: Job identifier
+    
+    Client Example:
+        const source = new EventSource('/api/sse/jobs/job_123');
+        source.addEventListener('job_progress', (e) => {
+            const progress = JSON.parse(e.data);
+            updateProgressBar(progress.percentage);
+            updateFileCount(progress.files_processed, progress.files_total);
+        });
+    
+    Events:
+        - job_progress: Job execution progress
+        - job_completed: Job finished successfully
+        - job_failed: Job failed with error
+    """
+    if not SSE_AVAILABLE:
+        raise HTTPException(503, "SSE not available - install sse-starlette")
+    
+    async def job_generator() -> AsyncGenerator:
+        """Generate job progress events."""
+        
+        if streaming_manager and hasattr(streaming_manager, 'subscribe_job'):
+            try:
+                async for event in streaming_manager.subscribe_job(job_id):
+                    event_type = "job_progress"
+                    
+                    if event.status == "completed":
+                        event_type = "job_completed"
+                    elif event.status == "failed":
+                        event_type = "job_failed"
+                    
+                    yield {
+                        "event": event_type,
+                        "data": json.dumps({
+                            "job_id": job_id,
+                            "status": event.status,
+                            "percentage": event.percentage,
+                            "files_processed": event.files_processed,
+                            "files_total": event.files_total,
+                            "message": event.message,
+                            "timestamp": datetime.utcnow().isoformat()
+                        }),
+                        "id": event.event_id,
+                        "retry": 5000
+                    }
+                    
+            except asyncio.CancelledError:
+                logger.info(f"Job stream cancelled for {job_id}")
+            except Exception as e:
+                logger.error(f"Job stream error: {e}")
+                yield {
+                    "event": "error",
+                    "data": json.dumps({"error": str(e), "job_id": job_id}),
+                    "retry": 10000
+                }
+        else:
+            # Mock job progress for testing
+            logger.warning("StreamingManager not available - generating mock job progress")
+            for i in range(10):
+                await asyncio.sleep(1)
+                percentage = (i + 1) * 10
+                
+                event_type = "job_progress"
+                if percentage >= 100:
+                    event_type = "job_completed"
+                
+                yield {
+                    "event": event_type,
+                    "data": json.dumps({
+                        "job_id": job_id,
+                        "status": "completed" if percentage >= 100 else "processing",
+                        "percentage": percentage,
+                        "files_processed": i + 1,
+                        "files_total": 10,
+                        "message": f"Processing file {i+1}/10",
+                        "timestamp": datetime.utcnow().isoformat()
+                    }),
+                    "id": str(i),
+                    "retry": 5000
+                }
+    
+    return EventSourceResponse(job_generator())
+
+
+@router.get("/quality/{session_id}")
+async def stream_quality_gates(session_id: str):
+    """
+    Stream quality gate notifications via SSE.
+    
+    Args:
+        session_id: Session identifier
+    
+    Client Example:
+        const source = new EventSource('/api/sse/quality/session_123');
+        source.addEventListener('quality_check', (e) => {
+            const check = JSON.parse(e.data);
+            if (!check.passed) {
+                showWarning(`Quality check failed: ${check.message}`);
+            }
+        });
+    
+    Events:
+        - quality_check: Quality gate check result
+        - review_required: Manual review required
+    """
+    if not SSE_AVAILABLE:
+        raise HTTPException(503, "SSE not available - install sse-starlette")
+    
+    async def quality_generator() -> AsyncGenerator:
+        """Generate quality gate events."""
+        
+        if streaming_manager and STREAMING_MANAGER_AVAILABLE:
+            try:
+                async for event in streaming_manager.subscribe_session(session_id):
+                    # Filter for quality-related events
+                    if event.event_type == EventType.QUALITY_CHECK.value:
+                        yield {
+                            "event": "quality_check",
+                            "data": json.dumps(event.data),
+                            "id": event.event_id,
+                            "retry": 5000
+                        }
+                    elif event.event_type == EventType.REVIEW_REQUIRED.value:
+                        yield {
+                            "event": "review_required",
+                            "data": json.dumps(event.data),
+                            "id": event.event_id,
+                            "retry": 5000
+                        }
+                    
+            except asyncio.CancelledError:
+                logger.info(f"Quality stream cancelled for session {session_id}")
+            except Exception as e:
+                logger.error(f"Quality stream error: {e}")
+                yield {
+                    "event": "error",
+                    "data": json.dumps({"error": str(e)}),
+                    "retry": 10000
+                }
+        else:
+            # Mock quality events
+            await asyncio.sleep(2)
+            yield {
+                "event": "quality_check",
+                "data": json.dumps({
+                    "session_id": session_id,
+                    "metric": "result_count",
+                    "value": 8,
+                    "threshold": 5,
+                    "passed": True,
+                    "message": "Sufficient results found"
+                }),
+                "id": "mock_1",
+                "retry": 5000
+            }
+    
+    return EventSourceResponse(quality_generator())
+
+
+@router.get("/health")
+async def sse_health():
+    """
+    SSE endpoint health check.
+    
+    Returns:
+        Health status including SSE availability and active streams
+    """
+    return {
+        "status": "healthy",
+        "sse_available": SSE_AVAILABLE,
+        "streaming_manager_available": streaming_manager is not None,
+        "active_streams": streaming_manager.get_client_count() if streaming_manager else 0,
+        "endpoints": {
+            "progress": "/api/sse/progress/{session_id}",
+            "metrics": "/api/sse/metrics",
+            "jobs": "/api/sse/jobs/{job_id}",
+            "quality": "/api/sse/quality/{session_id}"
+        }
+    }
+
+
+# Export for easy import
+__all__ = ['router', 'init_sse_endpoints']

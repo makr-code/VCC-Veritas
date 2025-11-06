@@ -35,6 +35,7 @@ from logging.handlers import RotatingFileHandler
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from starlette.staticfiles import StaticFiles
 import uvicorn
 import ssl
 
@@ -123,6 +124,34 @@ from backend.services.query_service import QueryService
 
 # API Router - ZWINGEND ERFORDERLICH!
 from backend.api import api_router, get_api_info
+
+# SSE Endpoints - SERVER-SENT EVENTS (NEU!)
+try:
+    from backend.api.sse_endpoints import router as sse_router, init_sse_endpoints
+    SSE_AVAILABLE = True
+except ImportError:
+    SSE_AVAILABLE = False
+    sse_router = None
+    init_sse_endpoints = None
+    logger.warning("⚠️ SSE Endpoints not available - install sse-starlette")
+
+# MCP HTTP Bridge (für Office Add-ins)
+try:
+    from backend.api.mcp_http_endpoints import router as mcp_http_router
+    MCP_HTTP_AVAILABLE = True
+except ImportError:
+    MCP_HTTP_AVAILABLE = False
+    mcp_http_router = None
+    logger.warning("ℹ️  MCP HTTP Bridge not available")
+
+# Office Ingestion (RAG Upload für Word/Excel/PowerPoint)
+try:
+    from backend.api.office_ingestion import router as office_ingestion_router
+    OFFICE_INGESTION_AVAILABLE = True
+except ImportError:
+    OFFICE_INGESTION_AVAILABLE = False
+    office_ingestion_router = None
+    logger.warning("ℹ️  Office Ingestion API not available")
 
 # ============================================================================
 # Feature Flags
@@ -361,6 +390,7 @@ async def lifespan(app: FastAPI):
     logger.info(f"   UDS3: ✅ Active (ChromaDB)")
     logger.info(f"   Pipeline: ✅ Active (14 Agents)")
     logger.info(f"   Streaming: ✅ Active")
+    logger.info(f"   SSE: {'✅ Active' if SSE_AVAILABLE else 'ℹ️  Not available'}")
     logger.info(f"   Query Service: ✅ Active")
     logger.info("=" * 80)
     
@@ -377,6 +407,12 @@ async def lifespan(app: FastAPI):
     logger.info("   GET  /api/agent/list - Agent Liste")
     logger.info("   GET  /api/system/health - Health Check")
     logger.info("   GET  /api/system/info - System Info")
+    if SSE_AVAILABLE:
+        logger.info("   --- SSE Streaming (NEW!) ---")
+        logger.info("   GET  /api/sse/progress/{session_id} - Agent Progress")
+        logger.info("   GET  /api/sse/metrics - System Metrics")
+        logger.info("   GET  /api/sse/jobs/{job_id} - Job Progress")
+        logger.info("   GET  /api/sse/quality/{session_id} - Quality Gates")
     logger.info("=" * 80)
     
     yield
@@ -470,6 +506,50 @@ else:
 
 app.include_router(api_router)
 logger.info("✅ API Router mounted at /api")
+
+# ============================================================================
+# Mount SSE Router (Server-Sent Events)
+# ============================================================================
+
+if SSE_AVAILABLE and sse_router:
+    app.include_router(sse_router)
+    logger.info("✅ SSE Router mounted at /api/sse")
+    
+    # Initialize SSE endpoints with StreamingManager (if available)
+    # Note: StreamingManager initialized later in lifespan, this is OK
+    # SSE endpoints work standalone or with StreamingManager
+    init_sse_endpoints(None)  # Will be updated in lifespan
+    logger.info("✅ SSE Endpoints initialized (will connect to StreamingManager on startup)")
+
+# ============================================================================
+# Mount MCP HTTP Bridge (Office Adapter)
+# ============================================================================
+
+if MCP_HTTP_AVAILABLE and mcp_http_router:
+    app.include_router(mcp_http_router)
+    logger.info("✅ MCP HTTP Bridge mounted at /api/mcp")
+
+# ============================================================================
+# Mount Office Ingestion API (RAG Upload)
+# ============================================================================
+
+if OFFICE_INGESTION_AVAILABLE and office_ingestion_router:
+    app.include_router(office_ingestion_router)
+    logger.info("✅ Office Ingestion API mounted at /api/office")
+
+# ============================================================================
+# Serve Office Add-in static files (Word Taskpane)
+# ============================================================================
+
+try:
+    office_dir = os.path.join(project_root, "desktop", "word-addin")
+    if os.path.isdir(office_dir):
+        app.mount("/office", StaticFiles(directory=office_dir, html=True), name="office")
+        logger.info("✅ Office Add-in static files mounted at /office")
+    else:
+        logger.info("ℹ️  Office Add-in directory not found (desktop/word-addin)")
+except Exception as e:
+    logger.warning(f"⚠️  Failed to mount Office static files: {e}")
 
 # ============================================================================
 # Mount Authentication Router

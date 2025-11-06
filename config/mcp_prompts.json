@@ -1,0 +1,86 @@
+{
+  "prompts": [
+    {
+      "name": "legal-research",
+      "description": "Juristische Recherche mit strukturierten Quellenhinweisen",
+      "system_message": "Du bist ein juristischer Assistent mit Zugriff auf VERITAS Datenbanken.",
+      "user_template": "Analysiere die Rechtslage zum Thema '{topic}' in der Jurisdiktion {jurisdiction}. Liefere strukturierte Quellenhinweise im IEEE-Format und klare Handlungsempfehlungen.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "topic": {
+            "type": "string",
+            "description": "Rechtsthema"
+          },
+          "jurisdiction": {
+            "type": "string",
+            "default": "DE",
+            "description": "Jurisdiktion (z.B. DE, EU, AT)"
+          }
+        },
+        "required": ["topic"]
+      }
+    },
+    {
+      "name": "baurecht-query",
+      "description": "Spezialisierte Abfrage für Baurecht und Genehmigungsverfahren",
+      "system_message": "Du bist ein Experte für deutsches Baurecht mit Schwerpunkt auf Baugenehmigungsverfahren, Bebauungsplänen und öffentlich-rechtlichen Vorschriften.",
+      "user_template": "Prüfe die baurechtliche Zulässigkeit von: {bauvorhaben}. Standort: {standort}. Analysiere: 1) Planungsrecht (B-Plan, FNP), 2) Bauordnungsrecht, 3) Erforderliche Genehmigungen, 4) Mögliche Konflikte.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "bauvorhaben": {
+            "type": "string",
+            "description": "Beschreibung des Bauvorhabens (z.B. 'Mehrfamilienhaus mit 6 Wohneinheiten')"
+          },
+          "standort": {
+            "type": "string",
+            "description": "Standort/Adresse des Bauvorhabens"
+          }
+        },
+        "required": ["bauvorhaben", "standort"]
+      }
+    },
+    {
+      "name": "immissionsschutz-analyse",
+      "description": "Analyse von Immissionsschutzfragen (Lärm, Luft, Geruch)",
+      "system_message": "Du bist ein Experte für Immissionsschutzrecht mit Fokus auf BImSchG, TA Lärm und TA Luft.",
+      "user_template": "Analysiere die Immissionsschutz-Anforderungen für: {vorhaben}. Standort: {standort}. Prüfe: 1) Genehmigungspflicht nach BImSchG, 2) TA Lärm/TA Luft Grenzwerte, 3) Erforderliche Gutachten, 4) Konfliktpotenzial mit Nachbarschaft.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "vorhaben": {
+            "type": "string",
+            "description": "Art des Vorhabens (z.B. 'Biogasanlage', 'Gewerbegebiet')"
+          },
+          "standort": {
+            "type": "string",
+            "description": "Standort/Adresse"
+          }
+        },
+        "required": ["vorhaben", "standort"]
+      }
+    },
+    {
+      "name": "verwaltungsrecht-prüfung",
+      "description": "Prüfung verwaltungsrechtlicher Fragestellungen",
+      "system_message": "Du bist ein Verwaltungsrechtsexperte mit Schwerpunkt auf Verwaltungsverfahren, Rechtsschutz und behördlichen Entscheidungen.",
+      "user_template": "Prüfe die verwaltungsrechtliche Fragestellung: {fragestellung}. Kontext: {kontext}. Analysiere: 1) Zuständige Behörde, 2) Anwendbares Verfahrensrecht, 3) Rechtsschutzmöglichkeiten, 4) Fristen.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "fragestellung": {
+            "type": "string",
+            "description": "Die verwaltungsrechtliche Fragestellung"
+          },
+          "kontext": {
+            "type": "string",
+            "description": "Zusätzlicher Kontext zur Situation",
+            "default": ""
+          }
+        },
+        "required": ["fragestellung"]
+      }
+    }
+  ]
+}

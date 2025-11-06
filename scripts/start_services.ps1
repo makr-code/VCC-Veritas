@@ -13,15 +13,15 @@ function Write-Header($text) {
 }
 
 function Write-Step($text) {
-    Write-Host "→ $text" -ForegroundColor Yellow
+    Write-Host "-> $text" -ForegroundColor Yellow
 }
 
 function Write-Success($text) {
-    Write-Host "  ✅ $text" -ForegroundColor Green
+    Write-Host "  [OK] $text" -ForegroundColor Green
 }
 
 function Write-Info($text) {
-    Write-Host "  ℹ️  $text" -ForegroundColor Blue
+    Write-Host "  [INFO] $text" -ForegroundColor Blue
 }
 
 # Basis-Pfade/PID-Datei
@@ -42,8 +42,8 @@ Write-Header "VERITAS Service Starter"
 if (-not $FrontendOnly) {
     Write-Step "Starte Backend (Port 5000)..."
 
-    # 🧹 Lösche Python Cache (kritisch für Code-Updates!)
-    Write-Step "Lösche __pycache__ für frischen Start..."
+    # Clean Python cache (wichtig für Code-Updates)
+    Write-Step "Loesche __pycache__ fuer frischen Start..."
     Get-ChildItem -Path (Join-Path $RootDir "backend") -Filter "__pycache__" -Recurse -Directory -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force
     Get-ChildItem -Path (Join-Path $RootDir "backend") -Filter "*.pyc" -Recurse -File -ErrorAction SilentlyContinue | Remove-Item -Force
     Write-Success "Cache gelöscht"
@@ -66,9 +66,9 @@ if (-not $FrontendOnly) {
         } else {
             $env:PYTHONPATH = "$newPyPath;$existingPyPath"
         }
-        Write-Info "PYTHONPATH gesetzt: $($env:PYTHONPATH)"
+    Write-Info "PYTHONPATH gesetzt: $($env:PYTHONPATH)"
     } catch {
-        Write-Host "  ⚠️  Konnte PYTHONPATH nicht setzen: $_" -ForegroundColor Yellow
+        Write-Host "  [WARN] Konnte PYTHONPATH nicht setzen: $_" -ForegroundColor Yellow
     }
 
     # Starte gezielt den uvicorn Prozess und speichere PID
@@ -88,14 +88,14 @@ if (-not $FrontendOnly) {
         Write-Info "Logs: $BackendLogFile"
         Write-Info "Errors: $BackendErrFile"
     } catch {
-        Write-Host "  ❌ Backend konnte nicht gestartet werden: $_" -ForegroundColor Red
+        Write-Host "  [ERROR] Backend konnte nicht gestartet werden: $_" -ForegroundColor Red
         exit 1
     }
 
-    # Health Check mit Retry (max. 10s) - Backend v4.0.0
-    Write-Info "Prüfe Health-Status (bis zu 10s)..."
+    # Health Check mit Retry (max. 20s) - Backend v4.0.0
+    Write-Info "Pruefe Health-Status (bis zu 20s)..."
     $healthy = $false
-    for ($i = 0; $i -lt 10; $i++) {
+    for ($i = 0; $i -lt 20; $i++) {
         try {
             $response = Invoke-RestMethod -Uri "http://127.0.0.1:5000/api/system/health" -TimeoutSec 2 -ErrorAction Stop
             $healthy = $true
@@ -104,19 +104,19 @@ if (-not $FrontendOnly) {
                 Write-Host "    Status: $($response.status)" -ForegroundColor Gray
                 if ($response.components) {
                     Write-Host "    Components:" -ForegroundColor Gray
-                    if ($response.components.uds3) { Write-Host "      • UDS3: ✓" -ForegroundColor Green }
-                    if ($response.components.pipeline) { Write-Host "      • Pipeline: ✓" -ForegroundColor Green }
-                    if ($response.components.agents) { Write-Host "      • Agents: ✓" -ForegroundColor Green }
+                    if ($response.components.uds3) { Write-Host "      - UDS3: OK" -ForegroundColor Green }
+                    if ($response.components.pipeline) { Write-Host "      - Pipeline: OK" -ForegroundColor Green }
+                    if ($response.components.agents) { Write-Host "      - Agents: OK" -ForegroundColor Green }
                 }
             }
             break
         } catch { Start-Sleep -Milliseconds 800 }
     }
     if (-not $healthy) {
-        Write-Host "  ⚠️  Backend Health Check fehlgeschlagen (bitte Logs prüfen)" -ForegroundColor Yellow
+        Write-Host "  [WARN] Backend Health Check fehlgeschlagen (bitte Logs pruefen)" -ForegroundColor Yellow
         Write-Host "     Tipp: Get-CimInstance Win32_Process -Filter 'ProcessId = $((Get-Content $BackendPidFile))' | Select-Object CommandLine" -ForegroundColor DarkYellow
         if (Test-Path $BackendLogFile) {
-            Write-Host "     📄 Letzte Log-Zeilen:" -ForegroundColor DarkYellow
+            Write-Host "     Letzte Log-Zeilen:" -ForegroundColor DarkYellow
             try { Get-Content -Path $BackendLogFile -Tail 60 | ForEach-Object { Write-Host ("       " + $_) -ForegroundColor DarkGray } } catch {}
         }
     }
@@ -155,13 +155,13 @@ if (-not $FrontendOnly) {
 if (-not $BackendOnly) {
     Write-Host "`nFrontend: " -NoNewline -ForegroundColor White
     Write-Host "GUI (Tkinter)" -ForegroundColor Cyan
-    Write-Host "  • Job ID:    $($frontendJob.Id)" -ForegroundColor Gray
+    Write-Host "  - Job ID:    $($frontendJob.Id)" -ForegroundColor Gray
 }
 
 # Befehle anzeigen
-Write-Host "`n📋 Nützliche Befehle:" -ForegroundColor Cyan
-Write-Host "  • Logs anzeigen:    Get-Job | Receive-Job -Keep" -ForegroundColor White
-Write-Host "  • Backend stoppen:  .\\scripts\\stop_services.ps1 -BackendOnly" -ForegroundColor White
-Write-Host "  • Status prüfen:    Get-Job" -ForegroundColor White
+Write-Host "`nNuetzliche Befehle:" -ForegroundColor Cyan
+Write-Host "  - Logs anzeigen:    Get-Job | Receive-Job -Keep" -ForegroundColor White
+Write-Host "  - Backend stoppen:  .\\scripts\\stop_services.ps1 -BackendOnly" -ForegroundColor White
+Write-Host "  - Status pruefen:    Get-Job" -ForegroundColor White
 
-Write-Host "`n✅ Services laufen im Hintergrund!`n" -ForegroundColor Green
+Write-Host "`nServices laufen im Hintergrund!`n" -ForegroundColor Green

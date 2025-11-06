@@ -11,6 +11,7 @@ from fastapi import APIRouter
 from .query_router import query_router
 from .agent_router import agent_router
 from .system_router import system_router
+from .office_api_router import router as office_router
 
 # API Info
 API_VERSION = "4.0.0"
@@ -18,6 +19,7 @@ API_MODULES = [
     "query",      # Query Processing
     "agent",      # Agent System
     "system",     # System Info
+    "office",     # Office Add-in Integration
 ]
 
 # Haupt-Router
@@ -27,6 +29,7 @@ api_router = APIRouter(prefix="/api")
 api_router.include_router(query_router, tags=["Query"])
 api_router.include_router(agent_router, tags=["Agents"])
 api_router.include_router(system_router, tags=["System"])
+api_router.include_router(office_router, tags=["Office Add-in"])
 
 
 def get_api_info():
