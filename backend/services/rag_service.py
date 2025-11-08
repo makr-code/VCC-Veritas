@@ -167,58 +167,54 @@ class RAGService:
     """
     Retrieval-Augmented Generation Service
     
-    Provides document search and retrieval using UDS3 multi-database framework.
-    Supports vector, graph, and relational search with hybrid ranking.
+    Provides document search and retrieval using multi-database framework.
+    Primary: ThemisDB (Multi-Model) → Fallback: UDS3 Polyglot
     """
     
     def __init__(self):
         """
-        Initialize RAG Service with UDS3 Polyglot Manager
+        Initialize RAG Service with Database Adapter (ThemisDB or UDS3).
         
-        UDS3 handles ALL database connections internally (auto-config).
-        RAG Service only orchestrates search operations.
+        Strategy:
+        ---------
+        1. **Primary:** ThemisDB adapter (if THEMIS_ENABLED=true)
+        2. **Fallback:** UDS3 Polyglot (if ThemisDB unavailable)
+        
+        Environment Variables:
+        ----------------------
+        - THEMIS_ENABLED: Enable ThemisDB (default: true)
+        - USE_UDS3_FALLBACK: Enable UDS3 fallback (default: true)
         """
         self.logger = logging.getLogger(__name__)
         
         # ============================================================================
-        # UDS3 Polyglot Manager - STRICT SEPARATION OF CONCERNS
+        # Database Adapter - Environment-Controlled Selection
         # ============================================================================
-        # UDS3 manages ALL database backends internally.
-        # RAG Service ONLY orchestrates search logic.
-        # NO direct backend access - everything through UDS3!
+        # Primary: ThemisDB (single multi-model database)
+        # Fallback: UDS3 Polyglot (multi-backend orchestration)
         
         try:
-            from uds3.core.polyglot_manager import UDS3PolyglotManager
+            from backend.adapters import get_database_adapter
             
-            # Nur Backend-TYPEN angeben - UDS3 übernimmt Rest!
-            backend_config = {
-                "relational": {"enabled": True},  # PostgreSQL - Auto-Config
-                "vector": {"enabled": True},      # ChromaDB - Auto-Config
-                "graph": {"enabled": True},       # Neo4j - Auto-Config
-                "file": {"enabled": True}         # CouchDB - Auto-Config
-            }
+            # Get adapter with automatic fallback
+            self.db_adapter = get_database_adapter(enable_fallback=True)
             
-            self.uds3_manager = UDS3PolyglotManager(
-                backend_config=backend_config,
-                enable_rag=False  # RAG Service handles RAG logic, not UDS3
-            )
-            self.logger.info("✅ UDS3 PolyglotManager initialisiert (Auto-Config)")
+            # Check which adapter was selected
+            adapter_name = self.db_adapter.__class__.__name__
+            self.logger.info(f"✅ RAG Service initialized with {adapter_name}")
             
         except Exception as e:
-            self.logger.error(f"❌ CRITICAL: UDS3 PolyglotManager Init FAILED: {e}")
-            raise RuntimeError(f"RAG Service requires UDS3 PolyglotManager - Init failed: {e}")
+            self.logger.error(f"❌ CRITICAL: Database Adapter Init FAILED: {e}")
+            raise RuntimeError(f"RAG Service requires database adapter - Init failed: {e}")
     
     def is_available(self) -> bool:
         """
-        Check if UDS3 manager is available
+        Check if database adapter is available
         
         Returns:
-            True if UDS3 PolyglotManager initialized
-            
-        Note: In production mode, this should ALWAYS return True
-              because __init__ throws RuntimeError if initialization fails.
+            True if adapter initialized successfully
         """
-        return hasattr(self, 'uds3_manager') and self.uds3_manager is not None
+        return hasattr(self, 'db_adapter') and self.db_adapter is not None
     
     def vector_search(
         self,

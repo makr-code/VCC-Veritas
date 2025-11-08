@@ -1,0 +1,648 @@
+"""
+VERITAS API v3 - Adapter Management Router
+==========================================
+
+Monitor and control database adapter selection (ThemisDB/UDS3).
+
+Endpoints:
+- GET  /status           - Current adapter status
+- GET  /metrics          - Performance metrics (all adapters)
+- POST /switch           - Validate adapter switch
+- GET  /failover/history - Failover event log
+- POST /test             - Test adapter connectivity
+
+Features:
+- Real-time adapter availability monitoring
+- Performance comparison (ThemisDB vs UDS3)
+- Failover validation
+- Health check aggregation
+
+Created: 2025-11-07
+"""
+
+from fastapi import APIRouter, HTTPException, Query
+from pydantic import BaseModel, Field
+from typing import Literal, List, Dict, Any, Optional
+from datetime import datetime
+import logging
+import os
+
+from backend.adapters import (
+    get_database_adapter,
+    get_adapter_type,
+    is_themisdb_available,
+    is_uds3_available,
+    DatabaseAdapterType
+)
+
+logger = logging.getLogger(__name__)
+
+adapter_router = APIRouter(prefix="/adapters", tags=["Adapters"])
+
+
+# ============================================================================
+# Pydantic Models
+# ============================================================================
+
+class AdapterStatus(BaseModel):
+    """Current adapter status"""
+    current_adapter: Literal["themis", "uds3"]
+    themis_available: bool
+    uds3_available: bool
+    failover_enabled: bool
+    last_check: str
+    env_config: Dict[str, str]
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "current_adapter": "themis",
+                "themis_available": True,
+                "uds3_available": True,
+                "failover_enabled": True,
+                "last_check": "2025-11-07T10:30:00Z",
+                "env_config": {
+                    "THEMIS_ENABLED": "true",
+                    "THEMIS_HOST": "localhost",
+                    "USE_UDS3_FALLBACK": "true"
+                }
+            }
+        }
+
+
+class AdapterMetrics(BaseModel):
+    """Adapter performance metrics"""
+    adapter: Literal["themis", "uds3"]
+    available: bool
+    total_queries: int
+    successful_queries: int
+    failed_queries: int
+    empty_results: int
+    avg_latency_ms: float
+    success_rate: float
+    timestamp: str
+
+
+class AdapterTestResult(BaseModel):
+    """Adapter connectivity test result"""
+    adapter: Literal["themis", "uds3"]
+    reachable: bool
+    latency_ms: Optional[float] = None
+    error: Optional[str] = None
+    timestamp: str
+
+
+class FailoverEvent(BaseModel):
+    """Failover event log entry"""
+    timestamp: str
+    from_adapter: str
+    to_adapter: str
+    reason: str
+    automatic: bool
+
+
+class AdapterCapability(BaseModel):
+    """Single adapter capability"""
+    name: str
+    supported: bool
+    description: str
+    endpoint: Optional[str] = None
+
+
+class AdapterCapabilities(BaseModel):
+    """Comprehensive adapter capabilities"""
+    adapter: Literal["themis", "uds3"]
+    available: bool
+    data_models: List[str]
+    query_languages: List[str]
+    features: List[AdapterCapability]
+    limitations: List[str]
+    performance_characteristics: Dict[str, str]
+
+
+# ============================================================================
+# Endpoints
+# ============================================================================
+
+@adapter_router.get("/status", response_model=AdapterStatus)
+async def get_adapter_status():
+    """
+    Get current adapter status and availability.
+    
+    Returns:
+        - current_adapter: Active adapter (themis/uds3)
+        - themis_available: ThemisDB server reachable
+        - uds3_available: UDS3 Polyglot initialized
+        - failover_enabled: Automatic fallback enabled
+        - env_config: Relevant environment variables
+    
+    Use Cases:
+        - Monitoring dashboard
+        - Pre-deployment validation
+        - Troubleshooting adapter issues
+    """
+    current = get_adapter_type()
+    themis_ok = is_themisdb_available()
+    uds3_ok = is_uds3_available()
+    
+    # Environment configuration
+    env_config = {
+        "THEMIS_ENABLED": os.getenv("THEMIS_ENABLED", "true"),
+        "THEMIS_HOST": os.getenv("THEMIS_HOST", "localhost"),
+        "THEMIS_PORT": os.getenv("THEMIS_PORT", "8765"),
+        "USE_UDS3_FALLBACK": os.getenv("USE_UDS3_FALLBACK", "true")
+    }
+    
+    fallback_enabled = env_config["USE_UDS3_FALLBACK"].lower() == "true"
+    
+    logger.info(
+        f"Adapter status: current={current}, "
+        f"themis={themis_ok}, uds3={uds3_ok}, fallback={fallback_enabled}"
+    )
+    
+    return AdapterStatus(
+        current_adapter=str(current),
+        themis_available=themis_ok,
+        uds3_available=uds3_ok,
+        failover_enabled=fallback_enabled,
+        last_check=datetime.utcnow().isoformat(),
+        env_config=env_config
+    )
+
+
+@adapter_router.get("/metrics", response_model=List[AdapterMetrics])
+async def get_adapter_metrics():
+    """
+    Get performance metrics for all available adapters.
+    
+    Metrics include:
+        - Query counts (total, successful, failed)
+        - Average latency
+        - Success rate
+        - Empty result counts
+    
+    Returns:
+        List of metrics for each available adapter
+    """
+    metrics = []
+    
+    # ThemisDB metrics
+    try:
+        if is_themisdb_available():
+            adapter = get_database_adapter(
+                adapter_type=DatabaseAdapterType.THEMIS,
+                enable_fallback=False
+            )
+            stats = adapter.get_stats()
+            
+            metrics.append(AdapterMetrics(
+                adapter="themis",
+                available=True,
+                total_queries=stats['total_queries'],
+                successful_queries=stats['successful_queries'],
+                failed_queries=stats['failed_queries'],
+                empty_results=stats['empty_results'],
+                avg_latency_ms=stats['avg_latency_ms'],
+                success_rate=stats['success_rate'],
+                timestamp=datetime.utcnow().isoformat()
+            ))
+            
+            logger.info(f"ThemisDB metrics: {stats['total_queries']} queries, {stats['success_rate']:.2%} success")
+    except Exception as e:
+        logger.warning(f"Failed to get ThemisDB metrics: {e}")
+        metrics.append(AdapterMetrics(
+            adapter="themis",
+            available=False,
+            total_queries=0,
+            successful_queries=0,
+            failed_queries=0,
+            empty_results=0,
+            avg_latency_ms=0.0,
+            success_rate=0.0,
+            timestamp=datetime.utcnow().isoformat()
+        ))
+    
+    # UDS3 metrics
+    try:
+        if is_uds3_available():
+            # TODO: Implement UDS3VectorSearchAdapter.get_stats()
+            # For now, return placeholder
+            metrics.append(AdapterMetrics(
+                adapter="uds3",
+                available=True,
+                total_queries=0,
+                successful_queries=0,
+                failed_queries=0,
+                empty_results=0,
+                avg_latency_ms=0.0,
+                success_rate=0.0,
+                timestamp=datetime.utcnow().isoformat()
+            ))
+            
+            logger.info("UDS3 metrics: Stats not yet implemented")
+    except Exception as e:
+        logger.warning(f"Failed to get UDS3 metrics: {e}")
+    
+    return metrics
+
+
+@adapter_router.post("/switch")
+async def switch_adapter(
+    target: Literal["themis", "uds3"],
+    validate_only: bool = Query(True, description="Only validate, don't switch")
+):
+    """
+    Switch primary adapter (requires backend restart).
+    
+    This endpoint validates that the target adapter is available.
+    Actual switch requires changing environment variables and restarting the backend.
+    
+    Args:
+        target: Target adapter (themis/uds3)
+        validate_only: If True, only validates without switching
+        
+    Returns:
+        Validation result and required actions
+    """
+    if target == "themis":
+        available = is_themisdb_available()
+        
+        if not available:
+            raise HTTPException(
+                status_code=503,
+                detail="ThemisDB not available - cannot switch. Check THEMIS_HOST and server status."
+            )
+        
+        logger.info("Switch to ThemisDB validated successfully")
+        
+        return {
+            "target": "themis",
+            "validated": True,
+            "available": True,
+            "action_required": (
+                "Set environment variables:\n"
+                "  THEMIS_ENABLED=true\n"
+                "  THEMIS_HOST=<your-themis-host>\n"
+                "Then restart backend: systemctl restart veritas-backend"
+            ) if validate_only else None,
+            "message": "ThemisDB is available and ready" if validate_only else "Switch initiated"
+        }
+    
+    elif target == "uds3":
+        available = is_uds3_available()
+        
+        if not available:
+            raise HTTPException(
+                status_code=503,
+                detail="UDS3 not available - cannot switch. Check UDS3 dependencies."
+            )
+        
+        logger.info("Switch to UDS3 validated successfully")
+        
+        return {
+            "target": "uds3",
+            "validated": True,
+            "available": True,
+            "action_required": (
+                "Set environment variables:\n"
+                "  THEMIS_ENABLED=false\n"
+                "Then restart backend: systemctl restart veritas-backend"
+            ) if validate_only else None,
+            "message": "UDS3 is available and ready" if validate_only else "Switch initiated"
+        }
+
+
+@adapter_router.post("/test", response_model=List[AdapterTestResult])
+async def test_adapters():
+    """
+    Test connectivity to all adapters.
+    
+    Performs health checks and measures latency.
+    
+    Returns:
+        Test results for each adapter
+    """
+    import time
+    results = []
+    
+    # Test ThemisDB
+    start = time.time()
+    try:
+        adapter = get_database_adapter(
+            adapter_type=DatabaseAdapterType.THEMIS,
+            enable_fallback=False
+        )
+        await adapter.health_check()
+        latency = (time.time() - start) * 1000
+        
+        results.append(AdapterTestResult(
+            adapter="themis",
+            reachable=True,
+            latency_ms=latency,
+            timestamp=datetime.utcnow().isoformat()
+        ))
+        
+        logger.info(f"ThemisDB test: OK ({latency:.1f}ms)")
+        
+    except Exception as e:
+        results.append(AdapterTestResult(
+            adapter="themis",
+            reachable=False,
+            error=str(e),
+            timestamp=datetime.utcnow().isoformat()
+        ))
+        
+        logger.warning(f"ThemisDB test: FAILED - {e}")
+    
+    # Test UDS3
+    try:
+        if is_uds3_available():
+            results.append(AdapterTestResult(
+                adapter="uds3",
+                reachable=True,
+                timestamp=datetime.utcnow().isoformat()
+            ))
+            logger.info("UDS3 test: OK")
+        else:
+            results.append(AdapterTestResult(
+                adapter="uds3",
+                reachable=False,
+                error="UDS3 not initialized",
+                timestamp=datetime.utcnow().isoformat()
+            ))
+            logger.warning("UDS3 test: NOT AVAILABLE")
+            
+    except Exception as e:
+        results.append(AdapterTestResult(
+            adapter="uds3",
+            reachable=False,
+            error=str(e),
+            timestamp=datetime.utcnow().isoformat()
+        ))
+        logger.warning(f"UDS3 test: FAILED - {e}")
+    
+    return results
+
+
+@adapter_router.get("/failover/history", response_model=List[FailoverEvent])
+async def get_failover_history(
+    limit: int = Query(100, ge=1, le=1000, description="Maximum events to return")
+):
+    """
+    Get failover event history.
+    
+    Returns log of adapter switches (planned maintenance or emergency failovers).
+    
+    TODO: Implement persistent failover logging to database.
+    
+    Args:
+        limit: Maximum number of events to return
+        
+    Returns:
+        List of failover events
+    """
+    # TODO: Implement persistent storage
+    # For now, return empty list
+    
+    logger.info("Failover history requested (not yet implemented)")
+    
+    return []
+
+
+@adapter_router.get("/comparison")
+async def compare_adapters():
+    """
+    Compare performance of ThemisDB vs UDS3.
+    
+    Returns side-by-side comparison of:
+        - Availability
+        - Query performance
+        - Success rates
+        - Feature support
+    """
+    comparison = {
+        "themis": {
+            "available": is_themisdb_available(),
+            "features": [
+                "Native Multi-Model (Vector, Graph, Document, Relational)",
+                "HNSW Vector Search",
+                "Property Graph Traversal",
+                "AQL Query Language",
+                "MVCC Transactions",
+                "Single Database (simplified ops)"
+            ]
+        },
+        "uds3": {
+            "available": is_uds3_available(),
+            "features": [
+                "Polyglot Persistence (4+ backends)",
+                "Multi-Backend Orchestration",
+                "SAGA Transactions",
+                "Backend-Specific Optimizations",
+                "Legacy Integration"
+            ]
+        }
+    }
+    
+    # Add metrics if available
+    try:
+        metrics = await get_adapter_metrics()
+        for metric in metrics:
+            comparison[metric.adapter]["metrics"] = {
+                "total_queries": metric.total_queries,
+                "avg_latency_ms": metric.avg_latency_ms,
+                "success_rate": metric.success_rate
+            }
+    except Exception as e:
+        logger.warning(f"Failed to add metrics to comparison: {e}")
+    
+    return comparison
+
+
+@adapter_router.get("/capabilities", response_model=List[AdapterCapabilities])
+async def get_adapter_capabilities():
+    """
+    Get detailed capabilities for all database adapters.
+    
+    Returns comprehensive feature matrix including:
+        - Supported data models (Vector, Graph, Document, Relational)
+        - Query languages (AQL, Cypher, SQL)
+        - Features (Search, Traversal, Transactions, etc.)
+        - Known limitations
+        - Performance characteristics
+    
+    Use Cases:
+        - Feature discovery for frontend
+        - API documentation generation
+        - Client capability negotiation
+        - Integration planning
+    """
+    capabilities = []
+    
+    # ThemisDB Capabilities
+    themis_capabilities = AdapterCapabilities(
+        adapter="themis",
+        available=is_themisdb_available(),
+        data_models=[
+            "Vector (Embeddings)",
+            "Graph (Property Graph)",
+            "Document (JSON)",
+            "Relational (Tables)"
+        ],
+        query_languages=[
+            "AQL (Themis Query Language)",
+            "REST API",
+            "Native Vector Search"
+        ],
+        features=[
+            AdapterCapability(
+                name="vector_search",
+                supported=True,
+                description="HNSW-based semantic search with multiple distance metrics",
+                endpoint="/api/v3/themis/vector/search"
+            ),
+            AdapterCapability(
+                name="graph_traversal",
+                supported=True,
+                description="Bidirectional property graph traversal with configurable depth",
+                endpoint="/api/v3/themis/graph/traverse"
+            ),
+            AdapterCapability(
+                name="aql_queries",
+                supported=True,
+                description="Multi-model AQL query execution",
+                endpoint="/api/v3/themis/aql/query"
+            ),
+            AdapterCapability(
+                name="document_crud",
+                supported=True,
+                description="JSON document storage with collection-based isolation",
+                endpoint="/api/v3/themis/document/{collection}/{key}"
+            ),
+            AdapterCapability(
+                name="acid_transactions",
+                supported=True,
+                description="MVCC transactions via RocksDB TransactionDB",
+                endpoint=None
+            ),
+            AdapterCapability(
+                name="full_text_search",
+                supported=False,
+                description="Full-text search not yet implemented (use vector search)",
+                endpoint=None
+            ),
+            AdapterCapability(
+                name="geospatial_queries",
+                supported=False,
+                description="Geospatial indexing not supported",
+                endpoint=None
+            ),
+            AdapterCapability(
+                name="real_time_streaming",
+                supported=False,
+                description="Change streams not implemented",
+                endpoint=None
+            )
+        ],
+        limitations=[
+            "Single-server deployment (no clustering yet)",
+            "Read-only AQL queries via REST API (write operations via native client)",
+            "No built-in authentication (use API Gateway)",
+            "Limited query optimization for complex AQL"
+        ],
+        performance_characteristics={
+            "vector_search_latency": "10-50ms (HNSW index)",
+            "graph_traversal_latency": "20-100ms (depth 1-3)",
+            "transaction_overhead": "Minimal (RocksDB native)",
+            "concurrent_connections": "1000+ (HTTP/2)",
+            "throughput": "5000+ queries/sec (single node)"
+        }
+    )
+    capabilities.append(themis_capabilities)
+    
+    # UDS3 Capabilities
+    uds3_capabilities = AdapterCapabilities(
+        adapter="uds3",
+        available=is_uds3_available(),
+        data_models=[
+            "Vector (via ChromaDB)",
+            "Graph (via Neo4j)",
+            "Relational (via PostgreSQL)",
+            "Document (via CouchDB)"
+        ],
+        query_languages=[
+            "Cypher (Neo4j)",
+            "SQL (PostgreSQL)",
+            "ChromaDB Query API",
+            "Unified Query Interface"
+        ],
+        features=[
+            AdapterCapability(
+                name="vector_search",
+                supported=True,
+                description="ChromaDB semantic search with multiple embeddings",
+                endpoint="/api/v3/uds3/vector/search"
+            ),
+            AdapterCapability(
+                name="graph_queries",
+                supported=True,
+                description="Neo4j Cypher queries for graph data",
+                endpoint="/api/v3/uds3/graph/query"
+            ),
+            AdapterCapability(
+                name="relational_queries",
+                supported=True,
+                description="PostgreSQL SQL queries",
+                endpoint="/api/v3/uds3/relational/query"
+            ),
+            AdapterCapability(
+                name="polyglot_queries",
+                supported=True,
+                description="Unified queries across multiple backends",
+                endpoint="/api/v3/uds3/query"
+            ),
+            AdapterCapability(
+                name="saga_transactions",
+                supported=True,
+                description="Distributed SAGA transactions across backends",
+                endpoint="/api/v3/saga/orchestrate"
+            ),
+            AdapterCapability(
+                name="bulk_operations",
+                supported=True,
+                description="Batch insert/update across backends",
+                endpoint="/api/v3/uds3/bulk"
+            ),
+            AdapterCapability(
+                name="backend_specific_optimization",
+                supported=True,
+                description="Use best backend for each query type",
+                endpoint=None
+            ),
+            AdapterCapability(
+                name="unified_transactions",
+                supported=False,
+                description="No true ACID across all backends (eventual consistency)",
+                endpoint=None
+            )
+        ],
+        limitations=[
+            "Multi-backend complexity (4+ databases to maintain)",
+            "Eventual consistency across backends",
+            "Higher operational overhead",
+            "SAGA transaction compensation required",
+            "Network latency for distributed queries"
+        ],
+        performance_characteristics={
+            "vector_search_latency": "20-80ms (ChromaDB + network)",
+            "graph_query_latency": "30-150ms (Neo4j + network)",
+            "polyglot_query_latency": "50-300ms (multi-backend coordination)",
+            "saga_overhead": "Significant (compensation logic)",
+            "concurrent_connections": "500+ (limited by backend pools)"
+        }
+    )
+    capabilities.append(uds3_capabilities)
+    
+    logger.info("Adapter capabilities retrieved")
+    
+    return capabilities

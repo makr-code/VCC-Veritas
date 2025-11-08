@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThemisDB WebSocket Client</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .status.connected {
+            background: #10b981;
+        }
+        
+        .status.disconnected {
+            background: #ef4444;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            background: #f9fafb;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            color: #6b7280;
+            transition: all 0.3s;
+        }
+        
+        .tab:hover {
+            background: #f3f4f6;
+        }
+        
+        .tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border 0.3s;
+        }
+        
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 10px;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        
+        .results {
+            margin-top: 30px;
+            max-height: 400px;
+            overflow-y: auto;
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .result-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .score {
+            background: #10b981;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        
+        .log-item {
+            padding: 10px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+        
+        .log-DEBUG { background: #f3f4f6; color: #6b7280; }
+        .log-INFO { background: #dbeafe; color: #1e40af; }
+        .log-WARNING { background: #fef3c7; color: #92400e; }
+        .log-ERROR { background: #fee2e2; color: #991b1b; }
+        
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .metric-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 ThemisDB WebSocket Client</h1>
+            <p>Real-time Vector Search & Adapter Monitoring</p>
+            <div class="status disconnected" id="connectionStatus">Disconnected</div>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('search')">Vector Search</button>
+            <button class="tab" onclick="switchTab('status')">Adapter Status</button>
+            <button class="tab" onclick="switchTab('logs')">Live Logs</button>
+            <button class="tab" onclick="switchTab('graph')">Graph Traversal</button>
+        </div>
+        
+        <!-- Vector Search Tab -->
+        <div id="search" class="tab-content active">
+            <h2>Real-time Vector Search</h2>
+            
+            <div class="input-group">
+                <label>WebSocket URL:</label>
+                <input type="text" id="searchWsUrl" value="ws://localhost:8000/api/v3/ws/search?client_id=browser_client">
+            </div>
+            
+            <div class="input-group">
+                <label>Search Query:</label>
+                <input type="text" id="searchQuery" placeholder="machine learning best practices" value="machine learning">
+            </div>
+            
+            <div class="input-group">
+                <label>Top K Results:</label>
+                <input type="number" id="topK" value="5" min="1" max="20">
+            </div>
+            
+            <div class="input-group">
+                <label>Collection:</label>
+                <input type="text" id="collection" value="documents">
+            </div>
+            
+            <button class="btn btn-primary" onclick="connectSearch()">Connect & Search</button>
+            <button class="btn btn-secondary" onclick="disconnectSearch()">Disconnect</button>
+            
+            <div class="results" id="searchResults">
+                <p style="color: #6b7280;">Verbinde mit WebSocket und starte eine Suche...</p>
+            </div>
+        </div>
+        
+        <!-- Adapter Status Tab -->
+        <div id="status" class="tab-content">
+            <h2>Adapter Status Monitor</h2>
+            
+            <div class="input-group">
+                <label>WebSocket URL:</label>
+                <input type="text" id="statusWsUrl" value="ws://localhost:8000/api/v3/ws/adapter/status?client_id=browser_client&interval=3">
+            </div>
+            
+            <button class="btn btn-primary" onclick="connectStatus()">Start Monitoring</button>
+            <button class="btn btn-secondary" onclick="disconnectStatus()">Stop</button>
+            
+            <div class="metrics">
+                <div class="metric-card">
+                    <div class="metric-label">Current Adapter</div>
+                    <div class="metric-value" id="currentAdapter">-</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">ThemisDB Status</div>
+                    <div class="metric-value" id="themisStatus">-</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">UDS3 Status</div>
+                    <div class="metric-value" id="uds3Status">-</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Active Connections</div>
+                    <div class="metric-value" id="activeConnections">-</div>
+                </div>
+            </div>
+            
+            <div class="results" id="statusResults" style="margin-top: 20px;">
+                <p style="color: #6b7280;">Warte auf Status-Updates...</p>
+            </div>
+        </div>
+        
+        <!-- Live Logs Tab -->
+        <div id="logs" class="tab-content">
+            <h2>Live Backend Logs</h2>
+            
+            <div class="input-group">
+                <label>WebSocket URL:</label>
+                <input type="text" id="logsWsUrl" value="ws://localhost:8000/api/v3/ws/logs?client_id=browser_client&log_level=INFO">
+            </div>
+            
+            <div class="input-group">
+                <label>Log Level:</label>
+                <select id="logLevel">
+                    <option value="DEBUG">DEBUG</option>
+                    <option value="INFO" selected>INFO</option>
+                    <option value="WARNING">WARNING</option>
+                    <option value="ERROR">ERROR</option>
+                </select>
+            </div>
+            
+            <button class="btn btn-primary" onclick="connectLogs()">Start Streaming</button>
+            <button class="btn btn-secondary" onclick="disconnectLogs()">Stop</button>
+            <button class="btn btn-danger" onclick="clearLogs()">Clear</button>
+            
+            <div class="results" id="logsResults">
+                <p style="color: #6b7280;">Warte auf Log-Einträge...</p>
+            </div>
+        </div>
+        
+        <!-- Graph Traversal Tab -->
+        <div id="graph" class="tab-content">
+            <h2>Real-time Graph Traversal</h2>
+            
+            <div class="input-group">
+                <label>WebSocket URL:</label>
+                <input type="text" id="graphWsUrl" value="ws://localhost:8000/api/v3/ws/graph/traverse?client_id=browser_client">
+            </div>
+            
+            <div class="input-group">
+                <label>Start Vertex:</label>
+                <input type="text" id="startVertex" placeholder="doc123" value="doc123">
+            </div>
+            
+            <div class="input-group">
+                <label>Edge Collection:</label>
+                <input type="text" id="edgeCollection" value="citations">
+            </div>
+            
+            <div class="input-group">
+                <label>Max Depth:</label>
+                <input type="number" id="maxDepth" value="3" min="1" max="10">
+            </div>
+            
+            <button class="btn btn-primary" onclick="connectGraph()">Connect & Traverse</button>
+            <button class="btn btn-secondary" onclick="disconnectGraph()">Disconnect</button>
+            
+            <div class="results" id="graphResults">
+                <p style="color: #6b7280;">Verbinde und starte Graph-Traversierung...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let searchWs = null;
+        let statusWs = null;
+        let logsWs = null;
+        let graphWs = null;
+        
+        // Tab Switching
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        // Update connection status
+        function updateStatus(connected) {
+            const status = document.getElementById('connectionStatus');
+            status.textContent = connected ? 'Connected' : 'Disconnected';
+            status.className = connected ? 'status connected' : 'status disconnected';
+        }
+        
+        // ===== VECTOR SEARCH =====
+        
+        function connectSearch() {
+            const url = document.getElementById('searchWsUrl').value;
+            const query = document.getElementById('searchQuery').value;
+            const topK = parseInt(document.getElementById('topK').value);
+            const collection = document.getElementById('collection').value;
+            
+            searchWs = new WebSocket(url);
+            
+            searchWs.onopen = () => {
+                updateStatus(true);
+                console.log('Search WebSocket connected');
+            };
+            
+            searchWs.onmessage = (event) => {
+                const message = JSON.parse(event.data);
+                const resultsDiv = document.getElementById('searchResults');
+                
+                switch (message.type) {
+                    case 'connected':
+                        resultsDiv.innerHTML = '<p style="color: #10b981;">✓ Connected! Sending query...</p>';
+                        // Send search query
+                        searchWs.send(JSON.stringify({
+                            action: 'search',
+                            query: query,
+                            top_k: topK,
+                            collection: collection
+                        }));
+                        break;
+                    
+                    case 'search_started':
+                        resultsDiv.innerHTML = `<p style="color: #667eea;">🔍 Searching for: "${message.query}" (Adapter: ${message.adapter})</p>`;
+                        break;
+                    
+                    case 'result':
+                        const resultHtml = `
+                            <div class="result-item">
+                                <div class="result-header">
+                                    <span>Result ${message.index + 1}/${message.total}</span>
+                                    <span class="score">Score: ${message.score.toFixed(3)}</span>
+                                </div>
+                                <div><strong>ID:</strong> ${message.data.id || 'N/A'}</div>
+                                <div><strong>Content:</strong> ${message.data.content || JSON.stringify(message.data)}</div>
+                            </div>
+                        `;
+                        resultsDiv.innerHTML += resultHtml;
+                        resultsDiv.scrollTop = resultsDiv.scrollHeight;
+                        break;
+                    
+                    case 'search_complete':
+                        resultsDiv.innerHTML += `
+                            <div style="margin-top: 20px; padding: 15px; background: #10b981; color: white; border-radius: 8px;">
+                                ✓ Search Complete: ${message.total_results} results in ${message.duration_ms}ms (${message.adapter_used})
+                            </div>
+                        `;
+                        break;
+                    
+                    case 'error':
+                        resultsDiv.innerHTML += `<p style="color: #ef4444;">❌ Error: ${message.message}</p>`;
+                        break;
+                }
+            };
+            
+            searchWs.onerror = (error) => {
+                console.error('Search WebSocket error:', error);
+                updateStatus(false);
+            };
+            
+            searchWs.onclose = () => {
+                updateStatus(false);
+                console.log('Search WebSocket disconnected');
+            };
+        }
+        
+        function disconnectSearch() {
+            if (searchWs) {
+                searchWs.close();
+                searchWs = null;
+            }
+        }
+        
+        // ===== ADAPTER STATUS =====
+        
+        function connectStatus() {
+            const url = document.getElementById('statusWsUrl').value;
+            
+            statusWs = new WebSocket(url);
+            
+            statusWs.onopen = () => {
+                updateStatus(true);
+                console.log('Status WebSocket connected');
+            };
+            
+            statusWs.onmessage = (event) => {
+                const message = JSON.parse(event.data);
+                
+                if (message.type === 'status_update') {
+                    // Update metrics
+                    document.getElementById('currentAdapter').textContent = message.current_adapter.toUpperCase();
+                    document.getElementById('themisStatus').textContent = message.themis.available ? '✓ Available' : '✗ Down';
+                    document.getElementById('uds3Status').textContent = message.uds3.available ? '✓ Available' : '✗ Down';
+                    document.getElementById('activeConnections').textContent = message.active_websocket_connections || 0;
+                    
+                    // Log to results
+                    const resultsDiv = document.getElementById('statusResults');
+                    const updateHtml = `
+                        <div class="result-item">
+                            <div class="result-header">
+                                <span>Status Update</span>
+                                <span style="font-size: 12px;">${new Date(message.timestamp).toLocaleTimeString()}</span>
+                            </div>
+                            <pre style="margin: 0; font-size: 12px;">${JSON.stringify(message, null, 2)}</pre>
+                        </div>
+                    `;
+                    resultsDiv.innerHTML = updateHtml + resultsDiv.innerHTML;
+                }
+            };
+            
+            statusWs.onerror = (error) => {
+                console.error('Status WebSocket error:', error);
+                updateStatus(false);
+            };
+            
+            statusWs.onclose = () => {
+                updateStatus(false);
+                console.log('Status WebSocket disconnected');
+            };
+        }
+        
+        function disconnectStatus() {
+            if (statusWs) {
+                statusWs.close();
+                statusWs = null;
+            }
+        }
+        
+        // ===== LIVE LOGS =====
+        
+        function connectLogs() {
+            const url = document.getElementById('logsWsUrl').value;
+            
+            logsWs = new WebSocket(url);
+            
+            logsWs.onopen = () => {
+                updateStatus(true);
+                console.log('Logs WebSocket connected');
+            };
+            
+            logsWs.onmessage = (event) => {
+                const message = JSON.parse(event.data);
+                const resultsDiv = document.getElementById('logsResults');
+                
+                if (message.type === 'log') {
+                    const logHtml = `
+                        <div class="log-item log-${message.level}">
+                            <strong>[${message.level}]</strong> ${new Date(message.timestamp).toLocaleTimeString()} - ${message.logger}<br>
+                            ${message.message}
+                        </div>
+                    `;
+                    resultsDiv.innerHTML += logHtml;
+                    resultsDiv.scrollTop = resultsDiv.scrollHeight;
+                }
+            };
+            
+            logsWs.onerror = (error) => {
+                console.error('Logs WebSocket error:', error);
+                updateStatus(false);
+            };
+            
+            logsWs.onclose = () => {
+                updateStatus(false);
+                console.log('Logs WebSocket disconnected');
+            };
+        }
+        
+        function disconnectLogs() {
+            if (logsWs) {
+                logsWs.close();
+                logsWs = null;
+            }
+        }
+        
+        function clearLogs() {
+            document.getElementById('logsResults').innerHTML = '<p style="color: #6b7280;">Log-Historie gelöscht.</p>';
+        }
+        
+        // ===== GRAPH TRAVERSAL =====
+        
+        function connectGraph() {
+            const url = document.getElementById('graphWsUrl').value;
+            const startVertex = document.getElementById('startVertex').value;
+            const edgeCollection = document.getElementById('edgeCollection').value;
+            const maxDepth = parseInt(document.getElementById('maxDepth').value);
+            
+            graphWs = new WebSocket(url);
+            
+            graphWs.onopen = () => {
+                updateStatus(true);
+                console.log('Graph WebSocket connected');
+            };
+            
+            graphWs.onmessage = (event) => {
+                const message = JSON.parse(event.data);
+                const resultsDiv = document.getElementById('graphResults');
+                
+                switch (message.type) {
+                    case 'connected':
+                        resultsDiv.innerHTML = '<p style="color: #10b981;">✓ Connected! Starting traversal...</p>';
+                        // Send traversal request
+                        graphWs.send(JSON.stringify({
+                            action: 'traverse',
+                            start_vertex: startVertex,
+                            edge_collection: edgeCollection,
+                            max_depth: maxDepth
+                        }));
+                        break;
+                    
+                    case 'traversal_started':
+                        resultsDiv.innerHTML = `<p style="color: #667eea;">🌐 Traversing from: ${message.start_vertex}</p>`;
+                        break;
+                    
+                    case 'node':
+                        const nodeHtml = `
+                            <div class="result-item">
+                                <div class="result-header">
+                                    <span>Node ${message.index + 1}/${message.total}</span>
+                                </div>
+                                <pre style="margin: 0; font-size: 12px;">${JSON.stringify(message.data, null, 2)}</pre>
+                            </div>
+                        `;
+                        resultsDiv.innerHTML += nodeHtml;
+                        resultsDiv.scrollTop = resultsDiv.scrollHeight;
+                        break;
+                    
+                    case 'edge':
+                        const edgeHtml = `
+                            <div class="result-item" style="border-left-color: #f59e0b;">
+                                <div class="result-header">
+                                    <span>Edge ${message.index + 1}/${message.total}</span>
+                                </div>
+                                <pre style="margin: 0; font-size: 12px;">${JSON.stringify(message.data, null, 2)}</pre>
+                            </div>
+                        `;
+                        resultsDiv.innerHTML += edgeHtml;
+                        break;
+                    
+                    case 'traversal_complete':
+                        resultsDiv.innerHTML += `
+                            <div style="margin-top: 20px; padding: 15px; background: #10b981; color: white; border-radius: 8px;">
+                                ✓ Traversal Complete: ${message.total_nodes} nodes, ${message.total_edges} edges
+                            </div>
+                        `;
+                        break;
+                    
+                    case 'error':
+                        resultsDiv.innerHTML += `<p style="color: #ef4444;">❌ Error: ${message.message}</p>`;
+                        break;
+                }
+            };
+            
+            graphWs.onerror = (error) => {
+                console.error('Graph WebSocket error:', error);
+                updateStatus(false);
+            };
+            
+            graphWs.onclose = () => {
+                updateStatus(false);
+                console.log('Graph WebSocket disconnected');
+            };
+        }
+        
+        function disconnectGraph() {
+            if (graphWs) {
+                graphWs.close();
+                graphWs = null;
+            }
+        }
+        
+        // Heartbeat (Keep-Alive) für alle Verbindungen
+        setInterval(() => {
+            if (searchWs && searchWs.readyState === WebSocket.OPEN) {
+                searchWs.send(JSON.stringify({ action: 'ping' }));
+            }
+            if (logsWs && logsWs.readyState === WebSocket.OPEN) {
+                logsWs.send(JSON.stringify({ action: 'ping' }));
+            }
+            if (graphWs && graphWs.readyState === WebSocket.OPEN) {
+                graphWs.send(JSON.stringify({ action: 'ping' }));
+            }
+        }, 30000);
+    </script>
+</body>
+</html>

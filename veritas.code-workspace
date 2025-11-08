@@ -4,16 +4,7 @@
 			"path": "."
 		},
 		{
-			"path": "../PKI"
-		},
-		{
-			"path": "../uds3"
-		},
-		{
-			"path": "../user"
-		},
-		{
-			"path": "../Covina"
+			"path": "../themis"
 		}
 	],
 	"settings": {

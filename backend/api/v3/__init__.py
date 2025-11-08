@@ -21,8 +21,11 @@ try:
     from .compliance_router import compliance_router
     from .governance_router import governance_router
     from .uds3_router import uds3_router
+    from .themis_router import themis_router
+    from .adapter_router import adapter_router
     from .user_router import user_router
     from .database_router import router as database_router
+    from .websocket_router import websocket_router
     
     api_v3_router.include_router(query_router)
     api_v3_router.include_router(agent_router)
@@ -35,8 +38,11 @@ try:
     api_v3_router.include_router(compliance_router)
     api_v3_router.include_router(governance_router)
     api_v3_router.include_router(uds3_router)
+    api_v3_router.include_router(themis_router)
+    api_v3_router.include_router(adapter_router)
     api_v3_router.include_router(user_router)
     api_v3_router.include_router(database_router)
+    api_v3_router.include_router(websocket_router)
 except ImportError as e:
     print(f"Warning: {e}")
 
@@ -44,7 +50,13 @@ def get_v3_info() -> Dict[str, Any]:
     return {
         "version": API_VERSION,
         "status": API_STATUS,
-        "modules": ["query", "agent", "system", "vpb", "covina", "pki", "immi", "saga", "compliance", "governance", "uds3", "user", "database"]
+        "modules": [
+            "query", "agent", "system", 
+            "vpb", "covina", "pki", "immi", 
+            "saga", "compliance", "governance", 
+            "uds3", "themis", "adapters",
+            "user", "database"
+        ]
     }
 
 @api_v3_router.get("/")
