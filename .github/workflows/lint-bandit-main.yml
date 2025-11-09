@@ -1,0 +1,89 @@
+name: Lint & Bandit (main)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  lint-bandit:
+    name: Run Flake8 and Bandit on main
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install linting & security tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 bandit
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Run Flake8 (treat issues as warnings)
+        run: |
+          flake8 backend/ shared/ tests/ --count --exit-zero --max-line-length=127 --statistics || true
+
+      - name: Run Bandit (security scan)
+        run: |
+          bandit -r backend/ shared/ -f json -o bandit-report.json || true
+
+      - name: Upload Bandit report
+        uses: actions/upload-artifact@v4
+        with:
+          name: bandit-report
+          path: bandit-report.json
+
+      - name: Comment Bandit report on PR
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let report = {};
+            try {
+              const raw = fs.readFileSync('bandit-report.json', 'utf8');
+              report = JSON.parse(raw || '{}');
+            } catch (e) {
+              core.info('No bandit-report.json found or parse error');
+              report = {};
+            }
+
+            const results = report.results || [];
+            const total = results.length;
+
+            let body = `### Bandit security scan — summary\n\n`;
+            body += `**Total findings:** ${total} \n\n`;
+
+            if (total > 0) {
+              body += `**Top ${Math.min(5, total)} findings:**\n`;
+              for (let i = 0; i < Math.min(5, results.length); i++) {
+                const r = results[i];
+                const file = r.filename || 'unknown file';
+                const test = r.test_name || r.test_id || 'issue';
+                const sev = r.issue_severity || r.severity || 'MEDIUM';
+                const line = r.line_number || r.line || 'n/a';
+                const text = (r.issue_text || r.more_info || '').replace(/\n/g, ' ');
+                body += `\n- **${sev}**: ${test} in \\`${file}\\\` (line ${line}) — ${text}`;
+              }
+              body += `\n\n`;
+              body += `Full report is attached as an artifact (bandit-report).`;
+            } else {
+              body += `No issues found by Bandit.`;
+            }
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: body
+            });
