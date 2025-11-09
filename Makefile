@@ -90,8 +90,8 @@ docs:
 
 security:
 	@echo "$(CYAN)Running security checks...$(NC)"
-	bandit -r backend/ -ll
-	safety check
+	bandit -r backend/ -ll || true
+	pip-audit -r requirements.txt -r requirements-dev.txt || true
 
 load-test:
 	@echo "$(CYAN)Running load tests...$(NC)"

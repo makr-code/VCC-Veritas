@@ -64,38 +64,41 @@ if ($Parallel) {
 switch ($TestType.ToLower()) {
     "lint" {
         Write-ColorOutput "`n=== Running Code Quality Checks ===" "Cyan"
-        
+
         Write-ColorOutput "`n→ Black (Code Formatter Check)..." "Yellow"
         black --check backend/ tests/
-        
+
         Write-ColorOutput "`n→ isort (Import Sorting Check)..." "Yellow"
         isort --check-only backend/ tests/
-        
+
         Write-ColorOutput "`n→ Flake8 (Linting)..." "Yellow"
         flake8 backend/ tests/ --count --statistics
-        
+
         Write-ColorOutput "`n→ Pylint..." "Yellow"
         pylint backend/ --exit-zero
-        
+
         Write-ColorOutput "`n→ mypy (Type Checking)..." "Yellow"
         mypy backend/ --ignore-missing-imports
-        
+
         Write-ColorOutput "`n→ Bandit (Security)..." "Yellow"
         bandit -r backend/ -ll
+
+        Write-ColorOutput "`n→ pip-audit (Dependency Vulnerabilities)..." "Yellow"
+        pip-audit -r requirements.txt -r requirements-dev.txt || Write-ColorOutput "pip-audit completed with findings" "Yellow"
     }
-    
+
     "unit" {
         Write-ColorOutput "`n=== Running Unit Tests ===" "Cyan"
         $pytestArgs += @("-m", "unit or not (integration or e2e)")
         pytest @pytestArgs tests/
     }
-    
+
     "integration" {
         Write-ColorOutput "`n=== Running Integration Tests ===" "Cyan"
         $pytestArgs += @("-m", "integration")
         pytest @pytestArgs tests/
     }
-    
+
     "api" {
         Write-ColorOutput "`n=== Running API Tests ===" "Cyan"
         $pytestArgs += @(
@@ -104,44 +107,47 @@ switch ($TestType.ToLower()) {
         )
         pytest @pytestArgs
     }
-    
+
     "websocket" {
         Write-ColorOutput "`n=== Running WebSocket Tests ===" "Cyan"
         $pytestArgs += "tests/test_websocket_router.py"
         pytest @pytestArgs
     }
-    
+
     "adapter" {
         Write-ColorOutput "`n=== Running Adapter Tests ===" "Cyan"
         $pytestArgs += "tests/test_themisdb_adapter.py"
         pytest @pytestArgs
     }
-    
+
     "all" {
         Write-ColorOutput "`n=== Running All Tests ===" "Cyan"
-        
+
         # 1. Linting
         Write-ColorOutput "`n→ Step 1: Code Quality Checks" "Yellow"
         & $PSCommandPath -TestType "lint"
-        
+
         # 2. Unit Tests
         Write-ColorOutput "`n→ Step 2: Unit Tests" "Yellow"
         $pytestArgs += @("-m", "not integration and not e2e")
         pytest @pytestArgs tests/
-        
+
         # 3. Integration Tests
         Write-ColorOutput "`n→ Step 3: Integration Tests" "Yellow"
         & $PSCommandPath -TestType "integration" -Verbose:$Verbose
-        
+
         # 4. API Tests
         Write-ColorOutput "`n→ Step 4: API Tests" "Yellow"
         & $PSCommandPath -TestType "api" -Verbose:$Verbose
-        
+
         # 5. WebSocket Tests
         Write-ColorOutput "`n→ Step 5: WebSocket Tests" "Yellow"
         & $PSCommandPath -TestType "websocket" -Verbose:$Verbose
+
+        Write-ColorOutput "`n→ Step 6: Dependency Vulnerability Audit" "Yellow"
+        pip-audit -r requirements.txt -r requirements-dev.txt || Write-ColorOutput "pip-audit completed with findings" "Yellow"
     }
-    
+
     default {
         Write-ColorOutput "Unknown test type: $TestType" "Red"
         Write-ColorOutput "Available types: all, unit, integration, api, websocket, adapter, lint" "Yellow"

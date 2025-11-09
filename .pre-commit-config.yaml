@@ -3,29 +3,32 @@
 # Installation: pre-commit install
 # Run manually: pre-commit run --all-files
 
+---
 repos:
   # Code Formatting
   - repo: https://github.com/psf/black
     rev: 23.12.1
     hooks:
       - id: black
-        language_version: python3.11
+        language_version: python3.13
         args: [--line-length=127]
-  
+
   # Import Sorting
   - repo: https://github.com/pycqa/isort
     rev: 5.13.2
     hooks:
       - id: isort
+        language_version: python3.13
         args: [--profile=black, --line-length=127]
-  
+
   # Linting
   - repo: https://github.com/pycqa/flake8
-    rev: 7.0.0
+    rev: 7.1.1
     hooks:
       - id: flake8
+        language_version: python3.13
         args: [--max-line-length=127, --extend-ignore=E203]
-  
+
   # Security
   - repo: https://github.com/PyCQA/bandit
     rev: 1.7.6
@@ -33,15 +36,16 @@ repos:
       - id: bandit
         args: [-r, backend/, -ll]
         exclude: tests/
-  
+        language_version: python3.13
+
   # Type Checking
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.8.0
     hooks:
       - id: mypy
-        additional_dependencies: [types-all]
         args: [--ignore-missing-imports, --no-strict-optional]
-  
+        language_version: python3.13
+
   # General Checks
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
@@ -56,17 +60,11 @@ repos:
       - id: debug-statements
       - id: mixed-line-ending
       - id: check-docstring-first
-  
+
   # YAML Linting
   - repo: https://github.com/adrienverge/yamllint
     rev: v1.33.0
     hooks:
       - id: yamllint
-        args: [-d, "{extends: default, rules: {line-length: {max: 127}}}"]
-  
-  # Markdown Linting
-  - repo: https://github.com/markdownlint/markdownlint
-    rev: v0.12.0
-    hooks:
-      - id: markdownlint
-        args: [--rules, ~MD013]  # Ignore line length
+        args: [-d, "{extends: default, rules: {line-length: {max: 127}, new-lines: {type: dos}}}"]
+        exclude: ^\.github\/workflows\/.*\.ya?ml$

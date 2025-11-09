@@ -2,15 +2,16 @@
 # ============================
 
 # FastAPI Framework
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-python-multipart==0.0.6
+fastapi>=0.104.1,<0.115.0
+uvicorn[standard]>=0.24.0,<0.32.0
+python-multipart>=0.0.6
 
 # Server-Sent Events (SSE) - NEW!
 sse-starlette==1.8.2
 
 # Database Drivers
-psycopg2-binary==2.9.9
+# Note: Use psycopg (v3) for Python 3.13+ compatibility
+psycopg[binary]>=3.1.0  # Modern PostgreSQL driver (replaces psycopg2)
 neo4j==5.14.1
 chromadb==0.4.15
 
@@ -18,18 +19,18 @@ chromadb==0.4.15
 # (Install from ../uds3)
 
 # Utilities
-python-dotenv==1.0.0
-pydantic==2.5.0
-pydantic-settings==2.1.0
+python-dotenv>=1.0.0
+pydantic>=2.5.0,<3.0.0
+pydantic-settings>=2.1.0
 pyyaml>=6.0
 
 # System Monitoring
-psutil==5.9.6
+psutil>=5.9.6
 
 # Testing
-pytest==7.4.3
-pytest-asyncio==0.21.1
-httpx==0.25.1
+pytest>=7.4.3
+pytest-asyncio>=0.21.1
+httpx>=0.28.1,<0.29
 
 # MCP (Model Context Protocol) - Optional (separater Prozess)
 # Hinweis: Das exakte SDK kann je nach Version abweichen. Wir nutzen hier

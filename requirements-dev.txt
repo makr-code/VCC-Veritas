@@ -12,13 +12,13 @@ pytest-timeout==2.2.0
 # Code Quality & Linting
 black==23.12.1  # Code formatter
 isort==5.13.2  # Import sorter
-flake8==7.0.0  # Linting
+flake8==7.1.1  # Linting (Python 3.13 compatible)
 pylint==3.0.3
 mypy==1.8.0  # Type checking
 
 # Security
 bandit==1.7.6  # Security linter
-safety==2.3.5  # Dependency vulnerability checker
+pip-audit==2.7.3  # Dependency vulnerability checker (replaces safety; compatible with packaging>=22)
 
 # Load Testing
 locust==2.20.0
@@ -28,7 +28,7 @@ mkdocs==1.5.3
 mkdocs-material==9.5.3
 
 # API Testing
-httpx==0.25.2  # Async HTTP client
+httpx==0.28.1  # Async HTTP client
 websockets==12.0  # WebSocket client
 
 # Mocking & Fixtures
@@ -41,7 +41,6 @@ coverage[toml]==7.4.0
 
 # Code Analysis
 radon==6.0.1  # Code complexity
-prospector==1.10.3
 
 # Pre-commit Hooks
 pre-commit==3.6.0

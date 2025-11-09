@@ -92,70 +92,76 @@ fi
 case $TEST_TYPE in
     lint)
         echo -e "${CYAN}\n=== Running Code Quality Checks ===${NC}"
-        
+
         echo -e "${YELLOW}\n→ Black...${NC}"
         black --check backend/ tests/ || true
-        
+
         echo -e "${YELLOW}\n→ isort...${NC}"
         isort --check-only backend/ tests/ || true
-        
+
         echo -e "${YELLOW}\n→ Flake8...${NC}"
         flake8 backend/ tests/ --count --statistics
-        
+
         echo -e "${YELLOW}\n→ Pylint...${NC}"
         pylint backend/ --exit-zero
-        
+
         echo -e "${YELLOW}\n→ mypy...${NC}"
         mypy backend/ --ignore-missing-imports || true
-        
+
         echo -e "${YELLOW}\n→ Bandit...${NC}"
         bandit -r backend/ -ll || true
+
+    echo -e "${YELLOW}\n→ pip-audit (Dependency Vulnerabilities)...${NC}"
+    pip-audit -r requirements.txt -r requirements-dev.txt || echo -e "${YELLOW}pip-audit completed with findings${NC}"
         ;;
-    
+
     unit)
         echo -e "${CYAN}\n=== Running Unit Tests ===${NC}"
         pytest $PYTEST_ARGS -m "unit or not (integration or e2e)" tests/
         ;;
-    
+
     integration)
         echo -e "${CYAN}\n=== Running Integration Tests ===${NC}"
         pytest $PYTEST_ARGS -m "integration" tests/
         ;;
-    
+
     api)
         echo -e "${CYAN}\n=== Running API Tests ===${NC}"
         pytest $PYTEST_ARGS tests/test_themis_router.py tests/test_adapter_router.py
         ;;
-    
+
     websocket)
         echo -e "${CYAN}\n=== Running WebSocket Tests ===${NC}"
         pytest $PYTEST_ARGS tests/test_websocket_router.py
         ;;
-    
+
     adapter)
         echo -e "${CYAN}\n=== Running Adapter Tests ===${NC}"
         pytest $PYTEST_ARGS tests/test_themisdb_adapter.py
         ;;
-    
+
     all)
         echo -e "${CYAN}\n=== Running All Tests ===${NC}"
-        
+
         echo -e "${YELLOW}\n→ Step 1: Code Quality${NC}"
         bash $0 --type lint
-        
+
         echo -e "${YELLOW}\n→ Step 2: Unit Tests${NC}"
         pytest $PYTEST_ARGS -m "not integration and not e2e" tests/
-        
+
         echo -e "${YELLOW}\n→ Step 3: Integration Tests${NC}"
         bash $0 --type integration
-        
+
         echo -e "${YELLOW}\n→ Step 4: API Tests${NC}"
         bash $0 --type api
-        
+
         echo -e "${YELLOW}\n→ Step 5: WebSocket Tests${NC}"
         bash $0 --type websocket
+
+    echo -e "${YELLOW}\n→ Step 6: Dependency Vulnerability Audit${NC}"
+    pip-audit -r requirements.txt -r requirements-dev.txt || echo -e "${YELLOW}pip-audit completed with findings${NC}"
         ;;
-    
+
     *)
         echo -e "${RED}Unknown test type: $TEST_TYPE${NC}"
         echo -e "${YELLOW}Available: all, unit, integration, api, websocket, adapter, lint${NC}"

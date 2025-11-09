@@ -1,7 +1,7 @@
 # ThemisDB Adapter - Test Suite Guide
 
-**Erstellt:** 7. November 2025  
-**Version:** 1.0  
+**Erstellt:** 7. November 2025
+**Version:** 1.0
 **Status:** ✅ Production-Ready
 
 ---
@@ -16,7 +16,7 @@ Umfassende Test-Suite für ThemisDB/UDS3 Adapter mit:
 - ✅ **WebSocket Tests** (Real-time Kommunikation)
 - ✅ **Load Tests** (Locust)
 - ✅ **Code Quality** (Black, Flake8, Pylint, mypy)
-- ✅ **Security Checks** (Bandit, Safety)
+- ✅ **Security Checks** (Bandit, pip-audit)
 - ✅ **CI/CD Integration** (GitHub Actions)
 
 ---
@@ -73,7 +73,7 @@ make test-websocket    # WebSocket Tests
 # Code Quality
 make lint              # Linting Checks
 make format            # Code formatieren
-make security          # Security Scan
+make security          # Security Scan (Bandit + pip-audit)
 
 # Coverage
 make coverage          # Tests mit Coverage Report
@@ -340,7 +340,7 @@ locust -f tests/load/locustfile.py \
 4. **API Tests** - REST Endpoints
 5. **WebSocket Tests** - Real-time Tests
 6. **Load Tests** - Nur auf `main` branch
-7. **Security Scan** - Trivy, Bandit, Safety
+7. **Security Scan** - Trivy, Bandit, pip-audit
 8. **Test Summary** - Aggregierte Ergebnisse
 
 ### Status Badge
@@ -504,10 +504,10 @@ def test_vector_search():
     # Arrange
     adapter = ThemisDBAdapter()
     query = "test query"
-    
+
     # Act
     results = await adapter.vector_search(query, top_k=5)
-    
+
     # Assert
     assert len(results) == 5
     assert all("score" in r for r in results)
@@ -576,25 +576,25 @@ radon mi backend/
 
 ## FAQ
 
-**Q: Wie lange dauern die Tests?**  
+**Q: Wie lange dauern die Tests?**
 A: Unit Tests: ~30s, Integration: ~2min, Alle: ~5min (parallel)
 
-**Q: Welche Python-Versionen werden unterstützt?**  
+**Q: Welche Python-Versionen werden unterstützt?**
 A: Python 3.10, 3.11, 3.12
 
-**Q: Muss ich alle Services lokal laufen haben?**  
+**Q: Muss ich alle Services lokal laufen haben?**
 A: Nein, Unit Tests funktionieren ohne. Integration Tests benötigen Redis/PostgreSQL.
 
-**Q: Wie erhöhe ich Coverage?**  
+**Q: Wie erhöhe ich Coverage?**
 A: 1) Fehlende Tests schreiben, 2) Edge Cases testen, 3) Error Paths testen
 
-**Q: Was ist der Unterschied zwischen Unit und Integration Tests?**  
+**Q: Was ist der Unterschied zwischen Unit und Integration Tests?**
 A: Unit Tests sind isoliert und schnell (Mocks), Integration Tests nutzen echte Services.
 
-**Q: Wie kann ich einzelne Tests überspringen?**  
+**Q: Wie kann ich einzelne Tests überspringen?**
 A: `@pytest.mark.skip(reason="...")` oder `@pytest.mark.skipif(condition)`
 
-**Q: Wie debugge ich Tests?**  
+**Q: Wie debugge ich Tests?**
 A: 1) `pytest --pdb` für Debugger, 2) `pytest -s` für print(), 3) `pytest -v --tb=long`
 
 ---
@@ -614,6 +614,6 @@ A: 1) `pytest --pdb` für Debugger, 2) `pytest -s` für print(), 3) `pytest -v -
 
 ---
 
-**Status:** ✅ Production-Ready  
-**Maintainer:** VCC Development Team  
+**Status:** ✅ Production-Ready
+**Maintainer:** VCC Development Team
 **Last Updated:** 7. November 2025
