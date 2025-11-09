@@ -78,3 +78,56 @@ data/*.db
 # ========================================
 data/secrets/
 data/backups/
+
+# ========================================
+# Test & Coverage Artifacts
+# Added: 20251109 - Missing patterns
+# ========================================
+.pytest_cache/
+.mypy_cache/
+.tox/
+.ruff_cache/
+coverage.xml
+.coverage*
+htmlcov/
+pytest-debug.log
+
+# ========================================
+# Virtual Environments
+# Added: 20251109 - Missing patterns
+# ========================================
+.venv/
+venv/
+ENV/
+env/
+
+# ========================================
+# OS / Platform Specific
+# Added: 20251109 - Missing patterns
+# ========================================
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# ========================================
+# Documentation Build Output (MkDocs / Sphinx)
+# Added: 20251109 - Missing patterns
+# ========================================
+site/
+_build/
+docs/_build/
+
+# ========================================
+# Dependency / Security Scan Reports
+# Added: 20251109 - Missing patterns
+# ========================================
+pip-audit*.json
+bandit_report.txt
+bandit_rescan.txt
+
+# ========================================
+# Node / Frontend (if present later)
+# Added: 20251109 - Future-proof
+# ========================================
+node_modules/
+*.tsbuildinfo
