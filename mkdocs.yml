@@ -1,0 +1,15 @@
+site_name: VERITAS Documentation
+site_url: https://github.com/makr-code/VCC-Veritas
+nav:
+  - Home: docs/VERITAS_Documentation_Index.md
+theme:
+  name: material
+  features:
+    - navigation.instant
+    - navigation.tabs
+extra:
+  repo_name: makr-code/VCC-Veritas
+site_dir: site
+markdown_extensions:
+  - toc:
+      permalink: true

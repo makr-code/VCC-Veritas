@@ -1,5 +1,7 @@
 # VERITAS - Verwaltungs-Informations- und Recherche-System
 
+> Documentation: full docs live in the `docs/` folder. Build a browsable site with MkDocs (`mkdocs build`) or see the generated site/wiki when available.
+
 ## Version 3.19.0 ✅ PRODUCTION READY
 
 **VERITAS** ist ein modernes, KI-gestütztes Informationssystem für die öffentliche Verwaltung, das natürliche Sprachverarbeitung und RAG (Retrieval-Augmented Generation) kombiniert, um präzise Antworten auf Verwaltungsfragen zu liefern.
