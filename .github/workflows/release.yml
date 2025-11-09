@@ -81,6 +81,7 @@ jobs:
       with:
         script: |
           const fs = require('fs');
+          const core = require('@actions/core');
           const changelog = fs.readFileSync('CHANGELOG.md', 'utf8');
           
           const isPrerelease = '${{ github.event_name }}' === 'workflow_dispatch' ? 
