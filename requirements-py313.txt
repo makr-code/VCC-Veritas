@@ -1,0 +1,40 @@
+# VERITAS Backend Requirements - Python 3.13 Compatible
+# =======================================================
+
+# FastAPI Framework
+fastapi>=0.104.1,<0.115.0
+uvicorn[standard]>=0.24.0,<0.32.0
+python-multipart>=0.0.6
+
+# Server-Sent Events (SSE)
+sse-starlette>=1.8.2
+
+# Database Drivers
+# psycopg3 is the modern, Python 3.13+ compatible PostgreSQL driver
+psycopg[binary]>=3.1.0  # Replaces psycopg2-binary
+neo4j>=5.14.1
+chromadb>=0.4.15
+
+# HTTP Client for ThemisDB Adapter
+httpx>=0.25.1
+tenacity>=8.2.0  # Retry logic
+
+# Utilities
+python-dotenv>=1.0.0
+pydantic>=2.5.0,<3.0.0
+pydantic-settings>=2.1.0
+pyyaml>=6.0
+
+# System Monitoring
+psutil>=5.9.6
+
+# Testing (Basic)
+pytest>=7.4.3
+pytest-asyncio>=0.21.1
+
+# MCP (Model Context Protocol) - Optional
+# Uncomment if needed:
+# mcp>=0.1.0
+
+# Optional: Async PostgreSQL driver (alternative)
+# asyncpg>=0.29.0
