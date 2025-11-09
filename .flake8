@@ -20,15 +20,15 @@ exclude =
     htmlcov,
     .mypy_cache
 
-# Ignore specific errors
+# Ignore specific errors (no inline comments here)
 ignore =
-    E203,  # whitespace before ':'
-    E266,  # too many leading '#' for block comment
-    E501,  # line too long (handled by black)
-    W503,  # line break before binary operator
-    W504,  # line break after binary operator
-    F401,  # imported but unused (sometimes needed)
-    E402,  # module level import not at top
+    E203
+    E266
+    E501
+    W503
+    W504
+    F401
+    E402
 
 # Error codes to always report
 select = 
