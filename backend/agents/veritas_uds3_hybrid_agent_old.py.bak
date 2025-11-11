@@ -18,16 +18,16 @@ Architecture:
 Usage:
     from backend.agents.veritas_uds3_hybrid_agent import UDS3HybridSearchAgent
     from uds3.uds3_core import get_optimized_unified_strategy
-    
+
     strategy = get_optimized_unified_strategy()
     agent = UDS3HybridSearchAgent(strategy)
-    
+
     results = await agent.hybrid_search(
         query="Was regelt § 58 LBO BW?",
         top_k=10,
         weights={"vector": 0.5, "keyword": 0.3, "graph": 0.2}
     )
-    
+
 Note: Uses UDS3 Search API (uds3_search_api.py) for all backend communication
 """
 
@@ -58,7 +58,7 @@ logger = logging.getLogger(__name__)
 class SearchResult:
     """
     Single search result with metadata
-    
+
     Compatible with UDS3SearchResult - wrapper for VERITAS-specific needs
     """
     document_id: str
@@ -66,16 +66,16 @@ class SearchResult:
     metadata: Dict[str, Any]
     scores: Dict[str, float]  # {"vector": 0.85, "keyword": 0.6, "graph": 0.4}
     final_score: float
-    
+
     @classmethod
     def from_uds3_result(cls, uds3_result: 'UDS3SearchResult', source_weight: float = 1.0):
         """
         Convert UDS3SearchResult to VERITAS SearchResult
-        
+
         Args:
             uds3_result: UDS3SearchResult instance
             source_weight: Weight for this source (e.g., 0.5 for vector)
-            
+
         Returns:
             SearchResult instance
         """
@@ -86,7 +86,7 @@ class SearchResult:
             scores={uds3_result.source: uds3_result.score * source_weight},
             final_score=uds3_result.score * source_weight
         )
-    
+
     def __repr__(self):
         return f"SearchResult(id={self.document_id}, score={self.final_score:.3f})"
 
@@ -94,40 +94,40 @@ class SearchResult:
 class UDS3HybridSearchAgent:
     """
     Hybrid Search Agent using UDS3 Search API
-    
+
     Architecture:
     1. Uses UDS3SearchAPI for all backend communication ✅
     2. Converts UDS3SearchResult to VERITAS SearchResult
     3. Provides VERITAS-specific API (backward compatible)
-    
+
     Benefits:
     - ✅ Error handling (retry logic in Database API Layer)
     - ✅ Type safety (SearchResult dataclass)
     - ✅ Reusable (UDS3SearchAPI can be used by other projects)
     - ✅ Maintainable (centralized search logic in UDS3)
     - ✅ Clean architecture (separation of concerns)
-    
+
     Note: Simplified from 1000 LOC → 200 LOC (uses UDS3 Search API)
     """
-    
+
     def __init__(self, strategy):
         """
         Initialize Hybrid Search Agent
-        
+
         Args:
             strategy: UnifiedDatabaseStrategy instance
         """
         self.strategy = strategy
-        
+
         # Initialize UDS3 Search API ✅
         if not UDS3_SEARCH_API_AVAILABLE:
             logger.error("❌ UDS3 Search API not available - install uds3_search_api.py")
             raise ImportError("UDS3 Search API required (uds3_search_api.py)")
-        
+
         self.search_api = UDS3SearchAPI(strategy)
-        
+
         logger.info("✅ UDS3HybridSearchAgent initialized (using UDS3SearchAPI)")
-    
+
     async def hybrid_search(
         self,
         query: str,
@@ -138,17 +138,17 @@ class UDS3HybridSearchAgent:
     ) -> List[SearchResult]:
         """
         Hybrid search using UDS3 Search API
-        
+
         Args:
             query: Search query
             top_k: Number of results
             weights: Score weights (e.g., {"vector": 0.5, "graph": 0.5})
             filters: Optional filters
             search_types: Search methods (default: ["vector", "graph"])
-            
+
         Returns:
             List of SearchResult objects
-            
+
         Example:
             results = await agent.hybrid_search(
                 query="Photovoltaik",
@@ -164,10 +164,10 @@ class UDS3HybridSearchAgent:
             search_types=search_types or ["vector", "graph"],
             weights=weights
         )
-        
+
         # Delegate to UDS3 Search API ✅
         uds3_results = await self.search_api.hybrid_search(search_query)
-        
+
         # Convert to VERITAS SearchResult
         results = []
         for uds3_result in uds3_results:
@@ -179,10 +179,10 @@ class UDS3HybridSearchAgent:
                 final_score=uds3_result.score
             )
             results.append(result)
-        
+
         logger.info(f"✅ Hybrid search: {len(results)} results")
         return results
-    
+
     async def vector_search(
         self,
         query: str,
@@ -191,12 +191,12 @@ class UDS3HybridSearchAgent:
     ) -> List[SearchResult]:
         """
         Vector-only search
-        
+
         Args:
             query: Search query
             top_k: Number of results
             collection: Optional collection name
-            
+
         Returns:
             List of SearchResult objects
         """
@@ -205,21 +205,21 @@ class UDS3HybridSearchAgent:
         if not model:
             logger.error("❌ Embedding model not available")
             return []
-        
+
         embedding = model.encode(query).tolist()
-        
+
         # Delegate to UDS3 Search API ✅
         uds3_results = await self.search_api.vector_search(embedding, top_k, collection)
-        
+
         # Convert to VERITAS SearchResult
         results = []
         for uds3_result in uds3_results:
             result = SearchResult.from_uds3_result(uds3_result, source_weight=1.0)
             results.append(result)
-        
+
         logger.info(f"✅ Vector search: {len(results)} results")
         return results
-    
+
     async def graph_search(
         self,
         query: str,
@@ -227,26 +227,26 @@ class UDS3HybridSearchAgent:
     ) -> List[SearchResult]:
         """
         Graph-only search
-        
+
         Args:
             query: Search query
             top_k: Number of results
-            
+
         Returns:
             List of SearchResult objects
         """
         # Delegate to UDS3 Search API ✅
         uds3_results = await self.search_api.graph_search(query, top_k)
-        
+
         # Convert to VERITAS SearchResult
         results = []
         for uds3_result in uds3_results:
             result = SearchResult.from_uds3_result(uds3_result, source_weight=1.0)
             results.append(result)
-        
+
         logger.info(f"✅ Graph search: {len(results)} results")
         return results
-    
+
     async def keyword_search(
         self,
         query: str,
@@ -255,24 +255,24 @@ class UDS3HybridSearchAgent:
     ) -> List[SearchResult]:
         """
         Keyword-only search
-        
+
         Args:
             query: Search query
             top_k: Number of results
             filters: Optional filters
-            
+
         Returns:
             List of SearchResult objects
         """
         # Delegate to UDS3 Search API ✅
         uds3_results = await self.search_api.keyword_search(query, top_k, filters)
-        
+
         # Convert to VERITAS SearchResult
         results = []
         for uds3_result in uds3_results:
             result = SearchResult.from_uds3_result(uds3_result, source_weight=1.0)
             results.append(result)
-        
+
         logger.info(f"✅ Keyword search: {len(results)} results")
         return results
 
@@ -283,7 +283,7 @@ class UDS3HybridSearchAgent:
     ):
         """
         Initialize Hybrid Search Agent
-        
+
         Args:
             unified_strategy: UDS3 UnifiedDatabaseStrategy instance
             default_weights: Default search weights
@@ -295,12 +295,12 @@ class UDS3HybridSearchAgent:
             "keyword": 0.3,
             "graph": 0.2
         }
-        
+
         # Check available backends
         self.has_vector = self.strategy.vector_backend is not None
         self.has_relational = self.strategy.relational_backend is not None
         self.has_graph = self.strategy.graph_backend is not None
-        
+
         # Validate weights sum to 1.0
         weight_sum = sum(self.default_weights.values())
         if abs(weight_sum - 1.0) > 0.01:
@@ -308,14 +308,14 @@ class UDS3HybridSearchAgent:
                 f"Weights sum to {weight_sum:.2f}, normalizing to 1.0"
             )
             self._normalize_weights(self.default_weights)
-        
+
         logger.info(
             f"UDS3HybridSearchAgent initialized with weights: {self.default_weights}"
         )
         logger.info(f"  Vector Backend: {self.has_vector}")
         logger.info(f"  Relational Backend: {self.has_relational}")
         logger.info(f"  Graph Backend: {self.has_graph}")
-    
+
     @staticmethod
     def _normalize_weights(weights: Dict[str, float]) -> None:
         """Normalize weights to sum to 1.0"""
@@ -323,7 +323,7 @@ class UDS3HybridSearchAgent:
         if total > 0:
             for key in weights:
                 weights[key] /= total
-    
+
     async def hybrid_search(
         self,
         query: str,
@@ -334,17 +334,17 @@ class UDS3HybridSearchAgent:
     ) -> List[SearchResult]:
         """
         Execute hybrid search combining all methods
-        
+
         Args:
             query: Search query
             top_k: Number of results to return
             weights: Custom weights (overrides default)
             filters: Filters for search (e.g., {"document_type": "regulation"})
             enable_graph: Enable graph search (default: True)
-        
+
         Returns:
             List of SearchResult objects, sorted by final_score
-        
+
         Example:
             results = await agent.hybrid_search(
                 query="Photovoltaik Baugenehmigung",
@@ -352,24 +352,24 @@ class UDS3HybridSearchAgent:
                 weights={"vector": 0.6, "keyword": 0.4, "graph": 0.0},
                 filters={"document_type": "regulation"}
             )
-        
+
         Note:
             Uses Direct Backend Access (bypass PolyglotQuery due to config issues).
             Graph + Relational search implemented, Vector search pending.
         """
-        
+
         # Use custom or default weights
         search_weights = weights or self.default_weights
         self._normalize_weights(search_weights)
-        
+
         logger.info(
             f"Hybrid Search (Direct Backend): query='{query[:50]}...', top_k={top_k}, "
             f"weights={search_weights}"
         )
-        
+
         try:
             all_results = []
-            
+
             # PostgreSQL Query (if backend available and weighted)
             if self.has_relational and search_weights.get("keyword", 0) > 0:
                 try:
@@ -381,7 +381,7 @@ class UDS3HybridSearchAgent:
                     logger.info(f"  → Got {len(postgres_results)} PostgreSQL results")
                 except Exception as e:
                     logger.error(f"PostgreSQL query failed: {e}")
-            
+
             # Neo4j Query (if backend available and weighted)
             if self.has_graph and enable_graph and search_weights.get("graph", 0) > 0:
                 try:
@@ -391,7 +391,7 @@ class UDS3HybridSearchAgent:
                     logger.info(f"  → Got {len(neo4j_results)} Neo4j results")
                 except Exception as e:
                     logger.error(f"Neo4j query failed: {e}")
-            
+
             # ChromaDB Vector Search (with embeddings)
             if self.has_vector and search_weights.get("vector", 0) > 0:
                 try:
@@ -401,24 +401,24 @@ class UDS3HybridSearchAgent:
                     logger.info(f"  → Got {len(chromadb_results)} ChromaDB results")
                 except Exception as e:
                     logger.error(f"ChromaDB query failed: {e}")
-            
+
             # Merge, deduplicate, and rank
             if not all_results:
                 logger.warning("No results from any backend")
                 return []
-            
+
             logger.info(f"Merging {len(all_results)} total results...")
             final_results = self._merge_and_rank(all_results, search_weights, top_k)
-            
+
             logger.info(f"✅ Hybrid Search complete: {len(final_results)} results")
             return final_results
-                
+
         except Exception as e:
             logger.error(f"UDS3 Hybrid Search failed: {e}")
             import traceback
             traceback.print_exc()
             return []
-    
+
     def _convert_uds3_results(
         self,
         uds3_result: Any,
@@ -426,13 +426,13 @@ class UDS3HybridSearchAgent:
     ) -> List[SearchResult]:
         """
         Convert UDS3 query results to SearchResult format
-        
+
         UDS3 returns results in various formats depending on the query method.
         This method normalizes them to our SearchResult dataclass.
         """
-        
+
         search_results = []
-        
+
         # Handle different UDS3 result formats
         if isinstance(uds3_result, dict):
             # Format 1: Dict with 'results' key
@@ -450,31 +450,31 @@ class UDS3HybridSearchAgent:
         else:
             logger.warning(f"Unknown UDS3 result format: {type(uds3_result)}")
             return []
-        
+
         # Convert each result
         for idx, doc in enumerate(results_list):
             if not isinstance(doc, dict):
                 continue
-            
+
             # Extract document data (handle various field names)
             doc_id = doc.get('id') or doc.get('document_id') or f"doc_{idx}"
             content = doc.get('content') or doc.get('text') or ""
             metadata = doc.get('metadata') or {}
-            
+
             # Extract scores (if available)
             scores = {
                 "vector": doc.get('vector_score', 0.0) or doc.get('similarity', 0.0),
                 "keyword": doc.get('keyword_score', 0.0) or doc.get('match_score', 0.0),
                 "graph": doc.get('graph_score', 0.0) or doc.get('relevance', 0.0)
             }
-            
+
             # Calculate final score
             final_score = (
                 weights.get("vector", 0) * scores["vector"] +
                 weights.get("keyword", 0) * scores["keyword"] +
                 weights.get("graph", 0) * scores["graph"]
             )
-            
+
             search_results.append(
                 SearchResult(
                     document_id=doc_id,
@@ -484,9 +484,9 @@ class UDS3HybridSearchAgent:
                     final_score=final_score
                 )
             )
-        
+
         return search_results
-    
+
     def _convert_polyglot_results(
         self,
         polyglot_result: Any,
@@ -494,49 +494,49 @@ class UDS3HybridSearchAgent:
     ) -> List[SearchResult]:
         """
         Convert PolyglotQueryResult to SearchResult format
-        
+
         Args:
             polyglot_result: Result from PolyglotQuery.execute()
             weights: Search weights for scoring
-        
+
         Returns:
             List of SearchResult objects
         """
         search_results = []
-        
+
         # Access joined_results from PolyglotQueryResult
         joined_results = getattr(polyglot_result, 'joined_results', [])
-        
+
         if not joined_results:
             logger.warning("PolyglotQueryResult has no joined_results")
             return []
-        
+
         logger.info(f"Converting {len(joined_results)} PolyglotQuery results...")
-        
+
         for idx, doc in enumerate(joined_results):
             if not isinstance(doc, dict):
                 continue
-            
+
             try:
                 # Extract document ID (try multiple field names)
                 doc_id = (
-                    doc.get('document_id') or 
-                    doc.get('id') or 
-                    doc.get('_id') or 
+                    doc.get('document_id') or
+                    doc.get('id') or
+                    doc.get('_id') or
                     f"doc_{idx}"
                 )
-                
+
                 # Extract content
                 content = (
-                    doc.get('content') or 
-                    doc.get('text') or 
-                    doc.get('description') or 
+                    doc.get('content') or
+                    doc.get('text') or
+                    doc.get('description') or
                     ""
                 )
-                
+
                 # Extract metadata
                 metadata = doc.get('metadata', {})
-                
+
                 # Extract scores from different databases
                 # Note: PolyglotQuery may not preserve individual scores
                 # For now, use uniform scoring based on presence
@@ -545,14 +545,14 @@ class UDS3HybridSearchAgent:
                     "keyword": 1.0 if self.has_relational else 0.0,
                     "graph": 1.0 if self.has_graph else 0.0
                 }
-                
+
                 # Calculate weighted final score
                 final_score = (
                     weights.get("vector", 0) * scores["vector"] +
                     weights.get("keyword", 0) * scores["keyword"] +
                     weights.get("graph", 0) * scores["graph"]
                 )
-                
+
                 # Create SearchResult
                 result = SearchResult(
                     document_id=doc_id,
@@ -561,20 +561,20 @@ class UDS3HybridSearchAgent:
                     scores=scores,
                     final_score=final_score
                 )
-                
+
                 search_results.append(result)
-                
+
             except Exception as e:
                 logger.error(f"Failed to convert document {idx}: {e}")
                 continue
-        
+
         logger.info(f"✅ Converted {len(search_results)} results")
         return search_results
-    
+
     # ========================================================================
     # Direct Backend Access Methods (Bypass PolyglotQuery)
     # ========================================================================
-    
+
     async def _query_postgres_direct(
         self,
         query: str,
@@ -583,26 +583,26 @@ class UDS3HybridSearchAgent:
     ) -> List[Dict[str, Any]]:
         """
         Direct PostgreSQL query without PolyglotQuery
-        
+
         Args:
             query: Search query (not used for SQL, but kept for API consistency)
             top_k: Maximum results
             filters: Field filters (e.g., {"document_type": "regulation"})
-        
+
         Returns:
             List of document dictionaries
         """
         if not self.has_relational:
             logger.warning("PostgreSQL backend not available")
             return []
-        
+
         try:
             backend = self.strategy.relational_backend
-            
+
             # Use get_statistics() to get sample documents
             # Note: This is a workaround - ideally we'd query by criteria
             logger.info(f"Fetching documents from PostgreSQL (limit={top_k})...")
-            
+
             # Try to get total document count
             try:
                 total_count = backend.get_document_count()
@@ -610,20 +610,20 @@ class UDS3HybridSearchAgent:
             except Exception as e:
                 logger.warning(f"Could not get document count: {e}")
                 total_count = 0
-            
+
             # For MVP: Return empty (no direct query API available)
             # In production: Would need custom SQL execution or iterate over documents
             logger.warning("PostgreSQL: No direct query API available, returning empty")
             logger.info("  Suggestion: Use iterate over get_document() or implement custom SQL")
-            
+
             return []
-            
+
         except Exception as e:
             logger.error(f"PostgreSQL direct query failed: {e}")
             import traceback
             traceback.print_exc()
             return []
-    
+
     async def _query_neo4j_direct(
         self,
         query: str,
@@ -631,21 +631,21 @@ class UDS3HybridSearchAgent:
     ) -> List[Dict[str, Any]]:
         """
         Direct Neo4j query using Cypher with execute_query()
-        
+
         Args:
             query: Search query (used in WHERE clause)
             top_k: Maximum results
-        
+
         Returns:
             List of document dictionaries
         """
         if not self.has_graph:
             logger.warning("Neo4j backend not available")
             return []
-        
+
         try:
             backend = self.strategy.graph_backend
-            
+
             # Build Cypher query with text search
             cypher = """
             MATCH (d:Document)
@@ -655,18 +655,18 @@ class UDS3HybridSearchAgent:
             RETURN d, collect(related) AS related_docs
             LIMIT $top_k
             """
-            
+
             params = {
                 'query': query,
                 'top_k': top_k
             }
-            
+
             logger.info(f"Executing Neo4j query with execute_query()...")
             logger.info(f"  Query: {query}, Limit: {top_k}")
-            
+
             # Execute query using correct method (discovered via introspection)
             results = backend.execute_query(cypher, params)
-            
+
             # Normalize results
             normalized = []
             for record in results:
@@ -675,10 +675,10 @@ class UDS3HybridSearchAgent:
                     doc_node = record.get('d')
                 else:
                     doc_node = record[0] if len(record) > 0 else None
-                
+
                 if doc_node is None:
                     continue
-                
+
                 # Extract properties from Neo4j Node object
                 if hasattr(doc_node, '__dict__') and hasattr(doc_node, '_properties'):
                     props = doc_node._properties
@@ -687,18 +687,18 @@ class UDS3HybridSearchAgent:
                 else:
                     # Fallback: try direct access
                     props = {}
-                
+
                 # Build document dict with proper field names
                 doc = {
                     'document_id': (
-                        props.get('document_id') or 
-                        props.get('id') or 
+                        props.get('document_id') or
+                        props.get('id') or
                         props.get('_id') or
                         'unknown'
                     ),
                     'content': (
-                        props.get('content') or 
-                        props.get('text') or 
+                        props.get('content') or
+                        props.get('text') or
                         props.get('description') or
                         ''
                     ),
@@ -712,16 +712,16 @@ class UDS3HybridSearchAgent:
                     'graph_score': 1.0  # Uniform score for now
                 }
                 normalized.append(doc)
-            
+
             logger.info(f"✅ Neo4j returned {len(normalized)} results")
             return normalized
-            
+
         except Exception as e:
             logger.error(f"Neo4j direct query failed: {e}")
             import traceback
             traceback.print_exc()
             return []
-    
+
     async def _query_chromadb_direct(
         self,
         query: str,
@@ -729,20 +729,20 @@ class UDS3HybridSearchAgent:
     ) -> List[Dict[str, Any]]:
         """
         Direct ChromaDB vector search using search_similar()
-        
+
         Generates embeddings from query text and searches similar vectors.
-        
+
         Args:
             query: Search query (converted to embedding)
             top_k: Maximum results
-        
+
         Returns:
             List of document dictionaries
         """
         if not self.has_vector:
             logger.warning("ChromaDB backend not available")
             return []
-        
+
         try:
             # Import sentence-transformers (installed via pip)
             try:
@@ -750,22 +750,22 @@ class UDS3HybridSearchAgent:
             except ImportError:
                 logger.error("sentence-transformers not installed! Run: pip install sentence-transformers")
                 return []
-            
+
             backend = self.strategy.vector_backend
-            
+
             # Load embedding model (cached after first load)
             logger.info("Loading embedding model (all-MiniLM-L6-v2)...")
             model = SentenceTransformer('all-MiniLM-L6-v2')  # 384D embeddings, fast
-            
+
             # Generate query embedding
             logger.info(f"Generating embedding for query: {query[:50]}...")
             embedding = model.encode(query)
-            
+
             # Convert to list (ChromaDB expects List[float])
             embedding_list = embedding.tolist()
-            
+
             logger.info(f"Executing ChromaDB search (embedding_dim={len(embedding_list)}, top_k={top_k})...")
-            
+
             # Search similar vectors using discovered API
             # Use 'veritas_demo' collection for demo data, or None for default
             results = backend.search_similar(
@@ -773,10 +773,10 @@ class UDS3HybridSearchAgent:
                 n_results=top_k,
                 collection='veritas_demo'  # Demo collection
             )
-            
+
             # Normalize results
             normalized = []
-            
+
             # ChromaDB returns different result structure - handle both formats
             if isinstance(results, dict):
                 # Format: {'ids': [...], 'distances': [...], 'metadatas': [...], 'documents': [...]}
@@ -784,18 +784,18 @@ class UDS3HybridSearchAgent:
                 distances = results.get('distances', [[]])[0] if results.get('distances') else []
                 metadatas = results.get('metadatas', [[]])[0] if results.get('metadatas') else []
                 documents = results.get('documents', [[]])[0] if results.get('documents') else []
-                
+
                 logger.info(f"  ChromaDB result format: dict with {len(ids)} ids")
                 logger.info(f"  Sample metadata: {metadatas[0] if metadatas else 'NONE'}")
-                
+
                 for i, doc_id in enumerate(ids):
                     # Distance to similarity score (lower distance = higher similarity)
                     # ChromaDB uses L2 distance, convert to similarity (0-1)
                     distance = distances[i] if i < len(distances) else 1.0
                     similarity = 1.0 / (1.0 + distance)  # Normalized similarity
-                    
+
                     metadata = metadatas[i] if i < len(metadatas) else {}
-                    
+
                     # Content can be in 'documents' array OR in metadata['content']
                     content = (
                         (documents[i] if i < len(documents) else '') or
@@ -803,7 +803,7 @@ class UDS3HybridSearchAgent:
                         metadata.get('text', '') or
                         ''
                     )
-                    
+
                     doc = {
                         'document_id': doc_id,
                         'content': content,
@@ -817,16 +817,16 @@ class UDS3HybridSearchAgent:
                         'vector_score': similarity
                     }
                     normalized.append(doc)
-            
+
             elif isinstance(results, list):
                 # Format: List of result dicts
                 logger.info(f"  ChromaDB result format: list with {len(results)} items")
-                
+
                 for result in results:
                     doc_id = result.get('id') or result.get('document_id', 'unknown')
                     distance = result.get('distance', 1.0)
                     similarity = 1.0 / (1.0 + distance)
-                    
+
                     metadata = result.get('metadata', {})
                     content = (
                         result.get('document', '') or
@@ -835,7 +835,7 @@ class UDS3HybridSearchAgent:
                         metadata.get('text', '') or
                         ''
                     )
-                    
+
                     doc = {
                         'document_id': doc_id,
                         'content': content,
@@ -850,16 +850,16 @@ class UDS3HybridSearchAgent:
                         'vector_score': similarity
                     }
                     normalized.append(doc)
-            
+
             logger.info(f"✅ ChromaDB returned {len(normalized)} results")
             return normalized
-            
+
         except Exception as e:
             logger.error(f"ChromaDB vector search failed: {e}")
             import traceback
             traceback.print_exc()
             return []
-    
+
     def _merge_and_rank(
         self,
         results: List[Dict[str, Any]],
@@ -868,40 +868,40 @@ class UDS3HybridSearchAgent:
     ) -> List[SearchResult]:
         """
         Merge results from multiple backends and rank by weighted score
-        
+
         Args:
             results: Combined results from all backends
             weights: Search weights for scoring
             top_k: Number of results to return
-        
+
         Returns:
             List of SearchResult objects, sorted by final_score
         """
         # Deduplicate by document_id
         seen_ids = set()
         merged = []
-        
+
         for result in results:
             doc_id = result.get('document_id')
             if not doc_id or doc_id in seen_ids:
                 continue
-            
+
             seen_ids.add(doc_id)
-            
+
             # Extract scores
             scores = {
                 'vector': result.get('vector_score', 0.0),
                 'keyword': result.get('keyword_score', 0.0),
                 'graph': result.get('graph_score', 0.0)
             }
-            
+
             # Calculate weighted final score
             final_score = (
                 weights.get('vector', 0) * scores['vector'] +
                 weights.get('keyword', 0) * scores['keyword'] +
                 weights.get('graph', 0) * scores['graph']
             )
-            
+
             # Create SearchResult
             search_result = SearchResult(
                 document_id=doc_id,
@@ -910,15 +910,15 @@ class UDS3HybridSearchAgent:
                 scores=scores,
                 final_score=final_score
             )
-            
+
             merged.append(search_result)
-        
+
         # Sort by final_score (descending)
         merged.sort(key=lambda x: x.final_score, reverse=True)
-        
+
         logger.info(f"✅ Merged {len(merged)} unique results, returning top {top_k}")
         return merged[:top_k]
-    
+
     async def _vector_search(
         self,
         query: str,
@@ -926,13 +926,13 @@ class UDS3HybridSearchAgent:
         filters: Optional[Dict[str, Any]]
     ) -> List[Dict[str, Any]]:
         """Execute vector search via UDS3"""
-        
+
         results = await self.store.vector_search(
             query=query,
             top_k=top_k,
             filters=filters or {}
         )
-        
+
         # Normalize to common format
         normalized = []
         for doc in results:
@@ -942,9 +942,9 @@ class UDS3HybridSearchAgent:
                 "metadata": doc.get("metadata", {}),
                 "vector_score": doc.get("similarity_score", 0.0)
             })
-        
+
         return normalized
-    
+
     async def _keyword_search(
         self,
         query: str,
@@ -952,14 +952,14 @@ class UDS3HybridSearchAgent:
         filters: Optional[Dict[str, Any]]
     ) -> List[Dict[str, Any]]:
         """Execute keyword search via UDS3"""
-        
+
         results = await self.store.keyword_search(
             query=query,
             top_k=top_k,
             search_mode="and",  # "and", "or", "phrase"
             filters=filters or {}
         )
-        
+
         # Normalize to common format
         normalized = []
         for doc in results:
@@ -969,9 +969,9 @@ class UDS3HybridSearchAgent:
                 "metadata": doc.get("metadata", {}),
                 "keyword_score": doc.get("match_score", 0.0)
             })
-        
+
         return normalized
-    
+
     async def _graph_search(
         self,
         query: str,
@@ -980,14 +980,14 @@ class UDS3HybridSearchAgent:
         vector_results: List[Dict[str, Any]]
     ) -> List[Dict[str, Any]]:
         """Execute graph query via UDS3"""
-        
+
         # Strategy: Find documents related to top vector results
         if not vector_results:
             return []
-        
+
         # Get top 3 vector results as seed documents
         seed_doc_ids = [doc["id"] for doc in vector_results[:3]]
-        
+
         # Cypher query: Find related documents
         cypher_query = """
         MATCH (d:Document)-[:RELATED_TO|REFERENCES]->(r:Document)
@@ -995,12 +995,12 @@ class UDS3HybridSearchAgent:
         RETURN DISTINCT r
         LIMIT $limit
         """
-        
+
         results = await self.store.graph_query(
             cypher_template=cypher_query,
             params={"doc_ids": seed_doc_ids, "limit": top_k}
         )
-        
+
         # Normalize to common format
         normalized = []
         for doc in results:
@@ -1010,9 +1010,9 @@ class UDS3HybridSearchAgent:
                 "metadata": doc.get("metadata", {}),
                 "graph_score": doc.get("relationship_score", 0.5)  # Default 0.5
             })
-        
+
         return normalized
-    
+
     def _merge_and_rerank(
         self,
         results: Dict[str, List[Dict[str, Any]]],
@@ -1020,15 +1020,15 @@ class UDS3HybridSearchAgent:
     ) -> List[SearchResult]:
         """
         Merge results from different methods and calculate final scores
-        
+
         Scoring Formula:
         final_score = w_v * vector_score + w_k * keyword_score + w_g * graph_score
-        
+
         where w_v + w_k + w_g = 1.0
         """
-        
+
         doc_map = {}  # doc_id -> SearchResult
-        
+
         # Process vector results
         for doc in results.get("vector", []):
             doc_id = doc["id"]
@@ -1040,7 +1040,7 @@ class UDS3HybridSearchAgent:
                     "scores": {"vector": 0.0, "keyword": 0.0, "graph": 0.0}
                 }
             doc_map[doc_id]["scores"]["vector"] = doc.get("vector_score", 0.0)
-        
+
         # Process keyword results
         for doc in results.get("keyword", []):
             doc_id = doc["id"]
@@ -1052,7 +1052,7 @@ class UDS3HybridSearchAgent:
                     "scores": {"vector": 0.0, "keyword": 0.0, "graph": 0.0}
                 }
             doc_map[doc_id]["scores"]["keyword"] = doc.get("keyword_score", 0.0)
-        
+
         # Process graph results
         for doc in results.get("graph", []):
             doc_id = doc["id"]
@@ -1064,7 +1064,7 @@ class UDS3HybridSearchAgent:
                     "scores": {"vector": 0.0, "keyword": 0.0, "graph": 0.0}
                 }
             doc_map[doc_id]["scores"]["graph"] = doc.get("graph_score", 0.0)
-        
+
         # Calculate final scores
         search_results = []
         for doc_data in doc_map.values():
@@ -1074,7 +1074,7 @@ class UDS3HybridSearchAgent:
                 weights.get("keyword", 0) * scores["keyword"] +
                 weights.get("graph", 0) * scores["graph"]
             )
-            
+
             search_results.append(
                 SearchResult(
                     document_id=doc_data["id"],
@@ -1084,12 +1084,12 @@ class UDS3HybridSearchAgent:
                     final_score=final_score
                 )
             )
-        
+
         # Sort by final score (descending)
         search_results.sort(key=lambda x: x.final_score, reverse=True)
-        
+
         return search_results
-    
+
     async def vector_search_only(
         self,
         query: str,
@@ -1103,7 +1103,7 @@ class UDS3HybridSearchAgent:
             filters=filters,
             enable_graph=False
         )
-    
+
     async def keyword_search_only(
         self,
         query: str,

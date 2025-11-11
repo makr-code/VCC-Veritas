@@ -5,48 +5,57 @@ Gemeinsame Request/Response Models für API v3.
 Konsistente Struktur über alle Endpoints.
 """
 
-from pydantic import BaseModel, Field, validator
-from typing import Optional, List, Dict, Any, Union, Literal
 from datetime import datetime
 from enum import Enum
+from typing import Any, Dict, List, Literal, Optional, Union
+
+from pydantic import BaseModel, Field, validator
 
 # ============================================================================
 # Base Models
 # ============================================================================
 
+
 class StatusEnum(str, Enum):
     """Status für asynchrone Operationen"""
+
     PENDING = "pending"
     IN_PROGRESS = "in_progress"
     COMPLETED = "completed"
     FAILED = "failed"
     CANCELLED = "cancelled"
 
+
 class ErrorResponse(BaseModel):
     """Standard Error Response"""
+
     error: str = Field(..., description="Fehlermeldung")
     error_code: Optional[str] = Field(None, description="Error Code")
     details: Optional[Dict[str, Any]] = Field(None, description="Zusätzliche Details")
     timestamp: datetime = Field(default_factory=datetime.now, description="Fehler-Zeitpunkt")
 
+
 class SuccessResponse(BaseModel):
     """Standard Success Response"""
+
     success: bool = Field(True, description="Erfolg-Flag")
     message: Optional[str] = Field(None, description="Erfolgsmeldung")
     data: Optional[Dict[str, Any]] = Field(None, description="Response Data")
     timestamp: datetime = Field(default_factory=datetime.now, description="Response-Zeitpunkt")
 
+
 # ============================================================================
 # Query Models
 # ============================================================================
 
+
 class SourceMetadata(BaseModel):
     """
     Source Metadata für Citations (✨ IEEE-EXTENDED)
-    
+
     Basis-Felder:
         - id, file, page, confidence, author, title, year, publisher, url, type
-    
+
     IEEE-Erweiterte Felder (via extra="allow"):
         - authors (formatiert nach IEEE)
         - ieee_citation (vollständige IEEE-Zitation)
@@ -58,6 +67,7 @@ class SourceMetadata(BaseModel):
         - rechtsgebiet, behörde, aktenzeichen, gericht
         - und weitere 25+ Felder aus Native RAG Chain
     """
+
     id: str = Field(..., description="Source ID")
     file: Optional[str] = Field(None, description="Dateiname")
     page: Optional[int] = Field(None, description="Seitennummer")
@@ -68,12 +78,14 @@ class SourceMetadata(BaseModel):
     publisher: Optional[str] = Field(None, description="Publisher")
     url: Optional[str] = Field(None, description="URL")
     type: Optional[str] = Field("document", description="Source Type (document, web, database)")
-    
+
     class Config:
         extra = "allow"  # ✨ Erlaubt IEEE-erweiterte Felder ohne explizite Definition
 
+
 class QueryMetadata(BaseModel):
     """Query Response Metadata"""
+
     model: str = Field(..., description="LLM Model verwendet")
     mode: str = Field(..., description="Query Mode verwendet")
     duration: float = Field(..., description="Query Dauer (Sekunden)")
@@ -83,8 +95,10 @@ class QueryMetadata(BaseModel):
     complexity: Optional[str] = Field(None, description="Query Complexity")
     agents_involved: Optional[List[str]] = Field(None, description="Verwendete Agents")
 
+
 class QueryRequest(BaseModel):
     """Standard Query Request"""
+
     query: str = Field(..., min_length=1, max_length=10000, description="User Query")
     mode: Optional[str] = Field("veritas", description="Query Mode (veritas, chat, vpb, covina)")
     model: Optional[str] = Field("llama3.2", description="LLM Model")
@@ -94,8 +108,10 @@ class QueryRequest(BaseModel):
     session_id: Optional[str] = Field(None, description="Session ID")
     metadata: Optional[Dict[str, Any]] = Field(None, description="Custom Metadata")
 
+
 class QueryResponse(BaseModel):
     """Standard Query Response"""
+
     content: str = Field(..., description="Generated Response")
     metadata: QueryMetadata = Field(..., description="Response Metadata")
     session_id: str = Field(..., description="Session ID")
@@ -104,12 +120,15 @@ class QueryResponse(BaseModel):
     url: Optional[str] = Field(None, description="URL")
     type: Optional[str] = Field("document", description="Source Type (document, web, database)")
 
+
 # ============================================================================
 # Agent Models
 # ============================================================================
 
+
 class AgentInfo(BaseModel):
     """Agent Information"""
+
     agent_id: str = Field(..., description="Agent ID")
     name: str = Field(..., description="Agent Name")
     description: Optional[str] = Field(None, description="Agent Beschreibung")
@@ -117,42 +136,53 @@ class AgentInfo(BaseModel):
     status: Literal["active", "inactive", "error"] = Field("active", description="Agent Status")
     version: Optional[str] = Field(None, description="Agent Version")
 
+
 class AgentExecuteRequest(BaseModel):
     """Agent Execution Request"""
+
     agent_id: str = Field(..., description="Agent ID")
     task: str = Field(..., description="Task Beschreibung")
     parameters: Optional[Dict[str, Any]] = Field(None, description="Task Parameters")
     timeout: Optional[int] = Field(60, ge=1, le=600, description="Timeout (Sekunden)")
 
+
 class AgentExecuteResponse(BaseModel):
     """Agent Execution Response"""
+
     agent_id: str = Field(..., description="Agent ID")
     result: Dict[str, Any] = Field(..., description="Execution Result")
     status: StatusEnum = Field(..., description="Execution Status")
     duration: float = Field(..., description="Execution Dauer")
     timestamp: datetime = Field(default_factory=datetime.now)
 
+
 # ============================================================================
 # System Models
 # ============================================================================
 
+
 class SystemHealth(BaseModel):
     """System Health Response"""
+
     status: Literal["healthy", "degraded", "unhealthy"] = Field(..., description="System Status")
     timestamp: datetime = Field(default_factory=datetime.now)
     services: Dict[str, bool] = Field(..., description="Service Status")
     uptime: Optional[float] = Field(None, description="Uptime (Sekunden)")
 
+
 class SystemCapabilities(BaseModel):
     """System Capabilities Response"""
+
     version: str = Field(..., description="System Version")
     endpoints: List[str] = Field(..., description="Verfügbare Endpoints")
     features: Dict[str, bool] = Field(..., description="Feature Flags")
     models: List[str] = Field(..., description="Verfügbare LLM Models")
     agents: List[str] = Field(..., description="Verfügbare Agents")
 
+
 class SystemMetrics(BaseModel):
     """System Metrics Response"""
+
     requests_total: int = Field(..., description="Total Requests")
     requests_per_second: float = Field(..., description="Requests/Second")
     average_latency: float = Field(..., description="Avg Latency (ms)")
@@ -160,12 +190,15 @@ class SystemMetrics(BaseModel):
     uptime: float = Field(..., description="Uptime (Sekunden)")
     timestamp: datetime = Field(default_factory=datetime.now)
 
+
 # ============================================================================
 # SAGA Models
 # ============================================================================
 
+
 class SAGAStep(BaseModel):
     """SAGA Step Definition"""
+
     step_id: str = Field(..., description="Step ID")
     service: str = Field(..., description="Service Name")
     action: str = Field(..., description="Action Name")
@@ -173,15 +206,19 @@ class SAGAStep(BaseModel):
     compensation: Optional[Dict[str, Any]] = Field(None, description="Compensation Action")
     timeout: int = Field(60, ge=1, le=600, description="Timeout (Sekunden)")
 
+
 class SAGAOrchestrationRequest(BaseModel):
     """SAGA Orchestration Request"""
+
     saga_name: str = Field(..., description="SAGA Name")
     steps: List[SAGAStep] = Field(..., min_items=1, description="SAGA Steps")
     timeout: int = Field(300, ge=1, le=3600, description="Total Timeout")
     metadata: Optional[Dict[str, Any]] = Field(None, description="Custom Metadata")
 
+
 class SAGAStatus(BaseModel):
     """SAGA Status Response"""
+
     saga_id: str = Field(..., description="SAGA ID")
     saga_name: str = Field(..., description="SAGA Name")
     status: StatusEnum = Field(..., description="SAGA Status")
@@ -193,27 +230,34 @@ class SAGAStatus(BaseModel):
     created_at: datetime = Field(..., description="Erstellungs-Zeitpunkt")
     updated_at: datetime = Field(..., description="Update-Zeitpunkt")
 
+
 # ============================================================================
 # Compliance Models
 # ============================================================================
 
+
 class ComplianceViolation(BaseModel):
     """Compliance Violation"""
+
     violation_id: str = Field(..., description="Violation ID")
     rule: str = Field(..., description="Verletzte Regel")
     severity: Literal["low", "medium", "high", "critical"] = Field(..., description="Severity")
     description: str = Field(..., description="Violation Beschreibung")
     remediation: Optional[str] = Field(None, description="Remediation Vorschlag")
 
+
 class ComplianceCheckRequest(BaseModel):
     """Compliance Check Request"""
+
     entity_type: str = Field(..., description="Entity Type (document, dataset, process)")
     entity_id: str = Field(..., description="Entity ID")
     rules: List[str] = Field(..., min_items=1, description="Compliance Rules (GDPR, DSGVO, BImSchG)")
     parameters: Optional[Dict[str, Any]] = Field(None, description="Check Parameters")
 
+
 class ComplianceCheckResponse(BaseModel):
     """Compliance Check Response"""
+
     entity_id: str = Field(..., description="Entity ID")
     status: Literal["compliant", "non_compliant", "unknown"] = Field(..., description="Compliance Status")
     score: float = Field(..., ge=0.0, le=1.0, description="Compliance Score")
@@ -221,18 +265,23 @@ class ComplianceCheckResponse(BaseModel):
     recommendations: List[str] = Field(..., description="Empfehlungen")
     checked_at: datetime = Field(default_factory=datetime.now)
 
+
 # ============================================================================
 # Governance Models
 # ============================================================================
 
+
 class DataLineageRequest(BaseModel):
     """Data Lineage Request"""
+
     entity_id: str = Field(..., description="Entity ID")
     depth: int = Field(3, ge=1, le=10, description="Lineage Depth")
     direction: Literal["upstream", "downstream", "both"] = Field("both", description="Lineage Direction")
 
+
 class DataLineageResponse(BaseModel):
     """Data Lineage Response"""
+
     entity_id: str = Field(..., description="Root Entity ID")
     lineage: Dict[str, Any] = Field(..., description="Lineage Graph (JSON)")
     total_nodes: int = Field(..., description="Anzahl Nodes")
@@ -240,8 +289,10 @@ class DataLineageResponse(BaseModel):
     max_depth: int = Field(..., description="Maximale Depth")
     generated_at: datetime = Field(default_factory=datetime.now)
 
+
 class DataGovernancePolicy(BaseModel):
     """Data Governance Policy"""
+
     policy_id: str = Field(..., description="Policy ID")
     name: str = Field(..., description="Policy Name")
     description: str = Field(..., description="Policy Beschreibung")
@@ -251,20 +302,25 @@ class DataGovernancePolicy(BaseModel):
     created_at: datetime = Field(..., description="Erstellungs-Zeitpunkt")
     updated_at: datetime = Field(..., description="Update-Zeitpunkt")
 
+
 # ============================================================================
 # Domain Endpoints - Phase 2
 # ============================================================================
 
+
 # VPB (Verwaltungspraxis der Bundesbehörden)
 class VPBQueryRequest(BaseModel):
     """VPB Query Request"""
+
     query: str = Field(..., min_length=1, description="VPB-spezifische Query")
     mode: Literal["veritas", "simple", "deep"] = Field("veritas", description="Query Mode")
     session_id: Optional[str] = Field(None, description="Session ID")
     filters: Optional[Dict[str, Any]] = Field(None, description="VPB-Filters (Jahr, Behörde, etc.)")
 
+
 class VPBDocument(BaseModel):
     """VPB Dokument"""
+
     document_id: str = Field(..., description="VPB Dokument ID")
     title: str = Field(..., description="Titel")
     authority: Optional[str] = Field(None, description="Behörde")
@@ -273,37 +329,47 @@ class VPBDocument(BaseModel):
     content_preview: Optional[str] = Field(None, description="Vorschau")
     relevance_score: Optional[float] = Field(None, ge=0.0, le=1.0, description="Relevanz")
 
+
 class VPBQueryResponse(BaseModel):
     """VPB Query Response"""
+
     query_id: str = Field(..., description="Query ID")
     content: str = Field(..., description="Response Content")
     documents: List[VPBDocument] = Field(default_factory=list, description="VPB Dokumente")
     metadata: Optional[Dict[str, Any]] = Field(None, description="Zusätzliche Metadaten")
     duration: Optional[float] = Field(None, description="Query Duration (Sekunden)")
 
+
 class VPBAnalysisRequest(BaseModel):
     """VPB Verwaltungsprozess-Analyse Request"""
+
     process_description: str = Field(..., min_length=1, description="Beschreibung des Verwaltungsprozesses")
     context: Optional[Dict[str, Any]] = Field(None, description="Kontext-Informationen")
 
+
 class VPBAnalysisResponse(BaseModel):
     """VPB Verwaltungsprozess-Analyse Response"""
+
     analysis_id: str = Field(..., description="Analyse ID")
     summary: str = Field(..., description="Analyse-Zusammenfassung")
     recommendations: List[str] = Field(default_factory=list, description="Empfehlungen")
     legal_references: List[VPBDocument] = Field(default_factory=list, description="Rechtliche Referenzen")
     risk_assessment: Optional[Dict[str, Any]] = Field(None, description="Risikobewertung")
 
+
 # COVINA (COVID-19 Intelligence Agent)
 class COVINAQueryRequest(BaseModel):
     """COVINA Query Request"""
+
     query: str = Field(..., min_length=1, description="COVID-19-bezogene Query")
     mode: Literal["veritas", "simple", "statistics"] = Field("veritas", description="Query Mode")
     session_id: Optional[str] = Field(None, description="Session ID")
     time_range: Optional[Dict[str, str]] = Field(None, description="Zeitbereich (from, to)")
 
+
 class COVINAStatistics(BaseModel):
     """COVINA Statistiken"""
+
     region: str = Field(..., description="Region")
     date: str = Field(..., description="Datum (ISO 8601)")
     cases: Optional[int] = Field(None, description="Fallzahlen")
@@ -311,16 +377,20 @@ class COVINAStatistics(BaseModel):
     r_value: Optional[float] = Field(None, description="R-Wert")
     data_source: Optional[str] = Field(None, description="Datenquelle")
 
+
 class COVINAReport(BaseModel):
     """COVINA Report"""
+
     report_id: str = Field(..., description="Report ID")
     title: str = Field(..., description="Report Titel")
     date: str = Field(..., description="Datum")
     summary: str = Field(..., description="Zusammenfassung")
     statistics: List[COVINAStatistics] = Field(default_factory=list, description="Statistiken")
 
+
 class COVINAQueryResponse(BaseModel):
     """COVINA Query Response"""
+
     query_id: str = Field(..., description="Query ID")
     content: str = Field(..., description="Response Content")
     statistics: List[COVINAStatistics] = Field(default_factory=list, description="Statistiken")
@@ -328,15 +398,19 @@ class COVINAQueryResponse(BaseModel):
     metadata: Optional[Dict[str, Any]] = Field(None, description="Zusätzliche Metadaten")
     duration: Optional[float] = Field(None, description="Query Duration (Sekunden)")
 
+
 # PKI (Public Key Infrastructure)
 class PKIQueryRequest(BaseModel):
     """PKI Query Request"""
+
     query: str = Field(..., min_length=1, description="PKI-bezogene Query")
     mode: Literal["veritas", "simple", "technical"] = Field("veritas", description="Query Mode")
     session_id: Optional[str] = Field(None, description="Session ID")
 
+
 class PKICertificate(BaseModel):
     """PKI Zertifikat"""
+
     certificate_id: str = Field(..., description="Zertifikat ID")
     subject: str = Field(..., description="Subject (CN)")
     issuer: str = Field(..., description="Issuer")
@@ -345,22 +419,28 @@ class PKICertificate(BaseModel):
     serial_number: Optional[str] = Field(None, description="Seriennummer")
     status: Literal["valid", "expired", "revoked"] = Field("valid", description="Status")
 
+
 class PKIQueryResponse(BaseModel):
     """PKI Query Response"""
+
     query_id: str = Field(..., description="Query ID")
     content: str = Field(..., description="Response Content")
     certificates: List[PKICertificate] = Field(default_factory=list, description="Zertifikate")
     metadata: Optional[Dict[str, Any]] = Field(None, description="Zusätzliche Metadaten")
     duration: Optional[float] = Field(None, description="Query Duration (Sekunden)")
 
+
 class PKIValidationRequest(BaseModel):
     """PKI Zertifikat-Validierung Request"""
+
     certificate_data: str = Field(..., description="Zertifikat-Daten (PEM/DER)")
     check_revocation: bool = Field(True, description="Revocation-Check durchführen")
     check_chain: bool = Field(True, description="Chain-Validierung durchführen")
 
+
 class PKIValidationResponse(BaseModel):
     """PKI Zertifikat-Validierung Response"""
+
     validation_id: str = Field(..., description="Validierungs-ID")
     is_valid: bool = Field(..., description="Zertifikat gültig?")
     status: str = Field(..., description="Validierungs-Status")
@@ -368,24 +448,30 @@ class PKIValidationResponse(BaseModel):
     warnings: List[str] = Field(default_factory=list, description="Warnungen")
     certificate_info: Optional[PKICertificate] = Field(None, description="Zertifikat-Info")
 
+
 # IMMI (Immissionsschutz)
 class IMMIQueryRequest(BaseModel):
     """IMMI Query Request"""
+
     query: str = Field(..., min_length=1, description="Immissionsschutz-bezogene Query")
     mode: Literal["veritas", "simple", "technical"] = Field("veritas", description="Query Mode")
     session_id: Optional[str] = Field(None, description="Session ID")
     location: Optional[Dict[str, float]] = Field(None, description="Standort (lat, lon)")
 
+
 class IMMIRegulation(BaseModel):
     """IMMI BImSchG Vorschrift"""
+
     regulation_id: str = Field(..., description="Vorschrift ID")
     title: str = Field(..., description="Titel")
     reference: str = Field(..., description="Gesetzesreferenz (z.B. §4 BImSchG)")
     content: str = Field(..., description="Vorschrift-Inhalt")
     category: Optional[str] = Field(None, description="Kategorie")
 
+
 class IMMIGeoData(BaseModel):
     """IMMI WKA Geodaten"""
+
     location_id: str = Field(..., description="Standort ID")
     name: Optional[str] = Field(None, description="Anlagenname")
     latitude: float = Field(..., description="Breitengrad")
@@ -394,8 +480,10 @@ class IMMIGeoData(BaseModel):
     distance_to_residential: Optional[float] = Field(None, description="Abstand zu Wohngebieten (m)")
     metadata: Optional[Dict[str, Any]] = Field(None, description="Zusätzliche Geodaten")
 
+
 class IMMIQueryResponse(BaseModel):
     """IMMI Query Response"""
+
     query_id: str = Field(..., description="Query ID")
     content: str = Field(..., description="Response Content")
     regulations: List[IMMIRegulation] = Field(default_factory=list, description="BImSchG Vorschriften")
@@ -403,19 +491,24 @@ class IMMIQueryResponse(BaseModel):
     metadata: Optional[Dict[str, Any]] = Field(None, description="Zusätzliche Metadaten")
     duration: Optional[float] = Field(None, description="Query Duration (Sekunden)")
 
+
 # ============================================================================
 # UDS3 Endpoints - Phase 4
 # ============================================================================
 
+
 class UDS3QueryRequest(BaseModel):
     """Unified Database Query Request"""
+
     query: str = Field(..., min_length=1, description="Query Text")
     database_type: Literal["vector", "graph", "relational", "file"] = Field(..., description="Database Type")
     parameters: Optional[Dict[str, Any]] = Field(None, description="Query Parameters")
     timeout: int = Field(60, ge=1, le=300, description="Timeout in Sekunden")
 
+
 class UDS3QueryResponse(BaseModel):
     """Unified Database Query Response"""
+
     query_id: str = Field(..., description="Query ID")
     database_type: str = Field(..., description="Database Type")
     results: List[Dict[str, Any]] = Field(..., description="Query Results")
@@ -423,43 +516,55 @@ class UDS3QueryResponse(BaseModel):
     metadata: Dict[str, Any] = Field(..., description="Query Metadata")
     duration: float = Field(..., description="Query Duration (Sekunden)")
 
+
 class VectorSearchRequest(BaseModel):
     """Vector Search Request"""
+
     query_vector: Optional[List[float]] = Field(None, description="Query Vector (optional wenn query_text gegeben)")
     query_text: Optional[str] = Field(None, description="Query Text (wird zu Vector konvertiert)")
     top_k: int = Field(10, ge=1, le=100, description="Top K Results")
     filters: Optional[Dict[str, Any]] = Field(None, description="Metadata Filters")
     similarity_threshold: float = Field(0.7, ge=0.0, le=1.0, description="Similarity Threshold")
 
+
 class VectorSearchResponse(BaseModel):
     """Vector Search Response"""
+
     results: List[Dict[str, Any]] = Field(..., description="Search Results with Scores")
     count: int = Field(..., description="Result Count")
     query_vector: Optional[List[float]] = Field(None, description="Query Vector Used")
     duration: float = Field(..., description="Search Duration (Sekunden)")
 
+
 class GraphQueryRequest(BaseModel):
     """Graph Query Request (Cypher)"""
+
     cypher_query: str = Field(..., min_length=1, description="Cypher Query")
     parameters: Optional[Dict[str, Any]] = Field(None, description="Query Parameters")
     limit: int = Field(100, ge=1, le=1000, description="Result Limit")
 
+
 class GraphQueryResponse(BaseModel):
     """Graph Query Response"""
+
     nodes: List[Dict[str, Any]] = Field(..., description="Graph Nodes")
     relationships: List[Dict[str, Any]] = Field(..., description="Graph Relationships")
     count: int = Field(..., description="Node Count")
     duration: float = Field(..., description="Query Duration (Sekunden)")
 
+
 class BulkOperationRequest(BaseModel):
     """Bulk Operation Request"""
+
     operation: Literal["insert", "update", "delete"] = Field(..., description="Operation Type")
     database_type: Literal["vector", "graph", "relational"] = Field(..., description="Target Database")
     data: List[Dict[str, Any]] = Field(..., description="Data to Process")
     batch_size: int = Field(100, ge=1, le=1000, description="Batch Size")
 
+
 class BulkOperationResponse(BaseModel):
     """Bulk Operation Response"""
+
     operation_id: str = Field(..., description="Operation ID")
     status: Literal["completed", "partial", "failed"] = Field(..., description="Operation Status")
     total_items: int = Field(..., description="Total Items")
@@ -468,8 +573,10 @@ class BulkOperationResponse(BaseModel):
     errors: List[str] = Field(default_factory=list, description="Error Messages")
     duration: float = Field(..., description="Operation Duration (Sekunden)")
 
+
 class DatabaseInfo(BaseModel):
     """Database Information"""
+
     database_type: str = Field(..., description="Database Type")
     name: str = Field(..., description="Database Name")
     status: Literal["online", "offline", "degraded"] = Field(..., description="Database Status")
@@ -477,8 +584,10 @@ class DatabaseInfo(BaseModel):
     record_count: int = Field(..., description="Record Count")
     last_updated: datetime = Field(..., description="Last Update")
 
+
 class UDS3Statistics(BaseModel):
     """UDS3 Statistics"""
+
     total_databases: int = Field(..., description="Total Databases")
     total_queries: int = Field(..., description="Total Queries (last 24h)")
     average_query_time: float = Field(..., description="Average Query Time (ms)")
@@ -486,20 +595,25 @@ class UDS3Statistics(BaseModel):
     cache_hit_rate: float = Field(..., ge=0.0, le=1.0, description="Cache Hit Rate")
     uptime_seconds: int = Field(..., description="Uptime in Seconds")
 
+
 # ============================================================================
 # User Endpoints - Phase 4
 # ============================================================================
 
+
 class UserRegistration(BaseModel):
     """User Registration Request"""
+
     username: str = Field(..., min_length=3, max_length=50, description="Username")
     email: str = Field(..., description="Email Address")
     password: str = Field(..., min_length=8, description="Password")
     full_name: Optional[str] = Field(None, description="Full Name")
     organization: Optional[str] = Field(None, description="Organization")
 
+
 class UserProfile(BaseModel):
     """User Profile"""
+
     user_id: str = Field(..., description="User ID")
     username: str = Field(..., description="Username")
     email: str = Field(..., description="Email Address")
@@ -511,8 +625,10 @@ class UserProfile(BaseModel):
     query_count: int = Field(0, description="Total Query Count")
     preferences: Optional[Dict[str, Any]] = Field(None, description="User Preferences")
 
+
 class UserPreferences(BaseModel):
     """User Preferences"""
+
     user_id: str = Field(..., description="User ID")
     theme: Literal["light", "dark", "forest"] = Field("forest", description="UI Theme")
     language: Literal["de", "en", "fr", "it"] = Field("de", description="Language")
@@ -522,8 +638,10 @@ class UserPreferences(BaseModel):
     auto_save_queries: bool = Field(True, description="Queries automatisch speichern")
     notifications_enabled: bool = Field(True, description="Notifications aktivieren")
 
+
 class UserFeedback(BaseModel):
     """User Feedback"""
+
     user_id: str = Field(..., description="User ID")
     feedback_type: Literal["bug", "feature", "improvement", "question", "other"] = Field(..., description="Feedback Type")
     title: str = Field(..., min_length=5, max_length=200, description="Feedback Title")
@@ -532,8 +650,10 @@ class UserFeedback(BaseModel):
     related_query_id: Optional[str] = Field(None, description="Related Query ID")
     attachments: Optional[List[str]] = Field(None, description="Attachment URLs")
 
+
 class UserQueryHistory(BaseModel):
     """User Query History Entry"""
+
     query_id: str = Field(..., description="Query ID")
     user_id: str = Field(..., description="User ID")
     query_text: str = Field(..., description="Query Text")
@@ -544,29 +664,70 @@ class UserQueryHistory(BaseModel):
     timestamp: datetime = Field(..., description="Query Timestamp")
     bookmarked: bool = Field(False, description="Bookmarked by User")
 
+
 __all__ = [
     # Base
-    "StatusEnum", "ErrorResponse", "SuccessResponse",
+    "StatusEnum",
+    "ErrorResponse",
+    "SuccessResponse",
     # Query
-    "QueryRequest", "QueryResponse", "QueryMetadata", "SourceMetadata",
+    "QueryRequest",
+    "QueryResponse",
+    "QueryMetadata",
+    "SourceMetadata",
     # Agent
-    "AgentInfo", "AgentExecuteRequest", "AgentExecuteResponse",
+    "AgentInfo",
+    "AgentExecuteRequest",
+    "AgentExecuteResponse",
     # System
-    "SystemHealth", "SystemCapabilities", "SystemMetrics",
+    "SystemHealth",
+    "SystemCapabilities",
+    "SystemMetrics",
     # SAGA
-    "SAGAStep", "SAGAOrchestrationRequest", "SAGAStatus",
+    "SAGAStep",
+    "SAGAOrchestrationRequest",
+    "SAGAStatus",
     # Compliance
-    "ComplianceCheckRequest", "ComplianceCheckResponse", "ComplianceViolation",
+    "ComplianceCheckRequest",
+    "ComplianceCheckResponse",
+    "ComplianceViolation",
     # Governance
-    "DataLineageRequest", "DataLineageResponse", "DataGovernancePolicy",
+    "DataLineageRequest",
+    "DataLineageResponse",
+    "DataGovernancePolicy",
     # Domain Endpoints (Phase 2)
-    "VPBQueryRequest", "VPBQueryResponse", "VPBDocument", "VPBAnalysisRequest", "VPBAnalysisResponse",
-    "COVINAQueryRequest", "COVINAQueryResponse", "COVINAStatistics", "COVINAReport",
-    "PKIQueryRequest", "PKIQueryResponse", "PKICertificate", "PKIValidationRequest", "PKIValidationResponse",
-    "IMMIQueryRequest", "IMMIQueryResponse", "IMMIRegulation", "IMMIGeoData",
+    "VPBQueryRequest",
+    "VPBQueryResponse",
+    "VPBDocument",
+    "VPBAnalysisRequest",
+    "VPBAnalysisResponse",
+    "COVINAQueryRequest",
+    "COVINAQueryResponse",
+    "COVINAStatistics",
+    "COVINAReport",
+    "PKIQueryRequest",
+    "PKIQueryResponse",
+    "PKICertificate",
+    "PKIValidationRequest",
+    "PKIValidationResponse",
+    "IMMIQueryRequest",
+    "IMMIQueryResponse",
+    "IMMIRegulation",
+    "IMMIGeoData",
     # Phase 4: UDS3 & User
-    "UDS3QueryRequest", "UDS3QueryResponse", "VectorSearchRequest", "VectorSearchResponse",
-    "GraphQueryRequest", "GraphQueryResponse", "BulkOperationRequest", "BulkOperationResponse",
-    "DatabaseInfo", "UDS3Statistics",
-    "UserRegistration", "UserProfile", "UserPreferences", "UserFeedback", "UserQueryHistory"
+    "UDS3QueryRequest",
+    "UDS3QueryResponse",
+    "VectorSearchRequest",
+    "VectorSearchResponse",
+    "GraphQueryRequest",
+    "GraphQueryResponse",
+    "BulkOperationRequest",
+    "BulkOperationResponse",
+    "DatabaseInfo",
+    "UDS3Statistics",
+    "UserRegistration",
+    "UserProfile",
+    "UserPreferences",
+    "UserFeedback",
+    "UserQueryHistory",
 ]

@@ -22,14 +22,15 @@ Features:
 Created: 2025-11-07
 """
 
+import logging
+import time
+from datetime import datetime
+from typing import Any, Dict, List, Literal, Optional
+
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
-from typing import List, Dict, Any, Optional, Literal
-from datetime import datetime
-import time
-import logging
 
-from backend.adapters import get_database_adapter, DatabaseAdapterType
+from backend.adapters import DatabaseAdapterType, get_database_adapter
 
 logger = logging.getLogger(__name__)
 
@@ -40,8 +41,10 @@ themis_router = APIRouter(prefix="/themis", tags=["ThemisDB"])
 # Pydantic Models
 # ============================================================================
 
+
 class ThemisVectorSearchRequest(BaseModel):
     """Vector search request for ThemisDB"""
+
     query: str = Field(..., description="Search query text")
     top_k: int = Field(5, ge=1, le=100, description="Number of top results")
     collection: str = Field("documents", description="Collection name")
@@ -54,13 +57,14 @@ class ThemisVectorSearchRequest(BaseModel):
                 "query": "BGB Vertragsrecht Minderjährige",
                 "top_k": 5,
                 "collection": "legal_documents",
-                "threshold": 0.7
+                "threshold": 0.7,
             }
         }
 
 
 class ThemisVectorSearchResponse(BaseModel):
     """Vector search response"""
+
     results: List[Dict[str, Any]]
     count: int
     collection: str
@@ -70,28 +74,27 @@ class ThemisVectorSearchResponse(BaseModel):
 
 class ThemisGraphTraverseRequest(BaseModel):
     """Graph traversal request"""
+
     start_vertex: str = Field(..., description="Start vertex ID (e.g., 'documents/doc123')")
     edge_collection: str = Field(..., description="Edge collection name (e.g., 'citations')")
-    direction: Literal["outbound", "inbound", "any"] = Field(
-        "outbound",
-        description="Traversal direction"
-    )
+    direction: Literal["outbound", "inbound", "any"] = Field("outbound", description="Traversal direction")
     min_depth: int = Field(1, ge=1, le=10, description="Minimum traversal depth")
     max_depth: int = Field(3, ge=1, le=10, description="Maximum traversal depth")
 
     class Config:
         schema_extra = {
             "example": {
-                "start_vertex": "documents/bgb_123",
+                "start_vertex": "documents / bgb_123",
                 "edge_collection": "citations",
                 "direction": "any",
-                "max_depth": 2
+                "max_depth": 2,
             }
         }
 
 
 class ThemisGraphTraverseResponse(BaseModel):
     """Graph traversal response"""
+
     paths: List[Dict[str, Any]]
     count: int
     start_vertex: str
@@ -100,26 +103,22 @@ class ThemisGraphTraverseResponse(BaseModel):
 
 class ThemisAQLRequest(BaseModel):
     """AQL query request"""
+
     query: str = Field(..., description="AQL query string (Themis Query Language)")
-    bind_vars: Optional[Dict[str, Any]] = Field(
-        None,
-        description="Query bind variables"
-    )
+    bind_vars: Optional[Dict[str, Any]] = Field(None, description="Query bind variables")
 
     class Config:
         schema_extra = {
             "example": {
                 "query": "FOR doc IN documents FILTER doc.year >= @year LIMIT @limit RETURN doc",
-                "bind_vars": {
-                    "year": 2020,
-                    "limit": 10
-                }
+                "bind_vars": {"year": 2020, "limit": 10},
             }
         }
 
 
 class ThemisAQLResponse(BaseModel):
     """AQL query response"""
+
     result: List[Dict[str, Any]]
     count: int
     execution_time_ms: float
@@ -127,12 +126,14 @@ class ThemisAQLResponse(BaseModel):
 
 class ThemisDocumentRequest(BaseModel):
     """Document insert/update request"""
+
     document: Dict[str, Any] = Field(..., description="Document data")
     key: Optional[str] = Field(None, description="Document key (auto-generated if not provided)")
 
 
 class ThemisHealthResponse(BaseModel):
     """ThemisDB health status"""
+
     status: Literal["healthy", "unhealthy", "unavailable"]
     available: bool
     version: Optional[str] = None
@@ -142,6 +143,7 @@ class ThemisHealthResponse(BaseModel):
 
 class ThemisStatsResponse(BaseModel):
     """ThemisDB adapter statistics"""
+
     adapter: str = "ThemisDB"
     statistics: Dict[str, Any]
     timestamp: str
@@ -151,129 +153,111 @@ class ThemisStatsResponse(BaseModel):
 # Endpoints
 # ============================================================================
 
+
 @themis_router.post("/vector/search", response_model=ThemisVectorSearchResponse)
 async def themis_vector_search(request: ThemisVectorSearchRequest):
     """
     Direct ThemisDB Vector Search using HNSW Index.
-    
+
     This endpoint bypasses the adapter factory and directly connects to ThemisDB.
     Use for ThemisDB-specific features or testing.
-    
+
     Features:
     - Native HNSW vector search
     - Multiple distance metrics (cosine, euclidean, dot product)
     - Collection-based isolation
     - Configurable similarity threshold
-    
+
     Returns:
         Vector search results with relevance scores
     """
     start_time = time.time()
-    
+
     try:
         # Force ThemisDB adapter (no fallback to UDS3)
-        adapter = get_database_adapter(
-            adapter_type=DatabaseAdapterType.THEMIS,
-            enable_fallback=False
-        )
-        
+        adapter = get_database_adapter(adapter_type=DatabaseAdapterType.THEMIS, enable_fallback=False)
+
         logger.info(f"ThemisDB vector search: query='{request.query[:50]}', top_k={request.top_k}")
-        
+
         # Execute vector search
         results = await adapter.vector_search(
             query=request.query,
             top_k=request.top_k,
             collection=request.collection,
             threshold=request.threshold,
-            metric=request.metric
+            metric=request.metric,
         )
-        
+
         execution_time = (time.time() - start_time) * 1000
-        
+
         logger.info(f"ThemisDB search completed: {len(results)} results in {execution_time:.1f}ms")
-        
+
         return ThemisVectorSearchResponse(
-            results=results,
-            count=len(results),
-            collection=request.collection,
-            execution_time_ms=execution_time
+            results=results, count=len(results), collection=request.collection, execution_time_ms=execution_time
         )
-        
+
     except Exception as e:
         logger.error(f"ThemisDB vector search failed: {e}")
-        raise HTTPException(
-            status_code=503,
-            detail=f"ThemisDB vector search failed: {str(e)}"
-        )
+        raise HTTPException(status_code=503, detail=f"ThemisDB vector search failed: {str(e)}")
 
 
 @themis_router.post("/graph/traverse", response_model=ThemisGraphTraverseResponse)
 async def themis_graph_traverse(request: ThemisGraphTraverseRequest):
     """
     Direct ThemisDB Graph Traversal using Property Graph Model.
-    
+
     Supports bidirectional traversal with configurable depth limits.
-    
+
     Direction Options:
     - outbound: Follow edges from start vertex
     - inbound: Follow edges to start vertex
     - any: Follow edges in both directions
-    
+
     Returns:
         List of paths with vertices and edges
     """
     start_time = time.time()
-    
+
     try:
-        adapter = get_database_adapter(
-            adapter_type=DatabaseAdapterType.THEMIS,
-            enable_fallback=False
-        )
-        
+        adapter = get_database_adapter(adapter_type=DatabaseAdapterType.THEMIS, enable_fallback=False)
+
         logger.info(
-            f"ThemisDB graph traverse: start={request.start_vertex}, "
-            f"depth={request.min_depth}-{request.max_depth}"
+            f"ThemisDB graph traverse: start={request.start_vertex}, " f"depth={request.min_depth}-{request.max_depth}"
         )
-        
+
         # Execute graph traversal
         results = await adapter.graph_traverse(
             start_vertex=request.start_vertex,
             edge_collection=request.edge_collection,
             direction=request.direction,
             min_depth=request.min_depth,
-            max_depth=request.max_depth
+            max_depth=request.max_depth,
         )
-        
+
         execution_time = (time.time() - start_time) * 1000
-        
+
         logger.info(f"ThemisDB traversal completed: {len(results)} paths in {execution_time:.1f}ms")
-        
+
         return ThemisGraphTraverseResponse(
-            paths=results,
-            count=len(results),
-            start_vertex=request.start_vertex,
-            execution_time_ms=execution_time
+            paths=results, count=len(results), start_vertex=request.start_vertex, execution_time_ms=execution_time
         )
-        
+
     except Exception as e:
         logger.error(f"ThemisDB graph traversal failed: {e}")
-        raise HTTPException(
-            status_code=503,
-            detail=f"ThemisDB graph traversal failed: {str(e)}"
-        )
+        raise HTTPException(status_code=503, detail=f"ThemisDB graph traversal failed: {str(e)}")
 
 
 @themis_router.post("/aql/query", response_model=ThemisAQLResponse)
 async def themis_aql_query(request: ThemisAQLRequest):
     """
     Execute AQL Query (ThemisDB Query Language).
-    
+
     AQL is similar to ArangoDB's query language and supports:
     - Multi-model queries (Vector, Graph, Document, Relational)
     - FOR loops, FILTER, SORT, LIMIT
     - Graph traversal patterns
     - Aggregations and grouping
-    
+
     Example Query:
         FOR doc IN documents
           FILTER doc.year >= @year
@@ -284,158 +268,114 @@ async def themis_aql_query(request: ThemisAQLRequest):
             title: doc.title,
             year: doc.year
           }
-    
+
     Security:
         - Read-only queries only (INSERT/UPDATE/DELETE disabled via API)
         - Query timeout: 30 seconds
         - Result limit: 1000 documents
     """
     start_time = time.time()
-    
+
     try:
-        adapter = get_database_adapter(
-            adapter_type=DatabaseAdapterType.THEMIS,
-            enable_fallback=False
-        )
-        
+        adapter = get_database_adapter(adapter_type=DatabaseAdapterType.THEMIS, enable_fallback=False)
+
         logger.info(f"ThemisDB AQL query: {request.query[:100]}")
-        
+
         # Execute AQL query
-        results = await adapter.execute_aql(
-            query=request.query,
-            bind_vars=request.bind_vars
-        )
-        
+        results = await adapter.execute_aql(query=request.query, bind_vars=request.bind_vars)
+
         execution_time = (time.time() - start_time) * 1000
-        
+
         logger.info(f"ThemisDB AQL completed: {len(results)} results in {execution_time:.1f}ms")
-        
-        return ThemisAQLResponse(
-            result=results,
-            count=len(results),
-            execution_time_ms=execution_time
-        )
-        
+
+        return ThemisAQLResponse(result=results, count=len(results), execution_time_ms=execution_time)
+
     except Exception as e:
         logger.error(f"ThemisDB AQL query failed: {e}")
-        raise HTTPException(
-            status_code=400,
-            detail=f"ThemisDB AQL query failed: {str(e)}"
-        )
+        raise HTTPException(status_code=400, detail=f"ThemisDB AQL query failed: {str(e)}")
 
 
 @themis_router.get("/document/{collection}/{key}")
 async def themis_get_document(collection: str, key: str):
     """
     Get single document by key from ThemisDB collection.
-    
+
     Args:
         collection: Collection name (e.g., 'documents')
         key: Document key/ID
-        
+
     Returns:
         Document data with metadata
     """
     try:
-        adapter = get_database_adapter(
-            adapter_type=DatabaseAdapterType.THEMIS,
-            enable_fallback=False
-        )
-        
+        adapter = get_database_adapter(adapter_type=DatabaseAdapterType.THEMIS, enable_fallback=False)
+
         document = await adapter.get_document(collection=collection, key=key)
-        
-        return {
-            "collection": collection,
-            "key": key,
-            "document": document
-        }
-        
+
+        return {"collection": collection, "key": key, "document": document}
+
     except Exception as e:
         logger.error(f"ThemisDB get_document failed: {e}")
-        raise HTTPException(
-            status_code=404,
-            detail=f"Document not found: {collection}/{key}"
-        )
+        raise HTTPException(status_code=404, detail=f"Document not found: {collection}/{key}")
 
 
 @themis_router.post("/document/{collection}")
 async def themis_insert_document(collection: str, request: ThemisDocumentRequest):
     """
     Insert document into ThemisDB collection.
-    
+
     Args:
         collection: Collection name
         request: Document data and optional key
-        
+
     Returns:
         Inserted document with generated key
     """
     try:
-        adapter = get_database_adapter(
-            adapter_type=DatabaseAdapterType.THEMIS,
-            enable_fallback=False
-        )
-        
-        result = await adapter.insert_document(
-            collection=collection,
-            document=request.document,
-            key=request.key
-        )
-        
-        return {
-            "collection": collection,
-            "inserted": result,
-            "message": "Document inserted successfully"
-        }
-        
+        adapter = get_database_adapter(adapter_type=DatabaseAdapterType.THEMIS, enable_fallback=False)
+
+        result = await adapter.insert_document(collection=collection, document=request.document, key=request.key)
+
+        return {"collection": collection, "inserted": result, "message": "Document inserted successfully"}
+
     except Exception as e:
         logger.error(f"ThemisDB insert_document failed: {e}")
-        raise HTTPException(
-            status_code=400,
-            detail=f"Document insertion failed: {str(e)}"
-        )
+        raise HTTPException(status_code=400, detail=f"Document insertion failed: {str(e)}")
 
 
 @themis_router.get("/health", response_model=ThemisHealthResponse)
 async def themis_health():
     """
     ThemisDB Health Check.
-    
+
     Checks connectivity and returns server status.
-    
+
     Returns:
         Health status with version and uptime
     """
     try:
-        adapter = get_database_adapter(
-            adapter_type=DatabaseAdapterType.THEMIS,
-            enable_fallback=False
-        )
-        
+        adapter = get_database_adapter(adapter_type=DatabaseAdapterType.THEMIS, enable_fallback=False)
+
         health = await adapter.health_check()
-        
+
         return ThemisHealthResponse(
             status="healthy",
             available=True,
             version=health.get("version"),
             uptime_seconds=health.get("uptime"),
-            timestamp=datetime.utcnow().isoformat()
+            timestamp=datetime.utcnow().isoformat(),
         )
-        
+
     except Exception as e:
         logger.warning(f"ThemisDB health check failed: {e}")
-        return ThemisHealthResponse(
-            status="unavailable",
-            available=False,
-            timestamp=datetime.utcnow().isoformat()
-        )
+        return ThemisHealthResponse(status="unavailable", available=False, timestamp=datetime.utcnow().isoformat())
 
 
 @themis_router.get("/stats", response_model=ThemisStatsResponse)
 async def themis_stats():
     """
     ThemisDB Adapter Statistics.
-    
+
     Returns:
         - Total queries
         - Success/failure counts
@@ -443,21 +383,12 @@ async def themis_stats():
         - Success rate
     """
     try:
-        adapter = get_database_adapter(
-            adapter_type=DatabaseAdapterType.THEMIS,
-            enable_fallback=False
-        )
-        
+        adapter = get_database_adapter(adapter_type=DatabaseAdapterType.THEMIS, enable_fallback=False)
+
         stats = adapter.get_stats()
-        
-        return ThemisStatsResponse(
-            statistics=stats,
-            timestamp=datetime.utcnow().isoformat()
-        )
-        
+
+        return ThemisStatsResponse(statistics=stats, timestamp=datetime.utcnow().isoformat())
+
     except Exception as e:
         logger.error(f"ThemisDB stats unavailable: {e}")
-        raise HTTPException(
-            status_code=503,
-            detail=f"ThemisDB statistics unavailable: {str(e)}"
-        )
+        raise HTTPException(status_code=503, detail=f"ThemisDB statistics unavailable: {str(e)}")

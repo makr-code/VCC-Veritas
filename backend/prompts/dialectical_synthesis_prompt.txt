@@ -26,27 +26,27 @@ ANWEISUNGEN:
    - Prüfe ob Widersprüche echt oder nur scheinbar sind
 
 2. AUFLÖSUNGS-STRATEGIEN (wähle passende):
-   
+
    a) KONTEXTUALISIERUNG:
       "Beide Aussagen sind richtig in unterschiedlichen Kontexten"
       Beispiel: Gesetz A gilt generell, Gesetz B ist Ausnahme für Spezialfall
-   
+
    b) HIERARCHISIERUNG:
       "Eine Quelle ist autoritativer als die andere"
       Beispiel: Bundesgesetz > Landesgesetz > Verordnung
-   
+
    c) SYNTHESE (dialektisch):
       "Beide enthalten Teilwahrheiten, höhere Ebene vereint sie"
       Beispiel: Einerseits... andererseits... in Wahrheit...
-   
+
    d) TEMPORAL ORDERING:
       "Zeitliche Abfolge erklärt Unterschied"
       Beispiel: Früher galt X, seit 2023 gilt Y
-   
+
    e) REGIONAL DIFFERENTIATION:
       "Regional unterschiedliche Regelungen"
       Beispiel: In Bayern gilt X, in Baden-Württemberg gilt Y
-   
+
    f) COMPLEMENTARY PERSPECTIVES:
       "Ergänzende Perspektiven auf dasselbe Problem"
       Beispiel: Rechtlich gesehen X, praktisch gesehen Y
@@ -101,7 +101,7 @@ Widerspruch:
 
 Synthese:
 {{
-  "synthesis_text": "Für Neubauten ist grundsätzlich eine Baugenehmigung nach §10 BauGB erforderlich. Diese muss bei der zuständigen Bauaufsichtsbehörde beantragt werden. 
+  "synthesis_text": "Für Neubauten ist grundsätzlich eine Baugenehmigung nach §10 BauGB erforderlich. Diese muss bei der zuständigen Bauaufsichtsbehörde beantragt werden.
 
 WICHTIGE DIFFERENZIERUNG: Es gibt jedoch das vereinfachte Baugenehmigungsverfahren nach Art. 59 BayBO (bzw. entsprechende Landesbauordnung), bei dem für bestimmte Gebäudetypen (z.B. Wohngebäude bis zu einer bestimmten Größe) nur eine vereinfachte Prüfung stattfindet. Hier wird trotzdem eine Genehmigung benötigt, aber der Umfang der Prüfung ist reduziert.
 
@@ -112,20 +112,20 @@ EMPFEHLUNG: Klären Sie zunächst:
 2. Größe und Standort
 3. Zuständige Bauaufsichtsbehörde
 Dann kann die konkrete Genehmigungsart bestimmt werden.",
-  
+
   "resolution_strategies": ["contextualization", "hierarchization"],
-  
+
   "resolved_contradictions": [
     {{
       "contradiction_index": 0,
       "resolution": "Der scheinbare Widerspruch zwischen genereller Genehmigungspflicht und vereinfachtem Verfahren wurde durch Kontextualisierung aufgelöst: Die Genehmigungspflicht besteht grundsätzlich, das vereinfachte Verfahren ist eine Erleichterung für bestimmte Fälle, hebt aber die Pflicht nicht auf."
     }}
   ],
-  
+
   "unresolved_conflicts": [],
-  
+
   "confidence": 0.90,
-  
+
   "reasoning": "Die Synthese verwendet Kontextualisierung (verschiedene Verfahrensarten) und Hierarchisierung (BImSchG-Genehmigung ersetzt Baugenehmigung). Alle Thesen wurden integriert. Hohe Konfidenz da alle Aussagen auf Rechtsgrundlagen basieren und sich logisch vereinbaren lassen."
 }}
 

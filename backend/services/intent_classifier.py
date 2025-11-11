@@ -17,22 +17,24 @@ Date: 2025-10-17
 """
 
 import re
-from typing import Dict, Optional, Tuple
-from enum import Enum
 from dataclasses import dataclass
+from enum import Enum
+from typing import Dict, Optional, Tuple
 
 
 class UserIntent(str, Enum):
     """User-Intent-Typen"""
-    QUICK_ANSWER = "quick_answer"    # 0.5x Token-Weight
-    EXPLANATION = "explanation"       # 1.0x Token-Weight
-    ANALYSIS = "analysis"             # 1.5x Token-Weight
-    RESEARCH = "research"             # 2.0x Token-Weight
+
+    QUICK_ANSWER = "quick_answer"  # 0.5x Token-Weight
+    EXPLANATION = "explanation"  # 1.0x Token-Weight
+    ANALYSIS = "analysis"  # 1.5x Token-Weight
+    RESEARCH = "research"  # 2.0x Token-Weight
 
 
 @dataclass
 class IntentPrediction:
     """Ergebnis der Intent-Klassifikation"""
+
     intent: UserIntent
     confidence: float  # 0.0 - 1.0
     method: str  # "rule_based", "llm", "hybrid"
@@ -41,7 +43,7 @@ class IntentPrediction:
 
 class RuleBasedIntentClassifier:
     """Schneller NLP-basierter Klassifikator ohne LLM"""
-    
+
     # Pattern für QUICK_ANSWER (einfache Fragen)
     QUICK_PATTERNS = [
         r"^was ist (ein|eine|der|die|das)\s",
@@ -53,10 +55,10 @@ class RuleBasedIntentClassifier:
         r"^hat\s.{0,30}\s(ein|eine)\s",
         r"^definiere\s",
         r"^nenne\s",
-        r"^liste\s",  # NEU: "Liste alle X auf"
+        r"^liste\s",  # NEU: "Liste alle X au"
         r"welche\s(behörde|behörden|stelle)\s",  # NEU: Zuständigkeitsfragen
     ]
-    
+
     # Pattern für EXPLANATION (Erklärungen)
     EXPLANATION_PATTERNS = [
         r"wie\s(funktioniert|läuft|arbeitet|wird)",
@@ -74,7 +76,7 @@ class RuleBasedIntentClassifier:
         r"welche\s(unterlagen|dokumente)\s",  # NEU: Dokumenten-Fragen
         r"wie\s(beantrage|gehe.*vor)\s",  # NEU: Prozessfragen
     ]
-    
+
     # Pattern für ANALYSIS (Analysen, Vergleiche)
     ANALYSIS_PATTERNS = [
         r"(analysiere|untersuche|prüfe|bewerte)\s",
@@ -86,7 +88,7 @@ class RuleBasedIntentClassifier:
         r"inwiefern\s",
         r"evaluiere\s",
     ]
-    
+
     # Pattern für RESEARCH (Komplexe Recherchen)
     RESEARCH_PATTERNS = [
         r"recherchiere\s",
@@ -99,51 +101,57 @@ class RuleBasedIntentClassifier:
         r"detaillierte\s(übersicht|analyse)",
         r"mehrere\s(aspekte|bereiche|dimensionen)",
     ]
-    
+
     # Keywords für Intent-Scoring
     DOMAIN_KEYWORDS = {
-        "verwaltungsrecht", "baurecht", "umweltrecht", "genehmigung",
-        "rechtlich", "gesetz", "verordnung", "vorschrift"
+        "verwaltungsrecht",
+        "baurecht",
+        "umweltrecht",
+        "genehmigung",
+        "rechtlich",
+        "gesetz",
+        "verordnung",
+        "vorschrift",
     }
-    
+
     @classmethod
     def classify(cls, query: str) -> IntentPrediction:
         """
         Klassifiziert Intent basierend auf Regeln
-        
+
         Args:
             query: User-Anfrage
-            
+
         Returns:
             IntentPrediction mit Intent, Confidence, Methode
         """
         query_lower = query.lower().strip()
-        
+
         # Score für jeden Intent
         scores = {
             UserIntent.QUICK_ANSWER: 0.0,
             UserIntent.EXPLANATION: 0.0,
             UserIntent.ANALYSIS: 0.0,
-            UserIntent.RESEARCH: 0.0
+            UserIntent.RESEARCH: 0.0,
         }
-        
+
         # 1. Pattern-Matching
         for pattern in cls.QUICK_PATTERNS:
             if re.search(pattern, query_lower):
                 scores[UserIntent.QUICK_ANSWER] += 2.0
-                
+
         for pattern in cls.EXPLANATION_PATTERNS:
             if re.search(pattern, query_lower):
                 scores[UserIntent.EXPLANATION] += 2.0
-                
+
         for pattern in cls.ANALYSIS_PATTERNS:
             if re.search(pattern, query_lower):
                 scores[UserIntent.ANALYSIS] += 2.0
-                
+
         for pattern in cls.RESEARCH_PATTERNS:
             if re.search(pattern, query_lower):
                 scores[UserIntent.RESEARCH] += 3.0  # Höhere Priorität für RESEARCH
-        
+
         # 2. Längen-Heuristik
         query_length = len(query)
         if query_length < 50:
@@ -152,34 +160,34 @@ class RuleBasedIntentClassifier:
             scores[UserIntent.RESEARCH] += 1.5
         elif query_length > 100:
             scores[UserIntent.ANALYSIS] += 1.0
-        
+
         # 3. Anzahl Fragezeichen/Semikolons (Teilfragen)
         subquestions = query.count("?") + query.count(";") // 2
         if subquestions >= 3:
             scores[UserIntent.RESEARCH] += 2.0
         elif subquestions >= 2:
             scores[UserIntent.ANALYSIS] += 1.0
-        
+
         # 4. Domänen-Komplexität
         domain_count = sum(1 for kw in cls.DOMAIN_KEYWORDS if kw in query_lower)
         if domain_count >= 3:
             scores[UserIntent.RESEARCH] += 1.5
         elif domain_count >= 2:
             scores[UserIntent.ANALYSIS] += 1.0
-        
+
         # 5. Listen-Struktur (1), 2), etc.)
-        list_items = len(re.findall(r'\d+\)', query))
+        list_items = len(re.findall(r"\d+\)", query))
         if list_items >= 3:
             scores[UserIntent.RESEARCH] += 2.0
-        
+
         # Intent mit höchstem Score wählen
         best_intent = max(scores, key=scores.get)
         best_score = scores[best_intent]
-        
+
         # Confidence berechnen (0.0 - 1.0)
         total_score = sum(scores.values())
         confidence = best_score / max(total_score, 1.0) if total_score > 0 else 0.3
-        
+
         # Reasoning für Debugging
         reasoning = f"Pattern-Score: {best_score:.1f}, Total: {total_score:.1f}"
         if best_score == 0:
@@ -187,36 +195,27 @@ class RuleBasedIntentClassifier:
             best_intent = UserIntent.EXPLANATION
             confidence = 0.3
             reasoning = "Kein Pattern-Match, Fallback zu EXPLANATION"
-        
-        return IntentPrediction(
-            intent=best_intent,
-            confidence=min(confidence, 1.0),
-            method="rule_based",
-            reasoning=reasoning
-        )
+
+        return IntentPrediction(intent=best_intent, confidence=min(confidence, 1.0), method="rule_based", reasoning=reasoning)
 
 
 class LLMIntentClassifier:
     """LLM-basierter Klassifikator für komplexe Fälle"""
-    
+
     @staticmethod
-    async def classify_async(
-        query: str,
-        ollama_service,
-        model: str = "phi3"
-    ) -> IntentPrediction:
+    async def classify_async(query: str, ollama_service, model: str = "phi3") -> IntentPrediction:
         """
         Fragt LLM nach Intent-Klassifikation
-        
+
         Args:
             query: User-Anfrage
             ollama_service: Ollama-Service-Instanz
             model: LLM-Modell (default: phi3)
-            
+
         Returns:
             IntentPrediction mit Intent, Confidence, Methode
         """
-        prompt = f"""Du bist ein Intent-Klassifikator. Klassifiziere die folgende Anfrage in eine der 4 Kategorien:
+        prompt = """Du bist ein Intent-Klassifikator. Klassifiziere die folgende Anfrage in eine der 4 Kategorien:
 
 1. QUICK_ANSWER: Einfache Fakten-Fragen ("Was ist X?", "Wer ist Y?")
 2. EXPLANATION: Erklärungen ("Wie funktioniert X?", "Warum passiert Y?")
@@ -226,71 +225,65 @@ class LLMIntentClassifier:
 Anfrage: "{query}"
 
 Antworte NUR mit einem JSON-Objekt in folgendem Format:
-{{"intent": "QUICK_ANSWER|EXPLANATION|ANALYSIS|RESEARCH", "confidence": 0.0-1.0, "reasoning": "kurze Begründung"}}"""
+{{"intent": "QUICK_ANSWER|EXPLANATION|ANALYSIS|RESEARCH", "confidence": 0.0 - 1.0, "reasoning": "kurze Begründung"}}"""
 
         try:
             response = await ollama_service.generate(
-                model=model,
-                prompt=prompt,
-                temperature=0.1,  # Niedrig für konsistente Klassifikation
-                max_tokens=150
+                model=model, prompt=prompt, temperature=0.1, max_tokens=150  # Niedrig für konsistente Klassifikation
             )
-            
+
             # JSON parsen
             import json
+
             result_text = response.get("response", "").strip()
-            
+
             # Versuche JSON zu extrahieren (auch wenn in Markdown-Block)
-            json_match = re.search(r'\{.*\}', result_text, re.DOTALL)
+            json_match = re.search(r"\{. * \}", result_text, re.DOTALL)
             if json_match:
                 result = json.loads(json_match.group(0))
-                
+
                 intent_str = result.get("intent", "EXPLANATION").upper()
                 intent = UserIntent[intent_str] if intent_str in UserIntent.__members__ else UserIntent.EXPLANATION
-                
+
                 return IntentPrediction(
                     intent=intent,
                     confidence=float(result.get("confidence", 0.7)),
                     method="llm",
-                    reasoning=result.get("reasoning", "LLM-basierte Klassifikation")
+                    reasoning=result.get("reasoning", "LLM-basierte Klassifikation"),
                 )
             else:
                 raise ValueError("Kein JSON in LLM-Response gefunden")
-                
+
         except Exception as e:
             # Fallback bei LLM-Fehler
             return IntentPrediction(
-                intent=UserIntent.EXPLANATION,
-                confidence=0.5,
-                method="llm_fallback",
-                reasoning=f"LLM-Fehler: {str(e)}"
+                intent=UserIntent.EXPLANATION, confidence=0.5, method="llm_fallback", reasoning=f"LLM-Fehler: {str(e)}"
             )
-    
+
     @staticmethod
     def classify_sync(query: str, ollama_service, model: str = "phi3") -> IntentPrediction:
         """Synchrone Wrapper-Funktion für LLM-Klassifikation"""
         import asyncio
+
         try:
             loop = asyncio.get_event_loop()
         except RuntimeError:
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
-        
-        return loop.run_until_complete(
-            LLMIntentClassifier.classify_async(query, ollama_service, model)
-        )
+
+        return loop.run_until_complete(LLMIntentClassifier.classify_async(query, ollama_service, model))
 
 
 class HybridIntentClassifier:
     """
     Kombiniert Rule-Based und LLM-Klassifikation
-    
+
     Strategie:
     1. Rule-Based Klassifikation (schnell)
     2. Bei niedriger Confidence (<0.7): LLM-Klassifikation
     3. Gewichtete Kombination beider Ergebnisse
     """
-    
+
     def __init__(self, llm_threshold: float = 0.7):
         """
         Args:
@@ -298,36 +291,29 @@ class HybridIntentClassifier:
         """
         self.llm_threshold = llm_threshold
         self.rule_classifier = RuleBasedIntentClassifier()
-    
-    async def classify_async(
-        self,
-        query: str,
-        ollama_service = None,
-        model: str = "phi3"
-    ) -> IntentPrediction:
+
+    async def classify_async(self, query: str, ollama_service=None, model: str = "phi3") -> IntentPrediction:
         """
         Hybride Klassifikation (async)
-        
+
         Args:
             query: User-Anfrage
             ollama_service: Optional - Ollama-Service für LLM-Fallback
             model: LLM-Modell
-            
+
         Returns:
             IntentPrediction mit Intent, Confidence, Methode
         """
         # 1. Rule-Based Klassifikation
         rule_prediction = self.rule_classifier.classify(query)
-        
+
         # 2. Wenn Confidence hoch genug: direkt zurückgeben
         if rule_prediction.confidence >= self.llm_threshold or ollama_service is None:
             return rule_prediction
-        
+
         # 3. LLM-Klassifikation bei niedriger Confidence
-        llm_prediction = await LLMIntentClassifier.classify_async(
-            query, ollama_service, model
-        )
-        
+        llm_prediction = await LLMIntentClassifier.classify_async(query, ollama_service, model)
+
         # 4. Hybrid-Entscheidung: LLM gewinnt bei höherer Confidence
         if llm_prediction.confidence > rule_prediction.confidence:
             llm_prediction.method = "hybrid_llm"
@@ -343,24 +329,18 @@ class HybridIntentClassifier:
                 f"LLM ({llm_prediction.confidence:.2f}): {rule_prediction.reasoning}"
             )
             return rule_prediction
-    
-    def classify_sync(
-        self,
-        query: str,
-        ollama_service = None,
-        model: str = "phi3"
-    ) -> IntentPrediction:
+
+    def classify_sync(self, query: str, ollama_service=None, model: str = "phi3") -> IntentPrediction:
         """Synchrone Wrapper-Funktion"""
         import asyncio
+
         try:
             loop = asyncio.get_event_loop()
         except RuntimeError:
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
-        
-        return loop.run_until_complete(
-            self.classify_async(query, ollama_service, model)
-        )
+
+        return loop.run_until_complete(self.classify_async(query, ollama_service, model))
 
 
 # Convenience-Funktionen
@@ -369,20 +349,13 @@ def classify_intent_fast(query: str) -> IntentPrediction:
     return RuleBasedIntentClassifier.classify(query)
 
 
-async def classify_intent_llm(
-    query: str,
-    ollama_service,
-    model: str = "phi3"
-) -> IntentPrediction:
+async def classify_intent_llm(query: str, ollama_service, model: str = "phi3") -> IntentPrediction:
     """LLM-basierte Klassifikation (async)"""
     return await LLMIntentClassifier.classify_async(query, ollama_service, model)
 
 
 async def classify_intent_hybrid(
-    query: str,
-    ollama_service = None,
-    model: str = "phi3",
-    llm_threshold: float = 0.7
+    query: str, ollama_service=None, model: str = "phi3", llm_threshold: float = 0.7
 ) -> IntentPrediction:
     """Hybride Klassifikation (async)"""
     classifier = HybridIntentClassifier(llm_threshold)
@@ -405,22 +378,22 @@ if __name__ == "__main__":
         "Erkläre den Unterschied zwischen Ermessen und gebundener Entscheidung.",
         "Wann tritt ein Verwaltungsakt in Kraft?",
     ]
-    
+
     classifier = RuleBasedIntentClassifier()
-    
+
     print("=" * 80)
     print("INTENT CLASSIFIER - Rule-Based Tests")
     print("=" * 80)
-    
+
     for i, query in enumerate(test_queries, 1):
         print(f"\n{'─' * 80}")
         print(f"Query {i}: {query[:70]}...")
-        
+
         prediction = classifier.classify(query)
-        
+
         print(f"\n🎯 Intent: {prediction.intent.value.upper()}")
         print(f"📊 Confidence: {prediction.confidence:.2%}")
         print(f"🔍 Method: {prediction.method}")
         print(f"💡 Reasoning: {prediction.reasoning}")
-    
+
     print(f"\n{'=' * 80}\n")

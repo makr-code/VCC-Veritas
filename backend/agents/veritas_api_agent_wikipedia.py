@@ -209,7 +209,7 @@ class WikipediaQueryRequest:
             "oder",
             "aber",
             "in",
-            "auf",
+            "au",
             "für",
             "von",
             "mit",
@@ -800,7 +800,7 @@ class WikipediaAgent:
                 },
                 {
                     "title": "Deutschland",
-                    "summary": "Deutschland ist ein Bundesstaat in Mitteleuropa. Er hat 16 Bundesländer und ist als freiheitlich-demokratischer und sozialer Rechtsstaat verfasst.",
+                    "summary": "Deutschland ist ein Bundesstaat in Mitteleuropa. Er hat 16 Bundesländer und ist als freiheitlich - demokratischer und sozialer Rechtsstaat verfasst.",
                     "url": f"https://{request.language.value}.wikipedia.org/wiki/Deutschland",
                     "page_id": "11867",
                     "relevance_score": 0.85,
@@ -857,7 +857,7 @@ class WikipediaAgent:
     def _generate_mock_article(self, title: str, language: str) -> WikipediaArticle:
         """Generiere Mock-Artikel für Demo"""
         # Beispiel-Content basierend auf Titel
-        mock_content = f"""
+        mock_content = """
         {title}
 
         {title} ist ein wichtiges Thema in der entsprechenden Fachdomäne. Dieser Artikel
@@ -935,7 +935,7 @@ class WikipediaAgent:
         self._stats["avg_processing_time_ms"] = self._stats["total_processing_time_ms"] / self._stats["queries_processed"]
 
     def _cleanup_cache(self):
-        """Cache-Cleanup bei Überlauf"""
+        """Cache-Cleanup bei Überlau"""
         if len(self._search_cache) > self.config.max_cache_size:
             # Entferne 20% der ältesten Einträge
             items_to_remove = len(self._search_cache) // 5
@@ -1018,7 +1018,7 @@ async def main():
             "query_type": WikipediaQueryType.ARTICLE,
             "language": WikipediaLanguage.GERMAN,
             "include_content": True,
-            "description": "KI-Artikel abrufen",
+            "description": "KI - Artikel abrufen",
         },
         {
             "query_text": "Quantencomputer",
@@ -1075,13 +1075,13 @@ async def main():
             print(f"   ❌ Error: {response.error_message}")
 
     # Agent-Status
-    print(f"\n📊 Agent Status:")
+    print("\n📊 Agent Status:")
     status = agent.get_status()
     print(f"   Queries processed: {status['performance']['queries_processed']}")
     print(f"   Avg processing time: {status['performance']['avg_processing_time_ms']:.1f}ms")
     print(f"   Success rate: {status['performance']['success_rate']:.2%}")
     print(f"   Cache hits: {status['performance']['cache_hits']}")
-    print(f"   Wikipedia API: {'Available' if status['wikipedia_available'] else 'Mock-Mode'}")
+    print(f"   Wikipedia API: {'Available' if status['wikipedia_available'] else 'Mock - Mode'}")
 
     print("\n✅ Wikipedia Agent test completed!")
 

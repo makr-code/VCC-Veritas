@@ -669,7 +669,7 @@ class ChemicalDataAgent:
         """Suche nach CAS-Nummer"""
         # Für Demo: Mock-Daten für bekannte CAS-Nummern
         mock_cas_data = {
-            "7732-18-5": {"name": "Wasser", "formula": "H2O", "mw": 18.015, "state": PhysicalState.LIQUID},  # Wasser
+            "7732 - 18-5": {"name": "Wasser", "formula": "H2O", "mw": 18.015, "state": PhysicalState.LIQUID},  # Wasser
             "64-19-7": {"name": "Essigsäure", "formula": "C2H4O2", "mw": 60.052, "state": PhysicalState.LIQUID},  # Essigsäure
             "67-56-1": {"name": "Methanol", "formula": "CH4O", "mw": 32.042, "state": PhysicalState.LIQUID},  # Methanol
             "7664-93-9": {  # Schwefelsäure
@@ -694,7 +694,7 @@ class ChemicalDataAgent:
             data = mock_cas_data[cas_number]
 
             substance = ChemicalSubstance(
-                substance_id=f"cas_{cas_number.replace('-', '_')}",
+                substance_id=f"cas_{cas_number.replace(' - ', '_')}",
                 primary_name=data["name"],
                 molecular_formula=data["formula"],
                 molecular_weight_gmol=data["mw"],
@@ -730,16 +730,16 @@ class ChemicalDataAgent:
 
         # Mock-Daten für häufige Chemikalien
         mock_name_data = {
-            "benzol": {"cas": "71-43-2", "formula": "C6H6", "hazardous": True},
-            "toluol": {"cas": "108-88-3", "formula": "C7H8", "hazardous": True},
-            "aceton": {"cas": "67-64-1", "formula": "C3H6O", "hazardous": False},
-            "ethanol": {"cas": "64-17-5", "formula": "C2H6O", "hazardous": False},
-            "schwefelsäure": {"cas": "7664-93-9", "formula": "H2SO4", "hazardous": True},
-            "salzsäure": {"cas": "7647-01-0", "formula": "HCl", "hazardous": True},
-            "natriumhydroxid": {"cas": "1310-73-2", "formula": "NaOH", "hazardous": True},
-            "ammoniak": {"cas": "7664-41-7", "formula": "NH3", "hazardous": True},
-            "methanol": {"cas": "67-56-1", "formula": "CH4O", "hazardous": True},
-            "wasser": {"cas": "7732-18-5", "formula": "H2O", "hazardous": False},
+            "benzol": {"cas": "71 - 43-2", "formula": "C6H6", "hazardous": True},
+            "toluol": {"cas": "108 - 88-3", "formula": "C7H8", "hazardous": True},
+            "aceton": {"cas": "67 - 64-1", "formula": "C3H6O", "hazardous": False},
+            "ethanol": {"cas": "64 - 17-5", "formula": "C2H6O", "hazardous": False},
+            "schwefelsäure": {"cas": "7664 - 93-9", "formula": "H2SO4", "hazardous": True},
+            "salzsäure": {"cas": "7647 - 01-0", "formula": "HCl", "hazardous": True},
+            "natriumhydroxid": {"cas": "1310 - 73-2", "formula": "NaOH", "hazardous": True},
+            "ammoniak": {"cas": "7664 - 41-7", "formula": "NH3", "hazardous": True},
+            "methanol": {"cas": "67 - 56-1", "formula": "CH4O", "hazardous": True},
+            "wasser": {"cas": "7732 - 18-5", "formula": "H2O", "hazardous": False},
         }
 
         name_lower = name.lower()
@@ -782,26 +782,26 @@ class ChemicalDataAgent:
 
         # Beispiel-Properties basierend auf bekannten Stoffen
         property_data = {
-            "7732-18-5": {  # Wasser
-                "density": (1.0, "g/cm³", 20.0),
+            "7732 - 18-5": {  # Wasser
+                "density": (1.0, "g / cm³", 20.0),
                 "melting_point": (0.0, "°C", 1013.25),
                 "boiling_point": (100.0, "°C", 1013.25),
                 "vapor_pressure": (2337.0, "Pa", 20.0),
             },
             "67-56-1": {  # Methanol
-                "density": (0.7918, "g/cm³", 20.0),
+                "density": (0.7918, "g / cm³", 20.0),
                 "melting_point": (-97.6, "°C", 1013.25),
                 "boiling_point": (64.7, "°C", 1013.25),
                 "vapor_pressure": (16940.0, "Pa", 25.0),
             },
             "7664-93-9": {  # Schwefelsäure
-                "density": (1.84, "g/cm³", 20.0),
+                "density": (1.84, "g / cm³", 20.0),
                 "melting_point": (10.31, "°C", 1013.25),
                 "boiling_point": (337.0, "°C", 1013.25),
                 "vapor_pressure": (0.13, "Pa", 25.0),
             },
             "71-43-2": {  # Benzol
-                "density": (0.8765, "g/cm³", 20.0),
+                "density": (0.8765, "g / cm³", 20.0),
                 "melting_point": (5.5, "°C", 1013.25),
                 "boiling_point": (80.1, "°C", 1013.25),
                 "vapor_pressure": (12700.0, "Pa", 25.0),
@@ -822,13 +822,13 @@ class ChemicalDataAgent:
 
         # Beispiel GHS-Klassifikationen
         ghs_data = {
-            "67-56-1": [  # Methanol
+            "67 - 56-1": [  # Methanol
                 (GHSHazardClass.FLAMMABLE_LIQUID, "2", "H225", "Flüssigkeit und Dampf leicht entzündbar"),
                 (GHSHazardClass.ACUTE_TOXICITY, "3", "H301", "Giftig bei Verschlucken"),
                 (GHSHazardClass.ACUTE_TOXICITY, "3", "H311", "Giftig bei Hautkontakt"),
                 (GHSHazardClass.ACUTE_TOXICITY, "3", "H331", "Giftig bei Einatmen"),
             ],
-            "7664-93-9": [  # Schwefelsäure
+            "7664 - 93-9": [  # Schwefelsäure
                 (
                     GHSHazardClass.SKIN_CORROSION,
                     "1A",
@@ -836,7 +836,7 @@ class ChemicalDataAgent:
                     "Verursacht schwere Verätzungen der Haut und schwere Augenschäden",
                 )
             ],
-            "71-43-2": [  # Benzol
+            "71 - 43-2": [  # Benzol
                 (GHSHazardClass.FLAMMABLE_LIQUID, "2", "H225", "Flüssigkeit und Dampf leicht entzündbar"),
                 (GHSHazardClass.CARCINOGENICITY, "1A", "H350", "Kann Krebs erzeugen"),
                 (GHSHazardClass.GERM_CELL_MUTAGENICITY, "1B", "H340", "Kann genetische Defekte verursachen"),
@@ -870,13 +870,13 @@ class ChemicalDataAgent:
 
         # Beispiel-Grenzwerte
         limit_data = {
-            "67-56-1": [  # Methanol
-                ("MAK", 200.0, "ml/m³", "8h-TWA", RegulationDatabase.DFG, "Deutschland"),
-                ("TLV-TWA", 200.0, "ppm", "8h-TWA", RegulationDatabase.ACGIH, "USA"),
+            "67 - 56-1": [  # Methanol
+                ("MAK", 200.0, "ml / m³", "8h - TWA", RegulationDatabase.DFG, "Deutschland"),
+                ("TLV - TWA", 200.0, "ppm", "8h - TWA", RegulationDatabase.ACGIH, "USA"),
             ],
-            "7664-93-9": [  # Schwefelsäure
-                ("MAK", 0.1, "mg/m³", "8h-TWA", RegulationDatabase.DFG, "Deutschland"),
-                ("TLV-TWA", 0.2, "mg/m³", "8h-TWA", RegulationDatabase.ACGIH, "USA"),
+            "7664 - 93-9": [  # Schwefelsäure
+                ("MAK", 0.1, "mg / m³", "8h - TWA", RegulationDatabase.DFG, "Deutschland"),
+                ("TLV - TWA", 0.2, "mg / m³", "8h - TWA", RegulationDatabase.ACGIH, "USA"),
             ],
         }
 
@@ -935,7 +935,7 @@ class ChemicalDataAgent:
 
         # Mock SDS für Demo
         sds = SafetyDataSheet(
-            sds_id=f"sds_{cas.replace('-', '_')}",
+            sds_id=f"sds_{cas.replace(' - ', '_')}",
             document_title=f"Sicherheitsdatenblatt - {substance.primary_name}",
             version="1.0",
             revision_date=datetime.now().strftime("%Y-%m-%d"),
@@ -949,7 +949,7 @@ class ChemicalDataAgent:
             "product_name": substance.primary_name,
             "cas_number": cas,
             "supplier": "Mock Chemical Company",
-            "emergency_phone": "+49-180-2273-456",
+            "emergency_phone": " + 49-180 - 2273-456",
         }
 
         sds.section_2_hazards = {
@@ -991,7 +991,7 @@ class ChemicalDataAgent:
         self._stats["avg_processing_time_ms"] = self._stats["total_processing_time_ms"] / self._stats["queries_processed"]
 
     def _cleanup_cache(self):
-        """Cache-Cleanup bei Überlauf"""
+        """Cache-Cleanup bei Überlau"""
         if len(self._search_cache) > self.config.max_cache_size:
             # Entferne 20% der ältesten Einträge
             items_to_remove = len(self._search_cache) // 5
@@ -1063,10 +1063,18 @@ async def main():
 
     # Test-Queries
     test_queries = [
-        {"search_term": "67-56-1", "identifier_type": ChemicalIdentifierType.CAS_NUMBER, "description": "CAS-Suche: Methanol"},
-        {"search_term": "schwefelsäure", "identifier_type": None, "description": "Name-Suche: Schwefelsäure"},
-        {"search_term": "benzol", "identifier_type": None, "description": "Name-Suche: Benzol (gefährlich)"},
-        {"search_term": "7732-18-5", "identifier_type": ChemicalIdentifierType.CAS_NUMBER, "description": "CAS-Suche: Wasser"},
+        {
+            "search_term": "67 - 56-1",
+            "identifier_type": ChemicalIdentifierType.CAS_NUMBER,
+            "description": "CAS - Suche: Methanol",
+        },
+        {"search_term": "schwefelsäure", "identifier_type": None, "description": "Name - Suche: Schwefelsäure"},
+        {"search_term": "benzol", "identifier_type": None, "description": "Name - Suche: Benzol (gefährlich)"},
+        {
+            "search_term": "7732 - 18-5",
+            "identifier_type": ChemicalIdentifierType.CAS_NUMBER,
+            "description": "CAS - Suche: Wasser",
+        },
     ]
 
     for i, query in enumerate(test_queries, 1):
@@ -1148,7 +1156,7 @@ async def main():
 
     # Integration Test: Chemical + Atmospheric Flow
     if ATMOSPHERIC_INTEGRATION_AVAILABLE:
-        print(f"\n🔗 Integration Test: Chemical Data → Atmospheric Flow")
+        print("\n🔗 Integration Test: Chemical Data → Atmospheric Flow")
 
         # Benzol-Daten für Emissionsberechnung
         benzol_request = ChemicalDataRequest(
@@ -1170,7 +1178,7 @@ async def main():
             vapor_pressure = benzol.get_property("vapor_pressure")
             if vapor_pressure:
                 print(f"   💨 Dampfdruck: {vapor_pressure.value} {vapor_pressure.unit}")
-                print(f"      → Hohe Verdampfungsrate erwartet")
+                print("      → Hohe Verdampfungsrate erwartet")
 
             # GHS-Klassifikation für Risikobewertung
             if benzol.ghs_classifications:
@@ -1179,7 +1187,7 @@ async def main():
                     print(f"      - {ghs.hazard_statement_text}")
 
     # Agent-Status
-    print(f"\n📊 Agent Status:")
+    print("\n📊 Agent Status:")
     status = agent.get_status()
     print(f"   Queries processed: {status['performance']['queries_processed']}")
     print(f"   Substances found: {status['performance']['substances_found']}")

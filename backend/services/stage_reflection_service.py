@@ -19,15 +19,16 @@ Created: 2025-10-15
 """
 
 import logging
-from typing import Dict, Any, List, Optional
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
 
 class ReflectionStage(str, Enum):
     """Pipeline-Stages für Reflection"""
+
     HYPOTHESIS = "hypothesis"
     AGENT_SELECTION = "agent_selection"
     RETRIEVAL = "retrieval"
@@ -38,28 +39,29 @@ class ReflectionStage(str, Enum):
 @dataclass
 class StageReflection:
     """Strukturierte Stage-Reflection"""
+
     stage: ReflectionStage
     completion_percent: float  # 0-100
-    fulfillment_status: str    # "incomplete", "partial", "complete"
+    fulfillment_status: str  # "incomplete", "partial", "complete"
     identified_gaps: List[str]  # Was fehlt noch?
-    gathered_info: List[str]    # Was wurde gefunden?
-    confidence: float           # 0-1
-    next_actions: List[str]     # Empfohlene nächste Schritte
-    llm_reasoning: str          # LLM Begründung
+    gathered_info: List[str]  # Was wurde gefunden?
+    confidence: float  # 0-1
+    next_actions: List[str]  # Empfohlene nächste Schritte
+    llm_reasoning: str  # LLM Begründung
     timestamp: str
 
 
 class StageReflectionService:
     """
     LLM-Service für Meta-Reflections zu Pipeline-Stages
-    
+
     Generiert strukturierte Analysen zu:
     - Informations-Erfüllungsgrad
     - Identifizierte Lücken
     - Qualität der Zwischenergebnisse
     - Empfohlene nächste Schritte
     """
-    
+
     def __init__(self, ollama_client=None):
         """
         Args:
@@ -67,7 +69,7 @@ class StageReflectionService:
         """
         self.ollama_client = ollama_client
         self.reflection_enabled = ollama_client is not None
-        
+
         # Prompt-Templates für verschiedene Stages
         self.reflection_prompts = {
             ReflectionStage.HYPOTHESIS: self._build_hypothesis_reflection_prompt,
@@ -76,64 +78,55 @@ class StageReflectionService:
             ReflectionStage.SYNTHESIS: self._build_synthesis_reflection_prompt,
             ReflectionStage.VALIDATION: self._build_validation_reflection_prompt,
         }
-        
+
         logger.info(f"🔍 StageReflectionService initialized (LLM: {self.reflection_enabled})")
-    
+
     async def reflect_on_stage(
-        self,
-        stage: ReflectionStage,
-        user_query: str,
-        stage_data: Dict[str, Any],
-        context: Optional[Dict[str, Any]] = None
+        self, stage: ReflectionStage, user_query: str, stage_data: Dict[str, Any], context: Optional[Dict[str, Any]] = None
     ) -> StageReflection:
         """
         Führt LLM-gestützte Reflection für Stage aus
-        
+
         Args:
             stage: Aktuelle Pipeline-Stage
             user_query: Original User-Query
             stage_data: Ergebnisse/Daten der aktuellen Stage
             context: Zusätzlicher Kontext (vorherige Stages etc.)
-            
+
         Returns:
             StageReflection mit strukturierter Analyse
         """
         if not self.reflection_enabled:
             return self._create_fallback_reflection(stage, stage_data)
-        
+
         try:
             # Baue Stage-spezifischen Reflection-Prompt
             prompt_builder = self.reflection_prompts.get(stage)
             if not prompt_builder:
                 logger.warning(f"⚠️ Kein Reflection-Prompt für Stage: {stage}")
                 return self._create_fallback_reflection(stage, stage_data)
-            
+
             reflection_prompt = prompt_builder(user_query, stage_data, context or {})
-            
+
             # LLM-Call für Meta-Reflection
             reflection_response = await self._call_llm_reflection(reflection_prompt, stage)
-            
+
             # Parse LLM-Response zu strukturiertem Format
             reflection = self._parse_reflection_response(stage, reflection_response, stage_data)
-            
+
             logger.info(f"✅ Stage Reflection: {stage} | Erfüllung: {reflection.completion_percent}%")
             return reflection
-            
+
         except Exception as e:
             logger.error(f"❌ Reflection Error ({stage}): {e}")
             return self._create_fallback_reflection(stage, stage_data)
-    
-    def _build_hypothesis_reflection_prompt(
-        self,
-        user_query: str,
-        stage_data: Dict[str, Any],
-        context: Dict[str, Any]
-    ) -> str:
+
+    def _build_hypothesis_reflection_prompt(self, user_query: str, stage_data: Dict[str, Any], context: Dict[str, Any]) -> str:
         """Prompt für Hypothesen-Generierungs-Reflection"""
-        hypotheses = stage_data.get('hypotheses', [])
-        query_complexity = stage_data.get('complexity', 'unknown')
-        
-        return f"""
+        hypotheses = stage_data.get("hypotheses", [])
+        query_complexity = stage_data.get("complexity", "unknown")
+
+        return """
 Du bist ein Meta-Analyst der die Qualität von generierten Hypothesen bewertet.
 
 USER QUERY:
@@ -182,18 +175,15 @@ NÄCHSTE_SCHRITTE:
 KONFIDENZ: <0.0-1.0>
 BEGRÜNDUNG: <Deine Reasoning>
 """
-    
+
     def _build_agent_selection_reflection_prompt(
-        self,
-        user_query: str,
-        stage_data: Dict[str, Any],
-        context: Dict[str, Any]
+        self, user_query: str, stage_data: Dict[str, Any], context: Dict[str, Any]
     ) -> str:
         """Prompt für Agent-Auswahl-Reflection"""
-        selected_agents = stage_data.get('selected_agents', [])
-        available_agents = stage_data.get('available_agents', [])
-        
-        return f"""
+        selected_agents = stage_data.get("selected_agents", [])
+        available_agents = stage_data.get("available_agents", [])
+
+        return """
 Du bist ein Meta-Analyst der die Qualität der Agent-Auswahl bewertet.
 
 USER QUERY:
@@ -240,25 +230,20 @@ NÄCHSTE_SCHRITTE:
 KONFIDENZ: <0.0-1.0>
 BEGRÜNDUNG: <Deine Reasoning>
 """
-    
-    def _build_retrieval_reflection_prompt(
-        self,
-        user_query: str,
-        stage_data: Dict[str, Any],
-        context: Dict[str, Any]
-    ) -> str:
+
+    def _build_retrieval_reflection_prompt(self, user_query: str, stage_data: Dict[str, Any], context: Dict[str, Any]) -> str:
         """Prompt für Retrieval-Reflection"""
-        agent_results = stage_data.get('agent_results', {})
-        total_sources = sum(len(r.get('sources', [])) for r in agent_results.values())
-        
-        return f"""
+        agent_results = stage_data.get("agent_results", {})
+        total_sources = sum(len(r.get("sources", [])) for r in agent_results.values())
+
+        return """
 Du bist ein Meta-Analyst der die Qualität der Information-Retrieval bewertet.
 
 USER QUERY:
 {user_query}
 
 AGENT ERGEBNISSE:
-{chr(10).join(f"- {agent}: {len(result.get('sources', []))} Quellen, Konfidenz: {result.get('confidence', 0):.2f}" 
+{chr(10).join(f"- {agent}: {len(result.get('sources', []))} Quellen, Konfidenz: {result.get('confidence', 0):.2f}"
               for agent, result in agent_results.items())}
 
 GESAMT: {total_sources} Quellen gefunden
@@ -301,18 +286,13 @@ NÄCHSTE_SCHRITTE:
 KONFIDENZ: <0.0-1.0>
 BEGRÜNDUNG: <Deine Reasoning>
 """
-    
-    def _build_synthesis_reflection_prompt(
-        self,
-        user_query: str,
-        stage_data: Dict[str, Any],
-        context: Dict[str, Any]
-    ) -> str:
+
+    def _build_synthesis_reflection_prompt(self, user_query: str, stage_data: Dict[str, Any], context: Dict[str, Any]) -> str:
         """Prompt für Synthese-Reflection"""
-        synthesis_result = stage_data.get('synthesis', {})
-        response_text = synthesis_result.get('response_text', '')[:500]  # Erste 500 chars
-        
-        return f"""
+        synthesis_result = stage_data.get("synthesis", {})
+        response_text = synthesis_result.get("response_text", "")[:500]  # Erste 500 chars
+
+        return """
 Du bist ein Meta-Analyst der die Qualität der finalen Synthese bewertet.
 
 USER QUERY:
@@ -364,17 +344,12 @@ NÄCHSTE_SCHRITTE:
 KONFIDENZ: <0.0-1.0>
 BEGRÜNDUNG: <Deine Reasoning>
 """
-    
-    def _build_validation_reflection_prompt(
-        self,
-        user_query: str,
-        stage_data: Dict[str, Any],
-        context: Dict[str, Any]
-    ) -> str:
+
+    def _build_validation_reflection_prompt(self, user_query: str, stage_data: Dict[str, Any], context: Dict[str, Any]) -> str:
         """Prompt für Validierungs-Reflection"""
-        validation_checks = stage_data.get('validation_checks', {})
-        
-        return f"""
+        validation_checks = stage_data.get("validation_checks", {})
+
+        return """
 Du bist ein Meta-Analyst der die Qualität der Validierung bewertet.
 
 USER QUERY:
@@ -417,15 +392,15 @@ NÄCHSTE_SCHRITTE:
 KONFIDENZ: <0.0-1.0>
 BEGRÜNDUNG: <Deine Reasoning>
 """
-    
+
     async def _call_llm_reflection(self, prompt: str, stage: ReflectionStage) -> str:
         """
         Ruft LLM mit Reflection-Prompt auf
-        
+
         Args:
             prompt: Reflection-Prompt
             stage: Aktuelle Stage
-            
+
         Returns:
             LLM Response-Text
         """
@@ -433,49 +408,44 @@ BEGRÜNDUNG: <Deine Reasoning>
             if not self.ollama_client:
                 logger.debug(f"⚠️ Kein Ollama-Client verfügbar für {stage}")
                 return ""
-            
+
             # Import OllamaRequest
             from backend.agents.veritas_ollama_client import OllamaRequest
-            
+
             # Erstelle OllamaRequest
             request = OllamaRequest(
                 model="llama3.2:latest",
                 prompt=prompt,
                 temperature=0.3,  # Niedrig für konsistente Analyse
                 max_tokens=800,
-                stream=False
+                stream=False,
             )
-            
+
             # Async Call über Ollama-Client
-            response = await self.ollama_client.generate_response(
-                request=request,
-                stream=False
-            )
-            
+            response = await self.ollama_client.generate_response(request=request, stream=False)
+
             # Response-Text extrahieren
-            if hasattr(response, 'response'):
+            if hasattr(response, "response"):
                 return response.response
             elif isinstance(response, dict):
-                return response.get('response', response.get('response_text', ''))
+                return response.get("response", response.get("response_text", ""))
             else:
                 logger.warning(f"⚠️ Unerwartetes Response-Format: {type(response)}")
                 return str(response)
-            
+
         except Exception as e:
             logger.error(f"❌ LLM Reflection Call Error ({stage}): {e}")
             import traceback
+
             traceback.print_exc()
             return ""
-    
+
     def _parse_reflection_response(
-        self,
-        stage: ReflectionStage,
-        llm_response: str,
-        stage_data: Dict[str, Any]
+        self, stage: ReflectionStage, llm_response: str, stage_data: Dict[str, Any]
     ) -> StageReflection:
         """
         Parsed LLM-Response zu strukturiertem StageReflection
-        
+
         Format erwartet:
         ERFÜLLUNG: 75
         STATUS: partial
@@ -484,10 +454,10 @@ BEGRÜNDUNG: <Deine Reasoning>
         ...
         """
         from datetime import datetime
-        
+
         try:
-            lines = llm_response.strip().split('\n')
-            
+            lines = llm_response.strip().split("\n")
+
             completion_percent = 50.0
             fulfillment_status = "partial"
             identified_gaps = []
@@ -495,41 +465,41 @@ BEGRÜNDUNG: <Deine Reasoning>
             next_actions = []
             confidence = 0.7
             llm_reasoning = ""
-            
+
             current_section = None
-            
+
             for line in lines:
                 line = line.strip()
-                
-                if line.startswith('ERFÜLLUNG:'):
+
+                if line.startswith("ERFÜLLUNG:"):
                     try:
-                        completion_percent = float(line.split(':')[1].strip())
+                        completion_percent = float(line.split(":")[1].strip())
                     except:
                         pass
-                elif line.startswith('STATUS:'):
-                    fulfillment_status = line.split(':')[1].strip().lower()
-                elif line.startswith('KONFIDENZ:'):
+                elif line.startswith("STATUS:"):
+                    fulfillment_status = line.split(":")[1].strip().lower()
+                elif line.startswith("KONFIDENZ:"):
                     try:
-                        confidence = float(line.split(':')[1].strip())
+                        confidence = float(line.split(":")[1].strip())
                     except:
                         pass
-                elif line.startswith('BEGRÜNDUNG:'):
-                    llm_reasoning = line.split(':', 1)[1].strip()
-                elif line.startswith('LÜCKEN:'):
-                    current_section = 'gaps'
-                elif line.startswith('GESAMMELT:'):
-                    current_section = 'gathered'
-                elif line.startswith('NÄCHSTE_SCHRITTE:'):
-                    current_section = 'actions'
-                elif line.startswith('- ') and current_section:
+                elif line.startswith("BEGRÜNDUNG:"):
+                    llm_reasoning = line.split(":", 1)[1].strip()
+                elif line.startswith("LÜCKEN:"):
+                    current_section = "gaps"
+                elif line.startswith("GESAMMELT:"):
+                    current_section = "gathered"
+                elif line.startswith("NÄCHSTE_SCHRITTE:"):
+                    current_section = "actions"
+                elif line.startswith("- ") and current_section:
                     item = line[2:].strip()
-                    if current_section == 'gaps':
+                    if current_section == "gaps":
                         identified_gaps.append(item)
-                    elif current_section == 'gathered':
+                    elif current_section == "gathered":
                         gathered_info.append(item)
-                    elif current_section == 'actions':
+                    elif current_section == "actions":
                         next_actions.append(item)
-            
+
             return StageReflection(
                 stage=stage,
                 completion_percent=completion_percent,
@@ -539,21 +509,17 @@ BEGRÜNDUNG: <Deine Reasoning>
                 confidence=confidence,
                 next_actions=next_actions,
                 llm_reasoning=llm_reasoning,
-                timestamp=datetime.now().isoformat()
+                timestamp=datetime.now().isoformat(),
             )
-            
+
         except Exception as e:
             logger.error(f"❌ Parse Reflection Error: {e}")
             return self._create_fallback_reflection(stage, stage_data)
-    
-    def _create_fallback_reflection(
-        self,
-        stage: ReflectionStage,
-        stage_data: Dict[str, Any]
-    ) -> StageReflection:
+
+    def _create_fallback_reflection(self, stage: ReflectionStage, stage_data: Dict[str, Any]) -> StageReflection:
         """Erstellt Fallback-Reflection ohne LLM"""
         from datetime import datetime
-        
+
         return StageReflection(
             stage=stage,
             completion_percent=70.0,
@@ -563,27 +529,23 @@ BEGRÜNDUNG: <Deine Reasoning>
             confidence=0.6,
             next_actions=["Fortfahren mit nächster Stage"],
             llm_reasoning="Fallback ohne LLM-Analyse",
-            timestamp=datetime.now().isoformat()
+            timestamp=datetime.now().isoformat(),
         )
-    
+
     def format_reflection_for_display(self, reflection: StageReflection) -> str:
         """
         Formatiert Reflection für Frontend-Display
-        
+
         Returns:
             Markdown-formatierte Reflection
         """
-        status_emoji = {
-            "incomplete": "🔴",
-            "partial": "🟡",
-            "complete": "🟢"
-        }
-        
+        status_emoji = {"incomplete": "🔴", "partial": "🟡", "complete": "🟢"}
+
         emoji = status_emoji.get(reflection.fulfillment_status, "⚪")
-        
-        output = f"""
+
+        output = """
 ### {emoji} Stage: {reflection.stage.value.title()}
-**Erfüllungsgrad:** {reflection.completion_percent:.0f}% | **Status:** {reflection.fulfillment_status}  
+**Erfüllungsgrad:** {reflection.completion_percent:.0f}% | **Status:** {reflection.fulfillment_status}
 **Konfidenz:** {reflection.confidence:.2f}
 
 #### ✅ Gesammelte Informationen:
@@ -607,16 +569,16 @@ _reflection_service: Optional[StageReflectionService] = None
 def get_reflection_service(ollama_client=None) -> StageReflectionService:
     """
     Holt/erstellt Singleton StageReflectionService
-    
+
     Args:
         ollama_client: Optional VeritasOllamaClient
-        
+
     Returns:
         StageReflectionService Instanz
     """
     global _reflection_service
-    
+
     if _reflection_service is None:
         _reflection_service = StageReflectionService(ollama_client)
-    
+
     return _reflection_service

@@ -157,13 +157,13 @@ async def root():
     """Root Endpoint - API Status"""
     return {
         "message": "Veritas API Backend (Streaming)",
-        "version": "1.0.0-streaming",
+        "version": "1.0.0 - streaming",
         "status": "active",
         "streaming_available": STREAMING_AVAILABLE,
         "endpoints": {
-            "chat": "/v2/query",
-            "streaming_chat": "/v2/query/stream",
-            "progress": "/progress/{session_id}",
+            "chat": " / v2/query",
+            "streaming_chat": " / v2/query / stream",
+            "progress": " / progress/{session_id}",
             "rag": "/ask",
             "agents": "/agents/ask",
             "docs": "/docs",
@@ -201,7 +201,7 @@ async def veritas_streaming_query(request: VeritasStreamingQueryRequest):
     return {
         "session_id": session_id,
         "query_id": query_id,
-        "stream_url": f"/progress/{session_id}",
+        "stream_url": f" / progress/{session_id}",
         "message": "Verarbeitung gestartet - verbinde mit Stream für Updates",
         "estimated_time": "5-15 Sekunden",
     }
@@ -217,9 +217,9 @@ async def get_progress_stream(session_id: str):
         raise HTTPException(status_code=503, detail="Streaming System nicht verfügbar")
 
     headers = {
-        "Content-Type": "text/event-stream",
-        "Cache-Control": "no-cache",
-        "Connection": "keep-alive",
+        "Content - Type": "text / event-stream",
+        "Cache - Control": "no - cache",
+        "Connection": "keep - alive",
     }
 
     return StreamingResponse(
@@ -354,7 +354,7 @@ def _generate_agent_result(agent_type: str, query: str, complexity: str) -> Dict
         "geo_context": {
             "summary": "Geografischer Kontext und lokale Bestimmungen identifiziert",
             "details": "Relevante Gebiets- und Standortinformationen gesammelt",
-            "sources": ["OpenStreetMap", "Gemeinde-DB", "Geoportal"],
+            "sources": ["OpenStreetMap", "Gemeinde - DB", "Geoportal"],
         },
         "legal_framework": {
             "summary": "Rechtliche Rahmenbedingungen und Vorschriften analysiert",
@@ -364,12 +364,12 @@ def _generate_agent_result(agent_type: str, query: str, complexity: str) -> Dict
         "construction": {
             "summary": "Bautechnische Aspekte und Genehmigungsverfahren bewertet",
             "details": "Bauvorschriften und technische Anforderungen geprüft",
-            "sources": ["DIN-Normen", "Bauordnung", "Technische Richtlinien"],
+            "sources": ["DIN - Normen", "Bauordnung", "Technische Richtlinien"],
         },
         "environmental": {
             "summary": "Umweltaspekte und Emissionsbestimmungen untersucht",
             "details": "Umweltschutzauflagen und Grenzwerte ermittelt",
-            "sources": ["Umweltbundesamt", "Luftreinhaltepläne", "EU-Richtlinien"],
+            "sources": ["Umweltbundesamt", "Luftreinhaltepläne", "EU - Richtlinien"],
         },
         "financial": {
             "summary": "Kostenstrukturen und finanzielle Aspekte kalkuliert",
@@ -379,17 +379,17 @@ def _generate_agent_result(agent_type: str, query: str, complexity: str) -> Dict
         "traffic": {
             "summary": "Verkehrsrechtliche Bestimmungen und Infrastruktur bewertet",
             "details": "Verkehrsregeln und Infrastrukturanforderungen geprüft",
-            "sources": ["StVO", "Verkehrsbehörde", "ÖPNV-Pläne"],
+            "sources": ["StVO", "Verkehrsbehörde", "ÖPNV - Pläne"],
         },
         "document_retrieval": {
             "summary": "Relevante Dokumente und Formulare gefunden",
             "details": "Antragsformulare und Informationsmaterialien identifiziert",
-            "sources": ["Verwaltungsportal", "Formulardatenbank", "FAQ-Sammlung"],
+            "sources": ["Verwaltungsportal", "Formulardatenbank", "FAQ - Sammlung"],
         },
         "external_api": {
             "summary": "Aktuelle externe Daten abgerufen",
-            "details": "Live-Daten und externe Informationsquellen ausgewertet",
-            "sources": ["API-Services", "Open-Data-Portale", "Echtzeitdaten"],
+            "details": "Live - Daten und externe Informationsquellen ausgewertet",
+            "sources": ["API - Services", "Open - Data-Portale", "Echtzeitdaten"],
         },
     }
 
@@ -420,7 +420,7 @@ def _synthesize_final_response(query: str, agent_results: Dict[str, Any], comple
     high_confidence_results = [result for result in agent_results.values() if result.get("confidence_score", 0) > 0.75]
 
     # Generiere Hauptantwort
-    main_response = f"""
+    main_response = """
 **Antwort auf Ihre Frage**: {query}
 
 **Zusammenfassung der Analyse** ({domain.title()}, {complexity.title()}):
@@ -439,7 +439,7 @@ def _synthesize_final_response(query: str, agent_results: Dict[str, Any], comple
 
     unique_sources = list(set(all_sources))[:10]  # Limitiere auf 10
 
-    main_response += f"""
+    main_response += """
 **Nächste Schritte**: Basierend auf der Analyse empfehlen wir Ihnen, sich zunächst über die spezifischen Anforderungen zu informieren und die entsprechenden Antragsformulare zu beschaffen.
 
 **Hinweis**: Diese Antwort wurde durch {len(agent_results)} spezialisierte Agenten erstellt und mit einem durchschnittlichen Vertrauenswert von {sum(r.get('confidence_score', 0) for r in agent_results.values()) / len(agent_results):.0%} bewertet.
@@ -502,7 +502,7 @@ async def veritas_chat_query(query_data: Dict[str, Any]):
         # Simulierte Agent-Ergebnisse (wie im Test-Backend)
         agent_results = {
             "geo_context": {
-                "response_text": f"Geo-Kontext für Query: {query_text[:50]}...",
+                "response_text": f"Geo - Kontext für Query: {query_text[:50]}...",
                 "confidence_score": 0.85,
                 "processing_time": 0.2,
                 "sources": ["OpenStreetMap", "Gemeinde-DB"],
@@ -522,7 +522,7 @@ async def veritas_chat_query(query_data: Dict[str, Any]):
         }
 
         # Simuliere finale Antwort
-        main_response = f"""
+        main_response = """
         **Antwort auf Ihre Frage**: {query_text}
 
         **Geo-Kontext**: Die Anfrage bezieht sich auf den lokalen Verwaltungsbereich.
@@ -546,7 +546,7 @@ async def veritas_chat_query(query_data: Dict[str, Any]):
             "sources": [
                 {"title": "BauGB", "url": "test://baugesetzbuch", "relevance": 0.9},
                 {"title": "VwVfG", "url": "test://verwaltungsverfahrensgesetz", "relevance": 0.8},
-                {"title": "Gemeinde-FAQ", "url": "test://gemeinde-faq", "relevance": 0.7},
+                {"title": "Gemeinde - FAQ", "url": "test://gemeinde - faq", "relevance": 0.7},
             ],
             "worker_results": agent_results,  # Kompatibilität mit veritas_app.py
             "agent_results": agent_results,
@@ -648,7 +648,12 @@ async def veritas_rag_query(request: VeritasRAGRequest):
         # Test RAG Response
         answer = f"Test RAG-Antwort für: {request.question}"
         sources = [
-            {"title": "Test-Dokument 1", "content": "Relevanter Test-Inhalt...", "score": 0.95, "source": "test_veritas_db"}
+            {
+                "title": "Test - Dokument 1",
+                "content": "Relevanter Test - Inhalt...",
+                "score": 0.95,
+                "source": "test_veritas_db",
+            }
         ]
 
         processing_time = time.time() - start_time
@@ -658,7 +663,7 @@ async def veritas_rag_query(request: VeritasRAGRequest):
             sources=sources,
             metadata={
                 "mode": request.mode,
-                "model": request.model or "test-llama3:latest",
+                "model": request.model or "test - llama3:latest",
                 "temperature": request.temperature,
                 "max_tokens": request.max_tokens,
                 "streaming_available": STREAMING_AVAILABLE,
@@ -726,7 +731,9 @@ async def v7_query_endpoint(request: V7QueryRequest):
     try:
         if request.enable_streaming:
             # Streaming-Modus: NDJSON-Events (optional, hier nur Hinweis)
-            return JSONResponse(status_code=501, content={"error": "Streaming-Modus für v7 API ist noch nicht implementiert."})
+            return JSONResponse(
+                status_code=501, content={"error": "Streaming - Modus für v7 API ist noch nicht implementiert."}
+            )
         result = await orchestrator_v7.process_query(
             user_query=request.query, user_id=request.user_id, context=request.context
         )

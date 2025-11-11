@@ -14,37 +14,37 @@ FEATURES:
 """
 
 from enum import Enum
-from typing import Dict, Any
+from typing import Any, Dict
 
 
 class PromptMode(Enum):
     """Prompt-Modi"""
-    INTERNAL_RAG = "internal_rag"        # Für RAG-Retrieval optimiert
-    USER_FACING = "user_facing"          # Für Benutzer-Interaktion optimiert
-    HYBRID = "hybrid"                     # Kombiniert beide Modi
+
+    INTERNAL_RAG = "internal_rag"  # Für RAG-Retrieval optimiert
+    USER_FACING = "user_facing"  # Für Benutzer-Interaktion optimiert
+    HYBRID = "hybrid"  # Kombiniert beide Modi
 
 
 class EnhancedPromptTemplates:
     """
     Verbesserte Prompt-Templates mit Dual-Mode-System
     """
-    
+
     # ============================================================================
     # INTERNAL RAG PROCESSING (Query-Enrichment für bessere Retrieval-Qualität)
     # ============================================================================
-    
-    INTERNAL_QUERY_ENRICHMENT = {
-        "system": """Du bist ein interner Query-Analyzer für ein RAG-System.
 
-AUFGABE: Erweitere die User-Query mit relevanten Fachbegriffen, Synonymen und Kontext für optimale Dokumenten-Retrieval.
+    INTERNAL_QUERY_ENRICHMENT = {
+        "system": """Du bist ein interner Query - Analyzer für ein RAG - System.
+
+AUFGABE: Erweitere die User - Query mit relevanten Fachbegriffen, Synonymen und Kontext für optimale Dokumenten - Retrieval.
 
 STIL:
 - Präzise, technisch
 - Strukturiert (Keywords, Synonyme, Kontext)
-- Optimiert für Vektor-Suche
+- Optimiert für Vektor - Suche
 
 OUTPUT: JSON mit {keywords, synonyms, context, search_terms}""",
-        
         "user_template": """Analysiere und erweitere folgende Query für RAG-Retrieval:
 
 **User-Query:** {query}
@@ -63,24 +63,23 @@ Beispiel:
   "synonyms": {{"Baugenehmigung": ["Baubewilligung", "Bauerlaubnis"]}},
   "context": "Baurecht, Genehmigungsverfahren nach BauGB",
   "search_terms": ["Baugenehmigung", "Bauantrag", "BauGB", "Bauordnung", ...]
-}}"""
+}}""",
     }
-    
+
     INTERNAL_RAG_FILTER = {
-        "system": """Du bist ein Filter für RAG-Suchergebnisse.
+        "system": """Du bist ein Filter für RAG - Suchergebnisse.
 
 AUFGABE: Bewerte Relevanz von gefundenen Dokumenten und filtere irrelevante Ergebnisse aus.
 
 STIL:
 - Objektiv, präzise
-- Score-basiert (0.0 - 1.0)
+- Score - basiert (0.0 - 1.0)
 - Begründung pro Dokument
 
 OUTPUT: JSON mit relevantem Subset + Scores""",
-        
-        "user_template": """Filtere RAG-Ergebnisse nach Relevanz:
+        "user_template": """Filtere RAG - Ergebnisse nach Relevanz:
 
-**Original-Query:** {query}
+**Original - Query:** {query}
 **Enriched-Query:** {enriched_query}
 **Gefundene Dokumente (Top 20):**
 {documents}
@@ -92,13 +91,13 @@ Bewerte jedes Dokument:
 
 Behalte nur Dokumente mit Score ≥ 0.6.
 
-OUTPUT: JSON mit Top 10 relevanten Dokumenten"""
+OUTPUT: JSON mit Top 10 relevanten Dokumenten""",
     }
-    
+
     # ============================================================================
     # USER-FACING OUTPUT (Natürliche, konversationelle Sprache)
     # ============================================================================
-    
+
     USER_FACING_RESPONSE = {
         "system": """Du bist ein hilfreicher Assistent für Verwaltungsfragen.
 
@@ -108,7 +107,7 @@ PERSÖNLICHKEIT:
 - Erklärt komplexe Sachverhalte verständlich
 
 STIL:
-- Natürliche Sprache (keine Meta-Kommentare wie "Antwort auf...")
+- Natürliche Sprache (keine Meta - Kommentare wie "Antwort auf...")
 - Strukturiert (Absätze, Listen, Hervorhebungen)
 - Direkt zur Sache
 
@@ -123,17 +122,17 @@ ERLAUBT:
 - Persönlich: "Das hängt von Ihrem konkreten Fall ab..."
 - Empathisch: "Das ist eine häufige Frage - hier die wichtigsten Punkte:"
 
-WISSENSCHAFTLICHE ZITATIONEN (IEEE-Standard) - SEHR WICHTIG!:
-- Markiere JEDEN Bezug auf Dokumente/Quellen mit [1], [2], [3] etc.
-- Platziere Zitation DIREKT nach dem zitierten Fakt/Satz
+WISSENSCHAFTLICHE ZITATIONEN (IEEE - Standard) - SEHR WICHTIG!:
+- Markiere JEDEN Bezug auf Dokumente / Quellen mit [1], [2], [3] etc.
+- Platziere Zitation DIREKT nach dem zitierten Fakt / Satz
 - Verwende fortlaufende Nummerierung (1, 2, 3, nicht 1, 1, 2)
 - Jede Quellenangabe in der Quellenliste = eine Nummer
-- BEISPIEL: "Nach § 58 LBO BW ist eine Baugenehmigung erforderlich[1]. Die Bearbeitungsdauer beträgt 2-3 Monate[2]."
+- BEISPIEL: "Nach § 58 LBO BW ist eine Baugenehmigung erforderlich[1]. Die Bearbeitungsdauer beträgt 2 - 3 Monate[2]."
 - WICHTIG: Auch bei mehrfacher Nutzung derselben Quelle → gleiche Nummer verwenden
 
-FORMAT (MARKDOWN-ÜBERSCHRIFTEN VERWENDEN!):
+FORMAT (MARKDOWN - ÜBERSCHRIFTEN VERWENDEN!):
 ## Direkte Antwort
-2-3 Sätze mit direkter Beantwortung, MIT [N] IEEE-Zitationen!
+2 - 3 Sätze mit direkter Beantwortung, MIT [N] IEEE - Zitationen!
 
 ## Details
 Strukturierte Detailinformationen mit:
@@ -148,8 +147,7 @@ Strukturierte Detailinformationen mit:
 (optional, wenn sinnvoll - praktische Handlungsempfehlungen)
 
 💡 **Vorschläge:**
-• 3-5 konkrete Follow-up-Fragen für den User""",
-        
+• 3 - 5 konkrete Follow - up-Fragen für den User""",
         "user_template": """**User fragte:** {query}
 
 **Kontext aus Dokumenten:**
@@ -249,14 +247,14 @@ Bei einem Einfamilienhaus (200m², Bausumme 400.000€) liegen die Gesamtkosten 
 **BEISPIEL 3 (SCHLECHT - KEINE ZITATIONEN!):**
 
 ## Direkte Antwort
-Basierend auf den Informationen kann ich mitteilen, dass für eine Baugenehmigung verschiedene Unterlagen erforderlich sind. Dies umfasst den Bauantrag sowie weitere Dokumente...  
+Basierend auf den Informationen kann ich mitteilen, dass für eine Baugenehmigung verschiedene Unterlagen erforderlich sind. Dies umfasst den Bauantrag sowie weitere Dokumente...
 
 ❌ **FEHLER:** KEINE [N] Zitationen! → FALSCH! NICHT SO MACHEN!
 
 **Jetzt beantworte die User-Frage GENAU WIE IN DEN EXZELLENTEN BEISPIELEN (MIT [N] ZITATIONEN UND MARKDOWN-ÜBERSCHRIFTEN!)**:
-"""
+""",
     }
-    
+
     USER_FACING_CLARIFICATION = {
         "system": """Du bist ein Assistent der bei unklaren Anfragen nachfragt.
 
@@ -266,8 +264,7 @@ STIL:
 - Mehrere Optionen anbieten
 
 ZIEL: User helfen, die Frage zu präzisieren""",
-        
-        "user_template": """Die User-Frage ist mehrdeutig:
+        "user_template": """Die User - Frage ist mehrdeutig:
 
 **Query:** {query}
 **Mehrdeutigkeiten:** {ambiguities}
@@ -290,31 +287,30 @@ Stelle 2-3 präzisierende Rückfragen:
 
 Können Sie Ihre Frage bitte präzisieren?"
 
-**Erstelle passende Rückfragen für die User-Query:**"""
+**Erstelle passende Rückfragen für die User-Query:**""",
     }
-    
+
     # ============================================================================
     # HYBRID MODE (Kombiniert RAG-Processing + User-Response)
     # ============================================================================
-    
-    HYBRID_FULL_PIPELINE = {
-        "system": """Du bist ein intelligenter Assistent mit 2-Phasen-Verarbeitung:
 
-PHASE 1 (INTERNAL): Query-Enrichment für RAG
+    HYBRID_FULL_PIPELINE = {
+        "system": """Du bist ein intelligenter Assistent mit 2 - Phasen-Verarbeitung:
+
+PHASE 1 (INTERNAL): Query - Enrichment für RAG
 - Erweitere Query mit Fachbegriffen
 - Generiere optimale Suchbegriffe
-- Strukturiere für Vektor-Retrieval
+- Strukturiere für Vektor - Retrieval
 
-PHASE 2 (EXTERNAL): User-Response-Generierung
+PHASE 2 (EXTERNAL): User - Response-Generierung
 - Verarbeite gefundene Dokumente
 - Erstelle natürliche, hilfreiche Antwort
-- Keine Meta-Kommentare, direkt zur Sache
+- Keine Meta - Kommentare, direkt zur Sache
 
 OUTPUT: {{
   "internal": {{...}},  // RAG-Enrichment
   "external": "..."     // User-Antwort
 }}""",
-        
         "user_template": """**User-Query:** {query}
 
 **PHASE 1: Internal Query-Enrichment**
@@ -335,13 +331,13 @@ OUTPUT-FORMAT:
     "context": "..."
   }},
   "external": "Direkte, hilfreiche Antwort für User..."
-}}"""
+}}""",
     }
-    
+
     # ============================================================================
     # DOMÄNEN-SPEZIFISCHE TEMPLATES
     # ============================================================================
-    
+
     DOMAIN_BUILDING = {
         "system": """Du bist Experte für Baurecht und Baugenehmigungen.
 
@@ -352,8 +348,7 @@ WISSEN:
 - Genehmigungsverfahren
 
 STIL: Präzise, rechtlich korrekt, verständlich""",
-        
-        "user_template": """**Baurechts-Anfrage:** {query}
+        "user_template": """**Baurechts - Anfrage:** {query}
 
 **Relevante Dokumente:** {documents}
 
@@ -364,9 +359,9 @@ Beantworte mit Fokus auf:
 • Zuständige Behörden
 • Fristen und Kosten
 
-Strukturiert und verständlich."""
+Strukturiert und verständlich.""",
     }
-    
+
     DOMAIN_ENVIRONMENTAL = {
         "system": """Du bist Experte für Umweltrecht und Immissionsschutz.
 
@@ -377,8 +372,7 @@ WISSEN:
 - Genehmigungspflichten
 
 STIL: Technisch präzise, umweltbewusst""",
-        
-        "user_template": """**Umweltrechts-Anfrage:** {query}
+        "user_template": """**Umweltrechts - Anfrage:** {query}
 
 **Relevante Vorschriften:** {documents}
 
@@ -389,27 +383,27 @@ Beantworte mit Fokus auf:
 • Überwachung und Kontrolle
 • Umweltauswirkungen
 
-Präzise und nachvollziehbar."""
+Präzise und nachvollziehbar.""",
     }
-    
+
     # ============================================================================
     # CONTEXT-AWARE RESPONSE ADAPTATION
     # ============================================================================
-    
+
     @staticmethod
     def get_system_prompt(mode: PromptMode, domain: str = "general") -> str:
         """
         Gibt optimierten System-Prompt basierend auf Modus und Domäne zurück
-        
+
         Args:
             mode: PromptMode (INTERNAL_RAG, USER_FACING, HYBRID)
             domain: Fachdomäne (building, environmental, transport, etc.)
-            
+
         Returns:
             str: Optimierter System-Prompt
         """
         templates = EnhancedPromptTemplates()
-        
+
         if mode == PromptMode.INTERNAL_RAG:
             return templates.INTERNAL_QUERY_ENRICHMENT["system"]
         elif mode == PromptMode.USER_FACING:
@@ -424,24 +418,22 @@ Präzise und nachvollziehbar."""
             return templates.HYBRID_FULL_PIPELINE["system"]
         else:
             return templates.USER_FACING_RESPONSE["system"]
-    
+
     @staticmethod
-    def get_user_prompt(mode: PromptMode, 
-                       domain: str = "general",
-                       **kwargs) -> str:
+    def get_user_prompt(mode: PromptMode, domain: str = "general", **kwargs) -> str:
         """
         Gibt optimierten User-Prompt zurück
-        
+
         Args:
             mode: PromptMode
             domain: Fachdomäne
             **kwargs: Template-Variablen (query, rag_context, agent_results, etc.)
-            
+
         Returns:
             str: Formatierter User-Prompt
         """
         templates = EnhancedPromptTemplates()
-        
+
         if mode == PromptMode.INTERNAL_RAG:
             template = templates.INTERNAL_QUERY_ENRICHMENT["user_template"]
         elif mode == PromptMode.USER_FACING:
@@ -455,25 +447,23 @@ Präzise und nachvollziehbar."""
             template = templates.HYBRID_FULL_PIPELINE["user_template"]
         else:
             template = templates.USER_FACING_RESPONSE["user_template"]
-        
+
         return template.format(**kwargs)
-    
+
     # ============================================================================
     # FOLLOW-UP SUGGESTIONS (Context-Aware)
     # ============================================================================
-    
+
     @staticmethod
-    def generate_follow_up_suggestions(query: str, 
-                                       domain: str,
-                                       agent_results: Dict[str, Any]) -> list[str]:
+    def generate_follow_up_suggestions(query: str, domain: str, agent_results: Dict[str, Any]) -> list[str]:
         """
         Generiert kontextuelle Follow-Up-Vorschläge
-        
+
         Args:
             query: Original-Query
             domain: Fachdomäne
             agent_results: Agent-Ergebnisse
-            
+
         Returns:
             list[str]: Liste mit 3-5 Follow-Up-Fragen
         """
@@ -483,31 +473,31 @@ Präzise und nachvollziehbar."""
                 "Wie lange dauert das Genehmigungsverfahren?",
                 "Was kostet die Baugenehmigung?",
                 "Kann ich eine Bauvoranfrage stellen?",
-                "Welche Fristen muss ich beachten?"
+                "Welche Fristen muss ich beachten?",
             ],
             "environmental": [
                 "Welche Emissionsgrenzwerte gelten?",
                 "Wie wird die Einhaltung überwacht?",
                 "Welche Messverfahren sind vorgeschrieben?",
                 "Gibt es Ausnahmen oder Übergangsfristen?",
-                "Welche Umweltauflagen gelten?"
+                "Welche Umweltauflagen gelten?",
             ],
             "transport": [
                 "Wo kann ich parken?",
                 "Gibt es Parkbeschränkungen?",
                 "Wie teuer ist das Parken?",
                 "Benötige ich einen Parkausweis?",
-                "Gibt es Anwohnerparkzonen?"
+                "Gibt es Anwohnerparkzonen?",
             ],
             "general": [
                 "Können Sie das genauer erklären?",
                 "Welche Alternativen gibt es?",
                 "Was sind die nächsten Schritte?",
                 "Wo finde ich weitere Informationen?",
-                "An wen kann ich mich wenden?"
-            ]
+                "An wen kann ich mich wenden?",
+            ],
         }
-        
+
         # Domain-spezifische Vorschläge, fallback auf general
         return suggestions_map.get(domain, suggestions_map["general"])[:3]
 
@@ -518,71 +508,64 @@ Präzise und nachvollziehbar."""
 
 if __name__ == "__main__":
     import json
-    
+
     print("🎯 Enhanced Prompt Templates - Examples\n")
-    
+
     # Example 1: Internal RAG Processing
     print("=" * 60)
     print("EXAMPLE 1: Internal RAG Query-Enrichment")
     print("=" * 60)
-    
-    system_prompt = EnhancedPromptTemplates.get_system_prompt(
-        mode=PromptMode.INTERNAL_RAG
-    )
-    
+
+    system_prompt = EnhancedPromptTemplates.get_system_prompt(mode=PromptMode.INTERNAL_RAG)
+
     user_prompt = EnhancedPromptTemplates.get_user_prompt(
         mode=PromptMode.INTERNAL_RAG,
         query="Was brauche ich für eine Baugenehmigung?",
         domain="building",
-        user_context="Privater Hausbau in Brandenburg"
+        user_context="Privater Hausbau in Brandenburg",
     )
-    
+
     print(f"SYSTEM: {system_prompt[:100]}...")
     print(f"\nUSER: {user_prompt[:200]}...")
-    
+
     # Example 2: User-Facing Response
     print("\n" + "=" * 60)
     print("EXAMPLE 2: User-Facing Natural Response")
     print("=" * 60)
-    
-    system_prompt = EnhancedPromptTemplates.get_system_prompt(
-        mode=PromptMode.USER_FACING,
-        domain="building"
-    )
-    
+
+    system_prompt = EnhancedPromptTemplates.get_system_prompt(mode=PromptMode.USER_FACING, domain="building")
+
     user_prompt = EnhancedPromptTemplates.get_user_prompt(
         mode=PromptMode.USER_FACING,
         domain="building",
         query="Was brauche ich für eine Baugenehmigung?",
         rag_context="BauGB §29-38, Bauordnung Brandenburg",
-        agent_results='{"legal": "Bauantrag nach BauGB erforderlich"}'
+        agent_results='{"legal": "Bauantrag nach BauGB erforderlich"}',
     )
-    
+
     print(f"SYSTEM: {system_prompt[:150]}...")
     print(f"\nUSER: {user_prompt[:300]}...")
-    
+
     # Example 3: Follow-Up Suggestions
     print("\n" + "=" * 60)
     print("EXAMPLE 3: Context-Aware Follow-Ups")
     print("=" * 60)
-    
+
     suggestions = EnhancedPromptTemplates.generate_follow_up_suggestions(
-        query="Was brauche ich für eine Baugenehmigung?",
-        domain="building",
-        agent_results={}
+        query="Was brauche ich für eine Baugenehmigung?", domain="building", agent_results={}
     )
-    
+
     print("Follow-Up-Vorschläge:")
     for i, suggestion in enumerate(suggestions, 1):
         print(f"  {i}. {suggestion}")
-    
+
     print("\n✅ Enhanced Prompt Templates ready!")
 
 
 # ============================================================================
 # VERWALTUNGSRECHT-SPEZIFISCHE PROMPTS (v3.19.1)
 # ============================================================================
-# 
+#
 # Datum: 10. Oktober 2025
 # Zweck: IEEE-Zitationen + Paragraphen-Referenzen + Follow-ups erzwingen
 # Basis: RAG Quality Test Results (0% Zitationen → Ziel: 100%)
@@ -597,7 +580,7 @@ class VerwaltungsrechtPrompts:
     Spezielle Prompts für verwaltungsrechtliche Anfragen
     mit Fokus auf Rechtsquellen-Zitation, direkte Zitate und Belastbarkeit
     """
-    
+
     SYSTEM_PROMPT = """
 Du bist ein hochspezialisierter Experte für Verwaltungsrecht mit Schwerpunkt Baurecht Baden-Württemberg.
 
@@ -613,16 +596,16 @@ Du bist ein hochspezialisierter Experte für Verwaltungsrecht mit Schwerpunkt Ba
    - Setze Zitate in Anführungszeichen: "..."
    - Nach jedem Zitat: IEEE-Referenz [1]
    - Mindestens 2-3 direkte Zitate pro Antwort
-   
+
    BEISPIEL DIREKTE ZITATE:
-   "Nach § 58 Abs. 1 LBO BW gilt: 'Die Baugenehmigung wird auf Antrag erteilt' [1]. 
-   Das Gesetz definiert weiter: 'Der Antrag ist schriftlich bei der zuständigen 
+   "Nach § 58 Abs. 1 LBO BW gilt: 'Die Baugenehmigung wird auf Antrag erteilt' [1].
+   Das Gesetz definiert weiter: 'Der Antrag ist schriftlich bei der zuständigen
    Baugenehmigungsbehörde einzureichen' [1]."
 
 3. **Quellen-Liste am Ende:**
    ```
    ## Quellen
-   
+
    [1] Landesbauordnung Baden-Württemberg (LBO BW), § 58
    [2] § 7 LBOVVO - Bauvorlagen
    ```
@@ -650,8 +633,8 @@ Du bist ein hochspezialisierter Experte für Verwaltungsrecht mit Schwerpunkt Ba
 # ZITAT-BEISPIELE
 
 EXZELLENT:
-"Gemäß § 59 Abs. 2 LBO BW gilt: 'Die Baugenehmigungsbehörde hat über den 
-Bauantrag innerhalb von drei Monaten zu entscheiden' [1]. Bei vereinfachten 
+"Gemäß § 59 Abs. 2 LBO BW gilt: 'Die Baugenehmigungsbehörde hat über den
+Bauantrag innerhalb von drei Monaten zu entscheiden' [1]. Bei vereinfachten
 Verfahren verkürzt sich die Frist auf 'einen Monat' [2]."
 
 GUT:
@@ -662,47 +645,43 @@ SCHLECHT (vermeide dies):
           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
           Kein direktes Zitat, keine Quelle, kein Paragraph
 """
-    
+
     @staticmethod
-    def build_prompt(
-        question: str,
-        retrieved_documents: List[Dict],
-        question_aspects: Optional[List[str]] = None
-    ) -> str:
+    def build_prompt(question: str, retrieved_documents: List[Dict], question_aspects: Optional[List[str]] = None) -> str:
         """
         Baut vollständiges Prompt für verwaltungsrechtliche Anfragen
-        
+
         Args:
             question: Benutzerfrage
             retrieved_documents: RAG-Dokumente
             question_aspects: Optional - erkannte Aspekte
-        
+
         Returns:
             Vollständiges Prompt
         """
-        
+
         # Aspekte extrahieren
         if question_aspects is None:
             question_aspects = VerwaltungsrechtPrompts.extract_aspects(question)
-        
+
         # Aspekte-Instruktion
         aspects_instruction = ""
         if len(question_aspects) > 1:
-            aspects_instruction = f"""
+            aspects_instruction = """
 # ASPEKTE DER FRAGE (ALLE abdecken!)
 
 Die Frage enthält **{len(question_aspects)} Aspekte**:
 
-{chr(10).join([f"{i+1}. **{aspect}**" for i, aspect in enumerate(question_aspects)])}
+{chr(10).join([f"{i + 1}. **{aspect}**" for i, aspect in enumerate(question_aspects)])}
 
 Strukturiere deine Antwort nach diesen Aspekten (jeweils ## Überschrift).
 """
-        
+
         # Quellen formatieren
         formatted_sources = VerwaltungsrechtPrompts.format_sources(retrieved_documents)
-        
+
         # Prompt zusammenbauen
-        prompt = f"""
+        prompt = """
 {VerwaltungsrechtPrompts.SYSTEM_PROMPT}
 
 {aspects_instruction}
@@ -726,58 +705,69 @@ Beantworte VOLLSTÄNDIG mit:
 
 Los geht's:
 """
-        
+
         return prompt
-    
+
     @staticmethod
     def format_sources(retrieved_documents: List[Dict]) -> str:
         """Formatiert Quellen mit [1], [2], [3] Nummern"""
         if not retrieved_documents:
             return "[KEINE QUELLEN VERFÜGBAR]"
-        
+
         formatted = []
         for idx, doc in enumerate(retrieved_documents, 1):
-            metadata = doc.get('metadata', {})
-            title = metadata.get('title', metadata.get('source', f'Dokument {idx}'))
-            paragraph = metadata.get('paragraph', '')
-            
+            metadata = doc.get("metadata", {})
+            title = metadata.get("title", metadata.get("source", f"Dokument {idx}"))
+            paragraph = metadata.get("paragraph", "")
+
             if paragraph:
                 title = f"{title} - {paragraph}"
-            
-            content = doc.get('content', doc.get('text', ''))[:600]
-            
-            formatted.append(f"""
+
+            content = doc.get("content", doc.get("text", ""))[:600]
+
+            formatted.append(
+                """
 [{idx}] **{title}**
 {'─' * 70}
 {content}
 [...]
-""")
-        
+"""
+            )
+
         return "\n".join(formatted)
-    
+
     @staticmethod
     def extract_aspects(question: str) -> List[str]:
         """
         Extrahiert Aspekte aus Multi-Teil-Fragen
-        
+
         Beispiel:
         "Welche Voraussetzungen, Fristen und Kosten..."
         → ["Voraussetzungen", "Fristen", "Kosten"]
         """
         aspects = []
         question_lower = question.lower()
-        
+
         keywords = {
-            "voraussetzungen", "anforderungen", "pflichten",
-            "fristen", "kosten", "gebühren", "unterlagen",
-            "ausnahmen", "unterschiede", "verfahren", "ablauf",
-            "rechtsmittel", "widerspruch"
+            "voraussetzungen",
+            "anforderungen",
+            "pflichten",
+            "fristen",
+            "kosten",
+            "gebühren",
+            "unterlagen",
+            "ausnahmen",
+            "unterschiede",
+            "verfahren",
+            "ablau",
+            "rechtsmittel",
+            "widerspruch",
         }
-        
+
         for keyword in keywords:
             if keyword in question_lower:
                 aspects.append(keyword.capitalize())
-        
+
         # Deduplizieren
         seen = set()
         unique = []
@@ -785,38 +775,34 @@ Los geht's:
             if aspect.lower() not in seen:
                 seen.add(aspect.lower())
                 unique.append(aspect)
-        
+
         return unique if unique else ["Hauptaspekt"]
-    
+
     @staticmethod
     def extract_ieee_citations(answer: str) -> List[str]:
         """Extrahiert [1], [2], [3] aus Antwort"""
-        citations = re.findall(r'\[(\d+)\]', answer)
+        citations = re.findall(r"\[(\d+)\]", answer)
         unique = sorted(set(int(c) for c in citations))
         return [str(c) for c in unique]
-    
+
     @staticmethod
     def extract_legal_references(answer: str) -> List[str]:
         """Extrahiert § 58 LBO BW, Art. 14 GG"""
         # Pattern für Paragraphen
-        paragraph_pattern = r'§\s*\d+[a-z]?\s*(?:Abs\.\s*\d+\s*)?(?:Satz\s*\d+\s*)?[A-ZÄÖÜ]{2,}(?:\s+[A-ZÄÖÜ]{2,})?'
+        paragraph_pattern = r"§\s*\d+[a-z]?\s*(?:Abs\.\s*\d+\s*)?(?:Satz\s*\d+\s*)?[A-ZÄÖÜ]{2,}(?:\s+[A-ZÄÖÜ]{2,})?"
         # Pattern für Artikel
-        article_pattern = r'Art\.\s*\d+[a-z]?\s*(?:Abs\.\s*\d+\s*)?[A-ZÄÖÜ]{2,}'
-        
+        article_pattern = r"Art\.\s*\d+[a-z]?\s*(?:Abs\.\s*\d+\s*)?[A-ZÄÖÜ]{2,}"
+
         paragraphs = re.findall(paragraph_pattern, answer)
         articles = re.findall(article_pattern, answer)
-        
+
         return paragraphs + articles
-    
+
     @staticmethod
-    def validate_answer(
-        answer: str,
-        min_citations: int = 3,
-        min_legal_refs: int = 2
-    ) -> Dict[str, Any]:
+    def validate_answer(answer: str, min_citations: int = 3, min_legal_refs: int = 2) -> Dict[str, Any]:
         """
         Validiert verwaltungsrechtliche Antwort-Qualität
-        
+
         Returns:
             {
                 "valid": bool,
@@ -827,24 +813,24 @@ Los geht's:
         """
         citations = VerwaltungsrechtPrompts.extract_ieee_citations(answer)
         legal_refs = VerwaltungsrechtPrompts.extract_legal_references(answer)
-        
+
         has_sources_section = "## Quellen" in answer
         has_followup_section = "## Nächste Schritte" in answer or "## Follow-up" in answer
-        
+
         issues = []
-        
+
         if len(citations) < min_citations:
             issues.append(f"⚠️ Zu wenig IEEE-Zitationen: {len(citations)}/{min_citations}")
-        
+
         if len(legal_refs) < min_legal_refs:
             issues.append(f"⚠️ Zu wenig Paragraphen-Referenzen: {len(legal_refs)}/{min_legal_refs}")
-        
+
         if not has_sources_section:
             issues.append("⚠️ Fehlende Section: ## Quellen")
-        
+
         if not has_followup_section:
             issues.append("⚠️ Fehlende Section: ## Nächste Schritte")
-        
+
         # Rating
         if len(issues) == 0:
             rating = "EXCELLENT"
@@ -854,7 +840,7 @@ Los geht's:
             rating = "NEEDS IMPROVEMENT"
         else:
             rating = "POOR"
-        
+
         return {
             "valid": len(issues) == 0,
             "rating": rating,
@@ -862,13 +848,13 @@ Los geht's:
                 "citation_count": len(citations),
                 "legal_reference_count": len(legal_refs),
                 "has_sources_section": has_sources_section,
-                "has_followup_section": has_followup_section
+                "has_followup_section": has_followup_section,
             },
             "issues": issues,
             "citations": citations,
-            "legal_references": legal_refs
+            "legal_references": legal_refs,
         }
-    
+
     FOLLOW_UP_PROMPT = """
 Generiere 4-5 verwaltungsrechtlich relevante Follow-up-Fragen basierend auf:
 

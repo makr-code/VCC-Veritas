@@ -8,18 +8,19 @@ Router werden in backend/backend.py gemountet.
 """
 
 from fastapi import APIRouter
-from .query_router import query_router
+
 from .agent_router import agent_router
-from .system_router import system_router
 from .office_api_router import router as office_router
+from .query_router import query_router
+from .system_router import system_router
 
 # API Info
 API_VERSION = "4.0.0"
 API_MODULES = [
-    "query",      # Query Processing
-    "agent",      # Agent System
-    "system",     # System Info
-    "office",     # Office Add-in Integration
+    "query",  # Query Processing
+    "agent",  # Agent System
+    "system",  # System Info
+    "office",  # Office Add-in Integration
 ]
 
 # Haupt-Router
@@ -34,18 +35,7 @@ api_router.include_router(office_router, tags=["Office Add-in"])
 
 def get_api_info():
     """Get API Information"""
-    return {
-        "version": API_VERSION,
-        "modules": API_MODULES,
-        "base_path": "/api",
-        "documentation": "/docs"
-    }
+    return {"version": API_VERSION, "modules": API_MODULES, "base_path": " / api", "documentation": " / docs"}
 
 
-__all__ = [
-    "api_router",
-    "get_api_info",
-    "query_router",
-    "agent_router",
-    "system_router"
-]
+__all__ = ["api_router", "get_api_info", "query_router", "agent_router", "system_router"]

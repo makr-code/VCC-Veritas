@@ -208,7 +208,7 @@ async def lifespan(app: FastAPI):
                 logger.info("✅ Certificate obtained successfully")
                 logger.info(f"   Serial: {cert_result.get('serial_number')}")
                 logger.info(f"   Valid until: {cert_result.get('valid_until')}")
-                logger.info(f"   Auto-renewal: Enabled")
+                logger.info("   Auto-renewal: Enabled")
 
                 # Store PKI client in app state
                 app.state.pki_client = pki_client
@@ -338,7 +338,7 @@ async def lifespan(app: FastAPI):
         app.state.pipeline = await get_intelligent_pipeline()
         logger.info("✅ Intelligent Pipeline initialisiert")
     except Exception as e:
-        logger.error(f"❌ KRITISCHER FEHLER: Pipeline konnte nicht initialisiert werden!")
+        logger.error("❌ KRITISCHER FEHLER: Pipeline konnte nicht initialisiert werden!")
         logger.error(f"   Fehler: {e}")
         raise RuntimeError("Pipeline initialization failed - cannot start VERITAS") from e
 
@@ -349,7 +349,7 @@ async def lifespan(app: FastAPI):
         app.state.streaming = create_progress_manager()
         logger.info("✅ Streaming Progress Manager initialisiert")
     except Exception as e:
-        logger.error(f"❌ KRITISCHER FEHLER: Streaming konnte nicht initialisiert werden!")
+        logger.error("❌ KRITISCHER FEHLER: Streaming konnte nicht initialisiert werden!")
         logger.error(f"   Fehler: {e}")
         raise RuntimeError("Streaming initialization failed - cannot start VERITAS") from e
 
@@ -362,7 +362,7 @@ async def lifespan(app: FastAPI):
         )
         logger.info("✅ Query Service initialisiert")
     except Exception as e:
-        logger.error(f"❌ KRITISCHER FEHLER: Query Service konnte nicht initialisiert werden!")
+        logger.error("❌ KRITISCHER FEHLER: Query Service konnte nicht initialisiert werden!")
         logger.error(f"   Fehler: {e}")
         raise RuntimeError("Query Service initialization failed - cannot start VERITAS") from e
 
@@ -379,11 +379,11 @@ async def lifespan(app: FastAPI):
     logger.info("=" * 80)
     logger.info("🔧 Components:")
     logger.info(f"   PKI: {'✅ Active (HTTPS)' if app.state.pki_enabled else 'ℹ️  Inactive (HTTP)'}")
-    logger.info(f"   UDS3: ✅ Active (ChromaDB)")
+    logger.info("   UDS3: ✅ Active (ChromaDB)")
     logger.info(f"   Pipeline: ✅ Active (14 Agents)")
     logger.info(f"   Streaming: ✅ Active")
     logger.info(f"   SSE: {'✅ Active' if SSE_AVAILABLE else 'ℹ️  Not available'}")
-    logger.info(f"   Query Service: ✅ Active")
+    logger.info("   Query Service: ✅ Active")
     logger.info("=" * 80)
 
     api_info = get_api_info()
@@ -570,9 +570,9 @@ async def root():
         "service": "VERITAS Unified Backend",
         "version": "4.0.0",
         "description": "Konsolidiertes Backend mit Unified Response Model",
-        "api": {"base": "/api", "version": api_info["version"], "modules": api_info["modules"]},
-        "documentation": {"swagger": "/docs", "redoc": "/redoc"},
-        "endpoints": {"query": "/api/query", "health": "/api/system/health", "info": "/api/system/info"},
+        "api": {"base": " / api", "version": api_info["version"], "modules": api_info["modules"]},
+        "documentation": {"swagger": " / docs", "redoc": " / redoc"},
+        "endpoints": {"query": " / api/query", "health": " / api/system / health", "info": " / api/system / info"},
         "features": {
             "unified_response": True,
             "ieee_citations": True,
@@ -665,7 +665,7 @@ if __name__ == "__main__":
                 ssl_keyfile = cert_paths.get("key")
                 ssl_certfile = cert_paths.get("cert")
                 ssl_ca_certs = cert_paths.get("ca")
-                logger.info(f"🔐 HTTPS enabled with PKI certificates")
+                logger.info("🔐 HTTPS enabled with PKI certificates")
                 logger.info(f"   Cert: {ssl_certfile}")
                 logger.info(f"   Key: {ssl_keyfile}")
                 logger.info(f"   CA: {ssl_ca_certs}")

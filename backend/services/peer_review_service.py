@@ -2,10 +2,22 @@
 Service für Multi-LLM Peer-Review Validation
 Führt parallele Reviews mit verschiedenen LLMs durch und berechnet Consensus.
 """
-from backend.models.peer_review import Review, PeerReviewResult, ReviewCriteria, ReviewRecommendation, ApprovalStatus, DEFAULT_REVIEW_CRITERIA, calculate_consensus_score, determine_approval_status, identify_conflicts
-from typing import List, Dict, Any
 import asyncio
 import json
+from typing import Any, Dict, List
+
+from backend.models.peer_review import (
+    DEFAULT_REVIEW_CRITERIA,
+    ApprovalStatus,
+    PeerReviewResult,
+    Review,
+    ReviewCriteria,
+    ReviewRecommendation,
+    calculate_consensus_score,
+    determine_approval_status,
+    identify_conflicts,
+)
+
 
 class PeerReviewValidationService:
     def __init__(self, llm_client, reviewer_models=None):
@@ -13,11 +25,13 @@ class PeerReviewValidationService:
         self.reviewer_models = reviewer_models or [
             ("llama3.1:8b", "Generalist, stark in Rechtsfragen"),
             ("mixtral:latest", "Multi-lingual, ausgewogen"),
-            ("gemma3:latest", "Faktenfokussiert, konservativ")
+            ("gemma3:latest", "Faktenfokussiert, konservativ"),
         ]
         self.prompt_path = "backend/prompts/peer_review_prompt.txt"
 
-    async def peer_review(self, query: str, final_response: str, agent_results: List[Dict[str, Any]], sources: List[str]) -> PeerReviewResult:
+    async def peer_review(
+        self, query: str, final_response: str, agent_results: List[Dict[str, Any]], sources: List[str]
+    ) -> PeerReviewResult:
         """Führt parallele Peer-Reviews mit mehreren LLMs durch"""
         prompt_base = self._build_prompt(query, final_response, agent_results, sources)
         tasks = [self._review_with_model(prompt_base, model, desc) for model, desc in self.reviewer_models]
@@ -35,7 +49,7 @@ class PeerReviewValidationService:
             conflicts=conflicts,
             final_verdict=self._build_final_verdict(reviews, approval_status),
             confidence=consensus,
-            recommendations=recommendations
+            recommendations=recommendations,
         )
 
     def _build_prompt(self, query, final_response, agent_results, sources):
@@ -50,7 +64,9 @@ class PeerReviewValidationService:
     async def _review_with_model(self, prompt, model, desc):
         # Simpler sync-Wrapper für LLM-Call (ggf. awaitable machen)
         loop = asyncio.get_event_loop()
-        response = await loop.run_in_executor(None, lambda: self.llm_client.generate(prompt, model=model, temperature=0.2, max_tokens=2048))
+        response = await loop.run_in_executor(
+            None, lambda: self.llm_client.generate(prompt, model=model, temperature=0.2, max_tokens=2048)
+        )
         data = json.loads(response)
         # Mapping auf Review-Dataclass
         criteria = {}
@@ -60,7 +76,7 @@ class PeerReviewValidationService:
                 weight=DEFAULT_REVIEW_CRITERIA.get(k, {}).get("weight", 0.2),
                 description=DEFAULT_REVIEW_CRITERIA.get(k, {}).get("description", ""),
                 score=v.get("score", 0.0),
-                comments=v.get("comments", "")
+                comments=v.get("comments", ""),
             )
         return Review(
             reviewer_model=model,

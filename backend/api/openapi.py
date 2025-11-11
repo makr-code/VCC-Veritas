@@ -18,7 +18,8 @@ Created: 2025-10-08
 Version: 1.0.0
 """
 
-from typing import Dict, Any, List, Optional
+from typing import Any, Dict, List, Optional
+
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 
@@ -26,17 +27,17 @@ from fastapi.openapi.utils import get_openapi
 def get_veritas_openapi_schema(app: FastAPI) -> Dict[str, Any]:
     """
     Generate complete OpenAPI schema for VERITAS API.
-    
+
     Args:
         app: FastAPI application instance
-        
+
     Returns:
         Complete OpenAPI 3.1.0 specification
     """
-    
+
     if app.openapi_schema:
         return app.openapi_schema
-    
+
     openapi_schema = get_openapi(
         title="VERITAS Framework API",
         version="1.0.0",
@@ -45,7 +46,7 @@ def get_veritas_openapi_schema(app: FastAPI) -> Dict[str, Any]:
         tags=_get_tags_metadata(),
         servers=_get_servers(),
     )
-    
+
     # Add custom components
     openapi_schema["components"] = {
         **openapi_schema.get("components", {}),
@@ -53,13 +54,13 @@ def get_veritas_openapi_schema(app: FastAPI) -> Dict[str, Any]:
         **_get_response_schemas(),
         **_get_example_schemas(),
     }
-    
+
     # Add security requirements
     openapi_schema["security"] = _get_global_security()
-    
+
     # Add webhooks (WebSocket documentation)
     openapi_schema["webhooks"] = _get_webhooks()
-    
+
     app.openapi_schema = openapi_schema
     return app.openapi_schema
 
@@ -69,15 +70,15 @@ def _get_api_description() -> str:
     return """
 # VERITAS Framework API
 
-**Version:** 1.0.0  
-**Environment:** Production  
+**Version:** 1.0.0
+**Environment:** Production
 **Base URL:** https://api.veritas.example.com
 
 ---
 
 ## Overview
 
-The VERITAS (Versatile Evidence-based Research and Intelligence Analysis System) Framework API 
+The VERITAS (Versatile Evidence-based Research and Intelligence Analysis System) Framework API
 provides a comprehensive set of endpoints for:
 
 - **Agent Orchestration**: Multi-agent execution with quality gates
@@ -130,7 +131,7 @@ provides a comprehensive set of endpoints for:
 # Login to get JWT token
 curl -X POST https://api.veritas.example.com/auth/login \\
   -H "Content-Type: application/json" \\
-  -d '{"username": "user@example.com", "password": "your-password"}'
+  -d '{"username": "user@example.com", "password": "your - password"}'
 
 # Response
 {
@@ -234,22 +235,16 @@ def _get_tags_metadata() -> List[Dict[str, Any]]:
         {
             "name": "Authentication",
             "description": "User authentication and token management (JWT, OAuth, API keys)",
-            "externalDocs": {
-                "description": "Authentication Guide",
-                "url": "https://docs.veritas.example.com/auth"
-            }
+            "externalDocs": {"description": "Authentication Guide", "url": "https://docs.veritas.example.com / auth"},
         },
         {
             "name": "Agents",
             "description": "Agent orchestration and execution endpoints",
-            "externalDocs": {
-                "description": "Agent System Documentation",
-                "url": "https://docs.veritas.example.com/agents"
-            }
+            "externalDocs": {"description": "Agent System Documentation", "url": "https://docs.veritas.example.com / agents"},
         },
         {
             "name": "RAG",
-            "description": "Retrieval-Augmented Generation endpoints for context-aware queries",
+            "description": "Retrieval - Augmented Generation endpoints for context - aware queries",
         },
         {
             "name": "Quality",
@@ -257,7 +252,7 @@ def _get_tags_metadata() -> List[Dict[str, Any]]:
         },
         {
             "name": "Streaming",
-            "description": "WebSocket streaming for real-time updates and agent progress",
+            "description": "WebSocket streaming for real - time updates and agent progress",
         },
         {
             "name": "Monitoring",
@@ -282,7 +277,7 @@ def _get_servers() -> List[Dict[str, Any]]:
             "description": "Production Server",
         },
         {
-            "url": "https://staging-api.veritas.example.com",
+            "url": "https://staging - api.veritas.example.com",
             "description": "Staging Server",
         },
         {
@@ -300,21 +295,21 @@ def _get_security_schemes() -> Dict[str, Any]:
                 "type": "http",
                 "scheme": "bearer",
                 "bearerFormat": "JWT",
-                "description": "JWT token obtained from /auth/login endpoint. Include in Authorization header as 'Bearer {token}'",
+                "description": "JWT token obtained from /auth / login endpoint. Include in Authorization header as 'Bearer {token}'",
             },
             "ApiKeyAuth": {
                 "type": "apiKey",
                 "in": "header",
-                "name": "X-API-Key",
-                "description": "API key for service-to-service authentication. Obtain from /auth/api-keys endpoint",
+                "name": "X - API-Key",
+                "description": "API key for service - to-service authentication. Obtain from /auth / api-keys endpoint",
             },
             "OAuth2": {
                 "type": "oauth2",
                 "flows": {
                     "authorizationCode": {
-                        "authorizationUrl": "https://api.veritas.example.com/oauth/authorize",
-                        "tokenUrl": "https://api.veritas.example.com/oauth/token",
-                        "refreshUrl": "https://api.veritas.example.com/oauth/refresh",
+                        "authorizationUrl": "https://api.veritas.example.com / oauth/authorize",
+                        "tokenUrl": "https://api.veritas.example.com / oauth/token",
+                        "refreshUrl": "https://api.veritas.example.com / oauth/refresh",
                         "scopes": {
                             "read": "Read access to resources",
                             "write": "Write access to resources",
@@ -324,7 +319,7 @@ def _get_security_schemes() -> Dict[str, Any]:
                             "quality:read": "Read quality metrics",
                             "quality:write": "Update quality settings",
                             "monitoring:read": "Read monitoring data",
-                        }
+                        },
                     }
                 },
                 "description": "OAuth 2.0 authorization code flow for third-party integrations",
@@ -343,37 +338,33 @@ def _get_response_schemas() -> Dict[str, Any]:
                     "error": {
                         "type": "object",
                         "properties": {
-                            "code": {
-                                "type": "string",
-                                "description": "Error code",
-                                "example": "VALIDATION_ERROR"
-                            },
+                            "code": {"type": "string", "description": "Error code", "example": "VALIDATION_ERROR"},
                             "message": {
                                 "type": "string",
-                                "description": "Human-readable error message",
-                                "example": "Invalid request parameters"
+                                "description": "Human - readable error message",
+                                "example": "Invalid request parameters",
                             },
                             "details": {
                                 "type": "object",
                                 "description": "Additional error details",
-                                "additionalProperties": True
+                                "additionalProperties": True,
                             },
                             "timestamp": {
                                 "type": "string",
-                                "format": "date-time",
+                                "format": "date - time",
                                 "description": "Error timestamp (ISO 8601)",
-                                "example": "2025-10-08T14:30:00Z"
+                                "example": "2025 - 10-08T14:30:00Z",
                             },
                             "request_id": {
                                 "type": "string",
                                 "description": "Unique request identifier for tracking",
-                                "example": "req_abc123xyz"
-                            }
+                                "example": "req_abc123xyz",
+                            },
                         },
-                        "required": ["code", "message", "timestamp"]
+                        "required": ["code", "message", "timestamp"],
                     }
                 },
-                "required": ["error"]
+                "required": ["error"],
             },
             "HealthCheck": {
                 "type": "object",
@@ -382,18 +373,10 @@ def _get_response_schemas() -> Dict[str, Any]:
                         "type": "string",
                         "enum": ["healthy", "degraded", "unhealthy"],
                         "description": "Overall health status",
-                        "example": "healthy"
+                        "example": "healthy",
                     },
-                    "version": {
-                        "type": "string",
-                        "description": "API version",
-                        "example": "1.0.0"
-                    },
-                    "timestamp": {
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2025-10-08T14:30:00Z"
-                    },
+                    "version": {"type": "string", "description": "API version", "example": "1.0.0"},
+                    "timestamp": {"type": "string", "format": "date - time", "example": "2025 - 10-08T14:30:00Z"},
                     "checks": {
                         "type": "object",
                         "description": "Individual component health checks",
@@ -401,8 +384,8 @@ def _get_response_schemas() -> Dict[str, Any]:
                             "database": {"type": "boolean"},
                             "redis": {"type": "boolean"},
                             "ollama": {"type": "boolean"},
-                            "agents": {"type": "boolean"}
-                        }
+                            "agents": {"type": "boolean"},
+                        },
                     },
                     "metrics": {
                         "type": "object",
@@ -410,56 +393,43 @@ def _get_response_schemas() -> Dict[str, Any]:
                         "properties": {
                             "uptime_seconds": {"type": "number"},
                             "request_count": {"type": "integer"},
-                            "error_rate": {"type": "number"}
-                        }
-                    }
+                            "error_rate": {"type": "number"},
+                        },
+                    },
                 },
-                "required": ["status", "version", "timestamp"]
+                "required": ["status", "version", "timestamp"],
             },
             "AgentExecutionPlan": {
                 "type": "object",
                 "properties": {
-                    "plan_id": {
-                        "type": "string",
-                        "description": "Unique plan identifier",
-                        "example": "plan_001"
-                    },
+                    "plan_id": {"type": "string", "description": "Unique plan identifier", "example": "plan_001"},
                     "agents": {
                         "type": "array",
                         "items": {"type": "string"},
                         "description": "List of agent types to execute",
-                        "example": ["financial", "environmental", "social"]
+                        "example": ["financial", "environmental", "social"],
                     },
                     "query": {
                         "type": "string",
                         "description": "User query or task description",
-                        "example": "Analyze sustainability impact"
+                        "example": "Analyze sustainability impact",
                     },
                     "context": {
                         "type": "object",
                         "description": "Additional context for execution",
-                        "additionalProperties": True
+                        "additionalProperties": True,
                     },
-                    "streaming": {
-                        "type": "boolean",
-                        "description": "Enable real-time streaming",
-                        "default": False
-                    },
+                    "streaming": {"type": "boolean", "description": "Enable real - time streaming", "default": False},
                     "quality_gates": {
                         "type": "object",
                         "description": "Quality gate thresholds",
                         "properties": {
-                            "min_score": {
-                                "type": "number",
-                                "minimum": 0,
-                                "maximum": 1,
-                                "default": 0.6
-                            },
-                            "require_review": {"type": "boolean", "default": False}
-                        }
-                    }
+                            "min_score": {"type": "number", "minimum": 0, "maximum": 1, "default": 0.6},
+                            "require_review": {"type": "boolean", "default": False},
+                        },
+                    },
                 },
-                "required": ["plan_id", "agents", "query"]
+                "required": ["plan_id", "agents", "query"],
             },
             "AgentExecutionResult": {
                 "type": "object",
@@ -468,13 +438,9 @@ def _get_response_schemas() -> Dict[str, Any]:
                     "status": {
                         "type": "string",
                         "enum": ["pending", "running", "completed", "failed", "cancelled"],
-                        "example": "completed"
+                        "example": "completed",
                     },
-                    "result": {
-                        "type": "object",
-                        "description": "Execution results",
-                        "additionalProperties": True
-                    },
+                    "result": {"type": "object", "description": "Execution results", "additionalProperties": True},
                     "agents": {
                         "type": "array",
                         "items": {
@@ -483,24 +449,16 @@ def _get_response_schemas() -> Dict[str, Any]:
                                 "agent_id": {"type": "string"},
                                 "agent_type": {"type": "string"},
                                 "status": {"type": "string"},
-                                "result": {"type": "object"}
-                            }
-                        }
+                                "result": {"type": "object"},
+                            },
+                        },
                     },
-                    "quality_score": {
-                        "type": "number",
-                        "minimum": 0,
-                        "maximum": 1,
-                        "description": "Overall quality score"
-                    },
-                    "execution_time": {
-                        "type": "number",
-                        "description": "Execution time in seconds"
-                    },
-                    "created_at": {"type": "string", "format": "date-time"},
-                    "completed_at": {"type": "string", "format": "date-time"}
+                    "quality_score": {"type": "number", "minimum": 0, "maximum": 1, "description": "Overall quality score"},
+                    "execution_time": {"type": "number", "description": "Execution time in seconds"},
+                    "created_at": {"type": "string", "format": "date - time"},
+                    "completed_at": {"type": "string", "format": "date - time"},
                 },
-                "required": ["plan_id", "status"]
+                "required": ["plan_id", "status"],
             },
             "StreamEvent": {
                 "type": "object",
@@ -517,22 +475,18 @@ def _get_response_schemas() -> Dict[str, Any]:
                             "QUALITY_CHECK",
                             "REVIEW_REQUIRED",
                             "METRICS_UPDATE",
-                            "LOG_MESSAGE"
+                            "LOG_MESSAGE",
                         ],
-                        "example": "STEP_COMPLETED"
+                        "example": "STEP_COMPLETED",
                     },
                     "plan_id": {"type": "string"},
                     "step_id": {"type": "string", "nullable": True},
                     "agent_id": {"type": "string", "nullable": True},
-                    "timestamp": {"type": "string", "format": "date-time"},
-                    "data": {
-                        "type": "object",
-                        "description": "Event-specific data",
-                        "additionalProperties": True
-                    },
-                    "message": {"type": "string", "nullable": True}
+                    "timestamp": {"type": "string", "format": "date - time"},
+                    "data": {"type": "object", "description": "Event - specific data", "additionalProperties": True},
+                    "message": {"type": "string", "nullable": True},
                 },
-                "required": ["event_type", "plan_id", "timestamp"]
+                "required": ["event_type", "plan_id", "timestamp"],
             },
             "QualityScore": {
                 "type": "object",
@@ -541,8 +495,8 @@ def _get_response_schemas() -> Dict[str, Any]:
                         "type": "number",
                         "minimum": 0,
                         "maximum": 1,
-                        "description": "Quality score (0-1)",
-                        "example": 0.85
+                        "description": "Quality score (0 - 1)",
+                        "example": 0.85,
                     },
                     "metrics": {
                         "type": "object",
@@ -550,24 +504,18 @@ def _get_response_schemas() -> Dict[str, Any]:
                             "relevance": {"type": "number"},
                             "coherence": {"type": "number"},
                             "completeness": {"type": "number"},
-                            "accuracy": {"type": "number"}
-                        }
+                            "accuracy": {"type": "number"},
+                        },
                     },
-                    "passed": {
-                        "type": "boolean",
-                        "description": "Whether quality gate passed"
-                    },
-                    "threshold": {
-                        "type": "number",
-                        "description": "Quality gate threshold"
-                    }
+                    "passed": {"type": "boolean", "description": "Whether quality gate passed"},
+                    "threshold": {"type": "number", "description": "Quality gate threshold"},
                 },
-                "required": ["score", "passed"]
+                "required": ["score", "passed"],
             },
             "MetricsSnapshot": {
                 "type": "object",
                 "properties": {
-                    "timestamp": {"type": "string", "format": "date-time"},
+                    "timestamp": {"type": "string", "format": "date - time"},
                     "agent_metrics": {
                         "type": "object",
                         "additionalProperties": {
@@ -577,9 +525,9 @@ def _get_response_schemas() -> Dict[str, Any]:
                                 "successful_executions": {"type": "integer"},
                                 "failed_executions": {"type": "integer"},
                                 "average_duration": {"type": "number"},
-                                "average_quality": {"type": "number"}
-                            }
-                        }
+                                "average_quality": {"type": "number"},
+                            },
+                        },
                     },
                     "system_metrics": {
                         "type": "object",
@@ -587,12 +535,12 @@ def _get_response_schemas() -> Dict[str, Any]:
                             "cpu_usage": {"type": "number"},
                             "memory_usage": {"type": "number"},
                             "active_agents": {"type": "integer"},
-                            "queue_length": {"type": "integer"}
-                        }
-                    }
+                            "queue_length": {"type": "integer"},
+                        },
+                    },
                 },
-                "required": ["timestamp"]
-            }
+                "required": ["timestamp"],
+            },
         }
     }
 
@@ -603,10 +551,7 @@ def _get_example_schemas() -> Dict[str, Any]:
         "examples": {
             "LoginRequest": {
                 "summary": "Login with credentials",
-                "value": {
-                    "username": "user@example.com",
-                    "password": "your-secure-password"
-                }
+                "value": {"username": "user@example.com", "password": "your - secure-password"},
             },
             "LoginResponse": {
                 "summary": "Successful login",
@@ -619,12 +564,12 @@ def _get_example_schemas() -> Dict[str, Any]:
                         "id": "user_123",
                         "username": "user@example.com",
                         "role": "user",
-                        "permissions": ["read", "write"]
-                    }
-                }
+                        "permissions": ["read", "write"],
+                    },
+                },
             },
             "AgentExecutionRequest": {
-                "summary": "Execute multi-agent plan",
+                "summary": "Execute multi - agent plan",
                 "value": {
                     "plan_id": "plan_sustainability_001",
                     "agents": ["financial", "environmental", "social"],
@@ -632,14 +577,11 @@ def _get_example_schemas() -> Dict[str, Any]:
                     "context": {
                         "company": "Green Energy Corp",
                         "year": 2025,
-                        "focus_areas": ["carbon_emissions", "roi", "community_impact"]
+                        "focus_areas": ["carbon_emissions", "roi", "community_impact"],
                     },
                     "streaming": True,
-                    "quality_gates": {
-                        "min_score": 0.7,
-                        "require_review": False
-                    }
-                }
+                    "quality_gates": {"min_score": 0.7, "require_review": False},
+                },
             },
             "AgentExecutionResponse": {
                 "summary": "Execution result",
@@ -649,48 +591,21 @@ def _get_example_schemas() -> Dict[str, Any]:
                     "result": {
                         "summary": "Comprehensive sustainability analysis completed",
                         "findings": {
-                            "financial": {
-                                "roi": 0.15,
-                                "payback_period": 7.2,
-                                "risk_level": "moderate"
-                            },
-                            "environmental": {
-                                "carbon_reduction": 45000,
-                                "renewable_percentage": 85,
-                                "impact_score": 0.92
-                            },
-                            "social": {
-                                "jobs_created": 150,
-                                "community_benefit": 0.88,
-                                "public_support": 0.76
-                            }
-                        }
+                            "financial": {"roi": 0.15, "payback_period": 7.2, "risk_level": "moderate"},
+                            "environmental": {"carbon_reduction": 45000, "renewable_percentage": 85, "impact_score": 0.92},
+                            "social": {"jobs_created": 150, "community_benefit": 0.88, "public_support": 0.76},
+                        },
                     },
                     "agents": [
-                        {
-                            "agent_id": "fin_001",
-                            "agent_type": "financial",
-                            "status": "completed",
-                            "quality_score": 0.89
-                        },
-                        {
-                            "agent_id": "env_001",
-                            "agent_type": "environmental",
-                            "status": "completed",
-                            "quality_score": 0.92
-                        },
-                        {
-                            "agent_id": "soc_001",
-                            "agent_type": "social",
-                            "status": "completed",
-                            "quality_score": 0.78
-                        }
+                        {"agent_id": "fin_001", "agent_type": "financial", "status": "completed", "quality_score": 0.89},
+                        {"agent_id": "env_001", "agent_type": "environmental", "status": "completed", "quality_score": 0.92},
+                        {"agent_id": "soc_001", "agent_type": "social", "status": "completed", "quality_score": 0.78},
                     ],
                     "quality_score": 0.86,
                     "execution_time": 12.45,
                     "created_at": "2025-10-08T14:30:00Z",
-                    "completed_at": "2025-10-08T14:30:12Z"
-                }
+                    "completed_at": "2025-10-08T14:30:12Z",
+                },
             },
             "StreamEventExample": {
                 "summary": "WebSocket stream event",
@@ -699,36 +614,20 @@ def _get_example_schemas() -> Dict[str, Any]:
                     "plan_id": "plan_sustainability_001",
                     "step_id": "step_financial_analysis",
                     "agent_id": "fin_001",
-                    "timestamp": "2025-10-08T14:30:05Z",
-                    "data": {
-                        "result": {
-                            "roi": 0.15,
-                            "confidence": 0.89
-                        },
-                        "quality_score": 0.89,
-                        "duration": 5.2
-                    },
-                    "message": "Financial analysis completed successfully"
-                }
+                    "timestamp": "2025 - 10-08T14:30:05Z",
+                    "data": {"result": {"roi": 0.15, "confidence": 0.89}, "quality_score": 0.89, "duration": 5.2},
+                    "message": "Financial analysis completed successfully",
+                },
             },
             "HealthCheckResponse": {
                 "summary": "Healthy system",
                 "value": {
                     "status": "healthy",
                     "version": "1.0.0",
-                    "timestamp": "2025-10-08T14:30:00Z",
-                    "checks": {
-                        "database": True,
-                        "redis": True,
-                        "ollama": True,
-                        "agents": True
-                    },
-                    "metrics": {
-                        "uptime_seconds": 86400,
-                        "request_count": 15420,
-                        "error_rate": 0.002
-                    }
-                }
+                    "timestamp": "2025 - 10-08T14:30:00Z",
+                    "checks": {"database": True, "redis": True, "ollama": True, "agents": True},
+                    "metrics": {"uptime_seconds": 86400, "request_count": 15420, "error_rate": 0.002},
+                },
             },
             "ErrorResponse": {
                 "summary": "Validation error",
@@ -736,15 +635,12 @@ def _get_example_schemas() -> Dict[str, Any]:
                     "error": {
                         "code": "VALIDATION_ERROR",
                         "message": "Invalid request parameters",
-                        "details": {
-                            "field": "agents",
-                            "reason": "At least one agent must be specified"
-                        },
+                        "details": {"field": "agents", "reason": "At least one agent must be specified"},
                         "timestamp": "2025-10-08T14:30:00Z",
-                        "request_id": "req_abc123xyz"
+                        "request_id": "req_abc123xyz",
                     }
-                }
-            }
+                },
+            },
         }
     }
 
@@ -764,11 +660,11 @@ def _get_webhooks() -> Dict[str, Any]:
             "post": {
                 "summary": "WebSocket: Agent Execution Stream",
                 "description": """
-Real-time WebSocket streaming for agent execution progress.
+Real - time WebSocket streaming for agent execution progress.
 
 **Connection URL:**
 ```
-wss://api.veritas.example.com/api/v1/streaming/ws/{client_id}?plan_id={plan_id}
+wss://api.veritas.example.com / api/v1 / streaming/ws / {client_id}?plan_id={plan_id}
 ```
 
 **Event Types:**
@@ -776,7 +672,7 @@ wss://api.veritas.example.com/api/v1/streaming/ws/{client_id}?plan_id={plan_id}
 - `PLAN_COMPLETED`: Execution plan completed
 - `PLAN_FAILED`: Execution plan failed
 - `STEP_STARTED`: Step started
-- `STEP_COMPLETED`: Step completed  
+- `STEP_COMPLETED`: Step completed
 - `STEP_FAILED`: Step failed
 - `QUALITY_CHECK`: Quality gate check
 - `REVIEW_REQUIRED`: Manual review required
@@ -794,7 +690,7 @@ ws.onopen = () => {
 ws.onmessage = (event) => {
   const data = JSON.parse(event.data);
   console.log(`Event: ${data.event_type}`, data);
-  
+
   switch(data.event_type) {
     case 'STEP_COMPLETED':
       console.log(`Step ${data.step_id} completed`);
@@ -826,14 +722,14 @@ import json
 
 async def stream_execution():
     uri = "wss://api.veritas.example.com/api/v1/streaming/ws/client123?plan_id=plan_001"
-    
+
     async with websockets.connect(uri) as websocket:
         print("Connected to execution stream")
-        
+
         async for message in websocket:
             data = json.loads(message)
             print(f"Event: {data['event_type']}", data)
-            
+
             if data['event_type'] == 'PLAN_COMPLETED':
                 print("Execution completed!")
                 break
@@ -841,23 +737,18 @@ async def stream_execution():
 asyncio.run(stream_execution())
 ```
                 """,
-                "requestBody": {
-                    "description": "No request body - connection via WebSocket URL",
-                    "required": False
-                },
+                "requestBody": {"description": "No request body - connection via WebSocket URL", "required": False},
                 "responses": {
                     "200": {
                         "description": "Stream event",
                         "content": {
-                            "application/json": {
-                                "schema": {"$ref": "#/components/schemas/StreamEvent"},
-                                "examples": {
-                                    "stepCompleted": {"$ref": "#/components/examples/StreamEventExample"}
-                                }
+                            "application / json": {
+                                "schema": {"$re": "# / components/schemas / StreamEvent"},
+                                "examples": {"stepCompleted": {"$re": "# / components/examples / StreamEventExample"}},
                             }
-                        }
+                        },
                     }
-                }
+                },
             }
         }
     }
@@ -866,47 +757,47 @@ asyncio.run(stream_execution())
 def customize_openapi(app: FastAPI):
     """
     Customize FastAPI app with enhanced OpenAPI documentation.
-    
+
     Args:
         app: FastAPI application instance
     """
-    
+
     def custom_openapi():
         return get_veritas_openapi_schema(app)
-    
+
     app.openapi = custom_openapi
-    
+
     # Customize Swagger UI
     app.swagger_ui_init_oauth = {
-        "clientId": "veritas-swagger-ui",
+        "clientId": "veritas - swagger-ui",
         "appName": "VERITAS API Explorer",
         "usePkceWithAuthorizationCodeGrant": True,
     }
-    
+
     return app
 
 
 # Example usage
 if __name__ == "__main__":
     from fastapi import FastAPI
-    
+
     app = FastAPI()
-    
+
     # Add some example endpoints
     @app.get("/health", tags=["Monitoring"])
     async def health():
         return {"status": "healthy"}
-    
+
     @app.post("/agents/execute", tags=["Agents"])
     async def execute_agents():
         return {"status": "executing"}
-    
+
     # Customize OpenAPI
     customize_openapi(app)
-    
+
     # Generate schema
     schema = get_veritas_openapi_schema(app)
-    
+
     print("OpenAPI Schema Generated:")
     print(f"- Title: {schema['info']['title']}")
     print(f"- Version: {schema['info']['version']}")

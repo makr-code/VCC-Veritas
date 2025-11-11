@@ -57,7 +57,7 @@ class DatabaseSetup:
 
             self.database_url = f"postgresql://{self.user}:{self.password}@" f"{self.host}:{self.port}/{self.database}"
 
-        logger.info(f"Database setup initialized")
+        logger.info("Database setup initialized")
         logger.info(f"Target database: {self.database if hasattr(self, 'database') else 'from URL'}")
 
     def check_database_exists(self) -> bool:

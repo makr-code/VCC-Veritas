@@ -6,7 +6,7 @@ Ein spezialisierter Agent für technische Normen, Vorschriften und Standards im 
 
 Der **Technical Standards Agent** bietet umfassende Informationen zu technischen Normen und Vorschriften:
 - **ISO Standards** - International Organization for Standardization
-- **DIN Normen** - Deutsches Institut für Normung  
+- **DIN Normen** - Deutsches Institut für Normung
 - **VDE Vorschriften** - Verband der Elektrotechnik
 - **EN Standards** - Europäische Normen
 - **IEC Standards** - International Electrotechnical Commission
@@ -21,7 +21,7 @@ Tests run: 11/11 ✅ 100% Success Rate
 ├── ISO Standard Search ✅
 ├── VDE Standard Search ✅
 ├── Organization Search ✅
-├── Category Search ✅  
+├── Category Search ✅
 ├── Standard Number Recognition ✅ 100% Accuracy
 ├── Compliance Assessment ✅ 85% Mock Compliance
 ├── Requirements Analysis ✅
@@ -48,7 +48,7 @@ Organizations: ISO, DIN, VDE, IEC, IEEE, OSHA
 - **EN** - Europäische Normen
 - **CEN** - European Committee for Standardization
 
-### Deutsche Standards  
+### Deutsche Standards
 - **DIN** - Deutsches Institut für Normung
 - **VDE** - Verband der Elektrotechnik
 
@@ -98,7 +98,7 @@ request = StandardsSearchRequest(
 # Synchron
 response = agent.search_standards(request)
 
-# Asynchron  
+# Asynchron
 response = await agent.search_standards_async(request)
 
 # Ergebnisse verarbeiten
@@ -148,14 +148,14 @@ response = agent.search_standards(request)
 
 if response.standards:
     standard = response.standards[0]
-    
+
     # Sicherheitsanforderungen analysieren
-    safety_requirements = [req for req in standard.requirements 
+    safety_requirements = [req for req in standard.requirements
                          if "sicherheit" in req.title.lower() or "schutz" in req.title.lower()]
-    
+
     print(f"⚡ {standard.identifier.standard_number}")
     print(f"Sicherheitsanforderungen: {len(safety_requirements)}")
-    
+
     for req in safety_requirements:
         print(f"   - {req.section}: {req.title}")
         print(f"     Compliance: {req.compliance_level.value}")
@@ -207,11 +207,11 @@ response = agent.search_standards(StandardsSearchRequest(
 
 standard = response.standards[0]
 
-# Anforderungen nach Compliance-Level analysieren  
+# Anforderungen nach Compliance-Level analysieren
 mandatory_reqs = standard.get_mandatory_requirements()
-recommended_reqs = [req for req in standard.requirements 
+recommended_reqs = [req for req in standard.requirements
                   if req.compliance_level == ComplianceLevel.RECOMMENDED]
-optional_reqs = [req for req in standard.requirements 
+optional_reqs = [req for req in standard.requirements
                if req.compliance_level == ComplianceLevel.OPTIONAL]
 
 print(f"📋 Anforderungsstruktur für {standard.identifier.standard_number}:")
@@ -242,7 +242,7 @@ print(f"\n📑 Anforderungen nach Abschnitten:")
 for section, reqs in sections.items():
     mandatory_count = len([r for r in reqs if r.compliance_level == ComplianceLevel.MANDATORY])
     print(f"   {section}: {len(reqs)} Anforderungen ({mandatory_count} verpflichtend)")
-    
+
     # Erste Anforderung des Abschnitts zeigen
     if reqs:
         req = reqs[0]
@@ -269,14 +269,14 @@ response = agent.search_standards(request)
 
 if response.compliance_assessment:
     assessment = response.compliance_assessment
-    
+
     print(f"🎯 Compliance-Bewertung: {assessment.target_standard}")
     print(f"   Gesamtcompliance: {assessment.overall_compliance_level:.1%}")
     print(f"   Konform: {assessment.compliant_requirements}/{assessment.total_requirements}")
     print(f"   Nicht konform: {assessment.non_compliant_requirements}")
     print(f"   Teilweise: {assessment.partial_compliance}")
     print(f"   Zertifizierungsbereitschaft: {assessment.certification_readiness:.1%}")
-    
+
     # Compliance-Gaps analysieren
     if assessment.compliance_gaps:
         print(f"\n⚠️ Identifizierte Gaps: {len(assessment.compliance_gaps)}")
@@ -284,13 +284,13 @@ if response.compliance_assessment:
             print(f"   - {gap['gap_description']}")
             print(f"     Priorität: {gap['priority']}")
             print(f"     Aufwand: {gap['estimated_effort_days']} Tage")
-    
+
     # Empfehlungen
     if assessment.recommendations:
         print(f"\n💡 Empfehlungen:")
         for rec in assessment.recommendations:
             print(f"   - {rec}")
-    
+
     # Kostenabschätzung
     if assessment.cost_estimate:
         print(f"\n💰 Kostenabschätzung: {assessment.cost_estimate}")
@@ -301,7 +301,7 @@ if response.compliance_assessment:
 ```python
 def plan_certification(assessment, standard):
     """Zertifizierungsplan basierend auf Gap-Analyse"""
-    
+
     plan = {
         "certification_readiness": assessment.certification_readiness,
         "estimated_timeline_months": 6,  # Standard-Zeitrahmen
@@ -310,23 +310,23 @@ def plan_certification(assessment, standard):
         "required_documentation": [],
         "test_requirements": []
     }
-    
+
     # Dokumentationsanforderungen sammeln
     for req in standard.get_mandatory_requirements():
         if req.documentation_required:
             plan["required_documentation"].extend(req.documentation_required)
-    
+
     # Prüfanforderungen sammeln
     for req in standard.requirements:
         if req.test_methods:
             plan["test_requirements"].extend(req.test_methods)
-    
+
     # Timeline anpassen basierend auf Compliance-Level
     if assessment.certification_readiness > 0.8:
         plan["estimated_timeline_months"] = 3
     elif assessment.certification_readiness < 0.5:
         plan["estimated_timeline_months"] = 12
-    
+
     return plan
 
 # Beispiel-Verwendung
@@ -355,7 +355,7 @@ standards_response = await standards_agent.search_standards_async(standards_requ
 # 2. Chemische Daten mit Standard-Anforderungen abgleichen
 if standards_response.standards:
     safety_standard = standards_response.standards[0]
-    
+
     # Chemical Data Agent für spezifische Stoffe
     chemical_request = ChemicalDataRequest(
         query_id="benzene-safety-check",
@@ -364,23 +364,23 @@ if standards_response.standards:
         include_ghs_classification=True,
         include_exposure_limits=True
     )
-    
+
     chemical_response = await chemical_agent.query_chemical_data_async(chemical_request)
-    
+
     if chemical_response.success:
         substance = chemical_response.substances[0]
-        
+
         # Standard-Anforderungen mit chemischen Eigenschaften abgleichen
         print(f"🧪 Compliance-Check: {substance.primary_name}")
         print(f"Standard: {safety_standard.identifier.standard_number}")
-        
+
         # GHS-Klassifikation vs. Standard-Anforderungen
         if substance.is_hazardous():
             hazard_requirements = [req for req in safety_standard.requirements
                                  if "hazard" in req.description.lower()]
-            
+
             print(f"   Gefährlicher Stoff: {len(hazard_requirements)} relevante Anforderungen")
-            
+
             # Grenzwerte prüfen
             for limit in substance.exposure_limits:
                 print(f"   {limit.limit_type}: {limit.value} {limit.unit}")
@@ -404,12 +404,12 @@ if atmospheric_standards.standards:
     for standard in atmospheric_standards.standards:
         # Anforderungen für Messverfahren
         measurement_reqs = [req for req in standard.requirements
-                          if "measurement" in req.description.lower() or 
+                          if "measurement" in req.description.lower() or
                              "monitoring" in req.description.lower()]
-        
+
         print(f"📊 {standard.identifier.standard_number}")
         print(f"   Messverfahren: {len(measurement_reqs)} Anforderungen")
-        
+
         # Integration mit Atmospheric Flow Calculations
         for req in measurement_reqs[:2]:
             print(f"   - {req.title}")
@@ -432,23 +432,23 @@ config = TechnicalStandardsConfig(
         StandardsOrganization.VDE,
         StandardsOrganization.IEC
     ],
-    
+
     # Cache-Einstellungen
     cache_enabled=True,
     cache_ttl_seconds=14400,  # 4 Stunden (Standards ändern sich selten)
     max_cache_size=2000,
-    
+
     # Performance
     max_concurrent_requests=3,
     request_timeout_seconds=45,
     max_retries=2,
     rate_limit_delay=1.0,     # Respektiere API-Limits
-    
+
     # Qualität
     min_relevance_threshold=0.4,
     require_current_standards=True,
     verify_organization=True,
-    
+
     # Compliance
     compliance_threshold=0.8,
     assessment_detail_level="detailed"
@@ -467,7 +467,7 @@ config = TechnicalStandardsConfig(
     vde_base_url="https://www.vde.com/api/v2",
     iec_base_url="https://webstore.iec.ch/api/standards",
     ieee_base_url="https://standards.ieee.org/api/v1",
-    
+
     # Authentifizierung (falls erforderlich)
     api_keys={
         "iso": "your-iso-api-key",
@@ -486,30 +486,30 @@ class TechnicalStandard:
     standard_id: str
     identifier: StandardIdentifier
     status: StandardStatus
-    
-    # Basis-Informationen  
+
+    # Basis-Informationen
     publication_date: str
     last_review_date: str
     next_review_date: str
-    
+
     # Inhalt
     abstract: str
     scope_and_application: StandardApplication
     requirements: List[StandardRequirement]
-    
+
     # Struktur
     sections: List[str]
     annexes: List[str]
     page_count: int
-    
+
     # Beziehungen
     supersedes: List[str]
     related_standards: List[str]
     referenced_by: List[str]
-    
+
     # Zertifizierung
     certification_info: Optional[CertificationInfo]
-    
+
     # Metadaten
     categories: List[StandardCategory]
     keywords: List[str]
@@ -519,20 +519,20 @@ class TechnicalStandard:
 ### StandardRequirement
 
 ```python
-@dataclass  
+@dataclass
 class StandardRequirement:
     requirement_id: str
     section: str                    # "4.1", "5.2.3"
     title: str
     description: str
     compliance_level: ComplianceLevel
-    
+
     # Verification
     test_methods: List[str]         # ["Isolationsprüfung", "SIL-Bewertung"]
     acceptance_criteria: str        # "Isolationswiderstand > 1 MΩ"
     documentation_required: List[str] # ["Prüfprotokoll", "Zertifikat"]
-    
-    # References  
+
+    # References
     referenced_standards: List[str]  # Verwandte Normen
     related_requirements: List[str]  # Abhängige Anforderungen
 ```
@@ -545,19 +545,19 @@ class ComplianceAssessment:
     assessment_id: str
     target_standard: str
     assessment_date: str
-    
+
     # Bewertungsergebnis
     overall_compliance_level: float  # 0.0-1.0
     compliant_requirements: int
     non_compliant_requirements: int
     partial_compliance: int
     total_requirements: int
-    
+
     # Analyse
     compliance_gaps: List[Dict]      # Detaillierte Gap-Liste
     recommendations: List[str]       # Handlungsempfehlungen
     priority_actions: List[str]      # Sofortmaßnahmen
-    
+
     # Zertifizierung
     certification_readiness: float  # 0.0-1.0
     estimated_effort_days: int
@@ -588,7 +588,7 @@ for std_number in standard_numbers:
 print(f"Batch-Analyse: {len(results)} Standards verarbeitet")
 
 # Management-System-Standards identifizieren
-management_standards = [std for std in results 
+management_standards = [std for std in results
                        if "management" in std.identifier.full_title.lower()]
 print(f"Management-Standards: {len(management_standards)}")
 ```
@@ -598,19 +598,19 @@ print(f"Management-Standards: {len(management_standards)}")
 ```python
 def analyze_standards_hierarchy(standards):
     """Analysiere Beziehungen zwischen Standards"""
-    
+
     hierarchy = {
         "root_standards": [],      # Keine Vorgänger
         "superseded_chains": [],   # Ersetzungsketten
         "reference_network": {},   # Verweisnetzwerk
         "categories": {}           # Nach Kategorien
     }
-    
+
     for standard in standards:
         # Root Standards (keine Vorgänger)
         if not standard.supersedes:
             hierarchy["root_standards"].append(standard.identifier.standard_number)
-        
+
         # Ersetzungsketten aufbauen
         if standard.superseded_by:
             for successor in standard.superseded_by:
@@ -618,18 +618,18 @@ def analyze_standards_hierarchy(standards):
                     "old": standard.identifier.standard_number,
                     "new": successor
                 })
-        
+
         # Verweisnetzwerk
         if standard.related_standards:
             hierarchy["reference_network"][standard.identifier.standard_number] = standard.related_standards
-        
+
         # Nach Kategorien gruppieren
         for category in standard.categories:
             cat_name = category.value
             if cat_name not in hierarchy["categories"]:
                 hierarchy["categories"][cat_name] = []
             hierarchy["categories"][cat_name].append(standard.identifier.standard_number)
-    
+
     return hierarchy
 
 # Beispiel-Verwendung
@@ -645,7 +645,7 @@ print(f"   Kategorien: {len(hierarchy['categories'])}")
 ```python
 def create_compliance_dashboard(assessments):
     """Erstelle Compliance-Dashboard für mehrere Standards"""
-    
+
     dashboard = {
         "overall_score": 0.0,
         "total_standards": len(assessments),
@@ -660,13 +660,13 @@ def create_compliance_dashboard(assessments):
         "total_effort_days": 0,
         "categories": {}
     }
-    
+
     total_compliance = 0
-    
+
     for assessment in assessments:
         compliance = assessment.overall_compliance_level
         total_compliance += compliance
-        
+
         # Compliance-Verteilung
         if compliance > 0.9:
             dashboard["compliance_distribution"]["excellent"] += 1
@@ -676,15 +676,15 @@ def create_compliance_dashboard(assessments):
             dashboard["compliance_distribution"]["acceptable"] += 1
         else:
             dashboard["compliance_distribution"]["poor"] += 1
-        
+
         # Zertifizierungsbereitschaft
         if assessment.certification_readiness > 0.8:
             dashboard["certification_ready"] += 1
-        
+
         # Aufwand summieren
         if assessment.estimated_effort_days:
             dashboard["total_effort_days"] += assessment.estimated_effort_days
-        
+
         # Priority Gaps sammeln
         for gap in assessment.compliance_gaps:
             if gap.get("priority") == "high":
@@ -692,9 +692,9 @@ def create_compliance_dashboard(assessments):
                     "standard": assessment.target_standard,
                     "gap": gap["gap_description"]
                 })
-    
+
     dashboard["overall_score"] = total_compliance / len(assessments) if assessments else 0
-    
+
     return dashboard
 
 # Dashboard erstellen und anzeigen
@@ -735,7 +735,7 @@ async def get_by_organization(
         organization = StandardsOrganization(org.lower())
     except ValueError:
         raise HTTPException(status_code=400, detail=f"Unknown organization: {org}")
-    
+
     request = StandardsSearchRequest(
         query_id=f"api-org-{org}",
         query_text=f"API search for {org} standards",
@@ -757,11 +757,11 @@ async def assess_compliance(
         product_scope=product_scope,
         max_results=1
     )
-    
+
     response = await standards_agent.search_standards_async(request)
     if not response.success or not response.compliance_assessment:
         raise HTTPException(status_code=404, detail="Compliance assessment not available")
-    
+
     return response.compliance_assessment.to_dict()
 ```
 
@@ -773,7 +773,7 @@ class TechnicalStandardsClient {
     constructor(baseUrl) {
         this.baseUrl = baseUrl;
     }
-    
+
     async searchStandards(searchTerm, options = {}) {
         const request = {
             query_id: `web-${Date.now()}`,
@@ -784,31 +784,31 @@ class TechnicalStandardsClient {
             include_requirements: options.includeRequirements || true,
             max_results: options.maxResults || 10
         };
-        
+
         const response = await fetch(`${this.baseUrl}/api/standards/search`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(request)
         });
-        
+
         return await response.json();
     }
-    
+
     async getByOrganization(org, searchTerm = "", maxResults = 10) {
         const params = new URLSearchParams({
             search_term: searchTerm,
             max_results: maxResults
         });
-        
+
         const response = await fetch(`${this.baseUrl}/api/standards/organization/${org}?${params}`);
         return await response.json();
     }
-    
+
     async assessCompliance(standardNumber, productScope) {
         const params = new URLSearchParams({
             product_scope: productScope
         });
-        
+
         const response = await fetch(`${this.baseUrl}/api/standards/compliance/${standardNumber}?${params}`);
         return await response.json();
     }
@@ -825,12 +825,12 @@ const isoResults = await client.searchStandards('quality management', {
 
 if (isoResults.success) {
     console.log(`Found ${isoResults.standards.length} ISO standards`);
-    
+
     isoResults.standards.forEach(standard => {
         console.log(`📄 ${standard.identifier.standard_number}`);
         console.log(`   ${standard.identifier.full_title}`);
         console.log(`   Status: ${standard.status}`);
-        
+
         // Anforderungen anzeigen
         if (standard.requirements.length > 0) {
             console.log(`   Requirements: ${standard.requirements.length}`);
@@ -848,7 +848,7 @@ if (compliance) {
     console.log(`   Overall: ${(compliance.overall_compliance_level * 100).toFixed(1)}%`);
     console.log(`   Certification Ready: ${(compliance.certification_readiness * 100).toFixed(1)}%`);
     console.log(`   Estimated Effort: ${compliance.estimated_effort_days} days`);
-    
+
     if (compliance.recommendations.length > 0) {
         console.log(`   Recommendations:`);
         compliance.recommendations.forEach(rec => console.log(`      - ${rec}`));
@@ -907,13 +907,13 @@ print(f"Cache-Hit-Rate: {agent_status['performance']['cache_hits'] / max(1, agen
 
 Der **VERITAS Technical Standards Agent** bietet:
 
-✅ **Umfassende Standards-Suche** - ISO, DIN, VDE, EN, IEC, IEEE, ASTM  
-✅ **Standard-Nummer-Erkennung** - Automatische Identifikation von Normen-Nummern  
-✅ **Compliance-Bewertung** - Gap-Analyse und Zertifizierungsbereitschaft  
-✅ **Anforderungsmanagement** - Detaillierte Norm-Anforderungen mit Prüfkriterien  
-✅ **Multi-Organisation-Suche** - Übergreifende Suche über alle Normungsorganisationen  
-✅ **Integration** - Nahtlose Kopplung mit Chemical Data und Atmospheric Flow Agents  
-✅ **Performance** - <1ms Antwortzeit, Cache-Funktionalität, 100% Testabdeckung  
+✅ **Umfassende Standards-Suche** - ISO, DIN, VDE, EN, IEC, IEEE, ASTM
+✅ **Standard-Nummer-Erkennung** - Automatische Identifikation von Normen-Nummern
+✅ **Compliance-Bewertung** - Gap-Analyse und Zertifizierungsbereitschaft
+✅ **Anforderungsmanagement** - Detaillierte Norm-Anforderungen mit Prüfkriterien
+✅ **Multi-Organisation-Suche** - Übergreifende Suche über alle Normungsorganisationen
+✅ **Integration** - Nahtlose Kopplung mit Chemical Data und Atmospheric Flow Agents
+✅ **Performance** - <1ms Antwortzeit, Cache-Funktionalität, 100% Testabdeckung
 
 Der Agent ist produktionsreif und bereit für die Integration in das VERITAS Multi-Agent System zur Unterstützung von Compliance-Prüfungen, Zertifizierungsplanung und regulatorischer Konformität.
 

@@ -2,14 +2,14 @@
 
 ## Verfügbare Spezialisierte Agenten
 
-### 1. 🌡️ **DWD Weather Agent** 
+### 1. 🌡️ **DWD Weather Agent**
 - **Datei:** `veritas_api_agent_dwd_weather.py`
 - **Zweck:** Deutsche Wetterdaten über DWD/dwdweather2
 - **Features:** Ortsbasiert, historische Daten, Vorhersagen, Stationen-Suche
 - **Status:** ✅ Implementiert & getestet
 
 ### 2. 📚 **Wikipedia Agent**
-- **Datei:** `veritas_api_agent_wikipedia.py` 
+- **Datei:** `veritas_api_agent_wikipedia.py`
 - **Zweck:** Wikipedia-Enzyklopädie Integration
 - **Features:** Mehrsprachig, Artikel-Abruf, Kategorien, intelligente Suche
 - **Status:** ✅ Implementiert & getestet
@@ -47,16 +47,16 @@ wikipedia_agent = None
 async def startup_agents():
     """Startup-Funktion für alle Agenten"""
     global dwd_agent, wikipedia_agent
-    
+
     # DWD Weather Agent
     dwd_agent = create_dwd_weather_agent()
     print("✅ DWD Weather Agent loaded")
-    
+
     # Wikipedia Agent
     wikipedia_agent = create_wikipedia_agent()
     print("✅ Wikipedia Agent loaded")
 
-@app.on_event("startup")  
+@app.on_event("startup")
 async def startup():
     await startup_agents()
 
@@ -68,7 +68,7 @@ async def dwd_weather_endpoint(request: dict):
         from backend.agents.veritas_api_agent_dwd_weather import (
             DwdWeatherQueryRequest, WeatherInterval, WeatherParameter
         )
-        
+
         weather_request = DwdWeatherQueryRequest(
             query_id=request.get("query_id", f"dwd-{int(time.time())}"),
             query_text=request.get("query", ""),
@@ -82,9 +82,9 @@ async def dwd_weather_endpoint(request: dict):
                 WeatherParameter(p) for p in request.get("parameters", ["temperature"])
             ]
         )
-        
+
         response = await dwd_agent.execute_query_async(weather_request)
-        
+
         return {
             "success": response.success,
             "query_id": response.query_id,
@@ -97,7 +97,7 @@ async def dwd_weather_endpoint(request: dict):
             },
             "error": response.error_message
         }
-        
+
     except Exception as e:
         return {
             "success": False,
@@ -119,7 +119,7 @@ async def wikipedia_search_endpoint(request: dict):
         from backend.agents.veritas_api_agent_wikipedia import (
             WikipediaQueryRequest, WikipediaLanguage, WikipediaQueryType
         )
-        
+
         wiki_request = WikipediaQueryRequest(
             query_id=request.get("query_id", f"wiki-search-{int(time.time())}"),
             query_text=request.get("query", ""),
@@ -128,9 +128,9 @@ async def wikipedia_search_endpoint(request: dict):
             max_results=request.get("max_results", 10),
             include_summary=request.get("include_summary", True)
         )
-        
+
         response = await wikipedia_agent.execute_query_async(wiki_request)
-        
+
         return {
             "success": response.success,
             "results": [result.to_dict() for result in response.search_results],
@@ -141,7 +141,7 @@ async def wikipedia_search_endpoint(request: dict):
             },
             "error": response.error_message
         }
-        
+
     except Exception as e:
         return {
             "success": False,
@@ -155,7 +155,7 @@ async def wikipedia_article_endpoint(request: dict):
         from backend.agents.veritas_api_agent_wikipedia import (
             WikipediaQueryRequest, WikipediaLanguage, WikipediaQueryType
         )
-        
+
         wiki_request = WikipediaQueryRequest(
             query_id=request.get("query_id", f"wiki-article-{int(time.time())}"),
             query_text=request.get("title", ""),
@@ -165,9 +165,9 @@ async def wikipedia_article_endpoint(request: dict):
             include_categories=request.get("include_categories", True),
             include_links=request.get("include_links", True)
         )
-        
+
         response = await wikipedia_agent.execute_query_async(wiki_request)
-        
+
         if response.success and response.articles:
             return {
                 "success": True,
@@ -182,7 +182,7 @@ async def wikipedia_article_endpoint(request: dict):
                 "success": False,
                 "error": response.error_message or "Article not found"
             }
-            
+
     except Exception as e:
         return {
             "success": False,
@@ -206,7 +206,7 @@ class VeritasAgentsClient {
     constructor(baseUrl = '') {
         this.baseUrl = baseUrl;
     }
-    
+
     // Wikipedia Methods
     async searchWikipedia(query, options = {}) {
         const {
@@ -214,58 +214,58 @@ class VeritasAgentsClient {
             maxResults = 10,
             includeSummary = true
         } = options;
-        
+
         const payload = {
             query,
             language,
             max_results: maxResults,
             include_summary: includeSummary
         };
-        
+
         const response = await fetch(`${this.baseUrl}/agents/wikipedia/search`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
-        
+
         return await response.json();
     }
-    
+
     async getWikipediaArticle(title, options = {}) {
         const {
             language = 'de',
             includeContent = true,
             includeCategories = true
         } = options;
-        
+
         const payload = {
             title,
             language,
             include_content: includeContent,
             include_categories: includeCategories
         };
-        
+
         const response = await fetch(`${this.baseUrl}/agents/wikipedia/article`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
-        
+
         return await response.json();
     }
-    
+
     // Weather Methods
     async queryWeather(options = {}) {
         const {
             location,
-            latitude, 
+            latitude,
             longitude,
             startDate,
             endDate = startDate,
             interval = 'daily',
             parameters = ['temperature']
         } = options;
-        
+
         const payload = {
             query: `Weather data for ${location || `${latitude},${longitude}`}`,
             location,
@@ -276,22 +276,22 @@ class VeritasAgentsClient {
             interval,
             parameters
         };
-        
+
         const response = await fetch(`${this.baseUrl}/agents/dwd_weather/query`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
-        
+
         return await response.json();
     }
-    
+
     // Agent Status Methods
     async getWikipediaStatus() {
         const response = await fetch(`${this.baseUrl}/agents/wikipedia/status`);
         return await response.json();
     }
-    
+
     async getWeatherStatus() {
         const response = await fetch(`${this.baseUrl}/agents/dwd_weather/status`);
         return await response.json();
@@ -335,7 +335,7 @@ from enum import Enum
 
 class AgentType(Enum):
     WEATHER = "weather"
-    TRAFFIC = "traffic" 
+    TRAFFIC = "traffic"
     FINANCIAL = "financial"
     ENVIRONMENTAL = "environmental"
     SOCIAL = "social"
@@ -354,16 +354,16 @@ class AgentInfo:
 class AgentRegistry:
     def __init__(self):
         self.agents: Dict[str, AgentInfo] = {}
-        
+
     def register_agent(self, agent_info: AgentInfo):
         """Registriere einen neuen Agenten"""
         self.agents[agent_info.name] = agent_info
         print(f"✅ Agent '{agent_info.name}' registered")
-        
+
     def get_available_agents(self) -> Dict[str, AgentInfo]:
         """Alle verfügbaren Agenten"""
         return self.agents
-        
+
     def get_agent_status(self, name: str) -> Optional[AgentInfo]:
         """Status eines spezifischen Agenten"""
         return self.agents.get(name)
@@ -383,7 +383,7 @@ agent_registry.register_agent(AgentInfo(
     },
     capabilities=[
         "historical_weather_data",
-        "current_weather", 
+        "current_weather",
         "station_based_data",
         "hourly_daily_intervals",
         "temperature_precipitation_wind"
@@ -394,7 +394,7 @@ agent_registry.register_agent(AgentInfo(
 agent_registry.register_agent(AgentInfo(
     name="wikipedia",
     type=AgentType.KNOWLEDGE,
-    version="1.0.0", 
+    version="1.0.0",
     description="Wikipedia encyclopedia integration agent",
     endpoints={
         "search": "/agents/wikipedia/search",
@@ -426,7 +426,7 @@ curl -X POST "http://localhost:8000/agents/dwd_weather/query" \
   -H "Content-Type: application/json" \
   -d '{
     "query": "Weather in Berlin",
-    "location": "Berlin", 
+    "location": "Berlin",
     "start_date": "2025-09-28",
     "end_date": "2025-09-28",
     "parameters": ["temperature", "precipitation"]

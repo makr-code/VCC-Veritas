@@ -393,7 +393,7 @@ async def lifespan(app: FastAPI):
     streaming_initialized = initialize_streaming_system()
 
     # UDS3 System initialisieren - optional, je nach RAG_MODE
-    rag_disabled = RAG_MODE in ("disabled", "off", "mock")
+    rag_disabled = RAG_MODE in ("disabled", "of", "mock")
     if rag_disabled:
         logger.warning("UDS3-Initialisierung wird übersprungen (VERITAS_RAG_MODE=%s)", RAG_MODE)
         uds3_initialized = False
@@ -532,18 +532,18 @@ async def root():
     """Root Endpoint - API Status"""
     return {
         "message": "Veritas API Backend (Streaming + UDS3 + IMMI + Feedback)",
-        "version": "1.0.0-streaming-uds3-immi-feedback",
+        "version": "1.0.0 - streaming-uds3 - immi-feedback",
         "status": "active",
         "streaming_available": STREAMING_AVAILABLE,
         "uds3_available": UDS3_AVAILABLE,
         "intelligent_pipeline_available": INTELLIGENT_PIPELINE_AVAILABLE,
         "endpoints": {
-            "chat": "/v2/query",
-            "streaming_chat": "/v2/query/stream",
-            "intelligent_chat": "/v2/intelligent/query",
-            "uds3_create": "/uds3/documents",
-            "uds3_query": "/uds3/query",
-            "progress": "/progress/{session_id}",
+            "chat": " / v2/query",
+            "streaming_chat": " / v2/query / stream",
+            "intelligent_chat": " / v2/intelligent / query",
+            "uds3_create": " / uds3/documents",
+            "uds3_query": " / uds3/query",
+            "progress": " / progress/{session_id}",
             "rag": "/ask",
             "agents": "/agents/ask",
             "immi_bimschg": "/api/immi/markers/bimschg",  # NEW
@@ -666,38 +666,38 @@ async def get_capabilities():
     # Streaming Capabilities
     streaming_capabilities = {
         "available": STREAMING_AVAILABLE,
-        "endpoints": ["/v2/query/stream", "/v2/intelligent/query"] if STREAMING_AVAILABLE else [],
+        "endpoints": [" / v2/query / stream", " / v2/intelligent / query"] if STREAMING_AVAILABLE else [],
         "features": ["progress_updates", "intermediate_results", "llm_thinking"] if STREAMING_AVAILABLE else [],
     }
 
     # System-weite Capabilities
     return {
         "system": {
-            "version": "1.0.0-production",
+            "version": "1.0.0 - production",
             "environment": "production",
             "timestamp": datetime.now().isoformat(),
             "uptime_seconds": (datetime.now() - datetime.fromtimestamp(0)).total_seconds(),  # Placeholder
         },
         "endpoints": {
             "chat": {
-                "path": "/v2/query",
+                "path": " / v2/query",
                 "available": True,
                 "production_ready": True,
                 "uses_intelligent_pipeline": INTELLIGENT_PIPELINE_AVAILABLE,
             },
             "streaming_chat": {
-                "path": "/v2/query/stream",
+                "path": " / v2/query / stream",
                 "available": STREAMING_AVAILABLE,
                 "production_ready": STREAMING_AVAILABLE,
             },
             "intelligent_query": {
-                "path": "/v2/intelligent/query",
+                "path": " / v2/intelligent / query",
                 "available": INTELLIGENT_PIPELINE_AVAILABLE,
                 "production_ready": INTELLIGENT_PIPELINE_AVAILABLE,
             },
-            "rag": {"path": "/ask", "available": True, "production_ready": INTELLIGENT_PIPELINE_AVAILABLE},
-            "uds3_documents": {"path": "/uds3/documents", "available": UDS3_AVAILABLE, "production_ready": UDS3_AVAILABLE},
-            "uds3_query": {"path": "/uds3/query", "available": UDS3_AVAILABLE, "production_ready": UDS3_AVAILABLE},
+            "rag": {"path": " / ask", "available": True, "production_ready": INTELLIGENT_PIPELINE_AVAILABLE},
+            "uds3_documents": {"path": " / uds3/documents", "available": UDS3_AVAILABLE, "production_ready": UDS3_AVAILABLE},
+            "uds3_query": {"path": " / uds3/query", "available": UDS3_AVAILABLE, "production_ready": UDS3_AVAILABLE},
         },
         "features": {
             "ollama": ollama_status,
@@ -734,7 +734,7 @@ def _generate_recommendations(ollama_available: bool, uds3_available: bool, pipe
         recommendations.append(
             {
                 "type": "warning",
-                "message": "Ollama nicht verfügbar - LLM-Features eingeschränkt",
+                "message": "Ollama nicht verfügbar - LLM - Features eingeschränkt",
                 "action": "Starten Sie Ollama: http://localhost:11434",
             }
         )
@@ -752,8 +752,8 @@ def _generate_recommendations(ollama_available: bool, uds3_available: bool, pipe
         recommendations.append(
             {
                 "type": "info",
-                "message": "UDS3 nicht verfügbar - Erweiterte Datenbank-Features deaktiviert",
-                "action": "Optional: UDS3 installieren für Multi-DB Support",
+                "message": "UDS3 nicht verfügbar - Erweiterte Datenbank - Features deaktiviert",
+                "action": "Optional: UDS3 installieren für Multi - DB Support",
             }
         )
 
@@ -821,9 +821,9 @@ async def veritas_intelligent_query(request: VeritasStreamingQueryRequest):
             "answer": pipeline_response.response_text,
             "confidence_score": pipeline_response.confidence_score,
             "processing_time": processing_time,
-            "model_used": "Ollama Multi-Agent Pipeline",
+            "model_used": "Ollama Multi - Agent Pipeline",
             "mode": "INTELLIGENT_PIPELINE",
-            # Multi-Agent Details
+            # Multi - Agent Details
             "agent_results": pipeline_response.agent_results,
             "agents_used": len(pipeline_response.agent_results),
             "sources": pipeline_response.sources,
@@ -897,7 +897,7 @@ async def veritas_streaming_query(request: VeritasStreamingQueryRequest):
     return {
         "session_id": session_id,
         "query_id": query_id,
-        "stream_url": f"/progress/{session_id}",
+        "stream_url": f" / progress/{session_id}",
         "message": "Verarbeitung gestartet - verbinde mit Stream für Updates",
         "estimated_time": "5-15 Sekunden",
     }
@@ -913,9 +913,9 @@ async def get_progress_stream(session_id: str):
         raise HTTPException(status_code=503, detail="Streaming System nicht verfügbar")
 
     headers = {
-        "Content-Type": "text/event-stream",
-        "Cache-Control": "no-cache",
-        "Connection": "keep-alive",
+        "Content - Type": "text / event-stream",
+        "Cache - Control": "no - cache",
+        "Connection": "keep - alive",
     }
 
     return StreamingResponse(
@@ -1615,7 +1615,7 @@ def _generate_agent_result(agent_type: str, query: str, complexity: str) -> Dict
         "geo_context": {
             "summary": "Geografischer Kontext und lokale Bestimmungen identifiziert",
             "details": "Relevante Gebiets- und Standortinformationen gesammelt",
-            "sources": ["OpenStreetMap", "Gemeinde-DB", "Geoportal"],
+            "sources": ["OpenStreetMap", "Gemeinde - DB", "Geoportal"],
         },
         "legal_framework": {
             "summary": "Rechtliche Rahmenbedingungen und Vorschriften analysiert",
@@ -1625,12 +1625,12 @@ def _generate_agent_result(agent_type: str, query: str, complexity: str) -> Dict
         "construction": {
             "summary": "Bautechnische Aspekte und Genehmigungsverfahren bewertet",
             "details": "Bauvorschriften und technische Anforderungen geprüft",
-            "sources": ["DIN-Normen", "Bauordnung", "Technische Richtlinien"],
+            "sources": ["DIN - Normen", "Bauordnung", "Technische Richtlinien"],
         },
         "environmental": {
             "summary": "Umweltaspekte und Emissionsbestimmungen untersucht",
             "details": "Umweltschutzauflagen und Grenzwerte ermittelt",
-            "sources": ["Umweltbundesamt", "Luftreinhaltepläne", "EU-Richtlinien"],
+            "sources": ["Umweltbundesamt", "Luftreinhaltepläne", "EU - Richtlinien"],
         },
         "financial": {
             "summary": "Kostenstrukturen und finanzielle Aspekte kalkuliert",
@@ -1640,17 +1640,17 @@ def _generate_agent_result(agent_type: str, query: str, complexity: str) -> Dict
         "traffic": {
             "summary": "Verkehrsrechtliche Bestimmungen und Infrastruktur bewertet",
             "details": "Verkehrsregeln und Infrastrukturanforderungen geprüft",
-            "sources": ["StVO", "Verkehrsbehörde", "ÖPNV-Pläne"],
+            "sources": ["StVO", "Verkehrsbehörde", "ÖPNV - Pläne"],
         },
         "document_retrieval": {
             "summary": "Relevante Dokumente und Formulare gefunden",
             "details": "Antragsformulare und Informationsmaterialien identifiziert",
-            "sources": ["Verwaltungsportal", "Formulardatenbank", "FAQ-Sammlung"],
+            "sources": ["Verwaltungsportal", "Formulardatenbank", "FAQ - Sammlung"],
         },
         "external_api": {
             "summary": "Aktuelle externe Daten abgerufen",
-            "details": "Live-Daten und externe Informationsquellen ausgewertet",
-            "sources": ["API-Services", "Open-Data-Portale", "Echtzeitdaten"],
+            "details": "Live - Daten und externe Informationsquellen ausgewertet",
+            "sources": ["API - Services", "Open - Data-Portale", "Echtzeitdaten"],
         },
     }
 
@@ -1711,7 +1711,7 @@ def _synthesize_final_response(
     logger.debug("Conversation context created: %d chars", len(conversation_context))
 
     # Generiere Hauptantwort
-    main_response = f"""
+    main_response = """
 **Antwort auf Ihre Frage**: {query}
 {conversation_context}
 **Zusammenfassung der Analyse** ({domain.title()}, {complexity.title()}):
@@ -1740,7 +1740,7 @@ def _synthesize_final_response(
     simulation_warning = ""
     if simulated_agents:
         logger.warning("%d of %d agents use simulated data", len(simulated_agents), len(agent_results))
-        simulation_warning = f"""
+        simulation_warning = """
 
 ⚠️  **DEMO-MODUS**: Diese Antwort basiert auf simulierten Beispieldaten.
 
@@ -1753,7 +1753,7 @@ def _synthesize_final_response(
 """
 
     main_response += simulation_warning
-    main_response += f"""
+    main_response += """
 **Nächste Schritte**: Basierend auf der Analyse empfehlen wir Ihnen, sich zunächst über die spezifischen Anforderungen zu informieren und die entsprechenden Antragsformulare zu beschaffen.
 
 **Hinweis**: Diese Antwort wurde durch {len(agent_results)} spezialisierte Agenten erstellt und mit einem durchschnittlichen Vertrauenswert von {sum(r.get('confidence_score', 0) for r in agent_results.values()) / len(agent_results):.0%} bewertet.
@@ -1773,7 +1773,7 @@ def _synthesize_final_response(
             "agent_count": len(agent_results),
             "high_confidence_count": len(high_confidence_results),
             "processing_method": "streaming_synthesis",
-            "has_simulation": len(simulated_agents) > 0,  # 🆕 Simulation-Flag
+            "has_simulation": len(simulated_agents) > 0,  # 🆕 Simulation - Flag
             "simulated_agents": simulated_agents,  # 🆕 Liste der simulierten Agenten
             "simulation_count": len(simulated_agents),  # 🆕 Anzahl simulierter Agenten
         },
@@ -1948,7 +1948,7 @@ def _generate_basic_response(query_text: str, session_id: str, reason: str) -> D
     processing_time = 0.01
 
     return {
-        "response_text": f"""Ihre Anfrage wurde empfangen: "{query_text}"
+        "response_text": """Ihre Anfrage wurde empfangen: "{query_text}"
 
 ⚠️ **Hinweis**: Die intelligente Pipeline ist derzeit nicht verfügbar.
 Grund: {reason}
@@ -1985,7 +1985,7 @@ Kontaktieren Sie den Administrator für Unterstützung.""",
 def _generate_error_response(query_text: str, session_id: str, error_message: str) -> Dict[str, Any]:
     """Generiert Error Response"""
     return {
-        "response_text": f"""❌ **Fehler bei der Verarbeitung**
+        "response_text": """❌ **Fehler bei der Verarbeitung**
 
 Ein Fehler ist aufgetreten: {error_message}
 
@@ -2142,7 +2142,7 @@ async def veritas_rag_query(request: VeritasRAGRequest):
 
                 if conversation_context:
                     # Erweiterte Frage mit Context
-                    enriched_question = f"""Bisherige Konversation:
+                    enriched_question = """Bisherige Konversation:
 {conversation_context}
 
 Aktuelle Frage:
@@ -2180,7 +2180,7 @@ Aktuelle Frage:
                     "mode": request.mode,
                     "model": request.model,
                     "temperature": request.temperature,
-                    **context_metadata,  # 🆕 Context-Metadaten hinzufügen
+                    **context_metadata,  # 🆕 Context - Metadaten hinzufügen
                 },
                 session_id=session_id,
                 enable_llm_commentary=False,
@@ -2198,13 +2198,13 @@ Aktuelle Frage:
                 sources=pipeline_response.sources,
                 metadata={
                     "mode": request.mode,
-                    "model": request.model or "intelligent-pipeline",
+                    "model": request.model or "intelligent - pipeline",
                     "temperature": request.temperature,
                     "max_tokens": request.max_tokens,
                     "streaming_available": STREAMING_AVAILABLE,
                     "agent_count": len(pipeline_response.agent_results),
                     "pipeline_mode": "production",
-                    **context_metadata,  # 🆕 Context-Info in Response
+                    **context_metadata,  # 🆕 Context - Info in Response
                 },
                 session_id=session_id,
                 mode=request.mode,
@@ -2219,7 +2219,7 @@ Aktuelle Frage:
             # FALLBACK: Wenn Pipeline nicht verfügbar
             logger.warning("Intelligent Pipeline nicht verfügbar - Basic Fallback")
 
-            answer = f"""⚠️ **Pipeline nicht verfügbar**
+            answer = """⚠️ **Pipeline nicht verfügbar**
 
 Ihre Frage: {request.question}
 
@@ -2397,7 +2397,7 @@ async def uds3_query(request: UDS3QueryRequest):
                 "query_type": request.query_type,
                 "query": request.query,
                 "filters_applied": len(request.filters),
-                "warning": "This endpoint returns simulated data - use /v2/query/stream for production",  # 🆕 Warnung
+                "warning": "This endpoint returns simulated data - use /v2 / query/stream for production",  # 🆕 Warnung
             },
             processing_time=processing_time,
             quality_metrics={"confidence": 0.85, "coverage": 0.90, "is_simulated": True},
@@ -2453,30 +2453,30 @@ async def get_available_modes():
         "modes": {
             "veritas": {
                 "display_name": "Standard RAG",
-                "description": "Retrieval-Augmented Generation mit Dokumenten-Suche",
+                "description": "Retrieval - Augmented Generation mit Dokumenten - Suche",
                 "status": "implemented",
-                "endpoints": ["/v2/query", "/v2/query/stream"],
+                "endpoints": [" / v2/query", " / v2/query / stream"],
                 "capabilities": ["rag", "streaming", "citations"],
             },
             "chat": {
                 "display_name": "Allgemeiner Chat",
-                "description": "Direkter Chat mit LLM ohne Dokument-Retrieval",
+                "description": "Direkter Chat mit LLM ohne Dokument - Retrieval",
                 "status": "implemented",
-                "endpoints": ["/v2/query"],
+                "endpoints": [" / v2/query"],
                 "capabilities": ["chat", "conversation_history"],
             },
             "vpb": {
                 "display_name": "VPB Verwaltung",
                 "description": "Spezialisiert auf Verwaltungsprozesse und Behörden",
                 "status": "implemented",
-                "endpoints": ["/v2/query"],
+                "endpoints": [" / v2/query"],
                 "capabilities": ["rag", "administrative_context"],
             },
             "covina": {
                 "display_name": "COVINA Analyse",
-                "description": "COVID-19 Verwaltungsanalyse (experimentell)",
+                "description": "COVID - 19 Verwaltungsanalyse (experimentell)",
                 "status": "experimental",
-                "endpoints": ["/v2/query"],
+                "endpoints": [" / v2/query"],
                 "capabilities": ["rag", "covid_context"],
             },
         },
@@ -2515,7 +2515,7 @@ async def get_available_agent_types():
                 "Reciprocal Rank Fusion (RRF)",
                 "Graceful Degradation",
             ],
-            "current_mode": "BM25-Hybrid (Dense=0.0)" if phase5_initialized else "Disabled",
+            "current_mode": "BM25 - Hybrid (Dense=0.0)" if phase5_initialized else "Disabled",
         },
     }
 
@@ -2574,7 +2574,7 @@ async def hybrid_search_endpoint(query: str, top_k: int = 10, enable_monitoring:
             "results": formatted_results,
             "total_results": len(formatted_results),
             "latency_ms": elapsed_ms,
-            "mode": "BM25-Hybrid" if all(r["dense_score"] == 0.0 for r in formatted_results) else "Full Hybrid",
+            "mode": "BM25 - Hybrid" if all(r["dense_score"] == 0.0 for r in formatted_results) else "Full Hybrid",
             "timestamp": datetime.now().isoformat(),
         }
 

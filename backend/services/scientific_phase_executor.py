@@ -167,7 +167,7 @@ class ScientificPhaseExecutor:
         if not config_path.exists():
             raise FileNotFoundError(
                 f"Method config nicht gefunden: {config_path}\n"
-                f"Verfügbare Methoden: {list((self.config_dir / 'scientific_methods').glob('*.json'))}"
+                f"Verfügbare Methoden: {list((self.config_dir / 'scientific_methods').glob(' * .json'))}"
             )
 
         try:
@@ -315,7 +315,7 @@ class ScientificPhaseExecutor:
 
         # 6. Template Variables (User Query, RAG Results, Previous Phases)
         prompt_parts.append("\n# INPUT-DATEN\n")
-        prompt_parts.append(f"\n## User Query\n{template_vars.get('user_query', 'N/A')}\n")
+        prompt_parts.append(f"\n## User Query\n{template_vars.get('user_query', 'N / A')}\n")
 
         if template_vars.get("rag_results"):
             prompt_parts.append(
@@ -398,7 +398,7 @@ class ScientificPhaseExecutor:
 
                         logger.info(
                             f"✅ Ollama response received: {len(llm_output)} chars, "
-                            f"duration={response.total_duration if response.total_duration else 'N/A'}ms"
+                            f"duration={response.total_duration if response.total_duration else 'N / A'}ms"
                         )
 
                         return llm_output, attempt
@@ -415,7 +415,7 @@ class ScientificPhaseExecutor:
                             "mock": True,
                             "phase_id": phase_id,
                             "message": "MOCK LLM Response - OllamaClient nicht initialisiert",
-                            "note": "Bitte VeritasOllamaClient initialisieren für echte LLM-Calls",
+                            "note": "Bitte VeritasOllamaClient initialisieren für echte LLM - Calls",
                         },
                         indent=2,
                     )
@@ -593,7 +593,7 @@ async def example_usage():
     # Execute Phase 1: Hypothesis
     result = await executor.execute_phase("hypothesis", context)
 
-    print(f"\n=== Phase 1 Result ===")
+    print("\n=== Phase 1 Result ===")
     print(f"Status: {result.status}")
     print(f"Confidence: {result.confidence}")
     print(f"Output:\n{json.dumps(result.output, indent=2, ensure_ascii=False)}")

@@ -14,13 +14,10 @@ Stellt ausgewählte MCP-Funktionen als HTTP-API bereit:
 from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
+
 from fastapi import APIRouter, HTTPException
 
-from backend.mcp.veritas_mcp_server import (
-    load_prompt_templates,
-    tool_hybrid_search,
-    resource_get_document,
-)
+from backend.mcp.veritas_mcp_server import load_prompt_templates, resource_get_document, tool_hybrid_search
 
 router = APIRouter(prefix="/api/mcp", tags=["MCP HTTP Bridge"])
 

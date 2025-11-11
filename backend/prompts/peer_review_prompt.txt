@@ -24,7 +24,7 @@ BEWERTUNGS-KRITERIEN:
    - Sind alle Fakten korrekt?
    - Gibt es falsche oder irreführende Aussagen?
    - Werden Fakten aus den Quellen korrekt wiedergegeben?
-   
+
    Score: 0-10 (0=viele Fehler, 10=perfekt korrekt)
    Begründung: Konkrete Beispiele für Stärken/Schwächen
 
@@ -32,7 +32,7 @@ BEWERTUNGS-KRITERIEN:
    - Wurde die Frage vollständig beantwortet?
    - Fehlen wichtige Aspekte?
    - Wurden alle relevanten Dimensionen adressiert?
-   
+
    Score: 0-10 (0=sehr lückenhaft, 10=vollständig)
    Begründung: Was fehlt? Was ist gut abgedeckt?
 
@@ -40,7 +40,7 @@ BEWERTUNGS-KRITERIEN:
    - Sind Gesetze/Verordnungen korrekt zitiert?
    - Stimmen Paragraphen und Artikel?
    - Sind Fristen und Verfahren korrekt dargestellt?
-   
+
    Score: 0-10 (0=rechtlich falsch, 10=rechtlich korrekt)
    Begründung: Welche Rechtsgrundlagen sind korrekt/inkorrekt?
 
@@ -48,7 +48,7 @@ BEWERTUNGS-KRITERIEN:
    - Ist die Antwort logisch kohärent?
    - Gibt es innere Widersprüche?
    - Ist die Argumentation nachvollziehbar?
-   
+
    Score: 0-10 (0=widersprüchlich, 10=perfekt kohärent)
    Begründung: Logische Struktur, Widersprüche?
 
@@ -56,7 +56,7 @@ BEWERTUNGS-KRITERIEN:
    - Wurden alle relevanten Quellen berücksichtigt?
    - Fehlen wichtige Perspektiven?
    - Ist die Quellennutzung angemessen?
-   
+
    Score: 0-10 (0=Quellen ignoriert, 10=optimal genutzt)
    Begründung: Welche Quellen wurden gut/schlecht genutzt?
 

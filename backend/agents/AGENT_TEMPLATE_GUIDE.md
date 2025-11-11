@@ -45,13 +45,13 @@ python agent_generator.py --domain medical --config '{"api_endpoint":"https://ap
 
 def process_query(self, request: DomainQueryRequest) -> DomainQueryResponse:
     """Implementiere deine Domain-spezifische Logic hier"""
-    
+
     # 1. Query analysieren
     query_text = request.query_text
-    
+
     # 2. Domain-spezifische Verarbeitung
     results = self._process_domain_logic(query_text)
-    
+
     # 3. Ergebnisse formatieren
     return DomainQueryResponse(
         query_id=request.query_id,
@@ -167,7 +167,7 @@ class DomainQueryRequest:
     context: Dict[str, Any] = field(default_factory=dict)
     # Domain-spezifische Felder hier hinzufügen
 
-@dataclass 
+@dataclass
 class DomainQueryResponse:
     query_id: str
     results: List[Dict[str, Any]]
@@ -181,7 +181,7 @@ class DomainAgent(BaseTemplateAgent):
     def process_query(self, request: DomainQueryRequest) -> DomainQueryResponse:
         # Implementiere Domain-Logic
         pass
-    
+
     def validate_input(self, request: DomainQueryRequest) -> bool:
         # Implementiere Validierung
         pass
@@ -230,13 +230,13 @@ async def domain_agent_query(domain: str, request: QueryRequest):
 class TestDomainAgent(unittest.TestCase):
     def test_agent_initialization(self):
         # Test Agent Setup
-        
+
     def test_basic_query_processing(self):
         # Test Standard Query Flow
-        
+
     def test_input_validation(self):
         # Test Validation Logic
-        
+
     def test_error_handling(self):
         # Test Error Scenarios
 ```
@@ -337,10 +337,10 @@ python veritas_api_agent_[domain].py  # Manual test
 def process_query(self, request: EnvironmentalQueryRequest) -> EnvironmentalQueryResponse:
     # Weather API Integration
     weather_data = self.weather_api.get_current_weather(request.location)
-    
+
     # Air Quality Data
     air_quality = self.air_quality_api.get_measurements(request.location)
-    
+
     # Combine Results
     results = [{
         "location": request.location,
@@ -348,7 +348,7 @@ def process_query(self, request: EnvironmentalQueryRequest) -> EnvironmentalQuer
         "air_quality_index": air_quality.aqi,
         "timestamp": datetime.now().isoformat()
     }]
-    
+
     return EnvironmentalQueryResponse(
         query_id=request.query_id,
         results=results,
@@ -362,17 +362,17 @@ def process_query(self, request: EnvironmentalQueryRequest) -> EnvironmentalQuer
 def process_query(self, request: FinancialQueryRequest) -> FinancialQueryResponse:
     # Stock Market Data
     stock_data = self.finance_api.get_stock_info(request.symbol)
-    
+
     # Financial Analysis
     analysis = self.analyze_financial_trends(stock_data)
-    
+
     results = [{
         "symbol": request.symbol,
         "current_price": stock_data.price,
         "trend": analysis.trend,
         "recommendation": analysis.recommendation
     }]
-    
+
     return FinancialQueryResponse(
         query_id=request.query_id,
         results=results,
@@ -389,7 +389,7 @@ Das VERITAS Agent Template System bietet:
 
 - ✅ **Schnelle Entwicklung** neuer Domain-Agents
 - ✅ **Standardisierte Architektur** für Konsistenz
-- ✅ **Automatische Code-Generierung** für Effizienz  
+- ✅ **Automatische Code-Generierung** für Effizienz
 - ✅ **Integrierte Best Practices** für Qualität
 - ✅ **Complete Testing Framework** für Zuverlässigkeit
 - ✅ **Seamless VERITAS Integration** für Kompatibilität
@@ -398,5 +398,5 @@ Das VERITAS Agent Template System bietet:
 
 ---
 
-*Dokumentation erstellt am: 28. September 2025*  
+*Dokumentation erstellt am: 28. September 2025*
 *VERITAS Agent Template System v1.0*

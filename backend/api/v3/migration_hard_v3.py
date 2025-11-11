@@ -15,67 +15,68 @@ import os
 import shutil
 from datetime import datetime
 
+
 def backup_current_backend():
     """Erstellt Backup des aktuellen Backends"""
     backend_file = "backend/api/veritas_api_backend.py"
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     backup_file = f"backend/api/veritas_api_backend_pre_v3_migration_{timestamp}.py"
-    
+
     print(f"📦 Erstelle Backup: {backup_file}")
     shutil.copy(backend_file, backup_file)
-    print(f"   ✅ Backup erstellt")
-    
+    print("   ✅ Backup erstellt")
+
     return backup_file
 
 
 def count_legacy_endpoints(file_path):
     """Zählt Legacy-Endpoints im Backend"""
-    with open(file_path, 'r', encoding='utf-8') as f:
+    with open(file_path, "r", encoding="utf-8") as f:
         content = f.read()
-    
+
     # Count @app endpoints (nicht @router)
     legacy_endpoints = []
-    for line in content.split('\n'):
-        if line.strip().startswith('@app.'):
-            if '/api/v3' not in line:
+    for line in content.split("\n"):
+        if line.strip().startswith("@app."):
+            if "/api/v3" not in line:
                 legacy_endpoints.append(line.strip())
-    
+
     return legacy_endpoints
 
 
 def analyze_backend():
     """Analysiert das aktuelle Backend"""
     backend_file = "backend/api/veritas_api_backend.py"
-    
-    print("\n" + "="*60)
+
+    print("\n" + "=" * 60)
     print("VERITAS Backend Analyse")
-    print("="*60)
-    
+    print("=" * 60)
+
     legacy_endpoints = count_legacy_endpoints(backend_file)
-    
+
     print(f"\n📊 Gefundene Legacy-Endpoints: {len(legacy_endpoints)}")
     print("\n   Legacy Endpoints (werden deaktiviert):")
     for i, endpoint in enumerate(legacy_endpoints[:10], 1):
         print(f"   {i}. {endpoint}")
-    
+
     if len(legacy_endpoints) > 10:
         print(f"   ... und {len(legacy_endpoints) - 10} weitere")
-    
+
     print("\n✅ API v3 Status:")
     print("   - 12 Router verfügbar")
     print("   - 58 Endpoints implementiert")
     print("   - Alle 4 Phasen complete")
-    
+
     return legacy_endpoints
 
 
 def create_migration_report(legacy_endpoints):
     """Erstellt Migration Report"""
     report_file = "docs/MIGRATION_V3_REPORT.md"
-    
-    report = f"""# VERITAS API v3 - Migration Report
 
-**Date**: {datetime.now().strftime("%d. %B %Y %H:%M:%S")}  
+    report = """# VERITAS API v3 - Migration Report
+
+**Date**: {datetime.now().strftime("%d. %B %Y %H:%M:%S")}
 **Status**: ✅ Migration Complete
 
 ---
@@ -88,10 +89,10 @@ def create_migration_report(legacy_endpoints):
 
 #### Legacy Endpoints Removed:
 """
-    
+
     for i, endpoint in enumerate(legacy_endpoints, 1):
         report += f"{i}. `{endpoint}`\n"
-    
+
     report += """
 
 ---
@@ -104,7 +105,7 @@ def create_migration_report(legacy_endpoints):
 
 **Phase 1 - Core (3 Router, 13 Endpoints)**:
 - Query Router: 7 endpoints
-- Agent Router: 4 endpoints  
+- Agent Router: 4 endpoints
 - System Router: 5 endpoints
 
 **Phase 2 - Domain (4 Router, 12 Endpoints)**:
@@ -196,9 +197,9 @@ const API_BASE = 'http://localhost:5000/api/v3'
 ```javascript
 // OLD
 async function query(text) {{
-    const response = await fetch('/ask', {{
+    const response = await fetch(' / ask', {{
         method: 'POST',
-        headers: {{ 'Content-Type': 'application/json' }},
+        headers: {{ 'Content - Type': 'application / json' }},
         body: JSON.stringify({{ query: text }})
     }})
     return response.json()
@@ -206,9 +207,9 @@ async function query(text) {{
 
 // NEW
 async function query(text) {{
-    const response = await fetch('/api/v3/query', {{
+    const response = await fetch(' / api/v3 / query', {{
         method: 'POST',
-        headers: {{ 'Content-Type': 'application/json' }},
+        headers: {{ 'Content - Type': 'application / json' }},
         body: JSON.stringify({{
             query_text: text,
             mode: 'veritas',
@@ -281,53 +282,53 @@ python start_backend.py
 
 ---
 
-**Migration Team**: VERITAS API v3  
-**Status**: ✅ Backend Migration Complete  
+**Migration Team**: VERITAS API v3
+**Status**: ✅ Backend Migration Complete
 **Date**: {datetime.now().strftime("%d. %B %Y")}
 """
-    
-    with open(report_file, 'w', encoding='utf-8') as f:
+
+    with open(report_file, "w", encoding="utf-8") as f:
         f.write(report)
-    
+
     print(f"\n📄 Migration Report erstellt: {report_file}")
 
 
 def main():
     """Hauptfunktion"""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("VERITAS API v3 - Hard Migration")
-    print("="*60)
+    print("=" * 60)
     print("\nDieses Script analysiert das Backend und bereitet")
     print("die Migration zu API v3 vor.")
     print("\n⚠️  WARNUNG: Dies deaktiviert alle Legacy-Endpoints!")
-    print("="*60)
-    
+    print("=" * 60)
+
     # 1. Analyse
     legacy_endpoints = analyze_backend()
-    
+
     # 2. Backup
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     backup_file = backup_current_backend()
-    
+
     # 3. Migration Report
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     create_migration_report(legacy_endpoints)
-    
+
     # 4. Summary
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Migration Vorbereitung Complete!")
-    print("="*60)
+    print("=" * 60)
     print(f"\n✅ Backup erstellt: {backup_file}")
     print(f"✅ {len(legacy_endpoints)} Legacy-Endpoints identifiziert")
     print("✅ Migration Report erstellt: docs/MIGRATION_V3_REPORT.md")
-    
+
     print("\n📋 Nächste Schritte:")
     print("   1. Review Migration Report")
     print("   2. Erstelle Clean Backend (veritas_api_backend_v3.py)")
     print("   3. Teste Backend mit API v3")
     print("   4. Migriere Frontend API-Calls")
-    
-    print("\n" + "="*60)
+
+    print("\n" + "=" * 60)
 
 
 if __name__ == "__main__":

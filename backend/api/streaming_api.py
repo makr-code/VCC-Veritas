@@ -115,7 +115,7 @@ async def root():
     return {
         "name": "VERITAS NLP Streaming API",
         "version": "1.0.0",
-        "endpoints": {"websocket": "/ws/process/{session_id}", "test_page": "/test", "health": "/health"},
+        "endpoints": {"websocket": " / ws/process / {session_id}", "test_page": "/test", "health": "/health"},
         "status": {"nlp_services": NLP_SERVICES_AVAILABLE, "fastapi": FASTAPI_AVAILABLE, "bridge": BRIDGE_AVAILABLE},
     }
 
@@ -293,84 +293,84 @@ async def test_page():
             <title>VERITAS NLP Streaming Test</title>
             <style>
                 body {
-                    font-family: 'Segoe UI', Arial, sans-serif;
-                    max-width: 800px;
+                    font - family: 'Segoe UI', Arial, sans - serif;
+                    max - width: 800px;
                     margin: 50px auto;
                     padding: 20px;
-                    background-color: #f5f5f5;
+                    background - color: #f5f5f5;
                 }
                 .container {
-                    background-color: white;
+                    background - color: white;
                     padding: 30px;
-                    border-radius: 10px;
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                    border - radius: 10px;
+                    box - shadow: 0 2px 10px rgba(0,0,0,0.1);
                 }
                 h1 {
                     color: #2c3e50;
-                    margin-bottom: 20px;
+                    margin - bottom: 20px;
                 }
                 input, button {
                     padding: 12px;
                     margin: 10px 0;
-                    font-size: 16px;
+                    font - size: 16px;
                     border: 1px solid #ddd;
-                    border-radius: 5px;
+                    border - radius: 5px;
                 }
                 input {
                     width: calc(100% - 24px);
                 }
                 button {
-                    background-color: #3498db;
+                    background - color: #3498db;
                     color: white;
                     border: none;
                     cursor: pointer;
                     width: 100%;
                 }
                 button:hover {
-                    background-color: #2980b9;
+                    background - color: #2980b9;
                 }
                 button:disabled {
-                    background-color: #95a5a6;
-                    cursor: not-allowed;
+                    background - color: #95a5a6;
+                    cursor: not - allowed;
                 }
                 #log {
                     border: 1px solid #ddd;
                     padding: 15px;
                     height: 400px;
-                    overflow-y: auto;
-                    background-color: #f9f9f9;
-                    font-family: 'Courier New', monospace;
-                    font-size: 14px;
-                    margin-top: 20px;
-                    border-radius: 5px;
+                    overflow - y: auto;
+                    background - color: #f9f9f9;
+                    font - family: 'Courier New', monospace;
+                    font - size: 14px;
+                    margin - top: 20px;
+                    border - radius: 5px;
                 }
                 .log-entry {
                     margin: 5px 0;
                     padding: 5px;
-                    border-left: 3px solid #3498db;
-                    background-color: white;
+                    border - left: 3px solid #3498db;
+                    background - color: white;
                 }
                 .log-entry.error {
-                    border-left-color: #e74c3c;
-                    background-color: #ffe6e6;
+                    border - left-color: #e74c3c;
+                    background - color: #ffe6e6;
                 }
                 .log-entry.success {
-                    border-left-color: #27ae60;
-                    background-color: #e6ffe6;
+                    border - left-color: #27ae60;
+                    background - color: #e6ffe6;
                 }
                 .status {
-                    display: inline-block;
+                    display: inline - block;
                     padding: 5px 10px;
-                    border-radius: 3px;
-                    font-size: 12px;
-                    margin-right: 10px;
+                    border - radius: 3px;
+                    font - size: 12px;
+                    margin - right: 10px;
                 }
                 .status.connected {
-                    background-color: #27ae60;
+                    background - color: #27ae60;
                     color: white;
                 }
                 .status.disconnected {
-                    background-color: #e74c3c;
+                    background - color: #e74c3c;
                     color: white;
                 }
             </style>
@@ -502,7 +502,7 @@ async def test_page():
                 function log(message, type = '') {
                     const logDiv = document.getElementById('log');
                     const entry = document.createElement('div');
-                    entry.className = 'log-entry ' + type;
+                    entry.className = 'log - entry ' + type;
                     entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
                     logDiv.appendChild(entry);
                     logDiv.scrollTop = logDiv.scrollHeight;
@@ -534,7 +534,7 @@ if __name__ == "__main__":
     print("=" * 80)
     print("\nStarting server...")
     print(f"   WebSocket endpoint: ws://localhost:8000/ws/process/{{session_id}}")
-    print(f"   Test page: http://localhost:8000/test")
+    print("   Test page: http://localhost:8000/test")
     print(f"   Health check: http://localhost:8000/health")
     print("\n" + "=" * 80)
 

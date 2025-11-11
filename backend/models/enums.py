@@ -10,6 +10,7 @@ from enum import Enum
 
 class QueryMode(str, Enum):
     """Query processing modes"""
+
     RAG = "rag"
     HYBRID = "hybrid"
     STREAMING = "streaming"
@@ -24,6 +25,7 @@ class QueryMode(str, Enum):
 
 class QueryComplexity(str, Enum):
     """Query complexity levels"""
+
     BASIC = "basic"
     STANDARD = "standard"
     ADVANCED = "advanced"
@@ -32,6 +34,7 @@ class QueryComplexity(str, Enum):
 
 class QueryDomain(str, Enum):
     """Legal/Administrative domains"""
+
     GENERAL = "general"
     BUILDING = "building"
     ENVIRONMENTAL = "environmental"
@@ -46,6 +49,7 @@ class QueryDomain(str, Enum):
 
 class SourceType(str, Enum):
     """Document/Source types"""
+
     DOCUMENT = "document"
     WEB = "web"
     DATABASE = "database"
@@ -55,6 +59,7 @@ class SourceType(str, Enum):
 
 class ImpactLevel(str, Enum):
     """Impact assessment levels"""
+
     HIGH = "High"
     MEDIUM = "Medium"
     LOW = "Low"
@@ -63,6 +68,7 @@ class ImpactLevel(str, Enum):
 
 class RelevanceLevel(str, Enum):
     """Relevance assessment levels"""
+
     VERY_HIGH = "Very High"
     HIGH = "High"
     MEDIUM = "Medium"
@@ -72,6 +78,7 @@ class RelevanceLevel(str, Enum):
 
 class QueryStatus(str, Enum):
     """Query processing status"""
+
     PENDING = "pending"
     IN_PROGRESS = "in_progress"
     COMPLETED = "completed"
@@ -81,6 +88,7 @@ class QueryStatus(str, Enum):
 
 class AgentCapability(str, Enum):
     """Agent capabilities for selection"""
+
     DOCUMENT_RETRIEVAL = "document_retrieval"
     GEO_CONTEXT = "geo_context"
     LEGAL_FRAMEWORK = "legal_framework"

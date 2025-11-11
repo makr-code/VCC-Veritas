@@ -713,7 +713,7 @@ class TechnicalStandardsAgent:
                 "version": "2021",
             },
             "IEC 61508": {
-                "title": "Funktionale Sicherheit sicherheitsbezogener elektrischer/elektronischer/programmierbarer elektronischer Systeme",
+                "title": "Funktionale Sicherheit sicherheitsbezogener elektrischer / elektronischer/programmierbarer elektronischer Systeme",
                 "org": StandardsOrganization.IEC,
                 "category": StandardCategory.SAFETY,
                 "status": StandardStatus.ACTIVE,
@@ -766,7 +766,7 @@ class TechnicalStandardsAgent:
             StandardsOrganization.IEC: [
                 ("IEC 61508", "Funktionale Sicherheit", StandardCategory.SAFETY),
                 ("IEC 60364", "Niederspannungsanlagen", StandardCategory.ELECTRICAL),
-                ("IEC 62304", "Medizingeräte-Software", StandardCategory.MEDICAL),
+                ("IEC 62304", "Medizingeräte - Software", StandardCategory.MEDICAL),
                 ("IEC 61131", "Speicherprogrammierbare Steuerungen", StandardCategory.MACHINERY),
             ],
         }
@@ -819,7 +819,7 @@ class TechnicalStandardsAgent:
             StandardCategory.SAFETY: [
                 ("ISO 45001", "Arbeitsschutz- und Sicherheitsmanagementsysteme", StandardsOrganization.ISO),
                 ("IEC 61508", "Funktionale Sicherheit", StandardsOrganization.IEC),
-                ("OSHA 29 CFR 1910", "Allgemeine Industrie-Sicherheitsstandards", StandardsOrganization.OSHA),
+                ("OSHA 29 CFR 1910", "Allgemeine Industrie - Sicherheitsstandards", StandardsOrganization.OSHA),
             ],
             StandardCategory.ELECTRICAL: [
                 ("VDE 0100", "Errichten von Niederspannungsanlagen", StandardsOrganization.VDE),
@@ -1077,7 +1077,7 @@ class TechnicalStandardsAgent:
         self._stats["avg_processing_time_ms"] = self._stats["total_processing_time_ms"] / self._stats["queries_processed"]
 
     def _cleanup_cache(self):
-        """Cache-Cleanup bei Überlauf"""
+        """Cache-Cleanup bei Überlau"""
         if len(self._search_cache) > self.config.max_cache_size:
             # Entferne 20% der ältesten Einträge
             items_to_remove = len(self._search_cache) // 5
@@ -1153,13 +1153,17 @@ async def main():
         {
             "search_term": "ISO 9001",
             "organization": StandardsOrganization.ISO,
-            "description": "ISO-Standard Suche: Qualitätsmanagement",
+            "description": "ISO - Standard Suche: Qualitätsmanagement",
         },
-        {"search_term": "VDE 0100", "organization": StandardsOrganization.VDE, "description": "VDE-Standard: Elektrotechnik"},
+        {
+            "search_term": "VDE 0100",
+            "organization": StandardsOrganization.VDE,
+            "description": "VDE - Standard: Elektrotechnik",
+        },
         {
             "search_term": "Sicherheit",
             "category": StandardCategory.SAFETY,
-            "description": "Kategorie-Suche: Sicherheitsnormen",
+            "description": "Kategorie - Suche: Sicherheitsnormen",
         },
         {"search_term": "Qualität", "organization": None, "description": "Allgemeine Suche: Qualitätsstandards"},
     ]
@@ -1244,12 +1248,12 @@ async def main():
                     print(f"      - {gap['gap_description']} (Priority: {gap['priority']})")
 
             if assessment.recommendations:
-                print(f"   💡 Recommendations:")
+                print("   💡 Recommendations:")
                 for rec in assessment.recommendations[:2]:
                     print(f"      - {rec}")
 
     # Agent-Status
-    print(f"\n📊 Agent Status:")
+    print("\n📊 Agent Status:")
     status = agent.get_status()
     print(f"   Queries processed: {status['performance']['queries_processed']}")
     print(f"   Standards found: {status['performance']['standards_found']}")

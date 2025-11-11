@@ -4,13 +4,20 @@ Capabilities: verwaltungsprozess, klageverfahren, einstweiliger rechtsschutz, ge
 Wissensbasis: VwGO, Fristen, Rechtsmittel, Urteilsdatenbank
 """
 
+
 class VerwaltungsprozessAgent:
     def __init__(self):
         self.agent_id = "VerwaltungsprozessAgent"
         self.version = "v1.0"
         self.capabilities = [
-            "verwaltungsprozess", "klageverfahren", "einstweiliger rechtsschutz", "gerichtsbarkeit",
-            "verwaltungsgericht", "fristen", "rechtsmittel", "urteilsdatenbank"
+            "verwaltungsprozess",
+            "klageverfahren",
+            "einstweiliger rechtsschutz",
+            "gerichtsbarkeit",
+            "verwaltungsgericht",
+            "fristen",
+            "rechtsmittel",
+            "urteilsdatenbank",
         ]
         self.knowledge_base = {
             "VwGO": "Verwaltungsgerichtsordnung: Regelungen für Klageverfahren und Rechtsschutz im Verwaltungsrecht.",
@@ -20,7 +27,7 @@ class VerwaltungsprozessAgent:
             "Berufung": "§ 124 VwGO: Berufung gegen Urteile des Verwaltungsgerichts, wenn zugelassen.",
             "Revision": "§ 132 VwGO: Revision zum Bundesverwaltungsgericht bei grundsätzlicher Bedeutung.",
             "Urteilsdatenbank": "Zugriff auf Rechtsprechung der Verwaltungsgerichte (z.B. BVerwG, OVG).",
-            "Verwaltungsgerichtsbarkeit": "Dreistufiger Aufbau: Verwaltungsgericht, Oberverwaltungsgericht, Bundesverwaltungsgericht."
+            "Verwaltungsgerichtsbarkeit": "Dreistufiger Aufbau: Verwaltungsgericht, Oberverwaltungsgericht, Bundesverwaltungsgericht.",
         }
 
     def query(self, keyword):
@@ -38,7 +45,7 @@ class VerwaltungsprozessAgent:
             "agent_id": self.agent_id,
             "version": self.version,
             "capabilities": self.capabilities,
-            "knowledge_base": list(self.knowledge_base.keys())
+            "knowledge_base": list(self.knowledge_base.keys()),
         }
 
     def search_prozess(self, query):

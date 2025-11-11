@@ -161,7 +161,7 @@ class VeritasAPIManager:
                 if self.process.poll() is not None:
                     # Prozess beendet
                     output = self.process.stdout.read()
-                    logger.error(f"❌ API-Server konnte nicht gestartet werden:")
+                    logger.error("❌ API-Server konnte nicht gestartet werden:")
                     logger.error(output)
                     return False
 
@@ -202,12 +202,12 @@ class VeritasAPIManager:
     def show_server_info(self):
         """Zeigt Server-Informationen"""
         if self.current_port:
-            print(f"\n🌐 VERITAS API läuft auf:")
+            print("\n🌐 VERITAS API läuft auf:")
             print(f"   URL: http://localhost:{self.current_port}")
             print(f"   Dokumentation: http://localhost:{self.current_port}/docs")
             print(f"   Alternative Docs: http://localhost:{self.current_port}/redoc")
             print(f"   Health Check: http://localhost:{self.current_port}/health")
-            print(f"\n💡 Zum Stoppen: Ctrl+C oder 'stop' eingeben")
+            print("\n💡 Zum Stoppen: Ctrl+C oder 'stop' eingeben")
 
     def interactive_mode(self):
         """Interaktiver Modus"""

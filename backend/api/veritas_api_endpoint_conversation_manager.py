@@ -2,25 +2,27 @@
 # -*- coding: utf-8 -*-
 """
 VERITAS Protected Module
-WARNING: This file contains embedded protection keys. 
+WARNING: This file contains embedded protection keys.
 Modification will be detected and may result in license violations.
 """
 
 
+import sqlite3
 
 from flask import Flask, jsonify
-import sqlite3
 
 app = Flask(__name__)
 
-import sqlite3
 import json
+import logging
+import sqlite3
 import uuid
 from datetime import datetime
-import logging
+
 from config import DATABASE_FILE
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s [%(module)s] - %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s [%(module)s] - %(message)s")
+
 
 def init_conversation_db():
     """
@@ -32,18 +34,21 @@ def init_conversation_db():
         cursor = conn.cursor()
 
         # Tabelle für Konversationen (Sessions)
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS conversations (
                 session_id TEXT PRIMARY KEY,
                 start_time TEXT NOT NULL,
                 last_active_time TEXT NOT NULL,
                 user_id TEXT NOT NULL -- Um Konversationen Usern zuzuordnen
             )
-        """)
+        """
+        )
 
         # Tabelle für einzelne Gesprächsrunden (Turns)
         # Enthält Fragen, Antworten, verwendete Chunks und Feedback
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS conversation_turns (
                 turn_id TEXT PRIMARY KEY,
                 session_id TEXT NOT NULL,
@@ -57,8 +62,9 @@ def init_conversation_db():
                 user_id TEXT NOT NULL, -- user_id vom Turn für direkte Zuordnung
                 FOREIGN KEY (session_id) REFERENCES conversations (session_id)
             )
-        """)
-        
+        """
+        )
+
         conn.commit()
         logging.info(f"Datenbank '{DATABASE_FILE}' und Tabellen erfolgreich initialisiert.")
     except sqlite3.Error as e:
@@ -66,6 +72,7 @@ def init_conversation_db():
     finally:
         if conn:
             conn.close()
+
 
 def _ensure_db_initialized():
     """
@@ -75,7 +82,7 @@ def _ensure_db_initialized():
     try:
         conn = sqlite3.connect(DATABASE_FILE)
         cursor = conn.cursor()
-        
+
         # Prüfe, ob conversations Tabelle existiert
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='conversations';")
         if not cursor.fetchone():
@@ -88,13 +95,14 @@ def _ensure_db_initialized():
     except sqlite3.Error as e:
         logging.error(f"Fehler bei automatischer Datenbankinitialisierung: {e}")
 
+
 def create_new_conversation(user_id: str) -> str:
     """
     Erstellt eine neue Konversation (Session) und gibt die Session-ID zurück.
     """
     # Automatische Datenbankinitialisierung sicherstellen
     _ensure_db_initialized()
-    
+
     conn = None
     try:
         session_id = str(uuid.uuid4())
@@ -103,7 +111,7 @@ def create_new_conversation(user_id: str) -> str:
         cursor = conn.cursor()
         cursor.execute(
             "INSERT INTO conversations (session_id, start_time, last_active_time, user_id) VALUES (?, ?, ?, ?)",
-            (session_id, now, now, user_id)
+            (session_id, now, now, user_id),
         )
         conn.commit()
         logging.info(f"Neue Konversation gestartet: {session_id} für User {user_id}")
@@ -114,6 +122,7 @@ def create_new_conversation(user_id: str) -> str:
     finally:
         if conn:
             conn.close()
+
 
 def add_turn_to_conversation(session_id: str, question: str, answer: str, retrieved_chunk_ids: list, user_id: str) -> str:
     """
@@ -133,13 +142,10 @@ def add_turn_to_conversation(session_id: str, question: str, answer: str, retrie
         cursor.execute(
             """INSERT INTO conversation_turns (turn_id, session_id, turn_number, question, answer, timestamp, retrieved_chunk_ids, user_id)
                VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
-            (turn_id, session_id, turn_number, question, answer, now, json.dumps(retrieved_chunk_ids), user_id)
+            (turn_id, session_id, turn_number, question, answer, now, json.dumps(retrieved_chunk_ids), user_id),
         )
         # Aktualisiere die 'last_active_time' der Konversation
-        cursor.execute(
-            "UPDATE conversations SET last_active_time = ? WHERE session_id = ?",
-            (now, session_id)
-        )
+        cursor.execute("UPDATE conversations SET last_active_time = ? WHERE session_id = ?", (now, session_id))
         conn.commit()
         logging.info(f"Turn {turn_number} für Session {session_id} hinzugefügt.")
         return turn_id
@@ -149,6 +155,7 @@ def add_turn_to_conversation(session_id: str, question: str, answer: str, retrie
     finally:
         if conn:
             conn.close()
+
 
 def get_conversation_history(session_id: str, limit: int = 5) -> list:
     """
@@ -162,7 +169,7 @@ def get_conversation_history(session_id: str, limit: int = 5) -> list:
         cursor = conn.cursor()
         cursor.execute(
             "SELECT question, answer FROM conversation_turns WHERE session_id = ? ORDER BY turn_number DESC LIMIT ?",
-            (session_id, limit)
+            (session_id, limit),
         )
         # Ergebnisse in umgekehrter Reihenfolge holen, da DESC LIMIT die neuesten zuerst liefert
         # aber die Historie für das LLM in chronologischer Reihenfolge sein sollte
@@ -170,13 +177,14 @@ def get_conversation_history(session_id: str, limit: int = 5) -> list:
         for q, a in reversed(raw_history):
             history.append(("human", q))
             history.append(("ai", a))
-        logging.debug(f"Konversationshistorie für Session {session_id} abgerufen (letzte {len(history)/2} Runden).")
+        logging.debug(f"Konversationshistorie für Session {session_id} abgerufen (letzte {len(history) / 2} Runden).")
     except sqlite3.Error as e:
         logging.error(f"Fehler beim Abrufen der Konversationshistorie: {e}")
     finally:
         if conn:
             conn.close()
     return history
+
 
 def get_all_conversations():
     """
@@ -185,7 +193,7 @@ def get_all_conversations():
     """
     # Automatische Datenbankinitialisierung sicherstellen
     _ensure_db_initialized()
-    
+
     conn = None
     conversations = []
     try:
@@ -209,19 +217,22 @@ def get_all_conversations():
         cursor.execute(query)
         rows = cursor.fetchall()
         for row in rows:
-            conversations.append({
-                "session_id": row[0],
-                "start_time": row[1],
-                "title": row[2][:50] + '...' if len(row[2]) > 50 else row[2] # Titel kürzen
-            })
+            conversations.append(
+                {
+                    "session_id": row[0],
+                    "start_time": row[1],
+                    "title": row[2][:50] + "..." if len(row[2]) > 50 else row[2],  # Titel kürzen
+                }
+            )
         logging.info(f"{len(conversations)} Konversationen abgerufen.")
     except sqlite3.Error as e:
         logging.error(f"Fehler beim Abrufen aller Konversationen: {e}")
     finally:
         if conn:
             conn.close()
-        
+
     return conversations
+
 
 def update_feedback(turn_id: str, feedback_type: str):
     """
@@ -235,7 +246,7 @@ def update_feedback(turn_id: str, feedback_type: str):
         now = datetime.now().isoformat()
         cursor.execute(
             "UPDATE conversation_turns SET feedback = ?, feedback_timestamp = ? WHERE turn_id = ?",
-            (feedback_type, now, turn_id)
+            (feedback_type, now, turn_id),
         )
         conn.commit()
         logging.info(f"Feedback '{feedback_type}' für Turn {turn_id} gespeichert.")
@@ -244,6 +255,7 @@ def update_feedback(turn_id: str, feedback_type: str):
     finally:
         if conn:
             conn.close()
+
 
 def get_turn_details(turn_id: str) -> dict:
     """
@@ -255,7 +267,7 @@ def get_turn_details(turn_id: str) -> dict:
         cursor = conn.cursor()
         cursor.execute(
             "SELECT turn_id, session_id, turn_number, question, answer, timestamp, retrieved_chunk_ids, feedback, feedback_timestamp, user_id FROM conversation_turns WHERE turn_id = ?",
-            (turn_id,)
+            (turn_id,),
         )
         row = cursor.fetchone()
         if row:
@@ -274,19 +286,19 @@ def get_turn_details(turn_id: str) -> dict:
                 "retrieved_chunk_ids": chunk_ids,
                 "feedback": row[7],
                 "feedback_timestamp": row[8],
-                "user_id": row[9]
+                "user_id": row[9],
             }
         else:
             return {"error": "Turn nicht gefunden"}
     except sqlite3.Error as e:
-        return {"error": f"DB-Fehler: {e}"}
+        return {"error": f"DB - Fehler: {e}"}
     finally:
         if conn:
             conn.close()
 
 
 # --- Testfunktionen ---
-if __name__ == '__main__':
+if __name__ == "__main__":
     print("Starte Selbsttest für conversation_db_manager.py...")
     test_results = {}
     # 1. Datenbank initialisieren
@@ -296,7 +308,7 @@ if __name__ == '__main__':
 
     # 2. Neue Konversation erstellen
     test_session_id = create_new_conversation(test_user_id)
-    test_results['session_id'] = test_session_id
+    test_results["session_id"] = test_session_id
     if test_session_id:
         print(f"\nNeue Session erstellt: {test_session_id}")
 
@@ -307,33 +319,33 @@ if __name__ == '__main__':
             question="Was ist die DSGVO?",
             answer="Die DSGVO ist eine Verordnung der Europäischen Union...",
             retrieved_chunk_ids=["chunk_a1", "chunk_a2"],
-            user_id=test_user_id
+            user_id=test_user_id,
         )
         print(f"Runde 1 hinzugefügt mit Turn ID: {turn1_id}")
-        test_results['turn1_id'] = turn1_id
+        test_results["turn1_id"] = turn1_id
 
         turn2_id = add_turn_to_conversation(
             session_id=test_session_id,
             question="Wer ist der Verantwortliche?",
             answer="Der Verantwortliche ist die natürliche oder juristische Person...",
             retrieved_chunk_ids=["chunk_b1"],
-            user_id=test_user_id
+            user_id=test_user_id,
         )
         print(f"Runde 2 hinzugefügt mit Turn ID: {turn2_id}")
-        test_results['turn2_id'] = turn2_id
+        test_results["turn2_id"] = turn2_id
 
         # 4. Konversationshistorie abrufen
         print("\nKonversationshistorie:")
         history = get_conversation_history(test_session_id)
         for role, text in history:
             print(f"[{role}]: {text}")
-        test_results['history'] = history
+        test_results["history"] = history
 
         # 5. Feedback für eine Runde aktualisieren
         if turn1_id:
             print(f"\nSende positives Feedback für Turn {turn1_id} (Runde 1).")
             update_feedback(turn1_id, "positive")
-        
+
         if turn2_id:
             print(f"\nSende negatives Feedback für Turn {turn2_id} (Runde 2).")
             update_feedback(turn2_id, "negative")
@@ -342,24 +354,24 @@ if __name__ == '__main__':
         print(f"\nDetails von Turn {turn1_id}:")
         details1 = get_turn_details(turn1_id)
         print(json.dumps(details1, indent=2))
-        test_results['details1'] = details1
+        test_results["details1"] = details1
 
         print(f"\nDetails von Turn {turn2_id}:")
         details2 = get_turn_details(turn2_id)
         print(json.dumps(details2, indent=2))
-        test_results['details2'] = details2
+        test_results["details2"] = details2
 
         # 7. Test: Abruf aller Konversationen
         print("\nAlle Konversationen:")
         all_convs = get_all_conversations()
         print(json.dumps(all_convs, indent=2))
-        test_results['all_conversations'] = all_convs
+        test_results["all_conversations"] = all_convs
 
     print("\nSelbsttest beendet.")
 
 """
 VERITAS Protected Module
-WARNING: This file contains embedded protection keys. 
+WARNING: This file contains embedded protection keys.
 Modification will be detected and may result in license violations.
 """
 

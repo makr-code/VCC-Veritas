@@ -190,7 +190,7 @@ async def lifespan(app: FastAPI):
     logger.info("=" * 70)
     logger.info("✅ VERITAS API v3 Backend Ready!")
     logger.info("=" * 70)
-    logger.info(f"📍 API Base: http://localhost:5000/api/v3")
+    logger.info("📍 API Base: http://localhost:5000/api/v3")
     logger.info(f"📖 Docs: http://localhost:5000/docs")
     logger.info(f"📊 UDS3: {'✅ Active' if app.state.uds3 else '⚠️  Demo Mode'}")
     logger.info(f"🤖 Pipeline: {'✅ Active' if app.state.intelligent_pipeline else '⚠️  Demo Mode'}")
@@ -268,8 +268,8 @@ async def root():
     return {
         "message": "VERITAS API v3 Backend",
         "version": "3.0.0",
-        "api_base": "/api/v3",
-        "documentation": "/docs",
+        "api_base": " / api/v3",
+        "documentation": " / docs",
         "api_info": v3_info,
         "timestamp": datetime.now().isoformat(),
     }

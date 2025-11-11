@@ -118,9 +118,9 @@ class VeritasSystemModeManager:
             "VERITAS": {
                 "system": "veritas_rag",
                 "display_name": "Veritas RAG System",
-                "description": "Standard-RAG mit Ollama und Multi-Database-Backend",
+                "description": "Standard - RAG mit Ollama und Multi - Database-Backend",
                 "status": "implemented",
-                "endpoints": ["/v2/query", "/ask", "/search"],
+                "endpoints": [" / v2/query", " / ask", " / search"],
                 "parameters": ["question", "model", "temperature", "max_tokens"],
                 "example": "Erkläre mir das deutsche Verwaltungsrecht",
                 "category": "core",
@@ -130,9 +130,9 @@ class VeritasSystemModeManager:
             "VERITAS_AGENTS": {
                 "system": "veritas_agents",
                 "display_name": "Veritas Agent System",
-                "description": "Erweiterte RAG-Pipeline mit Agent-Engine und Multi-Source Integration",
+                "description": "Erweiterte RAG - Pipeline mit Agent - Engine und Multi - Source Integration",
                 "status": "implemented" if self._check_agent_availability() else "unavailable",
-                "endpoints": ["/agents/ask", "/agents/search", "/agents/quality"],
+                "endpoints": [" / agents/ask", " / agents/search", " / agents/quality"],
                 "parameters": ["query", "sources", "quality_level", "enhancement_mode"],
                 "example": "Suche Informationen zu Bebauungsplänen mit hoher Qualität",
                 "category": "enhancement",
@@ -238,7 +238,7 @@ async def root():
         "status": "active",
         "agent_pipeline_available": AGENT_PIPELINE_AVAILABLE,
         "available_modes": system_manager.get_available_modes(),
-        "endpoints": {"chat": "/v2/query", "rag": "/ask", "agents": "/agents/ask", "docs": "/docs"},
+        "endpoints": {"chat": " / v2/query", "rag": " / ask", "agents": " / agents/ask", "docs": " / docs"},
     }
 
 
@@ -274,7 +274,7 @@ async def veritas_chat_query(query_data: Dict[str, Any]):
         if not AGENT_PIPELINE_AVAILABLE or not agent_orchestrator:
             # Legacy fallback
             return {
-                "response_text": f"Legacy-Antwort für: {query_text}",
+                "response_text": f"Legacy - Antwort für: {query_text}",
                 "confidence_score": 0.7,
                 "sources": [],
                 "worker_results": {},
@@ -376,7 +376,7 @@ async def veritas_rag_query(request: VeritasRAGRequest):
 
         # Dummy-Implementierung für Migration
         answer = f"Veritas RAG Antwort für: {request.question}"
-        sources = [{"title": "Beispiel-Dokument", "content": "Relevanter Inhalt...", "score": 0.95, "source": "veritas_db"}]
+        sources = [{"title": "Beispiel - Dokument", "content": "Relevanter Inhalt...", "score": 0.95, "source": "veritas_db"}]
 
         processing_time = time.time() - start_time
 
@@ -500,7 +500,7 @@ async def _legacy_agent_query(request: VeritasAgentQueryRequest, session_id: str
     # Dummy-Implementierung für Migration
     return VeritasAgentQueryResponse(
         answer=f"Legacy Agent-Antwort für: {request.query}",
-        agent_results=[{"agent_type": "legacy_agent", "result": "Legacy-Verarbeitung aktiv", "confidence": 0.7}],
+        agent_results=[{"agent_type": "legacy_agent", "result": "Legacy - Verarbeitung aktiv", "confidence": 0.7}],
         external_data=[],
         quality_metrics={"overall_confidence": 0.7, "agent_count": 1, "system_mode": "legacy"},
         processing_details={"system_mode": "legacy_fallback", "message": "Agent Pipeline nicht verfügbar"},

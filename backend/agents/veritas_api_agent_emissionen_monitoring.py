@@ -4,20 +4,27 @@ Capabilities: emissionsmessung, kontinuierliche überwachung, Emissionsbericht, 
 Wissensbasis: BImSchG, TA Luft, Messstellenverordnung
 """
 
+
 class EmissionenMonitoringAgent:
     def __init__(self):
         self.agent_id = "EmissionenMonitoringAgent"
         self.version = "v1.0"
         self.capabilities = [
-            "emissionsmessung", "kontinuierliche überwachung", "emissionsbericht", "grenzwertüberschreitung",
-            "messstellen", "berichterstattung", "emissionsdatenbank", "fernüberwachung"
+            "emissionsmessung",
+            "kontinuierliche überwachung",
+            "emissionsbericht",
+            "grenzwertüberschreitung",
+            "messstellen",
+            "berichterstattung",
+            "emissionsdatenbank",
+            "fernüberwachung",
         ]
         self.knowledge_base = {
-            "BImSchG": "Bundes-Immissionsschutzgesetz: Regelungen zu Emissionen und Überwachung.",
+            "BImSchG": "Bundes - Immissionsschutzgesetz: Regelungen zu Emissionen und Überwachung.",
             "TA Luft": "Technische Anleitung zur Reinhaltung der Luft: Grenzwerte und Messverfahren.",
             "Messstellenverordnung": "Vorgaben für Messstellen und kontinuierliche Überwachung.",
             "Emissionsdatenbank": "Datenbank für Emissionswerte und Berichte.",
-            "Fernüberwachung": "Technologien zur Fernüberwachung von Emissionsquellen."
+            "Fernüberwachung": "Technologien zur Fernüberwachung von Emissionsquellen.",
         }
 
     def query(self, keyword):
@@ -35,7 +42,7 @@ class EmissionenMonitoringAgent:
             "agent_id": self.agent_id,
             "version": self.version,
             "capabilities": self.capabilities,
-            "knowledge_base": list(self.knowledge_base.keys())
+            "knowledge_base": list(self.knowledge_base.keys()),
         }
 
     def search_emissionen(self, query):

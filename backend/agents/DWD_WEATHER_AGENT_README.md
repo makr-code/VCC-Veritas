@@ -10,7 +10,7 @@ Der DWD Weather Agent integriert den Deutschen Wetterdienst (DWD) in das VERITAS
 
 - **Deutscher Wetterdienst Integration** - Offizielle DWD-Daten über dwdweather2
 - **Ortsbasierte Stationssuche** - Automatische Suche der nächsten Wetterstationen
-- **Flexible Zeitintervalle** - Stündliche und tägliche Datenabfrage  
+- **Flexible Zeitintervalle** - Stündliche und tägliche Datenabfrage
 - **Umfangreiche Parameter** - Temperatur, Niederschlag, Wind, Luftfeuchtigkeit, Luftdruck
 - **Statistische Auswertung** - Min/Max/Durchschnitt und Trend-Analysen
 - **Performance-Optimierung** - Caching und parallele Datenabfrage
@@ -41,7 +41,7 @@ backend/agents/
 
 ```python
 from backend.agents.veritas_api_agent_dwd_weather import (
-    DwdWeatherAgent, DwdWeatherQueryRequest, 
+    DwdWeatherAgent, DwdWeatherQueryRequest,
     WeatherInterval, WeatherParameter, DwdWeatherConfig
 )
 
@@ -55,7 +55,7 @@ request = DwdWeatherQueryRequest(
     query_text="Aktuelles Wetter in Berlin",
     location="Berlin",
     start_date="2025-09-25",
-    end_date="2025-09-28", 
+    end_date="2025-09-28",
     interval=WeatherInterval.DAILY,
     parameters=[
         WeatherParameter.TEMPERATURE,
@@ -206,7 +206,7 @@ stations = dwd.nearest_station(lat=52.5200, lon=13.4050)
 # In backend/api/veritas_api_backend.py
 
 from backend.agents.veritas_api_agent_dwd_weather import (
-    create_dwd_weather_agent, DwdWeatherQueryRequest, 
+    create_dwd_weather_agent, DwdWeatherQueryRequest,
     WeatherInterval, WeatherParameter
 )
 
@@ -216,7 +216,7 @@ dwd_agent = create_dwd_weather_agent()
 @app.post("/agents/dwd_weather/query")
 async def dwd_weather_query(request: dict):
     """DWD Weather Query Endpoint"""
-    
+
     # Request Parameter parsen
     weather_request = DwdWeatherQueryRequest(
         query_id=request.get("query_id", str(uuid.uuid4())),
@@ -229,10 +229,10 @@ async def dwd_weather_query(request: dict):
         interval=WeatherInterval(request.get("interval", "daily")),
         parameters=[WeatherParameter(p) for p in request.get("parameters", ["temperature"])]
     )
-    
+
     # Query ausführen
     response = await dwd_agent.execute_query_async(weather_request)
-    
+
     return {
         "success": response.success,
         "data": response.results,
@@ -268,7 +268,7 @@ async function getWeatherData(location, startDate, endDate) {
             parameters: ["temperature", "precipitation", "wind"]
         })
     });
-    
+
     const data = await response.json();
     return data;
 }
@@ -288,7 +288,7 @@ console.log(`${weather.data.length} Stationen gefunden`);
 # Standalone Test (ohne VERITAS-System)
 python backend/agents/test_dwd_weather_standalone.py
 
-# Mit VERITAS-System  
+# Mit VERITAS-System
 python -m unittest backend.agents.tests.test_dwd_weather_agent
 ```
 
@@ -351,15 +351,15 @@ config = DwdWeatherConfig(
     data_source="Deutscher Wetterdienst",
     supported_intervals=["hourly", "daily"],
     cache_enabled=True,
-    
+
     # Performance
     max_concurrent_tasks=5,
     timeout_seconds=60,
     min_confidence_threshold=0.9,
     max_retries=3,
     cache_ttl_seconds=3600,
-    
-    # Suche  
+
+    # Suche
     max_distance_km=50.0,
     max_stations=5
 )
@@ -400,7 +400,7 @@ Für echte DWD-Integration:
 def _fetch_real_dwd_data(self, station_id: str, start: datetime, end: datetime):
     """Echte DWD-API Integration"""
     from dwdweather2 import DwdWeather
-    
+
     dwd = DwdWeather(resolution="hourly")
     df = dwd.query(
         station_id=station_id,
@@ -408,7 +408,7 @@ def _fetch_real_dwd_data(self, station_id: str, start: datetime, end: datetime):
         start_date=start,
         end_date=end
     )
-    
+
     return df  # Pandas DataFrame mit DWD-Daten
 ```
 
@@ -431,7 +431,7 @@ def _fetch_real_dwd_data(self, station_id: str, start: datetime, end: datetime):
 "Niederschlag München September 2025"
 "Windgeschwindigkeit Hamburg gestern"
 
-# Aktuelle Daten  
+# Aktuelle Daten
 "Aktuelles Wetter Frankfurt"
 "Luftfeuchtigkeit Köln heute"
 "Luftdruck Deutschland jetzt"
@@ -448,7 +448,7 @@ def _fetch_real_dwd_data(self, station_id: str, start: datetime, end: datetime):
 Der **VERITAS DWD Weather Agent** bietet:
 
 - ✅ **Vollständige DWD-Integration** mit dwdweather2
-- ✅ **Flexible Query-API** für verschiedene Anwendungsfälle  
+- ✅ **Flexible Query-API** für verschiedene Anwendungsfälle
 - ✅ **Performance-optimiert** mit Caching und Parallel Processing
 - ✅ **Production-ready** mit Error Handling und Monitoring
 - ✅ **VERITAS-kompatibel** für nahtlose System-Integration
@@ -457,5 +457,5 @@ Der **VERITAS DWD Weather Agent** bietet:
 
 ---
 
-*Erstellt am: 28. September 2025*  
+*Erstellt am: 28. September 2025*
 *VERITAS DWD Weather Agent v1.0*

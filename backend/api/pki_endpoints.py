@@ -15,22 +15,22 @@ Endpunkte:
 - POST   /api/v1/pki/ca/sign               - CSR signieren
 """
 
-from fastapi import APIRouter, HTTPException, Query
-from pydantic import BaseModel, Field
-from typing import List, Optional
 from datetime import datetime
 from enum import Enum
+from typing import List, Optional
 
+from fastapi import APIRouter, HTTPException, Query
 from pki import (
+    CANotInitializedError,
+    CAService,
     CertificateManager,
+    CertificateNotFoundError,
     CertificateStatus,
     CertificateType,
-    CAService,
-    CertificateNotFoundError,
     InvalidCertificateError,
-    CANotInitializedError,
-    InvalidCSRError
+    InvalidCSRError,
 )
+from pydantic import BaseModel, Field
 
 # ============================================================================
 # Router Setup
@@ -48,8 +48,10 @@ ca_service = CAService(auto_initialize=True)
 # Request/Response Models
 # ============================================================================
 
+
 class CertificateTypeEnum(str, Enum):
     """Zertifikatstyp Enum"""
+
     SERVER = "server"
     CLIENT = "client"
     CODE_SIGNING = "code_signing"
@@ -58,6 +60,7 @@ class CertificateTypeEnum(str, Enum):
 
 class CertificateStatusEnum(str, Enum):
     """Zertifikatsstatus Enum"""
+
     VALID = "valid"
     EXPIRED = "expired"
     REVOKED = "revoked"
@@ -66,6 +69,7 @@ class CertificateStatusEnum(str, Enum):
 
 class CreateCertificateRequest(BaseModel):
     """Request: Zertifikat erstellen"""
+
     common_name: str = Field(..., description="Common Name (CN)", example="api.veritas.local")
     validity_days: int = Field(365, description="Gültigkeit in Tagen", ge=1, le=3650)
     key_size: int = Field(2048, description="RSA-Schlüsselgröße", enum=[2048, 4096])
@@ -81,6 +85,7 @@ class CreateCertificateRequest(BaseModel):
 
 class CertificateResponse(BaseModel):
     """Response: Zertifikat"""
+
     cert_id: str = Field(..., description="Zertifikats-ID")
     common_name: str = Field(..., description="Common Name")
     cert_type: str = Field(..., description="Zertifikatstyp")
@@ -96,6 +101,7 @@ class CertificateResponse(BaseModel):
 
 class CertificateDetailResponse(CertificateResponse):
     """Response: Zertifikat mit Details"""
+
     cert_pem: str = Field(..., description="Zertifikat (PEM)")
     subject: dict = Field(..., description="Subject DN")
     sans: List[str] = Field(..., description="Subject Alternative Names")
@@ -103,12 +109,13 @@ class CertificateDetailResponse(CertificateResponse):
 
 class RevokeCertificateRequest(BaseModel):
     """Request: Zertifikat widerrufen"""
-    reason: str = Field("unspecified", description="Widerrufsgrund", 
-                       example="key_compromise")
+
+    reason: str = Field("unspecified", description="Widerrufsgrund", example="key_compromise")
 
 
 class SignCSRRequest(BaseModel):
     """Request: CSR signieren"""
+
     csr_pem: str = Field(..., description="CSR (PEM-Format)")
     validity_days: int = Field(365, description="Gültigkeit in Tagen", ge=1, le=3650)
     cert_type: CertificateTypeEnum = Field(CertificateTypeEnum.SERVER, description="Zertifikatstyp")
@@ -116,6 +123,7 @@ class SignCSRRequest(BaseModel):
 
 class SignedCertificateResponse(BaseModel):
     """Response: Signiertes Zertifikat"""
+
     cert_id: str
     serial_number: str
     subject: str
@@ -128,6 +136,7 @@ class SignedCertificateResponse(BaseModel):
 
 class CAInfoResponse(BaseModel):
     """Response: CA-Informationen"""
+
     ca_name: str
     initialized: bool
     certificate: dict
@@ -136,6 +145,7 @@ class CAInfoResponse(BaseModel):
 
 class StatisticsResponse(BaseModel):
     """Response: PKI-Statistiken"""
+
     total_certificates: int
     valid_certificates: int
     expired_certificates: int
@@ -149,11 +159,12 @@ class StatisticsResponse(BaseModel):
 # Certificate Endpoints
 # ============================================================================
 
+
 @router.post("/certificates", response_model=CertificateDetailResponse, status_code=201)
 async def create_certificate(request: CreateCertificateRequest):
     """
     Erstellt ein neues Zertifikat.
-    
+
     - **common_name**: Fully Qualified Domain Name (FQDN)
     - **validity_days**: Gültigkeit (1-3650 Tage)
     - **key_size**: 2048 oder 4096 Bit
@@ -171,7 +182,7 @@ async def create_certificate(request: CreateCertificateRequest):
             organization=request.organization,
             organizational_unit=request.organizational_unit,
             email=request.email,
-            sans=request.sans
+            sans=request.sans,
         )
         return cert
     except InvalidCertificateError as e:
@@ -185,11 +196,11 @@ async def list_certificates(
     status: Optional[CertificateStatusEnum] = Query(None, description="Filter nach Status"),
     cert_type: Optional[CertificateTypeEnum] = Query(None, description="Filter nach Typ"),
     limit: int = Query(100, description="Max. Anzahl Ergebnisse", ge=1, le=1000),
-    offset: int = Query(0, description="Offset für Pagination", ge=0)
+    offset: int = Query(0, description="Offset für Pagination", ge=0),
 ):
     """
     Listet Zertifikate mit optionalen Filtern.
-    
+
     - **status**: Filter nach Status (valid, expired, revoked, pending)
     - **cert_type**: Filter nach Typ (server, client, etc.)
     - **limit**: Max. Anzahl Ergebnisse (1-1000)
@@ -198,13 +209,8 @@ async def list_certificates(
     try:
         status_filter = CertificateStatus(status.value) if status else None
         type_filter = CertificateType(cert_type.value) if cert_type else None
-        
-        certs = cert_manager.list_certificates(
-            status=status_filter,
-            cert_type=type_filter,
-            limit=limit,
-            offset=offset
-        )
+
+        certs = cert_manager.list_certificates(status=status_filter, cert_type=type_filter, limit=limit, offset=offset)
         return certs
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal error: {str(e)}")
@@ -214,7 +220,7 @@ async def list_certificates(
 async def get_certificate(cert_id: str):
     """
     Ruft Details eines Zertifikats ab.
-    
+
     - **cert_id**: Zertifikats-ID (UUID)
     """
     cert = cert_manager.get_certificate(cert_id)
@@ -224,13 +230,10 @@ async def get_certificate(cert_id: str):
 
 
 @router.delete("/certificates/{cert_id}")
-async def revoke_certificate(
-    cert_id: str,
-    request: RevokeCertificateRequest = RevokeCertificateRequest()
-):
+async def revoke_certificate(cert_id: str, request: RevokeCertificateRequest = RevokeCertificateRequest()):
     """
     Widerruft ein Zertifikat.
-    
+
     - **cert_id**: Zertifikats-ID
     - **reason**: Widerrufsgrund (unspecified, key_compromise, superseded, etc.)
     """
@@ -245,15 +248,14 @@ async def revoke_certificate(
 
 @router.post("/certificates/{cert_id}/renew", response_model=CertificateDetailResponse)
 async def renew_certificate(
-    cert_id: str,
-    validity_days: int = Query(365, description="Neue Gültigkeit in Tagen", ge=1, le=3650)
+    cert_id: str, validity_days: int = Query(365, description="Neue Gültigkeit in Tagen", ge=1, le=3650)
 ):
     """
     Erneuert ein bestehendes Zertifikat.
-    
+
     - **cert_id**: ID des zu erneuernden Zertifikats
     - **validity_days**: Neue Gültigkeit (1-3650 Tage)
-    
+
     Das alte Zertifikat wird automatisch widerrufen.
     """
     try:
@@ -269,11 +271,12 @@ async def renew_certificate(
 # CA Endpoints
 # ============================================================================
 
+
 @router.get("/ca/info", response_model=CAInfoResponse)
 async def get_ca_info():
     """
     Ruft Informationen über die Certificate Authority ab.
-    
+
     Gibt CA-Name, Zertifikatsdetails und Statistiken zurück.
     """
     try:
@@ -289,7 +292,7 @@ async def get_ca_info():
 async def get_ca_certificate():
     """
     Ruft das CA-Zertifikat ab (PEM-Format).
-    
+
     Kann verwendet werden, um die CA als Trusted Root hinzuzufügen.
     """
     try:
@@ -305,7 +308,7 @@ async def get_ca_certificate():
 async def get_crl():
     """
     Ruft die Certificate Revocation List (CRL) ab.
-    
+
     Enthält alle widerrufenen Zertifikate.
     """
     try:
@@ -321,16 +324,14 @@ async def get_crl():
 async def sign_csr(request: SignCSRRequest):
     """
     Signiert einen Certificate Signing Request (CSR).
-    
+
     - **csr_pem**: CSR im PEM-Format
     - **validity_days**: Gültigkeit des signierten Zertifikats (1-3650 Tage)
     - **cert_type**: Zertifikatstyp (server, client, etc.)
     """
     try:
         signed_cert = ca_service.sign_csr(
-            csr_pem=request.csr_pem,
-            validity_days=request.validity_days,
-            cert_type=request.cert_type.value
+            csr_pem=request.csr_pem, validity_days=request.validity_days, cert_type=request.cert_type.value
         )
         return signed_cert
     except CANotInitializedError:
@@ -345,11 +346,12 @@ async def sign_csr(request: SignCSRRequest):
 # Statistics Endpoint
 # ============================================================================
 
+
 @router.get("/statistics", response_model=StatisticsResponse)
 async def get_statistics():
     """
     Ruft PKI-Statistiken ab.
-    
+
     - Anzahl Zertifikate (gesamt, valide, abgelaufen, widerrufen)
     - Zertifikate nach Typ
     - CA-Informationen
@@ -357,16 +359,13 @@ async def get_statistics():
     """
     try:
         cert_stats = cert_manager.get_statistics()
-        
+
         try:
             ca_info = ca_service.get_ca_info()
         except:
             ca_info = {"initialized": False}
-        
-        return {
-            **cert_stats,
-            "ca_info": ca_info
-        }
+
+        return {**cert_stats, "ca_info": ca_info}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal error: {str(e)}")
 
@@ -375,16 +374,17 @@ async def get_statistics():
 # Health Check
 # ============================================================================
 
+
 @router.get("/health")
 async def health_check():
     """
     PKI Health Check
-    
+
     Prüft ob PKI-Services verfügbar sind.
     """
     return {
         "status": "healthy",
         "cert_manager": "online",
         "ca_service": "online" if ca_service.ca_initialized else "not_initialized",
-        "mock_mode": cert_manager.mock_mode
+        "mock_mode": cert_manager.mock_mode,
     }

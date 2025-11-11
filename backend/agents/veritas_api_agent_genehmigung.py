@@ -24,49 +24,38 @@ Author: VERITAS Development Team
 Date: 2025-10-16
 """
 
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+
 
 class GenehmigungsAgent:
     """Agent für Genehmigungsverfahren und Beteiligung"""
+
     name = "GenehmigungsAgent"
     domain = "LEGAL"
     version = "v1.0"
     capabilities = [
-        "genehmigungsverfahren", "antragsstellung", "verwaltungsverfahren", "fristen",
-        "beteiligung", "öffentlichkeitsbeteiligung", "widerspruch", "anhörung",
-        "umweltinformationsgesetz", "akteneinsicht"
+        "genehmigungsverfahren",
+        "antragsstellung",
+        "verwaltungsverfahren",
+        "fristen",
+        "beteiligung",
+        "öffentlichkeitsbeteiligung",
+        "widerspruch",
+        "anhörung",
+        "umweltinformationsgesetz",
+        "akteneinsicht",
     ]
     knowledge_base = {
-        "genehmigungsverfahren": [
-            {"gesetz": "VwVfG", "inhalt": "Regelungen zu Verwaltungsverfahren und Genehmigungen."}
-        ],
-        "antragsstellung": [
-            {"gesetz": "VwVfG", "inhalt": "Form und Ablauf der Antragstellung."}
-        ],
-        "verwaltungsverfahren": [
-            {"gesetz": "VwVfG", "inhalt": "Ablauf und Grundsätze des Verwaltungsverfahrens."}
-        ],
-        "fristen": [
-            {"gesetz": "VwVfG", "inhalt": "Fristen im Verwaltungsverfahren."}
-        ],
-        "beteiligung": [
-            {"gesetz": "VwVfG", "inhalt": "Beteiligungsrechte im Verfahren."}
-        ],
-        "öffentlichkeitsbeteiligung": [
-            {"gesetz": "VwVfG", "inhalt": "Öffentliche Beteiligung bei Genehmigungen."}
-        ],
-        "widerspruch": [
-            {"gesetz": "VwVfG", "inhalt": "Widerspruchsverfahren gegen Verwaltungsakte."}
-        ],
-        "anhörung": [
-            {"gesetz": "VwVfG", "inhalt": "Recht auf Anhörung im Verfahren."}
-        ],
-        "umweltinformationsgesetz": [
-            {"gesetz": "UIG", "inhalt": "Recht auf Zugang zu Umweltinformationen."}
-        ],
-        "akteneinsicht": [
-            {"gesetz": "VwVfG", "inhalt": "Recht auf Akteneinsicht im Verfahren."}
-        ]
+        "genehmigungsverfahren": [{"gesetz": "VwVfG", "inhalt": "Regelungen zu Verwaltungsverfahren und Genehmigungen."}],
+        "antragsstellung": [{"gesetz": "VwVfG", "inhalt": "Form und Ablauf der Antragstellung."}],
+        "verwaltungsverfahren": [{"gesetz": "VwVfG", "inhalt": "Ablauf und Grundsätze des Verwaltungsverfahrens."}],
+        "fristen": [{"gesetz": "VwVfG", "inhalt": "Fristen im Verwaltungsverfahren."}],
+        "beteiligung": [{"gesetz": "VwVfG", "inhalt": "Beteiligungsrechte im Verfahren."}],
+        "öffentlichkeitsbeteiligung": [{"gesetz": "VwVfG", "inhalt": "Öffentliche Beteiligung bei Genehmigungen."}],
+        "widerspruch": [{"gesetz": "VwVfG", "inhalt": "Widerspruchsverfahren gegen Verwaltungsakte."}],
+        "anhörung": [{"gesetz": "VwVfG", "inhalt": "Recht auf Anhörung im Verfahren."}],
+        "umweltinformationsgesetz": [{"gesetz": "UIG", "inhalt": "Recht auf Zugang zu Umweltinformationen."}],
+        "akteneinsicht": [{"gesetz": "VwVfG", "inhalt": "Recht auf Akteneinsicht im Verfahren."}],
     }
 
     def query(self, text: str) -> Dict[str, Any]:
@@ -83,12 +72,7 @@ class GenehmigungsAgent:
                     if any(word in text.lower() for word in [entry["gesetz"].lower(), entry["inhalt"].lower()]):
                         results.append(entry)
                         confidence = 0.6
-        return {
-            "success": bool(results),
-            "results": results,
-            "confidence": confidence,
-            "agent": self.name
-        }
+        return {"success": bool(results), "results": results, "confidence": confidence, "agent": self.name}
 
     def get_info(self) -> Dict[str, Any]:
         return {
@@ -96,11 +80,13 @@ class GenehmigungsAgent:
             "domain": self.domain,
             "version": self.version,
             "capabilities": self.capabilities,
-            "knowledge_base_size": sum(len(v) for v in self.knowledge_base.values())
+            "knowledge_base_size": sum(len(v) for v in self.knowledge_base.values()),
         }
 
     def search_genehmigung(self, text: str) -> List[Dict[str, Any]]:
-        return [entry for entry in self.knowledge_base.get("genehmigungsverfahren", []) if text.lower() in entry["inhalt"].lower()]
+        return [
+            entry for entry in self.knowledge_base.get("genehmigungsverfahren", []) if text.lower() in entry["inhalt"].lower()
+        ]
 
     def search_beteiligung(self, text: str) -> List[Dict[str, Any]]:
         return [entry for entry in self.knowledge_base.get("beteiligung", []) if text.lower() in entry["inhalt"].lower()]

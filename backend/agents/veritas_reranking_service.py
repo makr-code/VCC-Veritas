@@ -202,9 +202,9 @@ class ReRankingService:
 
             if top_docs:
                 logger.debug(
-                    f"📊 Top-Scores: "
+                    "📊 Top-Scores: "
                     f"#1: {top_docs[0].get('rerank_score', 0):.3f}, "
-                    f"#{len(top_docs)}: {top_docs[-1].get('rerank_score', 0):.3f}"
+                    f"#{len(top_docs)}: {top_docs[ - 1].get('rerank_score', 0):.3f}"
                 )
 
             return top_docs
@@ -396,7 +396,7 @@ if __name__ == "__main__":
         {
             "id": "doc3",
             "title": "Python Best Practices",
-            "snippet": "Bewährte Methoden für sauberen und wartbaren Python-Code.",
+            "snippet": "Bewährte Methoden für sauberen und wartbaren Python - Code.",
         },
         {
             "id": "doc4",
@@ -409,9 +409,9 @@ if __name__ == "__main__":
         """Test-Funktion"""
         query = "Python Programmierung lernen"
 
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print(f"Query: {query}")
-        print(f"{'='*60}\n")
+        print(f"{'=' * 60}\n")
 
         print("Ursprüngliche Reihenfolge:")
         for i, doc in enumerate(test_docs, 1):
@@ -428,7 +428,7 @@ if __name__ == "__main__":
         # Statistiken
         service = get_reranking_service()
         stats = service.get_stats()
-        print(f"\nService-Statistiken:")
+        print("\nService-Statistiken:")
         print(f"  Verfügbar: {stats['available']}")
         print(f"  Modell: {stats['model_name']}")
         print(f"  Top-K: {stats['config']['top_k']}")

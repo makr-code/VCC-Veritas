@@ -2,18 +2,26 @@
 Service für dialektische Synthese (Thesis-Antithesis-Synthesis)
 Nutze Ollama LLM für Thesen-Extraktion, Widerspruchs-Erkennung und Synthese.
 """
-from backend.models.dialectical_synthesis import Thesis, Contradiction, DialecticalSynthesis, create_thesis_from_dict, create_contradiction_from_dict
-from typing import List, Dict, Any
 import json
+from typing import Any, Dict, List
+
+from backend.models.dialectical_synthesis import (
+    Contradiction,
+    DialecticalSynthesis,
+    Thesis,
+    create_contradiction_from_dict,
+    create_thesis_from_dict,
+)
+
 
 class DialecticalSynthesisService:
     def __init__(self, llm_client, model_name="llama3.1:8b"):
         self.llm_client = llm_client
         self.model_name = model_name
         self.prompts = {
-            "thesis_extraction": "backend/prompts/thesis_extraction_prompt.txt",
-            "contradiction_detection": "backend/prompts/contradiction_detection_prompt.txt",
-            "dialectical_synthesis": "backend/prompts/dialectical_synthesis_prompt.txt"
+            "thesis_extraction": "backend / prompts/thesis_extraction_prompt.txt",
+            "contradiction_detection": "backend / prompts/contradiction_detection_prompt.txt",
+            "dialectical_synthesis": "backend / prompts/dialectical_synthesis_prompt.txt",
         }
 
     def extract_theses(self, agent_results: List[Dict[str, Any]]) -> List[Thesis]:
@@ -38,7 +46,7 @@ class DialecticalSynthesisService:
         prompt_vars = {
             "query": query,
             "theses": json.dumps([t.to_dict() for t in theses], ensure_ascii=False),
-            "contradictions": json.dumps([c.to_dict() for c in contradictions], ensure_ascii=False)
+            "contradictions": json.dumps([c.to_dict() for c in contradictions], ensure_ascii=False),
         }
         with open(self.prompts["dialectical_synthesis"], encoding="utf-8") as f:
             prompt = f.read()
@@ -47,8 +55,16 @@ class DialecticalSynthesisService:
         llm_response = self.llm_client.generate(prompt, model=self.model_name, temperature=0.2, max_tokens=3072)
         data = json.loads(llm_response)
         # Mapping der Felder auf DialecticalSynthesis
-        resolved = [contradictions[c["contradiction_index"]] for c in data.get("resolved_contradictions", []) if "contradiction_index" in c]
-        unresolved = [contradictions[c["contradiction_index"]] for c in data.get("unresolved_conflicts", []) if "contradiction_index" in c]
+        resolved = [
+            contradictions[c["contradiction_index"]]
+            for c in data.get("resolved_contradictions", [])
+            if "contradiction_index" in c
+        ]
+        unresolved = [
+            contradictions[c["contradiction_index"]]
+            for c in data.get("unresolved_conflicts", [])
+            if "contradiction_index" in c
+        ]
         return DialecticalSynthesis(
             theses=theses,
             contradictions=contradictions,
@@ -57,5 +73,5 @@ class DialecticalSynthesisService:
             unresolved_conflicts=unresolved,
             confidence=data.get("confidence", 0.7),
             reasoning=data.get("reasoning", ""),
-            metadata={"resolved": len(resolved), "unresolved": len(unresolved)}
+            metadata={"resolved": len(resolved), "unresolved": len(unresolved)},
         )

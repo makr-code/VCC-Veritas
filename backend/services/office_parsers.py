@@ -67,7 +67,7 @@ def parse_word_document(content: bytes, filename: str = "document.docx") -> Dict
     # Short-IDs ist SHA-256 übertrieben, aber sicher und vermeidet Bandit-Finding B324.
     doc_hash = hashlib.sha256(content).hexdigest()[:8]
 
-    stub_text = f"""[STUB] Word-Dokument: {filename}
+    stub_text = """[STUB] Word-Dokument: {filename}
 
 Absatz 1: Dies ist ein simulierter Text aus einem Word-Dokument.
 Die echte Implementierung würde python-docx verwenden, um den tatsächlichen
@@ -94,9 +94,9 @@ Dokumenten-Hash: {doc_hash}
         },
         "structure": {
             "paragraphs": stub_text.split("\n\n"),
-            "headings": ["[STUB] Word-Dokument"],
-            "tables": [],  # STUB: Würde Tabellen-Daten enthalten
-            "images": [],  # STUB: Würde Bild-Referenzen enthalten
+            "headings": ["[STUB] Word - Dokument"],
+            "tables": [],  # STUB: Würde Tabellen - Daten enthalten
+            "images": [],  # STUB: Würde Bild - Referenzen enthalten
         },
         "chunks": [{"chunk_id": f"{doc_hash}_chunk_0", "text": stub_text, "metadata": {"type": "paragraph", "index": 0}}],
     }
@@ -185,7 +185,7 @@ def parse_excel_document(content: bytes, filename: str = "spreadsheet.xlsx") -> 
         "structure": {
             "sheets": stub_sheets,
             "formulas": [],  # STUB: Würde Formeln enthalten
-            "charts": [],  # STUB: Würde Chart-Referenzen enthalten
+            "charts": [],  # STUB: Würde Chart - Referenzen enthalten
         },
         "chunks": [
             {
@@ -260,8 +260,8 @@ def parse_powerpoint_document(content: bytes, filename: str = "presentation.pptx
             "slide_number": 1,
             "title": "STUB: Einführung",
             "content": [
-                "Dies ist eine simulierte PowerPoint-Folie.",
-                "Die echte Implementierung würde python-pptx verwenden.",
+                "Dies ist eine simulierte PowerPoint - Folie.",
+                "Die echte Implementierung würde python - pptx verwenden.",
             ],
         },
         {
@@ -272,7 +272,7 @@ def parse_powerpoint_document(content: bytes, filename: str = "presentation.pptx
         {
             "slide_number": 3,
             "title": "STUB: Integration",
-            "content": [f"Dokumenten-Hash: {doc_hash}", "Parser bereit für Produktiv-Einsatz"],
+            "content": [f"Dokumenten - Hash: {doc_hash}", "Parser bereit für Produktiv-Einsatz"],
         },
     ]
 
@@ -299,8 +299,8 @@ def parse_powerpoint_document(content: bytes, filename: str = "presentation.pptx
         },
         "structure": {
             "slides": stub_slides,
-            "notes": [],  # STUB: Würde Speaker-Notes enthalten
-            "images": [],  # STUB: Würde Bild-Referenzen enthalten
+            "notes": [],  # STUB: Würde Speaker - Notes enthalten
+            "images": [],  # STUB: Würde Bild - Referenzen enthalten
         },
         "chunks": [
             {

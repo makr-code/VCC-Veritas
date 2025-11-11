@@ -21,36 +21,36 @@
 CREATE TABLE IF NOT EXISTS research_plans (
     -- Primary Key
     plan_id VARCHAR(255) PRIMARY KEY,
-    
+
     -- Plan Metadata
     research_question TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     status VARCHAR(50) NOT NULL DEFAULT 'pending',
-    
+
     -- Execution Tracking
     current_step_index INTEGER DEFAULT 0,
     total_steps INTEGER DEFAULT 0,
     progress_percentage DECIMAL(5,2) DEFAULT 0.0,
-    
+
     -- Schema & Configuration
     schema_name VARCHAR(255),
     schema_version VARCHAR(50),
     plan_document JSONB NOT NULL,
-    
+
     -- VERITAS-specific Fields
     uds3_databases TEXT[],
     phase5_hybrid_search BOOLEAN DEFAULT true,
     security_level VARCHAR(50) DEFAULT 'internal',
     source_domains TEXT[],
     query_complexity VARCHAR(50),
-    
+
     -- Results & Metadata
     final_result JSONB,
     execution_time_ms INTEGER,
     error_message TEXT,
     retry_count INTEGER DEFAULT 0,
-    
+
     -- Indexing
     CONSTRAINT valid_status CHECK (status IN ('pending', 'running', 'paused', 'completed', 'failed', 'cancelled'))
 );
@@ -71,40 +71,40 @@ CREATE INDEX IF NOT EXISTS idx_research_plans_plan_document ON research_plans US
 CREATE TABLE IF NOT EXISTS research_plan_steps (
     -- Primary Key
     step_id VARCHAR(255) PRIMARY KEY,
-    
+
     -- Foreign Key
     plan_id VARCHAR(255) NOT NULL REFERENCES research_plans(plan_id) ON DELETE CASCADE,
-    
+
     -- Step Metadata
     step_index INTEGER NOT NULL,
     step_name VARCHAR(255) NOT NULL,
     step_type VARCHAR(100) NOT NULL,
-    
+
     -- Agent Assignment
     agent_name VARCHAR(255),
     agent_type VARCHAR(100),
     assigned_capability VARCHAR(255),
-    
+
     -- Execution Tracking
     status VARCHAR(50) NOT NULL DEFAULT 'pending',
     started_at TIMESTAMP,
     completed_at TIMESTAMP,
     execution_time_ms INTEGER,
-    
+
     -- Step Configuration
     step_config JSONB,
     tool_name VARCHAR(255),
     tool_input JSONB,
-    
+
     -- Dependencies
     depends_on TEXT[],
     parallel_group VARCHAR(100),
-    
+
     -- Results
     result JSONB,
     error_message TEXT,
     retry_count INTEGER DEFAULT 0,
-    
+
     -- Constraints
     CONSTRAINT valid_step_status CHECK (status IN ('pending', 'running', 'completed', 'failed', 'skipped')),
     CONSTRAINT unique_step_per_plan UNIQUE (plan_id, step_index)
@@ -126,36 +126,36 @@ CREATE INDEX IF NOT EXISTS idx_steps_dependencies ON research_plan_steps USING G
 CREATE TABLE IF NOT EXISTS step_results (
     -- Primary Key
     result_id SERIAL PRIMARY KEY,
-    
+
     -- Foreign Keys
     step_id VARCHAR(255) NOT NULL REFERENCES research_plan_steps(step_id) ON DELETE CASCADE,
     plan_id VARCHAR(255) NOT NULL REFERENCES research_plans(plan_id) ON DELETE CASCADE,
-    
+
     -- Result Metadata
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     result_type VARCHAR(100) NOT NULL,
-    
+
     -- Result Data
     result_data JSONB NOT NULL,
     raw_output TEXT,
-    
+
     -- Quality Metrics
     confidence_score DECIMAL(5,4),
     quality_score DECIMAL(5,4),
     source_count INTEGER,
-    
+
     -- VERITAS-specific Fields
     uds3_search_results JSONB,
     bm25_results JSONB,
     hybrid_fusion_score DECIMAL(5,4),
     reranking_applied BOOLEAN DEFAULT false,
-    
+
     -- Metadata
     metadata JSONB,
-    
+
     -- Constraints
     CONSTRAINT valid_result_type CHECK (result_type IN (
-        'data_retrieval', 'data_analysis', 'synthesis', 
+        'data_retrieval', 'data_analysis', 'synthesis',
         'validation', 'final_answer', 'intermediate', 'error'
     ))
 );
@@ -176,31 +176,31 @@ CREATE INDEX IF NOT EXISTS idx_results_confidence ON step_results(confidence_sco
 CREATE TABLE IF NOT EXISTS agent_execution_log (
     -- Primary Key
     log_id SERIAL PRIMARY KEY,
-    
+
     -- Foreign Keys
     step_id VARCHAR(255) REFERENCES research_plan_steps(step_id) ON DELETE CASCADE,
     plan_id VARCHAR(255) REFERENCES research_plans(plan_id) ON DELETE CASCADE,
-    
+
     -- Log Metadata
     timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     log_level VARCHAR(20) NOT NULL,
-    
+
     -- Agent Information
     agent_name VARCHAR(255),
     agent_type VARCHAR(100),
-    
+
     -- Log Data
     message TEXT NOT NULL,
     context JSONB,
-    
+
     -- Performance Metrics
     duration_ms INTEGER,
     memory_mb INTEGER,
-    
+
     -- Error Tracking
     error_type VARCHAR(255),
     stack_trace TEXT,
-    
+
     -- Constraints
     CONSTRAINT valid_log_level CHECK (log_level IN ('DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'))
 );
@@ -221,29 +221,29 @@ CREATE INDEX IF NOT EXISTS idx_log_agent ON agent_execution_log(agent_name);
 CREATE TABLE IF NOT EXISTS agent_registry_metadata (
     -- Primary Key
     agent_name VARCHAR(255) PRIMARY KEY,
-    
+
     -- Agent Classification
     agent_type VARCHAR(100) NOT NULL,
     domain VARCHAR(100),
-    
+
     -- Capabilities
     capabilities TEXT[] NOT NULL,
     tools TEXT[],
-    
+
     -- Configuration
     default_config JSONB,
     schema_name VARCHAR(255),
-    
+
     -- Status
     is_active BOOLEAN DEFAULT true,
     is_migrated BOOLEAN DEFAULT false,
     migration_date TIMESTAMP,
-    
+
     -- Metadata
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     version VARCHAR(50),
-    
+
     -- Performance Stats
     total_executions INTEGER DEFAULT 0,
     success_rate DECIMAL(5,2),
@@ -264,7 +264,7 @@ CREATE INDEX IF NOT EXISTS idx_registry_capabilities ON agent_registry_metadata 
 
 -- Active Research Plans Overview
 CREATE OR REPLACE VIEW active_research_plans AS
-SELECT 
+SELECT
     plan_id,
     research_question,
     status,
@@ -283,7 +283,7 @@ ORDER BY created_at DESC;
 
 -- Step Execution Summary
 CREATE OR REPLACE VIEW step_execution_summary AS
-SELECT 
+SELECT
     s.plan_id,
     s.step_id,
     s.step_name,
@@ -300,7 +300,7 @@ GROUP BY s.plan_id, s.step_id, s.step_name, s.agent_name, s.status, s.execution_
 
 -- Agent Performance Stats
 CREATE OR REPLACE VIEW agent_performance_stats AS
-SELECT 
+SELECT
     agent_name,
     COUNT(*) as total_executions,
     COUNT(CASE WHEN status = 'completed' THEN 1 END) as successful_executions,
@@ -347,7 +347,7 @@ CREATE OR REPLACE FUNCTION update_plan_progress()
 RETURNS TRIGGER AS $$
 BEGIN
     UPDATE research_plans
-    SET 
+    SET
         progress_percentage = (
             SELECT ROUND(
                 100.0 * COUNT(CASE WHEN status = 'completed' THEN 1 END) / NULLIF(COUNT(*), 0),
@@ -363,7 +363,7 @@ BEGIN
             AND status = 'completed'
         )
     WHERE plan_id = NEW.plan_id;
-    
+
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -381,12 +381,12 @@ CREATE TRIGGER update_progress_on_step_completion
 
 -- Insert sample agent metadata
 INSERT INTO agent_registry_metadata (
-    agent_name, agent_type, domain, capabilities, tools, 
+    agent_name, agent_type, domain, capabilities, tools,
     default_config, is_active, is_migrated
-) VALUES 
+) VALUES
 (
-    'environmental', 
-    'DataRetrievalAgent', 
+    'environmental',
+    'DataRetrievalAgent',
     'environmental',
     ARRAY['query_processing', 'data_analysis', 'environmental_data'],
     ARRAY['uds3', 'database', 'api_call'],

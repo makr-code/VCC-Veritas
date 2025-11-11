@@ -113,7 +113,7 @@ de_request = WikipediaQueryRequest(
 
 # Englische Abfrage
 en_request = WikipediaQueryRequest(
-    query_id="multi-en", 
+    query_id="multi-en",
     query_text="Berlin",
     language=WikipediaLanguage.ENGLISH
 )
@@ -195,7 +195,7 @@ en_response = agent.execute_query(en_request)
   ],
   "articles": [
     {
-      "title": "Künstliche Intelligenz", 
+      "title": "Künstliche Intelligenz",
       "content": "Vollständiger Artikel-Text...",
       "summary": "Kurze Zusammenfassung...",
       "url": "https://de.wikipedia.org/wiki/Künstliche_Intelligenz",
@@ -231,7 +231,7 @@ class WikipediaSearchResult:
 ### **WikipediaArticle**
 
 ```python
-@dataclass 
+@dataclass
 class WikipediaArticle:
     title: str                    # Artikel-Titel
     content: str                  # Vollständiger Text
@@ -239,18 +239,18 @@ class WikipediaArticle:
     url: str                      # Wikipedia-URL
     page_id: Optional[str]        # Page-ID
     language: str                 # Sprache
-    
+
     # Metadaten
     categories: List[str]         # Wikipedia-Kategorien
     links: List[str]             # Interne Links
     references: List[str]        # Externe Referenzen
     images: List[str]            # Bild-URLs
-    
-    # Statistiken  
+
+    # Statistiken
     word_count: int              # Anzahl Wörter
     section_count: int           # Anzahl Abschnitte
     last_modified: Optional[str] # Letzte Änderung
-    
+
     # Struktur
     sections: Dict[str, str]     # Abschnitte mit Inhalt
     infobox: Dict[str, str]      # Infobox-Daten
@@ -277,7 +277,7 @@ wikipedia_agent = create_wikipedia_agent()
 @app.post("/agents/wikipedia/search")
 async def wikipedia_search(request: dict):
     """Wikipedia Search Endpoint"""
-    
+
     # Request verarbeiten
     wiki_request = WikipediaQueryRequest(
         query_id=request.get("query_id", str(uuid.uuid4())),
@@ -287,10 +287,10 @@ async def wikipedia_search(request: dict):
         max_results=request.get("max_results", 10),
         include_summary=request.get("include_summary", True)
     )
-    
+
     # Query ausführen
     response = await wikipedia_agent.execute_query_async(wiki_request)
-    
+
     return {
         "success": response.success,
         "results": [result.to_dict() for result in response.search_results],
@@ -303,10 +303,10 @@ async def wikipedia_search(request: dict):
         "error": response.error_message
     }
 
-@app.post("/agents/wikipedia/article") 
+@app.post("/agents/wikipedia/article")
 async def wikipedia_article(request: dict):
     """Wikipedia Article Retrieval"""
-    
+
     wiki_request = WikipediaQueryRequest(
         query_id=request.get("query_id", str(uuid.uuid4())),
         query_text=request["title"],
@@ -316,9 +316,9 @@ async def wikipedia_article(request: dict):
         include_categories=request.get("include_categories", True),
         include_links=request.get("include_links", True)
     )
-    
+
     response = await wikipedia_agent.execute_query_async(wiki_request)
-    
+
     if response.success and response.articles:
         return {
             "success": True,
@@ -342,16 +342,16 @@ async def wikipedia_status():
 @app.post("/agents/wikipedia/summary")
 async def wikipedia_summary(request: dict):
     """Wikipedia Summary Generation"""
-    
+
     wiki_request = WikipediaQueryRequest(
         query_id=request.get("query_id", str(uuid.uuid4())),
         query_text=request["query"],
         query_type=WikipediaQueryType.SUMMARY,
         language=WikipediaLanguage(request.get("language", "de"))
     )
-    
+
     response = await wikipedia_agent.execute_query_async(wiki_request)
-    
+
     if response.success and response.articles:
         article = response.articles[0]
         return {
@@ -377,7 +377,7 @@ class VeritasWikipediaClient {
     constructor(baseUrl = '') {
         this.baseUrl = baseUrl;
     }
-    
+
     // Wikipedia-Suche
     async search(query, options = {}) {
         const {
@@ -385,23 +385,23 @@ class VeritasWikipediaClient {
             maxResults = 10,
             includeSummary = true
         } = options;
-        
+
         const payload = {
             query,
             language,
             max_results: maxResults,
             include_summary: includeSummary
         };
-        
+
         const response = await fetch(`${this.baseUrl}/agents/wikipedia/search`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
-        
+
         return await response.json();
     }
-    
+
     // Artikel abrufen
     async getArticle(title, options = {}) {
         const {
@@ -410,7 +410,7 @@ class VeritasWikipediaClient {
             includeCategories = true,
             includeLinks = true
         } = options;
-        
+
         const payload = {
             title,
             language,
@@ -418,16 +418,16 @@ class VeritasWikipediaClient {
             include_categories: includeCategories,
             include_links: includeLinks
         };
-        
+
         const response = await fetch(`${this.baseUrl}/agents/wikipedia/article`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
-        
+
         return await response.json();
     }
-    
+
     // Zusammenfassung abrufen
     async getSummary(query, language = 'de') {
         const response = await fetch(`${this.baseUrl}/agents/wikipedia/summary`, {
@@ -435,10 +435,10 @@ class VeritasWikipediaClient {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ query, language })
         });
-        
+
         return await response.json();
     }
-    
+
     // Agent-Status
     async getStatus() {
         const response = await fetch(`${this.baseUrl}/agents/wikipedia/status`);
@@ -487,7 +487,7 @@ python backend/agents/veritas_api_agent_wikipedia.py
 
 1. **Basic Search Tests** - Verschiedene Suchbegriffe und Themen
 2. **Article Retrieval Tests** - Vollständige Artikel-Abfrage
-3. **Multilingual Tests** - Tests in verschiedenen Sprachen  
+3. **Multilingual Tests** - Tests in verschiedenen Sprachen
 4. **Performance Tests** - Concurrent Queries und Caching
 5. **Specialized Query Tests** - Summary, Random, Categories
 
@@ -504,7 +504,7 @@ python backend/agents/veritas_api_agent_wikipedia.py
    📊 Results: 2, Confidence: 0.90
    ⏱️  Time: 0ms
 
-📄 === ARTICLE RETRIEVAL TESTS ===  
+📄 === ARTICLE RETRIEVAL TESTS ===
 📖 Test: Specific Article - Berlin
    ✅ Article loaded: Berlin
    📊 Content: 102 words, 4 sections
@@ -525,10 +525,10 @@ import unittest
 from backend.agents.veritas_api_agent_wikipedia import *
 
 class TestWikipediaAgent(unittest.TestCase):
-    
+
     def setUp(self):
         self.agent = create_wikipedia_agent()
-    
+
     def test_search_query(self):
         request = WikipediaQueryRequest(
             query_id="test-search",
@@ -538,7 +538,7 @@ class TestWikipediaAgent(unittest.TestCase):
         response = self.agent.execute_query(request)
         self.assertTrue(response.success)
         self.assertGreater(response.results_returned, 0)
-    
+
     def test_article_query(self):
         request = WikipediaQueryRequest(
             query_id="test-article",
@@ -549,7 +549,7 @@ class TestWikipediaAgent(unittest.TestCase):
         response = self.agent.execute_query(request)
         self.assertTrue(response.success)
         self.assertEqual(len(response.articles), 1)
-    
+
     def test_multilingual(self):
         # Deutsche Abfrage
         de_request = WikipediaQueryRequest(
@@ -558,15 +558,15 @@ class TestWikipediaAgent(unittest.TestCase):
             language=WikipediaLanguage.GERMAN
         )
         de_response = self.agent.execute_query(de_request)
-        
-        # Englische Abfrage  
+
+        # Englische Abfrage
         en_request = WikipediaQueryRequest(
             query_id="test-en",
-            query_text="Berlin", 
+            query_text="Berlin",
             language=WikipediaLanguage.ENGLISH
         )
         en_response = self.agent.execute_query(en_request)
-        
+
         self.assertTrue(de_response.success)
         self.assertTrue(en_response.success)
 ```
@@ -597,7 +597,7 @@ print(f"- Avg Processing Time: {status['performance']['avg_processing_time_ms']}
 print(f"- Cache Hits: {status['performance']['cache_hits']}")
 print(f"- API Calls Made: {status['performance']['api_calls_made']}")
 
-print("Cache Status:")  
+print("Cache Status:")
 print(f"- Search Cache: {status['cache']['search_cache_size']} entries")
 print(f"- Article Cache: {status['cache']['article_cache_size']} entries")
 ```
@@ -613,22 +613,22 @@ config = WikipediaConfig(
     cache_enabled=True,
     cache_ttl_seconds=3600,          # 1 Stunde TTL
     max_cache_size=1000,             # Max. 1000 gecachte Einträge
-    
+
     # API-Limits
     max_search_results=50,           # Max. 50 Suchergebnisse
     timeout_seconds=30,              # 30s Timeout
     max_retries=3,                   # 3 Wiederholungen
     rate_limit_delay=0.1,            # 0.1s zwischen Calls
-    
+
     # Content-Limits
     max_content_length=10000,        # Max. 10k Zeichen
     min_article_length=100,          # Min. 100 Zeichen
-    
+
     # Features
     extract_categories=True,         # Kategorien extrahieren
-    extract_links=True,              # Links extrahieren  
+    extract_links=True,              # Links extrahieren
     extract_images=False,            # Bilder-URLs (optional)
-    
+
     # Mehrsprachig
     default_language="de",
     supported_languages=["de", "en", "fr", "es", "it", "nl", "ru", "zh", "ja", "pt"]
@@ -673,14 +673,14 @@ agent = WikipediaAgent(config)
 def _fetch_real_wikipedia_article(self, title: str, language: str) -> WikipediaArticle:
     """Echte Wikipedia-API Integration"""
     import wikipedia
-    
+
     # Sprache setzen
     wikipedia.set_lang(language)
-    
+
     try:
         # Wikipedia-Seite laden
         page = wikipedia.page(title)
-        
+
         return WikipediaArticle(
             title=page.title,
             content=page.content,
@@ -696,11 +696,11 @@ def _fetch_real_wikipedia_article(self, title: str, language: str) -> WikipediaA
             section_count=len(page.content.split('\n\n')),
             sections=self._extract_sections(page.content)
         )
-        
+
     except wikipedia.exceptions.DisambiguationError as e:
         # Begriffsklärung behandeln
         return self._handle_disambiguation(e.options, language)
-    
+
     except wikipedia.exceptions.PageError:
         # Seite nicht gefunden
         return None
@@ -711,31 +711,31 @@ def _fetch_real_wikipedia_article(self, title: str, language: str) -> WikipediaA
 ```python
 def intelligent_search(self, query: str) -> List[WikipediaSearchResult]:
     """Intelligente Suche mit NLP-Verbesserungen"""
-    
+
     # 1. Query-Analyse
     entities = self._extract_named_entities(query)
     keywords = self._extract_keywords(query)
     intent = self._detect_search_intent(query)
-    
+
     # 2. Multi-Strategy Search
     results = []
-    
+
     # Exact-Match für Entitäten
     for entity in entities:
         exact_results = self._exact_search(entity)
         results.extend(exact_results)
-    
-    # Keyword-basierte Suche  
+
+    # Keyword-basierte Suche
     keyword_results = self._keyword_search(keywords)
     results.extend(keyword_results)
-    
+
     # Fuzzy-Search für Tippfehler
     fuzzy_results = self._fuzzy_search(query)
     results.extend(fuzzy_results)
-    
+
     # 3. Relevanz-Ranking
     ranked_results = self._rank_results(results, query)
-    
+
     return ranked_results[:self.config.max_search_results]
 ```
 
@@ -780,7 +780,7 @@ def intelligent_search(self, query: str) -> List[WikipediaSearchResult]:
 
 # Mehrsprachige Abfragen
 "Paris" (français)
-"Tokyo" (日本語)  
+"Tokyo" (日本語)
 "London" (English)
 "Madrid" (Español)
 ```
@@ -797,17 +797,17 @@ def quick_fact_lookup(topic: str) -> str:
         query_text=topic,
         query_type=WikipediaQueryType.SUMMARY
     )
-    
+
     response = agent.execute_query(request)
     if response.success and response.articles:
         return response.articles[0].summary
     return f"Keine Informationen zu '{topic}' gefunden"
 
-# Pattern 2: Multi-Source Information  
+# Pattern 2: Multi-Source Information
 def comprehensive_research(topic: str) -> Dict[str, Any]:
     """Umfassende Recherche zu einem Thema"""
     agent = create_wikipedia_agent()
-    
+
     # 1. Hauptartikel
     main_article = agent.execute_query(WikipediaQueryRequest(
         query_id=f"main-{topic}",
@@ -816,7 +816,7 @@ def comprehensive_research(topic: str) -> Dict[str, Any]:
         include_content=True,
         include_categories=True
     ))
-    
+
     # 2. Verwandte Artikel
     related_search = agent.execute_query(WikipediaQueryRequest(
         query_id=f"related-{topic}",
@@ -824,14 +824,14 @@ def comprehensive_research(topic: str) -> Dict[str, Any]:
         query_type=WikipediaQueryType.SEARCH,
         max_results=10
     ))
-    
+
     # 3. Kategorien
     categories = agent.execute_query(WikipediaQueryRequest(
         query_id=f"categories-{topic}",
         query_text=topic,
         query_type=WikipediaQueryType.CATEGORIES
     ))
-    
+
     return {
         'main_article': main_article,
         'related_articles': related_search,
@@ -843,7 +843,7 @@ def multilingual_research(topic: str, languages: List[str]) -> Dict[str, Any]:
     """Mehrsprachige Forschung zu einem Thema"""
     agent = create_wikipedia_agent()
     results = {}
-    
+
     for lang in languages:
         request = WikipediaQueryRequest(
             query_id=f"multi-{lang}-{topic}",
@@ -852,10 +852,10 @@ def multilingual_research(topic: str, languages: List[str]) -> Dict[str, Any]:
             language=WikipediaLanguage(lang),
             include_content=True
         )
-        
+
         response = agent.execute_query(request)
         results[lang] = response
-    
+
     return results
 ```
 
@@ -866,7 +866,7 @@ def multilingual_research(topic: str, languages: List[str]) -> Dict[str, Any]:
 Der **VERITAS Wikipedia Agent** bietet:
 
 - ✅ **Vollständige Wikipedia-Integration** mit echtem API-Support
-- ✅ **Mehrsprachiger Support** für 10+ Sprachen  
+- ✅ **Mehrsprachiger Support** für 10+ Sprachen
 - ✅ **Intelligente Query-Verarbeitung** für natürlichsprachige Anfragen
 - ✅ **Performance-optimiert** mit Caching und Concurrent Processing
 - ✅ **Production-ready** mit umfassender Fehlerbehandlung
@@ -885,6 +885,6 @@ Der **VERITAS Wikipedia Agent** bietet:
 
 ---
 
-*Erstellt am: 28. September 2025*  
-*VERITAS Wikipedia Agent v1.0*  
+*Erstellt am: 28. September 2025*
+*VERITAS Wikipedia Agent v1.0*
 *19 Tests passed, 100% Success Rate*

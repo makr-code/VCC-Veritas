@@ -199,8 +199,8 @@ async def test_endpoint(request: Request) -> Dict[str, Any]:
         {
             "message": "mTLS authentication successful",
             "client": {
-                "service": "veritas-client",
-                "cn": "veritas-client",
+                "service": "veritas - client",
+                "cn": "veritas - client",
                 "authenticated": true
             }
         }
@@ -276,7 +276,7 @@ async def startup_event():
     logger.info("=" * 70)
     logger.info(f"PKI Services: {'✅ Initialized' if ca_service else '❌ Not available'}")
     logger.info(f"mTLS Middleware: {'✅ Active' if ca_service else '⚠️  Disabled'}")
-    logger.info(f"Endpoints:")
+    logger.info("Endpoints:")
     logger.info(f"  - Health Check: /health (no mTLS)")
     logger.info(f"  - API Test: /api/v1/test (mTLS required)")
     logger.info(f"  - Certificate Info: /api/v1/certificate-info (mTLS required)")
@@ -336,10 +336,10 @@ def run_server(host: str = "127.0.0.1", port: int = 5000, ca_storage_path: str =
     logger.info("🔒 Client certificate required for all endpoints except /health")
     logger.info("")
     logger.info("📋 Test commands:")
-    logger.info(f"   # Health check (no cert):")
+    logger.info("   # Health check (no cert):")
     logger.info(f"   curl -k https://{host}:{port}/health")
     logger.info("")
-    logger.info(f"   # API test (with cert):")
+    logger.info("   # API test (with cert):")
     logger.info(f"   curl --cert {ca_path}/client_cert.pem \\")
     logger.info(f"        --key {ca_path}/client_key.pem \\")
     logger.info(f"        --cacert {root_ca} \\")

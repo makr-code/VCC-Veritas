@@ -70,7 +70,7 @@ class FlowModelType(Enum):
     """Strömungsmodell-Typen"""
 
     GAUSSIAN_PLUME = "gaussian_plume"  # Gaussian Fahnenmodell
-    GAUSSIAN_PUFF = "gaussian_puff"  # Gaussian Puff-Modell
+    GAUSSIAN_PUFF = "gaussian_puf"  # Gaussian Puff-Modell
     LAGRANGIAN = "lagrangian"  # Lagrangian Particle Tracking
     EULERIAN = "eulerian"  # Eulerian Grid Model
     HYBRID = "hybrid"  # Hybrid-Ansatz
@@ -189,7 +189,7 @@ class WindField:
     def get_wind_at_point(self, coord: Coordinate) -> Optional[WindVector]:
         """Interpoliere Windvektor an spezifischem Punkt"""
         # Vereinfachte Implementierung - nächster Gitterpunkt
-        min_distance = float("inf")
+        min_distance = float("in")
         nearest_wind = None
 
         for grid_key, wind_vector in self.wind_vectors.items():
@@ -446,7 +446,7 @@ class AtmosphericFlowConfig:
 
     # Modell-Parameter
     default_flow_model: str = "gaussian_plume"
-    supported_models: List[str] = field(default_factory=lambda: ["gaussian_plume", "gaussian_puff", "lagrangian"])
+    supported_models: List[str] = field(default_factory=lambda: ["gaussian_plume", "gaussian_puf", "lagrangian"])
 
     # Raster-Parameter
     default_grid_resolution_m: float = 100.0
@@ -524,7 +524,7 @@ class AtmosphericFlowAgent:
             "total_calculation_time_s": 0,
         }
 
-        self.logger.info(f"✅ Atmospheric Flow Agent initialized")
+        self.logger.info("✅ Atmospheric Flow Agent initialized")
 
     # =========================================================================
     # HAUPT-BERECHNUNG-METHODEN
@@ -630,7 +630,7 @@ class AtmosphericFlowAgent:
             # DWD Weather Query
             weather_request = DwdWeatherQueryRequest(
                 query_id=f"flow-weather-{request.query_id}",
-                query_text=f"Wind data for atmospheric flow calculation",
+                query_text="Wind data for atmospheric flow calculation",
                 latitude=center_lat,
                 longitude=center_lon,
                 start_date=datetime.now().strftime("%Y-%m-%d"),
@@ -921,7 +921,7 @@ class AtmosphericFlowAgent:
         response = FlowCalculationResponse(
             query_id=request.query_id,
             success=True,
-            model_used="gaussian_puff",
+            model_used="gaussian_puf",
             weather_data_source="DWD" if self.weather_agent else "Manual/Default",
         )
 
@@ -1168,19 +1168,19 @@ async def main():
             "name": "Gaussian Plume Model",
             "model": FlowModelType.GAUSSIAN_PLUME,
             "wind_data": [
-                WindVector(5.0, 225.0, 10.0),  # 5 m/s aus SW (towards NE)
-                WindVector(3.0, 270.0, 10.0),  # 3 m/s aus W (towards E)
+                WindVector(5.0, 225.0, 10.0),  # 5 m / s aus SW (towards NE)
+                WindVector(3.0, 270.0, 10.0),  # 3 m / s aus W (towards E)
             ],
         },
         {
             "name": "Gaussian Puff Model",
             "model": FlowModelType.GAUSSIAN_PUFF,
-            "wind_data": [WindVector(8.0, 180.0, 10.0)],  # 8 m/s aus S (towards N)
+            "wind_data": [WindVector(8.0, 180.0, 10.0)],  # 8 m / s aus S (towards N)
         },
         {
             "name": "Lagrangian Model",
             "model": FlowModelType.LAGRANGIAN,
-            "wind_data": [WindVector(4.0, 200.0, 10.0)],  # 4 m/s aus SSW
+            "wind_data": [WindVector(4.0, 200.0, 10.0)],  # 4 m / s aus SSW
         },
     ]
 
@@ -1215,7 +1215,7 @@ async def main():
             # Top 3 belastete Rezeptoren
             sorted_results = sorted(response.flow_results, key=lambda r: r.concentration_ugm3, reverse=True)
 
-            print(f"   🏆 Top belastete Rezeptoren:")
+            print("   🏆 Top belastete Rezeptoren:")
             for j, result in enumerate(sorted_results[:3], 1):
                 print(f"      {j}. {result.receptor_id}: {result.concentration_ugm3:.2f} μg/m³")
                 print(f"         Distance: {result.distance_m:.0f}m, Bearing: {result.bearing_deg:.0f}°")
@@ -1225,7 +1225,7 @@ async def main():
             print(f"   ❌ Error: {response.error_message}")
 
     # Agent-Status
-    print(f"\n📊 Agent Status:")
+    print("\n📊 Agent Status:")
     status = agent.get_status()
     print(f"   Calculations processed: {status['performance']['calculations_processed']}")
     print(f"   Avg calculation time: {status['performance']['avg_calculation_time_s']:.2f}s")

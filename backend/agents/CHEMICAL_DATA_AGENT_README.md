@@ -17,7 +17,7 @@ Der **Chemical Data Agent** stellt umfassende chemische Stoffinformationen zur V
 ```
 Tests run: 9/9 ✅ 100% Success Rate
 ├── CAS Number Search ✅
-├── Name-based Search ✅  
+├── Name-based Search ✅
 ├── Physical Properties ✅
 ├── GHS Classification ✅
 ├── Exposure Limits ✅
@@ -43,7 +43,7 @@ Substances Found: 7 unique chemicals
 
 ### Datenquellen (Konfigurierbar)
 - **PubChem** - NCBI Chemical Database
-- **ChemSpider** - RSC Chemical Database  
+- **ChemSpider** - RSC Chemical Database
 - **ECHA Chem** - European Chemicals Agency
 - **GESTIS** - Deutsche DGUV Stoffdatenbank
 - **NIST WebBook** - Physikalische Eigenschaften
@@ -54,7 +54,7 @@ Substances Found: 7 unique chemicals
 
 ```python
 from veritas_api_agent_chemical_data import (
-    ChemicalDataAgent, ChemicalDataRequest, 
+    ChemicalDataAgent, ChemicalDataRequest,
     ChemicalIdentifierType, create_chemical_data_agent
 )
 
@@ -117,7 +117,7 @@ density = substance.get_property("density")
 if density:
     print(f"Dichte: {density.value} {density.unit} bei {density.temperature_c}°C")
 
-boiling_point = substance.get_property("boiling_point") 
+boiling_point = substance.get_property("boiling_point")
 vapor_pressure = substance.get_property("vapor_pressure")
 
 # Alle Eigenschaften
@@ -181,11 +181,11 @@ if sds:
     print(f"Version: {sds.version} ({sds.revision_date})")
     print(f"Anbieter: {sds.supplier}")
     print(f"Notfall: {sds.emergency_phone}")
-    
+
     # SDS-Sektionen
     print("\nSektion 2 - Gefahrenidentifikation:")
     print(sds.section_2_hazards)
-    
+
     print("\nSektion 9 - Physikalische Eigenschaften:")
     print(sds.section_9_physical_chemical)
 ```
@@ -217,7 +217,7 @@ emission_source = EmissionSource(
     release_height_m=25.0,
     temperature_k=273.15 + 80,  # Aus boiling_point
     velocity_m_per_s=5.0,
-    
+
     # Chemische Eigenschaften für erweiterte Modellierung
     chemical_name=substance.primary_name,
     cas_number=substance.get_cas_number(),
@@ -229,7 +229,7 @@ emission_source = EmissionSource(
 if substance.is_hazardous():
     print(f"⚠️ {substance.primary_name} ist als gefährlich eingestuft")
     print(f"Signalwort: {substance.get_signal_word()}")
-    
+
     # Grenzwerte für Bewertung
     mak = substance.get_exposure_limit(RegulationDatabase.DFG)
     if mak:
@@ -260,23 +260,23 @@ from veritas_api_agent_chemical_data import ChemicalDataConfig
 config = ChemicalDataConfig(
     # Datenquellen
     enabled_databases=["pubchem", "echa_chem", "gestis"],
-    
+
     # Cache-Einstellungen
     cache_enabled=True,
     cache_ttl_seconds=7200,  # 2 Stunden
     max_cache_size=1000,
-    
+
     # Performance
     max_concurrent_requests=5,
     request_timeout_seconds=30,
     max_retries=3,
-    
+
     # Qualität
     min_quality_threshold=0.3,
     require_cas_number=False,
     verify_molecular_formula=True,
-    
-    # SDS-Anbieter  
+
+    # SDS-Anbieter
     sds_providers=["sigma_aldrich", "merck", "fisher_scientific"],
     sds_max_age_days=365
 )
@@ -290,12 +290,12 @@ agent = create_chemical_data_agent(config)
 config = ChemicalDataConfig(
     # API-Schlüssel (optional)
     chemspider_api_key="your-key-here",
-    
+
     # Custom Endpoints
     pubchem_base_url="https://pubchem.ncbi.nlm.nih.gov/rest/pug",
     echa_base_url="https://echa.europa.eu/api",
     gestis_base_url="https://gestis-database.dguv.de/api",
-    
+
     # Sprachen
     default_language="de",
     supported_languages=["de", "en", "fr"]
@@ -311,25 +311,25 @@ config = ChemicalDataConfig(
 class ChemicalSubstance:
     substance_id: str
     primary_name: str
-    
+
     # Identifikatoren
     identifiers: List[ChemicalIdentifier]
-    
-    # Grunddaten  
+
+    # Grunddaten
     molecular_formula: str
     molecular_weight_gmol: float
     physical_state: PhysicalState
-    
+
     # Eigenschaften
     physical_properties: List[PhysicalProperty]
     ghs_classifications: List[GHSClassification]
     toxicological_data: List[ToxicologicalData]
     environmental_data: List[EnvironmentalData]
     exposure_limits: List[ExposureLimit]
-    
+
     # SDS
     safety_data_sheet: Optional[SafetyDataSheet]
-    
+
     # Metadaten
     quality_score: float
     data_sources: List[str]
@@ -399,13 +399,13 @@ def analyze_hazards(substances: List[ChemicalSubstance]):
         "toxic": 0,
         "corrosive": 0
     }
-    
+
     for substance in substances:
         if substance.is_hazardous():
             hazard_summary["hazardous"] += 1
-            
+
             hazard_classes = [ghs.hazard_class for ghs in substance.ghs_classifications]
-            
+
             if GHSHazardClass.CARCINOGENICITY in hazard_classes:
                 hazard_summary["carcinogenic"] += 1
             if GHSHazardClass.FLAMMABLE_LIQUID in hazard_classes:
@@ -414,7 +414,7 @@ def analyze_hazards(substances: List[ChemicalSubstance]):
                 hazard_summary["toxic"] += 1
             if GHSHazardClass.SKIN_CORROSION in hazard_classes:
                 hazard_summary["corrosive"] += 1
-    
+
     return hazard_summary
 ```
 
@@ -423,28 +423,28 @@ def analyze_hazards(substances: List[ChemicalSubstance]):
 ```python
 def check_compliance(substance: ChemicalSubstance, target_regulation: RegulationDatabase):
     """Prüfe Compliance mit spezifischen Vorschriften"""
-    
+
     compliance_status = {
         "compliant": True,
         "issues": [],
         "recommendations": []
     }
-    
+
     # Grenzwerte prüfen
     limit = substance.get_exposure_limit(target_regulation)
     if not limit:
         compliance_status["issues"].append(f"Keine Grenzwerte für {target_regulation.value} gefunden")
         compliance_status["compliant"] = False
-    
+
     # GHS-Klassifikation prüfen
     if not substance.ghs_classifications:
         compliance_status["issues"].append("Keine GHS-Klassifikation vorhanden")
         compliance_status["compliant"] = False
-    
-    # SDS prüfen  
+
+    # SDS prüfen
     if not substance.safety_data_sheet:
         compliance_status["recommendations"].append("Sicherheitsdatenblatt empfohlen")
-    
+
     return compliance_status
 ```
 
@@ -492,7 +492,7 @@ print(f"Agent Status: {agent_status}")
 # Langjährige Speicherung für CAS-Nummern
 config.cache_ttl_seconds = 86400  # 24 Stunden
 
-# Große Cache-Größe für Batch-Operations  
+# Große Cache-Größe für Batch-Operations
 config.max_cache_size = 5000
 
 # Präload häufiger Substanzen
@@ -512,7 +512,7 @@ async def batch_lookup(cas_numbers: List[str]):
     for cas in cas_numbers:
         request = ChemicalDataRequest(query_id=f"parallel-{cas}", search_term=cas)
         tasks.append(agent.query_chemical_data_async(request))
-    
+
     responses = await asyncio.gather(*tasks)
     return responses
 ```
@@ -554,7 +554,7 @@ class ChemicalDataClient {
     constructor(baseUrl) {
         this.baseUrl = baseUrl;
     }
-    
+
     async searchChemical(searchTerm, options = {}) {
         const request = {
             query_id: `web-${Date.now()}`,
@@ -564,16 +564,16 @@ class ChemicalDataClient {
             include_ghs_classification: options.includeGHS || true,
             max_results: options.maxResults || 5
         };
-        
+
         const response = await fetch(`${this.baseUrl}/api/chemical/search`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(request)
         });
-        
+
         return await response.json();
     }
-    
+
     async getByCAS(casNumber) {
         const response = await fetch(`${this.baseUrl}/api/chemical/cas/${casNumber}`);
         return await response.json();
@@ -589,7 +589,7 @@ if (result.success) {
     const substance = result.substances[0];
     console.log(`Found: ${substance.primary_name}`);
     console.log(`CAS: ${substance.identifiers.find(i => i.identifier_type === 'cas_number')?.value}`);
-    
+
     // GHS-Gefahren anzeigen
     if (substance.ghs_classifications.length > 0) {
         console.log('Hazards:');
@@ -606,12 +606,12 @@ if (result.success) {
 
 Der **VERITAS Chemical Data Agent** bietet:
 
-✅ **Vollständige chemische Datenabfrage** - CAS, Namen, Strukturformeln  
-✅ **Sicherheitsdatenblätter** - 16-Sektionen SDS/MSDS Dokumente  
-✅ **GHS-Klassifikation** - Gefahrenklassen, Piktogramme, Signal-Wörter  
-✅ **Arbeitsplatz-Grenzwerte** - MAK, TLV, PEL für verschiedene Länder  
-✅ **Integration** - Nahtlose Kopplung mit Atmospheric Flow Agent  
-✅ **Performance** - Caching, Batch-Processing, <1ms Antwortzeit  
+✅ **Vollständige chemische Datenabfrage** - CAS, Namen, Strukturformeln
+✅ **Sicherheitsdatenblätter** - 16-Sektionen SDS/MSDS Dokumente
+✅ **GHS-Klassifikation** - Gefahrenklassen, Piktogramme, Signal-Wörter
+✅ **Arbeitsplatz-Grenzwerte** - MAK, TLV, PEL für verschiedene Länder
+✅ **Integration** - Nahtlose Kopplung mit Atmospheric Flow Agent
+✅ **Performance** - Caching, Batch-Processing, <1ms Antwortzeit
 ✅ **Qualitätsgarantie** - 100% Testabdeckung, Datenvalidierung
 
 Der Agent ist produktionsreif und bereit für die Integration in das VERITAS Multi-Agent System zur Unterstützung von Emissionsmodellierung, Risikobewertung und Compliance-Prüfungen.

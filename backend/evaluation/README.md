@@ -285,6 +285,6 @@ Internal VERITAS Project - Proprietary
 
 ---
 
-**Version:** 1.0  
-**Last Updated:** 06.10.2025  
+**Version:** 1.0
+**Last Updated:** 06.10.2025
 **Author:** VERITAS System

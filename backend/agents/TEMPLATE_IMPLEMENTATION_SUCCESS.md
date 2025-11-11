@@ -43,7 +43,7 @@
 ```python
 BaseTemplateAgent
 ├── __init__()                 # Automatische Initialisierung & Registry
-├── execute_query()            # Standard Query-Pipeline 
+├── execute_query()            # Standard Query-Pipeline
 ├── process_query()            # [ABSTRACT] Domain-Logic implementieren
 ├── validate_input()           # [ABSTRACT] Input-Validierung
 ├── preprocess_query()         # [OPTIONAL] Query-Preprocessing
@@ -115,7 +115,7 @@ python agent_generator.py --domain medical --capabilities DOCUMENT_RETRIEVAL,LLM
 def process_query(self, request: MedicalQueryRequest) -> MedicalQueryResponse:
     # Implementiere Medical-spezifische Logic
     medical_data = self.medical_api.analyze_symptoms(request.query_text)
-    
+
     return MedicalQueryResponse(
         query_id=request.query_id,
         results=[{
@@ -141,7 +141,7 @@ python veritas_api_agent_medical.py  # Direkter Test
 - Konsistente Request/Response-Patterns
 - Standardisierte Error Handling und Logging
 
-### ✅ **Automatisierung** 
+### ✅ **Automatisierung**
 - Vollautomatische Agent-Code-Generierung
 - Auto-generierte Tests und Dokumentation
 - Template-basierte Domain-Anpassung
@@ -168,7 +168,7 @@ python veritas_api_agent_medical.py  # Direkter Test
 Das VERITAS Agent Template System ist **vollständig implementiert** und **production-ready**:
 
 - ✅ **Template-Architektur:** Vollständig funktional
-- ✅ **Code-Generator:** Alle 12 Domains unterstützt  
+- ✅ **Code-Generator:** Alle 12 Domains unterstützt
 - ✅ **Testing:** Comprehensive Test-Suite
 - ✅ **Documentation:** Complete Developer Guide
 - ✅ **Integration:** VERITAS-System-Ready
@@ -191,5 +191,5 @@ Das VERITAS Agent Template System ist **vollständig implementiert** und **produ
 
 ---
 
-*Template System implementiert am: 28. September 2025*  
+*Template System implementiert am: 28. September 2025*
 *VERITAS Agent Template System v1.0 - Production Ready*

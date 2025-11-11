@@ -5,9 +5,10 @@ VERITAS Agent Router
 Agent-System Endpoints
 """
 
-from fastapi import APIRouter, HTTPException
-from typing import List, Dict, Any
 import logging
+from typing import Any, Dict, List
+
+from fastapi import APIRouter, HTTPException
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +19,7 @@ agent_router = APIRouter(prefix="/agent")
 async def list_agents() -> List[Dict[str, Any]]:
     """
     Liste aller verfügbaren Agents
-    
+
     Returns:
         Liste von Agent-Informationen
     """
@@ -28,20 +29,10 @@ async def list_agents() -> List[Dict[str, Any]]:
             "id": "document_retrieval",
             "name": "Document Retrieval Agent",
             "capabilities": ["document_retrieval"],
-            "status": "active"
+            "status": "active",
         },
-        {
-            "id": "legal_framework",
-            "name": "Legal Framework Agent",
-            "capabilities": ["legal_framework"],
-            "status": "active"
-        },
-        {
-            "id": "geo_context",
-            "name": "Geo Context Agent",
-            "capabilities": ["geo_context"],
-            "status": "active"
-        }
+        {"id": "legal_framework", "name": "Legal Framework Agent", "capabilities": ["legal_framework"], "status": "active"},
+        {"id": "geo_context", "name": "Geo Context Agent", "capabilities": ["geo_context"], "status": "active"},
     ]
 
 
@@ -59,7 +50,7 @@ async def get_agent_capabilities() -> Dict[str, List[str]]:
             "quality_assessment",
             "authority_mapping",
             "external_api",
-            "database_query"
+            "database_query",
         ]
     }
 
@@ -70,9 +61,4 @@ async def get_agent_status(agent_id: str) -> Dict[str, Any]:
     Status eines spezifischen Agents
     """
     # TODO: Get from AgentRegistry
-    return {
-        "agent_id": agent_id,
-        "status": "active",
-        "last_execution": None,
-        "success_rate": 0.95
-    }
+    return {"agent_id": agent_id, "status": "active", "last_execution": None, "success_rate": 0.95}

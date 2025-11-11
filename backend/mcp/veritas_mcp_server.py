@@ -25,7 +25,7 @@ Aktuell implementierte Tools (MVP)
 
 Hinweis: Die eigentliche MCP-Transport-Schicht wird nur aktiviert, wenn das
 Python-Paket "mcp" installiert ist. Andernfalls startet der Server im
-"Trockenlauf" und bietet CLI-Tests an.
+"Trockenlau" und bietet CLI-Tests an.
 """
 
 from __future__ import annotations
@@ -56,9 +56,10 @@ logger.setLevel(logging.INFO)
 # -----------------------------------------------------------------------------
 def _lazy_import_query_service():
     """Lädt QueryService und benötigte Modelle lazy, um Import-Loops zu vermeiden."""
-    from backend.services.query_service import QueryService  # type: ignore
-    from backend.models.request import UnifiedQueryRequest  # type: ignore
     from backend.models.enums import QueryMode  # type: ignore
+    from backend.models.request import UnifiedQueryRequest  # type: ignore
+    from backend.services.query_service import QueryService  # type: ignore
+
     return QueryService, UnifiedQueryRequest, QueryMode
 
 
@@ -120,7 +121,7 @@ async def tool_execute_agent(query: str, agent_types: Optional[List[str]] = None
     """
     agent_types = agent_types or []
     return {
-        "status": "not-implemented-yet",
+        "status": "not - implemented-yet",
         "message": "Agent execution will be wired to IntelligentMultiAgentPipeline in the next step.",
         "query": query,
         "agent_types": agent_types,
@@ -133,9 +134,9 @@ async def tool_execute_agent(query: str, agent_types: Optional[List[str]] = None
 async def resource_get_document(document_id: str) -> Dict[str, Any]:
     """
     Ruft ein Dokument aus VERITAS-Datenbanken ab (UDS3).
-    
+
     URI-Schema: veritas://documents/{document_id}
-    
+
     Rückgabe:
     - uri: veritas://documents/{id}
     - mimeType: text/plain oder application/json
@@ -145,7 +146,7 @@ async def resource_get_document(document_id: str) -> Dict[str, Any]:
     try:
         # Lazy-Import der UDS3 PolyglotManager
         from uds3.core.polyglot_manager import UDS3PolyglotManager
-        
+
         # Initialisiere UDS3 Manager (minimale Config)
         uds3 = UDS3PolyglotManager(
             backend_config={
@@ -154,76 +155,74 @@ async def resource_get_document(document_id: str) -> Dict[str, Any]:
                 "graph": {"enabled": True},
                 "file": {"enabled": True},
             },
-            enable_rag=False
+            enable_rag=False,
         )
-        
+
         # Versuche Dokument aus verschiedenen Backends zu holen
         # 1. PostgreSQL (strukturierte Metadaten)
         pg_result = await _fetch_from_postgresql(uds3, document_id)
         if pg_result:
             return pg_result
-        
+
         # 2. ChromaDB (Vektorsuche nach ID)
         chroma_result = await _fetch_from_chromadb(uds3, document_id)
         if chroma_result:
             return chroma_result
-        
+
         # 3. CouchDB (Volltext-Dokumente)
         couch_result = await _fetch_from_couchdb(uds3, document_id)
         if couch_result:
             return couch_result
-        
+
         # Dokument nicht gefunden
         return {
-            "uri": f"veritas://documents/{document_id}",
+            "uri": f"veritas://documents / {document_id}",
             "mimeType": "application/json",
-            "text": json.dumps({
-                "error": "Document not found",
-                "document_id": document_id,
-                "searched_backends": ["postgresql", "chromadb", "couchdb"]
-            }),
+            "text": json.dumps(
+                {
+                    "error": "Document not found",
+                    "document_id": document_id,
+                    "searched_backends": ["postgresql", "chromadb", "couchdb"],
+                }
+            ),
         }
-        
+
     except Exception as e:
         logger.error(f"Resource fetch error for document {document_id}: {e}")
         return {
-            "uri": f"veritas://documents/{document_id}",
+            "uri": f"veritas://documents / {document_id}",
             "mimeType": "application/json",
-            "text": json.dumps({
-                "error": str(e),
-                "document_id": document_id
-            }),
+            "text": json.dumps({"error": str(e), "document_id": document_id}),
         }
 
 
 async def _fetch_from_postgresql(uds3: Any, doc_id: str) -> Optional[Dict[str, Any]]:  # noqa: ANN401
     """Versucht Dokument aus PostgreSQL zu holen."""
     try:
-        if not hasattr(uds3, 'relational_backend') or not uds3.relational_backend:
+        if not hasattr(uds3, "relational_backend") or not uds3.relational_backend:
             return None
-        
+
         # Annahme: UDS3 hat eine read()-Methode oder ähnliches
         # Fallback: Nutze direkte SQL-Query falls verfügbar
         result = await asyncio.get_event_loop().run_in_executor(
             None,
             lambda: uds3.relational_backend.execute_query(
-                "SELECT id, title, content, metadata FROM documents WHERE id = %s LIMIT 1",
-                (doc_id,)
-            )
+                "SELECT id, title, content, metadata FROM documents WHERE id = %s LIMIT 1", (doc_id,)
+            ),
         )
-        
+
         if result and len(result) > 0:
             row = result[0]
             return {
-                "uri": f"veritas://documents/{doc_id}",
+                "uri": f"veritas://documents / {doc_id}",
                 "mimeType": "text/plain",
                 "text": row.get("content", ""),
                 "metadata": {
                     "id": row.get("id"),
                     "title": row.get("title", "Untitled"),
                     "source": "postgresql",
-                    "extra": row.get("metadata", {})
-                }
+                    "extra": row.get("metadata", {}),
+                },
             }
     except Exception as e:
         logger.debug(f"PostgreSQL fetch failed for {doc_id}: {e}")
@@ -233,34 +232,31 @@ async def _fetch_from_postgresql(uds3: Any, doc_id: str) -> Optional[Dict[str, A
 async def _fetch_from_chromadb(uds3: Any, doc_id: str) -> Optional[Dict[str, Any]]:  # noqa: ANN401
     """Versucht Dokument aus ChromaDB zu holen (Metadaten-basierte Suche)."""
     try:
-        if not hasattr(uds3, 'vector_backend') or not uds3.vector_backend:
+        if not hasattr(uds3, "vector_backend") or not uds3.vector_backend:
             return None
-        
+
         # ChromaDB: get() by ID falls verfügbar
         # Fallback: query mit metadata filter
         collection = uds3.vector_backend.get_collection("veritas_documents")
         if not collection:
             return None
-        
-        result = await asyncio.get_event_loop().run_in_executor(
-            None,
-            lambda: collection.get(ids=[doc_id])
-        )
-        
+
+        result = await asyncio.get_event_loop().run_in_executor(None, lambda: collection.get(ids=[doc_id]))
+
         if result and result.get("documents") and len(result["documents"]) > 0:
             doc_text = result["documents"][0]
             metadata = result.get("metadatas", [{}])[0] if result.get("metadatas") else {}
-            
+
             return {
-                "uri": f"veritas://documents/{doc_id}",
+                "uri": f"veritas://documents / {doc_id}",
                 "mimeType": "text/plain",
                 "text": doc_text,
                 "metadata": {
                     "id": doc_id,
                     "title": metadata.get("title", "Untitled"),
                     "source": "chromadb",
-                    "extra": metadata
-                }
+                    "extra": metadata,
+                },
             }
     except Exception as e:
         logger.debug(f"ChromaDB fetch failed for {doc_id}: {e}")
@@ -270,26 +266,18 @@ async def _fetch_from_chromadb(uds3: Any, doc_id: str) -> Optional[Dict[str, Any
 async def _fetch_from_couchdb(uds3: Any, doc_id: str) -> Optional[Dict[str, Any]]:  # noqa: ANN401
     """Versucht Dokument aus CouchDB zu holen."""
     try:
-        if not hasattr(uds3, 'file_backend') or not uds3.file_backend:
+        if not hasattr(uds3, "file_backend") or not uds3.file_backend:
             return None
-        
+
         # CouchDB: read_document() oder ähnliches
-        result = await asyncio.get_event_loop().run_in_executor(
-            None,
-            lambda: uds3.file_backend.read(doc_id)
-        )
-        
+        result = await asyncio.get_event_loop().run_in_executor(None, lambda: uds3.file_backend.read(doc_id))
+
         if result:
             return {
-                "uri": f"veritas://documents/{doc_id}",
+                "uri": f"veritas://documents / {doc_id}",
                 "mimeType": "application/json",
                 "text": json.dumps(result, ensure_ascii=False, indent=2),
-                "metadata": {
-                    "id": doc_id,
-                    "title": result.get("title", "Untitled"),
-                    "source": "couchdb",
-                    "extra": result
-                }
+                "metadata": {"id": doc_id, "title": result.get("title", "Untitled"), "source": "couchdb", "extra": result},
             }
     except Exception as e:
         logger.debug(f"CouchDB fetch failed for {doc_id}: {e}")
@@ -317,6 +305,7 @@ class ToolSpec:
 @dataclass
 class PromptTemplate:
     """Flexible Prompt-Vorlage, kann aus Datei/DB geladen werden."""
+
     name: str
     description: str
     system_message: str
@@ -350,7 +339,7 @@ def build_tools_metadata() -> List[ToolSpec]:
             parameters={
                 "type": "object",
                 "properties": {
-                    "query": {"type": "string", "description": "Aufgabe/Beschreibung"},
+                    "query": {"type": "string", "description": "Aufgabe / Beschreibung"},
                     "agent_types": {
                         "type": "array",
                         "items": {"type": "string"},
@@ -366,17 +355,13 @@ def build_tools_metadata() -> List[ToolSpec]:
 def load_prompt_templates() -> List[PromptTemplate]:
     """
     Lädt Prompt-Vorlagen aus JSON/YAML-Datei oder gibt Default-Templates zurück.
-    
+
     Flexible Konfiguration: Kann später auf Datei-basiert erweitert werden.
     Aktuell: Built-in Default-Templates als Fallback.
     """
     # Versuche Prompt-Config aus Datei zu laden (optional)
-    prompts_file = os.path.join(
-        os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
-        "config",
-        "mcp_prompts.json"
-    )
-    
+    prompts_file = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "config", "mcp_prompts.json")
+
     if os.path.exists(prompts_file):
         try:
             with open(prompts_file, "r", encoding="utf-8") as f:
@@ -393,7 +378,7 @@ def load_prompt_templates() -> List[PromptTemplate]:
                 ]
         except Exception as e:
             logger.warning(f"Prompt-Config konnte nicht geladen werden: {e}")
-    
+
     # Default-Templates (Fallback)
     return [
         PromptTemplate(
@@ -430,7 +415,7 @@ def load_prompt_templates() -> List[PromptTemplate]:
                 "type": "object",
                 "properties": {
                     "bauvorhaben": {"type": "string", "description": "Beschreibung des Bauvorhabens"},
-                    "standort": {"type": "string", "description": "Standort/Adresse"},
+                    "standort": {"type": "string", "description": "Standort / Adresse"},
                 },
                 "required": ["bauvorhaben", "standort"],
             },
@@ -467,6 +452,7 @@ async def _run_stdio_server_async():
 
     # --- Tool-Registrierungen -------------------------------------------------
     try:
+
         @server.tool("hybrid_search")  # type: ignore
         async def _mcp_hybrid_search(query: str, top_k: int = 5) -> Any:  # noqa: ANN401
             return await tool_hybrid_search(query, top_k)
@@ -486,7 +472,7 @@ async def _run_stdio_server_async():
     # --- Prompt-Registrierung (Flexibel über Templates) ----------------------
     try:
         prompt_templates = load_prompt_templates()
-        
+
         for template in prompt_templates:
             # Dynamische Prompt-Registrierung
             async def _create_prompt_handler(tmpl: PromptTemplate):
@@ -494,7 +480,7 @@ async def _run_stdio_server_async():
                     """Dynamisch generierter Prompt-Handler."""
                     # Ersetze Template-Variablen in user_template
                     user_message = tmpl.user_template.format(**kwargs)
-                    
+
                     return {
                         "description": tmpl.description,
                         "messages": [
@@ -502,24 +488,26 @@ async def _run_stdio_server_async():
                             {"role": "user", "content": user_message},
                         ],
                     }
+
                 return _handler
-            
+
             # Registriere Prompt mit Name aus Template
             handler = await _create_prompt_handler(template)
             server.prompt(template.name)(handler)  # type: ignore
             logger.info(f"   ✅ Prompt registriert: {template.name}")
-        
+
         logger.info(f"✅ {len(prompt_templates)} MCP-Prompts registriert")
     except Exception as e:
         logger.warning(f"Prompt-Registrierung fehlgeschlagen (SDK-Version?): {e}")
 
     # --- Resource-Registrierung (Dokumentenabruf) ----------------------------
     try:
+
         @server.resource("veritas://documents/{document_id}")  # type: ignore
         async def _resource_document(document_id: str) -> Any:  # noqa: ANN401
             """Dokumentenabruf aus VERITAS-Datenbanken."""
             return await resource_get_document(document_id)
-        
+
         logger.info("✅ MCP-Resource registriert: veritas://documents/{id}")
     except Exception as e:
         logger.warning(f"Resource-Registrierung fehlgeschlagen (SDK-Version?): {e}")
@@ -546,28 +534,40 @@ def run_stdio_server() -> None:
 async def _cli_demo() -> None:
     """Einfacher CLI-Test: führt eine Demo-Hybrid-Suche aus und zeigt Agentenliste."""
     print("\n=== VERITAS MCP CLI-Demo ===")
-    
+
     print("\n1) Hybrid-Suche ausführen")
     result = await tool_hybrid_search("Baurechtliche Genehmigung Solaranlage", top_k=3)
-    print(json.dumps({
-        "tool": "hybrid_search",
-        "result_keys": list(result.keys()),
-        "sources_count": len(result.get("sources", [])),
-    }, ensure_ascii=False, indent=2))
+    print(
+        json.dumps(
+            {
+                "tool": "hybrid_search",
+                "result_keys": list(result.keys()),
+                "sources_count": len(result.get("sources", [])),
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
+    )
 
     print("\n2) Agenten auflisten")
     agents = await tool_list_agents()
     print(json.dumps(agents, ensure_ascii=False, indent=2))
-    
+
     print("\n3) Dokument abrufen (Mock-Test)")
     document = await resource_get_document("doc_test_123")
-    print(json.dumps({
-        "resource": "veritas://documents/doc_test_123",
-        "uri": document.get("uri"),
-        "mimeType": document.get("mimeType"),
-        "has_text": bool(document.get("text")),
-        "metadata_keys": list(document.get("metadata", {}).keys()) if "metadata" in document else [],
-    }, ensure_ascii=False, indent=2))
+    print(
+        json.dumps(
+            {
+                "resource": "veritas://documents / doc_test_123",
+                "uri": document.get("uri"),
+                "mimeType": document.get("mimeType"),
+                "has_text": bool(document.get("text")),
+                "metadata_keys": list(document.get("metadata", {}).keys()) if "metadata" in document else [],
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
+    )
 
 
 def main(argv: Optional[List[str]] = None) -> None:

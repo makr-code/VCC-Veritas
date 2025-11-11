@@ -45,7 +45,7 @@ class SearchMethod(Enum):
 class RankingStrategy(Enum):
     """Ranking strategies for hybrid search"""
 
-    RECIPROCAL_RANK_FUSION = "rrf"  # Reciprocal Rank Fusion
+    RECIPROCAL_RANK_FUSION = "rr"  # Reciprocal Rank Fusion
     WEIGHTED_SCORE = "weighted"  # Weighted sum of scores
     BORDA_COUNT = "borda"  # Borda count voting
 
@@ -69,7 +69,7 @@ class SearchWeights:
 class SearchFilters:
     """Filters for document search"""
 
-    document_types: Optional[List[str]] = None  # e.g., ["pdf", "docx"]
+    document_types: Optional[List[str]] = None  # e.g., ["pd", "docx"]
     date_range: Optional[Tuple[datetime, datetime]] = None
     min_relevance: float = 0.0  # Minimum relevance score (0.0-1.0)
     max_results: int = 10
@@ -637,7 +637,7 @@ class RAGService:
 
         # German administrative term synonyms
         synonym_map = {
-            # Building/Construction
+            # Building / Construction
             "bauantrag": ["baugenehmigung", "bauantragsverfahren", "baugesuch"],
             "einfamilienhaus": ["wohnhaus", "eigenheim", "wohngebäude"],
             "umbau": ["sanierung", "renovierung", "modernisierung"],
@@ -647,7 +647,7 @@ class RAGService:
             "gmbh": ["gesellschaft mit beschränkter haftung", "kapitalgesellschaft"],
             "unternehmensgründung": ["firmengründung", "geschäftsgründung"],
             # Documents
-            "personalausweis": ["ausweis", "identitätskarte", "id-karte"],
+            "personalausweis": ["ausweis", "identitätskarte", "id - karte"],
             "führerschein": ["fahrerlaubnis", "fahrberechtigung"],
             "reisepass": ["pass", "reisedokument"],
             # Procedures
@@ -798,7 +798,7 @@ class RAGService:
         mock_docs = [
             {
                 "id": "doc_1",
-                "title": "Bauantragsverfahren in Baden-Württemberg",
+                "title": "Bauantragsverfahren in Baden - Württemberg",
                 "content": "Ein Bauantrag in Stuttgart erfordert...",
                 "relevance": 0.92,
             },
@@ -845,7 +845,7 @@ if __name__ == "__main__":
 
     # Initialize service (will throw RuntimeError if any backend fails)
     rag = RAGService()
-    print(f"\n✅ RAG Service initialized - ALL backends connected!")
+    print("\n✅ RAG Service initialized - ALL backends connected!")
     print(f"   - ChromaDB: {'✅' if rag.chromadb else '❌'}")
     print(f"   - Neo4j: {'✅' if rag.neo4j else '❌'}")
     print(f"   - PostgreSQL: {'✅' if rag.postgresql else '❌'}")

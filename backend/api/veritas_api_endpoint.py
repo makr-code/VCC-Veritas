@@ -100,9 +100,9 @@ class SystemModeManager:
             "VERITAS": {
                 "system": "veritas",
                 "display_name": "Veritas RAG System",
-                "description": "Hauptsystem für Retrieval-Augmented Generation mit Multi-Backend Support",
+                "description": "Hauptsystem für Retrieval - Augmented Generation mit Multi - Backend Support",
                 "status": "implemented",
-                "endpoints": ["/ask", "/search", "/chat"],
+                "endpoints": [" / ask", " / search", " / chat"],
                 "parameters": ["question", "model", "temperature", "max_tokens"],
                 "example": "Erkläre mir das deutsche Verwaltungsrecht",
                 "category": "core",
@@ -112,9 +112,9 @@ class SystemModeManager:
             "COVINA": {
                 "system": "covina",
                 "display_name": "Covina Module System",
-                "description": "Erweiterte RAG-Pipeline mit Qualitäts-Enhancement und Multi-Source Integration",
+                "description": "Erweiterte RAG - Pipeline mit Qualitäts - Enhancement und Multi - Source Integration",
                 "status": "implemented" if self._check_covina_availability() else "unavailable",
-                "endpoints": ["/covina/ask", "/covina/search", "/covina/quality"],
+                "endpoints": [" / covina/ask", " / covina/search", " / covina/quality"],
                 "parameters": ["query", "sources", "quality_level", "enhancement_mode"],
                 "example": "Suche Informationen zu Bebauungsplänen mit hoher Qualität",
                 "category": "enhancement",
@@ -124,9 +124,9 @@ class SystemModeManager:
             "VPB": {
                 "system": "vpb",
                 "display_name": "VPB Verwaltungsprozesse",
-                "description": "Verwaltungsprozess-Beschreibungssprache für deutsche Behörden",
+                "description": "Verwaltungsprozess - Beschreibungssprache für deutsche Behörden",
                 "status": "implemented" if self._check_vpb_availability() else "unavailable",
-                "endpoints": ["/vpb/ask", "/vpb/process", "/vpb/analyze"],
+                "endpoints": [" / vpb/ask", " / vpb/process", " / vpb/analyze"],
                 "parameters": ["process_type", "analysis_depth", "compliance_check"],
                 "example": "Wie läuft ein Baugenehmigungsverfahren ab?",
                 "category": "domain_specific",
@@ -136,9 +136,9 @@ class SystemModeManager:
             "CHAT": {
                 "system": "chat",
                 "display_name": "Conversation System",
-                "description": "Persistente Chat-Sessions mit Kontext-Erhaltung",
+                "description": "Persistente Chat - Sessions mit Kontext - Erhaltung",
                 "status": "implemented" if self._check_conversation_availability() else "unavailable",
-                "endpoints": ["/chat/start", "/chat/continue", "/chat/history"],
+                "endpoints": [" / chat/start", " / chat/continue", " / chat/history"],
                 "parameters": ["session_id", "message", "context_length"],
                 "example": "Fortlaufende Diskussion über Rechtsfragen",
                 "category": "interaction",
@@ -148,9 +148,9 @@ class SystemModeManager:
             "QUALITY": {
                 "system": "quality",
                 "display_name": "Quality Enhancement",
-                "description": "Qualitätsbewertung und -verbesserung für RAG-Antworten",
+                "description": "Qualitätsbewertung und -verbesserung für RAG - Antworten",
                 "status": "implemented" if self._check_quality_availability() else "unavailable",
-                "endpoints": ["/quality/analyze", "/quality/enhance", "/quality/metrics"],
+                "endpoints": [" / quality/analyze", " / quality/enhance", " / quality/metrics"],
                 "parameters": ["content", "enhancement_level", "metrics_type"],
                 "example": "Qualitätsbewertung einer generierten Antwort",
                 "category": "analysis",
@@ -160,11 +160,11 @@ class SystemModeManager:
             "AGENT": {
                 "system": "agent",
                 "display_name": "Agent Engine",
-                "description": "Erweiterte RAG-Pipeline mit externen Datenquellen (EU LEX, Google Search, SQL)",
+                "description": "Erweiterte RAG - Pipeline mit externen Datenquellen (EU LEX, Google Search, SQL)",
                 "status": "implemented" if self._check_agent_availability() else "unavailable",
-                "endpoints": ["/agent/query", "/agent/configure", "/agent/stats", "/agent/workers"],
+                "endpoints": [" / agent/query", " / agent/configure", " / agent/stats", " / agent/workers"],
                 "parameters": ["query", "external_sources", "max_workers", "enable_external_sources"],
-                "example": "Suche in EU-Recht und externen Datenbanken zur Baugenehmigung",
+                "example": "Suche in EU - Recht und externen Datenbanken zur Baugenehmigung",
                 "category": "external_integration",
                 "priority": 2,
             },
@@ -274,7 +274,7 @@ if COVINA_AVAILABLE:
 
     logger.info("✅ Covina module loaded successfully")
 else:
-    logger.warning(f"❌ Covina module not available")
+    logger.warning("❌ Covina module not available")
 
 # VPB Integration imports
 if VPB_AVAILABLE:
@@ -798,13 +798,13 @@ async def rag_ask(request: RAGRequest):
         if not COVINA_AVAILABLE:
             # Fallback without Covina
             response_data = {
-                "answer": "Covina-Modul nicht verfügbar. System läuft im reduzierten Modus.",
+                "answer": "Covina - Modul nicht verfügbar. System läuft im reduzierten Modus.",
                 "sources": [],
                 "confidence_score": 0.0,
                 "processing_time_seconds": time.time() - start_time,
                 "session_id": session_id,
                 "timestamp": datetime.now().isoformat(),
-                "suggestions": ["Covina-Modul installieren für volle Funktionalität"],
+                "suggestions": ["Covina - Modul installieren für volle Funktionalität"],
             }
         else:
             # Covina Module Query - async wrapper with correct parameter mapping
@@ -1222,7 +1222,7 @@ async def get_worker_info():
                     "cache_ttl": 1800,
                 },
                 {"type": "legal_framework", "description": "Rechtliche Rahmenanalyse", "status": "active", "cache_ttl": 3600},
-                {"type": "eu_lex", "description": "EU-Rechtsportal-Integration", "status": "active", "cache_ttl": 3600},
+                {"type": "eu_lex", "description": "EU - Rechtsportal-Integration", "status": "active", "cache_ttl": 3600},
             ],
             "external_apis": {
                 "google_search": {
@@ -1282,7 +1282,7 @@ async def get_metadata():
     """
     try:
         metadata = {
-            "api_version": "2.0.0-fastapi-production",
+            "api_version": "2.0.0 - fastapi-production",
             "framework": "FastAPI",
             "features": {
                 "async_processing": True,
@@ -1294,11 +1294,11 @@ async def get_metadata():
                 "conversation_system": CONVERSATION_AVAILABLE,
             },
             "endpoints": {
-                "documentation": "/docs",
-                "redoc": "/redoc",
-                "openapi_spec": "/openapi.json",
-                "health_check": "/health",
-                "system_status": "/status",
+                "documentation": " / docs",
+                "redoc": " / redoc",
+                "openapi_spec": " / openapi.json",
+                "health_check": " / health",
+                "system_status": " / status",
             },
             "performance": {
                 "async_support": True,
@@ -1402,14 +1402,14 @@ async def get_vpb_modes_legacy():
                 "display_name": "VPB Prozess Abfrage",
                 "description": "Stellt Fragen zu Verwaltungsprozessen",
                 "status": vpb_mode["status"],
-                "endpoint": "/vpb/ask",
+                "endpoint": " / vpb/ask",
             },
             {
                 "mode": "VPB",
                 "display_name": "VPB Core System",
                 "description": vpb_mode["description"],
                 "status": vpb_mode["status"],
-                "endpoint": "/vpb/core",
+                "endpoint": " / vpb/core",
             },
         ]
 
@@ -1524,7 +1524,7 @@ async def vpb_ask_mode(request: VPBAnalysisRequest):
         details = {
             "analysis_depth": request.analysis_depth,
             "include_suggestions": request.include_suggestions,
-            "matched_processes": ["Beispiel-Prozess-1", "Beispiel-Prozess-2"],
+            "matched_processes": ["Beispiel - Prozess-1", "Beispiel - Prozess-2"],
         }
 
         sources = [{"type": "vpb_process", "name": "Beispiel Verwaltungsprozess", "confidence": 0.92}]
@@ -1813,7 +1813,7 @@ async def universal_query_v2(request: dict):
             "confidence_score": 0.5,
             "model_used": "fallback",
             "suggestions": ["Payload Library installieren für volle Funktionalität"],
-            "metadata": {"endpoint": "/v2/query", "mode": "fallback", "payload_available": False},
+            "metadata": {"endpoint": " / v2/query", "mode": "fallback", "payload_available": False},
         }
         return fallback_response
 
@@ -1867,7 +1867,7 @@ async def universal_query_v2(request: dict):
                     sources = [
                         {
                             "title": "Demo RAG Source v2",
-                            "content": f"Kontext für: {question[:50] if question else 'N/A'}...",
+                            "content": f"Kontext für: {question[:50] if question else 'N / A'}...",
                             "confidence": 0.95,
                             "metadata": {"source_type": "demo", "version": "v2"},
                         }
@@ -1893,7 +1893,7 @@ async def universal_query_v2(request: dict):
                 "model_used": model,
                 "quality_score": 0.92,
                 "data": {"rag_metadata": rag_metadata, "enhanced": True, "covina_available": COVINA_AVAILABLE},
-                "metadata": {"endpoint": "/v2/query", "type": "rag", "payload_version": "1.0.0"},
+                "metadata": {"endpoint": " / v2/query", "type": "rag", "payload_version": "1.0.0"},
             }
 
             # Verwende UniversalQueryResponse falls verfügbar, sonst dict
@@ -1925,7 +1925,7 @@ async def universal_query_v2(request: dict):
                     "analysis_depth": request.analysis_depth or "standard",
                     "process_category": "general",
                     "complexity": "medium",
-                    "estimated_duration": "2-5 Werktage",
+                    "estimated_duration": "2 - 5 Werktage",
                 },
                 process_recommendations=[
                     "✅ Prozess-Optimierung möglich",
@@ -1934,7 +1934,7 @@ async def universal_query_v2(request: dict):
                 ],
                 suggestions=["🔧 Prozess optimieren", "📊 Weitere Analyse", "🎯 Spezialisierung"],
                 model_used=request.model,
-                metadata={"endpoint": "/v2/query", "type": "vpb", "payload_version": "1.0.0", "vpb_enhanced": True},
+                metadata={"endpoint": " / v2/query", "type": "vpb", "payload_version": "1.0.0", "vpb_enhanced": True},
             )
 
         elif request.request_type == RequestType.CHAT:
@@ -1955,7 +1955,7 @@ async def universal_query_v2(request: dict):
                 conversation_id=session_id,
                 suggestions=["💭 Erzähl mir mehr", "🤔 Andere Perspektive?", "📝 Zusammenfassung?"],
                 metadata={
-                    "endpoint": "/v2/query",
+                    "endpoint": " / v2/query",
                     "type": "chat",
                     "payload_version": "1.0.0",
                     "conversation_mode": request.parameters.get("conversation_mode", "standard"),
@@ -1981,7 +1981,7 @@ async def universal_query_v2(request: dict):
                 model_performance={"tokens_per_second": 45.2, "memory_usage_mb": 234.5, "gpu_utilization": 0.67},
                 suggestions=["🚀 Covina erweitert", "🔬 Tiefe Analyse", "⚡ Optimierung"],
                 metadata={
-                    "endpoint": "/v2/query",
+                    "endpoint": " / v2/query",
                     "type": "covina",
                     "payload_version": "1.0.0",
                     "covina_mode": request.parameters.get("covina_mode", "standard"),
@@ -2005,7 +2005,7 @@ async def universal_query_v2(request: dict):
                 processing_time_seconds=time.time() - start_time,
                 answer=f"🖥️ System-Status: {request.question}",
                 data=system_info,
-                metadata={"endpoint": "/v2/query", "type": "system", "payload_version": "1.0.0"},
+                metadata={"endpoint": " / v2/query", "type": "system", "payload_version": "1.0.0"},
             )
 
         else:
@@ -2019,7 +2019,7 @@ async def universal_query_v2(request: dict):
                 error_code="UNSUPPORTED_REQUEST_TYPE",
                 error_message=f"Request type '{request.request_type}' wird noch nicht unterstützt",
                 metadata={
-                    "endpoint": "/v2/query",
+                    "endpoint": " / v2/query",
                     "supported_types": [t.value for t in RequestType],
                     "payload_version": "1.0.0",
                 },
@@ -2036,7 +2036,7 @@ async def universal_query_v2(request: dict):
             error_code="INTERNAL_ERROR",
             error_message=str(e),
             error_details={"exception_type": type(e).__name__},
-            metadata={"endpoint": "/v2/query", "error_context": "universal_query_v2", "payload_version": "1.0.0"},
+            metadata={"endpoint": " / v2/query", "error_context": "universal_query_v2", "payload_version": "1.0.0"},
         )
 
 
@@ -2076,9 +2076,9 @@ async def system_info_v2():
                 "chromadb": {"status": "active", "version": "0.4.x"},
             },
             "endpoints": {
-                "legacy": ["/ask", "/vpb/ask", "/chat/start", "/conversations"],
-                "universal_v2": ["/v2/query", "/v2/system/info"],
-                "system": ["/health", "/status", "/modes", "/get_models"],
+                "legacy": [" / ask", " / vpb/ask", " / chat/start", " / conversations"],
+                "universal_v2": [" / v2/query", " / v2/system / info"],
+                "system": [" / health", " / status", " / modes", " / get_models"],
             },
             "features": {
                 "rag": True,
@@ -2107,7 +2107,7 @@ async def system_info_v2():
             processing_time_seconds=time.time() - start_time,
             answer="🖥️ Veritas System v2.0 - Vollständige Systeminfo abgerufen",
             data=system_info,
-            metadata={"endpoint": "/v2/system/info", "payload_version": "1.0.0", "info_type": "comprehensive"},
+            metadata={"endpoint": " / v2/system / info", "payload_version": "1.0.0", "info_type": "comprehensive"},
         )
 
     except Exception as e:
@@ -2119,7 +2119,7 @@ async def system_info_v2():
             answer="",
             error_code="SYSTEM_INFO_ERROR",
             error_message=str(e),
-            metadata={"endpoint": "/v2/system/info", "payload_version": "1.0.0"},
+            metadata={"endpoint": " / v2/system / info", "payload_version": "1.0.0"},
         )
 
 
@@ -2150,7 +2150,7 @@ async def payload_examples_v2():
             },
             "vpb_request": {
                 "request_type": "vpb_analysis",
-                "question": "Analysiere diese VPB-Daten",
+                "question": "Analysiere diese VPB - Daten",
                 "metadata": {"example": True},
             },
             "chat_request": {
@@ -2162,7 +2162,7 @@ async def payload_examples_v2():
             "system_request": {"request_type": "system", "question": "Systemstatus anzeigen", "metadata": {"example": True}},
             "covina_request": {
                 "request_type": "covina",
-                "question": "Erweiterte LLM-Analyse durchführen",
+                "question": "Erweiterte LLM - Analyse durchführen",
                 "parameters": {"covina_mode": "enhanced"},
                 "metadata": {"example": True},
             },
@@ -2173,10 +2173,10 @@ async def payload_examples_v2():
             "payload_version": "1.0.0",
             "examples": examples,
             "usage_info": {
-                "endpoint": "/v2/query",
+                "endpoint": " / v2/query",
                 "method": "POST",
-                "content_type": "application/json",
-                "documentation": "/docs",
+                "content_type": "application / json",
+                "documentation": " / docs",
             },
         }
 
@@ -2211,7 +2211,7 @@ if __name__ == "__main__":
             logger.info(f"✅ Alternativer Port gefunden: {available_port}")
             default_port = available_port
         else:
-            logger.error(f"❌ Keine verfügbaren Ports gefunden (geprüft: {default_port}-{default_port+9})")
+            logger.error(f"❌ Keine verfügbaren Ports gefunden (geprüft: {default_port}-{default_port + 9})")
             logger.error("💡 Mögliche Lösungen:")
             logger.error("   - Anderen VERITAS-Prozess beenden")
             logger.error("   - Port 5000 freigeben")

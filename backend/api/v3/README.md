@@ -1,7 +1,7 @@
 # VERITAS API v3 - Enterprise REST API
 
-**Version:** 3.0.0  
-**Status:** Implementation (Phase 1 Complete)  
+**Version:** 3.0.0
+**Status:** Implementation (Phase 1 Complete)
 **Release Date:** 17. Oktober 2025
 
 Enterprise-grade REST API mit modularer Struktur, konsistenten Conventions und umfassenden Features.
@@ -434,9 +434,9 @@ backend/api/v3/
    ```python
    # backend/api/v3/my_router.py
    from fastapi import APIRouter
-   
+
    my_router = APIRouter(prefix="/my_module", tags=["My Module"])
-   
+
    @my_router.get("/")
    async def get_my_data():
        return {"data": "..."}

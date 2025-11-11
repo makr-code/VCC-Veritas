@@ -340,7 +340,7 @@ class AgentOrchestrator:
         # Schema für STANDARD Queries (🟡 Standard: Multi-Domain + externe Datenquellen)
         standard_schema = {
             "schema_name": "standard_query_pipeline",
-            "description": "Multi-Domain Queries mit externen Datenquellen",
+            "description": "Multi - Domain Queries mit externen Datenquellen",
             "complexity": "standard",
             "stages": [
                 {
@@ -422,7 +422,7 @@ class AgentOrchestrator:
         # Schema für ADVANCED Queries (🔴 Advanced: Complex Reasoning + Multi-Step-Analysis)
         advanced_schema = {
             "schema_name": "advanced_query_pipeline",
-            "description": "Komplexe Queries mit Multi-Step-Analysis",
+            "description": "Komplexe Queries mit Multi - Step-Analysis",
             "complexity": "advanced",
             "stages": [
                 {
@@ -669,7 +669,7 @@ class AgentOrchestrator:
             QueryDomain.BUSINESS: ["gewerbe", "geschäft", "laden", "gaststätte", "betrieb", "unternehmen"],
             QueryDomain.TAXATION: ["steuer", "gebühr", "abgabe", "finanz", "förder", "unterstützung"],
             QueryDomain.CIVIC_ENGAGEMENT: ["bürger", "wahl", "beteiligung", "antrag", "beschwerde", "petition"],
-            QueryDomain.SECURITY: ["sicherheit", "ordnung", "polizei", "feuerwehr", "notruf", "gefahr"],
+            QueryDomain.SECURITY: ["sicherheit", "ordnung", "polizei", "feuerwehr", "notru", "gefahr"],
             QueryDomain.HEALTH: ["arzt", "krankenhaus", "impf", "medizin", "therapie", "behandlung"],
         }
 
@@ -805,7 +805,7 @@ class AgentOrchestrator:
             return pipeline_id
 
     def _resolve_dynamic_agent_type(self, domain: QueryDomain, capability: str) -> str:
-        """Löst dynamic agent types basierend auf Domain auf"""
+        """Löst dynamic agent types basierend auf Domain au"""
 
         # Domain-zu-Agent-Typ Mapping
         domain_agent_mapping = {

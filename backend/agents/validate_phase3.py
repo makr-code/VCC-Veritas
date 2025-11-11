@@ -1,7 +1,7 @@
 """Quick validation of VERITAS Agent Framework - Phase 3 Complete"""
 
-from registry_agent_adapter import RegistryAgentAdapter
 from environmental_agent_adapter import EnvironmentalAgentAdapter
+from registry_agent_adapter import RegistryAgentAdapter
 
 print("\n" + "=" * 60)
 print("   VERITAS AGENT FRAMEWORK - VALIDATION")

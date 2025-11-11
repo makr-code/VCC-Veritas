@@ -110,7 +110,7 @@ response = agent.calculate_flow(request)
 if response.success:
     print(f"Berechnungen: {response.total_source_receptor_pairs}")
     print(f"Max Konzentration: {response.max_concentration_ugm3:.2f} μg/m³")
-    
+
     for result in response.flow_results:
         print(f"{result.receptor_id}: {result.concentration_ugm3:.2f} μg/m³")
         print(f"  Entfernung: {result.distance_m:.0f}m")
@@ -279,7 +279,7 @@ class EmissionSource:
     source_id: str                           # Eindeutige ID
     coordinate: Coordinate                   # Lat, Lon, Elevation
     source_type: EmissionSourceType         # POINT, LINE, AREA, VOLUME
-    
+
     # Emissions-Parameter
     emission_rate: float                    # kg/h oder μg/s
     pollutant_name: str                     # Schadstoff
@@ -287,11 +287,11 @@ class EmissionSource:
     stack_diameter_m: float                 # Durchmesser
     exit_velocity_ms: float                 # Austrittsgeschwindigkeit
     exit_temperature_k: float               # Austrittstemperatur
-    
+
     # Geometrie (Linien-/Flächenquellen)
     geometry_points: List[Coordinate]       # Geometrie-Definition
     area_m2: float                          # Flächengröße
-    
+
     # Zeitliche Variation
     temporal_profile: Dict[str, float]      # Stunde -> Faktor
 ```
@@ -304,7 +304,7 @@ class WindField:
     grid_bounds: Dict[str, float]           # Berechnungsgebiet
     grid_resolution_m: float                # Raster-Auflösung
     wind_vectors: Dict[str, WindVector]     # Windvektoren per Grid-Punkt
-    
+
     # Atmosphärische Parameter
     stability_class: AtmosphericStabilityClass  # A-F (Pasquill-Gifford)
     mixing_height_m: float                  # Mischungsschichthöhe
@@ -319,23 +319,23 @@ class WindField:
 class FlowCalculationResult:
     source_id: str
     receptor_id: str
-    
+
     # Konzentrationen
     concentration_ugm3: float               # Durchschnittskonzentration
     peak_concentration_ugm3: float          # Maximale Konzentration
     time_to_peak_minutes: float             # Transportzeit
-    
+
     # Geometrie
     distance_m: float                       # Entfernung
     bearing_deg: float                      # Richtung
     effective_height_m: float               # Effektive Quellhöhe
-    
+
     # Meteorologie
     wind_speed_ms: float
     wind_direction_deg: float
     stability_class: AtmosphericStabilityClass
     mixing_height_m: float
-    
+
     # Unsicherheiten
     confidence_level: float                 # 0.0-1.0
     uncertainty_factor: float               # Unsicherheitsfaktor
@@ -361,7 +361,7 @@ flow_agent = create_atmospheric_flow_agent()
 @app.post("/agents/atmospheric_flow/calculate")
 async def atmospheric_flow_calculation(request: dict):
     """Atmospheric Flow Calculation Endpoint"""
-    
+
     # Sources parsen
     sources = []
     for source_data in request.get("emission_sources", []):
@@ -376,7 +376,7 @@ async def atmospheric_flow_calculation(request: dict):
             exit_velocity_ms=source_data.get("exit_velocity_ms", 0.0)
         )
         sources.append(source)
-    
+
     # Receptors parsen
     receptors = []
     for receptor_data in request.get("receptor_points", []):
@@ -387,7 +387,7 @@ async def atmospheric_flow_calculation(request: dict):
             receptor_type=receptor_data.get("receptor_type", "general")
         )
         receptors.append(receptor)
-    
+
     # Flow Request erstellen
     flow_request = FlowCalculationRequest(
         query_id=request.get("query_id", f"flow-{int(time.time())}"),
@@ -399,10 +399,10 @@ async def atmospheric_flow_calculation(request: dict):
         flow_model=FlowModelType(request.get("flow_model", "gaussian_plume")),
         use_weather_data=request.get("use_weather_data", True)
     )
-    
+
     # Berechnung ausführen
     response = await flow_agent.calculate_flow_async(flow_request)
-    
+
     return {
         "success": response.success,
         "results": [result.to_dict() for result in response.flow_results],
@@ -438,17 +438,17 @@ class VeritasFlowClient {
     constructor(baseUrl = '') {
         this.baseUrl = baseUrl;
     }
-    
+
     async calculateDispersion(options = {}) {
         const {
             sources,
-            receptors, 
+            receptors,
             calculationBounds,
             gridResolution = 100.0,
             flowModel = 'gaussian_plume',
             useWeatherData = true
         } = options;
-        
+
         const payload = {
             query: "Atmospheric dispersion calculation",
             calculation_bounds: calculationBounds,
@@ -458,16 +458,16 @@ class VeritasFlowClient {
             flow_model: flowModel,
             use_weather_data: useWeatherData
         };
-        
+
         const response = await fetch(`${this.baseUrl}/agents/atmospheric_flow/calculate`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
-        
+
         return await response.json();
     }
-    
+
     async getFlowStatus() {
         const response = await fetch(`${this.baseUrl}/agents/atmospheric_flow/status`);
         return await response.json();
@@ -538,9 +538,9 @@ python backend/agents/veritas_api_agent_atmospheric_flow.py
 
 ### **Validierung**
 
-**Emissionsraten:** 100 kg/h NOx-Emission  
-**Distanzen:** 400m - 1500m zu Rezeptoren  
-**Windgeschwindigkeiten:** 3-8 m/s  
+**Emissionsraten:** 100 kg/h NOx-Emission
+**Distanzen:** 400m - 1500m zu Rezeptoren
+**Windgeschwindigkeiten:** 3-8 m/s
 **Konzentrationen:** 0-240 μg/m³ (realistischer Bereich)
 
 ---
@@ -630,7 +630,7 @@ from backend.agents.veritas_api_agent_atmospheric_flow import AtmosphericStabili
 # Stabilitätsklassen-Einfluss
 stability_effects = {
     AtmosphericStabilityClass.A: "Sehr instabil - starke Dispersion",
-    AtmosphericStabilityClass.D: "Neutral - moderate Dispersion", 
+    AtmosphericStabilityClass.D: "Neutral - moderate Dispersion",
     AtmosphericStabilityClass.F: "Sehr stabil - geringe Dispersion"
 }
 
@@ -665,8 +665,8 @@ for source in sources:
 Die Basis-Gleichung für kontinuierliche Punktquellen:
 
 ```
-C(x,y,z) = (Q / (π * σy * σz * u)) * 
-           exp(-y²/(2σy²)) * 
+C(x,y,z) = (Q / (π * σy * σz * u)) *
+           exp(-y²/(2σy²)) *
            [exp(-(z-H)²/(2σz²)) + exp(-(z+H)²/(2σz²))]
 ```
 
@@ -786,27 +786,27 @@ config = AtmosphericFlowConfig(
     # Modell-Parameter
     default_flow_model="gaussian_plume",
     supported_models=["gaussian_plume", "gaussian_puff", "lagrangian"],
-    
+
     # Raster-Parameter
     default_grid_resolution_m=100.0,
     max_grid_points=10000,
     max_calculation_distance_km=50.0,
-    
+
     # Meteorologie
     weather_integration_enabled=True,
     default_stability_class="D",
     default_mixing_height_m=1000.0,
-    
+
     # Performance
     max_sources=100,
     max_receptors=1000,
     calculation_timeout_s=300,
     parallel_calculations=True,
-    
+
     # Cache
     cache_enabled=True,
     cache_ttl_seconds=1800,  # 30 min
-    
+
     # Physik
     air_density_kgm3=1.225,
     gravity_ms2=9.81,
@@ -841,6 +841,6 @@ Der **VERITAS Atmospheric Flow Agent** bietet:
 
 ---
 
-*Erstellt am: 28. September 2025*  
-*VERITAS Atmospheric Flow Agent v1.0*  
+*Erstellt am: 28. September 2025*
+*VERITAS Atmospheric Flow Agent v1.0*
 *Getestet: 3 Modelle, 100% Success Rate*
