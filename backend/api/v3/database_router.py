@@ -18,7 +18,7 @@ router = APIRouter(prefix="/database", tags=["Database"])
 
 # Datenbank-Pfade
 PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
-DATABASES = {
+DATABASES: Dict[str, Dict[str, Any]] = {
     "bimschg": {
         "path": PROJECT_ROOT / "data" / "bimschg" / "BImSchG.sqlite",
         "table": "bimschg",
@@ -418,8 +418,8 @@ async def search_records(
     table_name = DATABASES[db_name]["table"]
 
     # Query zusammenbauen
-    conditions = []
-    params = []
+    conditions: List[str] = []
+    params: List[Any] = []
 
     if request.bst_nr:
         conditions.append("CAST(bst_nr AS TEXT) LIKE ?")
@@ -539,7 +539,7 @@ async def get_statistics(db_name: Literal["bimschg", "wka"]):
     # Gesamtanzahl (table_name validated)  # nosec
     total = cursor.execute(SQL_TEMPLATES[db_name]["count_all"]).fetchone()[0]
 
-    stats = {
+    stats: Dict[str, Any] = {
         "total_records": total,
         "unique_bst": cursor.execute(SQL_TEMPLATES[db_name]["count_distinct_bst"]).fetchone()[0],
         "unique_ort": cursor.execute(SQL_TEMPLATES[db_name]["count_distinct_ort"]).fetchone()[0],

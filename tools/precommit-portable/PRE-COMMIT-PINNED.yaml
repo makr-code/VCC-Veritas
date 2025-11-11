@@ -1,0 +1,83 @@
+# Pinned pre-commit configuration (example)
+# IMPORTANT: Verify and update the pinned `rev` values before using in production.
+# These values are illustrative; run `pre-commit autoupdate` in a controlled branch
+# to upgrade pins safely.
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: debug-statements
+
+  - repo: https://github.com/psf/black
+    rev: 25.11.0
+    hooks:
+      - id: black
+        language_version: python3
+
+  - repo: https://github.com/pre-commit/mirrors-isort
+    rev: v5.10.1
+    hooks:
+      - id: isort
+        args: [--profile=black]
+
+  # flake8 mirror temporarily removed from autoupdate due to fetch errors
+  # Re-add if needed with a concrete rev, e.g. rev: 6.1.0
+
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: v0.14.4
+    hooks:
+      - id: ruff
+        args: [--fix]
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.18.2
+    hooks:
+      - id: mypy
+        # Consider scoping with `files:` to speed up large repos
+
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.8.6
+    hooks:
+      - id: bandit
+        args: [-r, .]
+
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.37.1
+    hooks:
+      - id: yamllint
+        files: \.(yml|yaml)$
+
+  - repo: https://github.com/returntocorp/semgrep
+    rev: v1.89.0
+    hooks:
+      - id: semgrep
+        args: [--config, p/ci]
+
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.1
+    hooks:
+      - id: codespell
+
+  - repo: https://github.com/pyupio/safety
+    rev: 1.10.3
+    hooks:
+      - id: safety
+        args: [--full-report]
+
+  - repo: https://github.com/jorisroovers/gitlint
+    rev: v0.19.1
+    hooks:
+      - id: gitlint
+
+# Local hooks can be appended here for project-specific checks
+# End of pinned template

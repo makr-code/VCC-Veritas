@@ -1,0 +1,32 @@
+# Recommended pyproject.toml snippet to centralize tool configuration.
+# Copy relevant sections into your project's `pyproject.toml`.
+
+[tool.black]
+line-length = 88
+target-version = ["py311"]
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+line_length = 88
+known_first_party = ["your_package_name"]
+
+[tool.ruff]
+line-length = 88
+select = ["E", "F", "W", "C", "I", "B", "D", "S"]
+# optional: enable auto-fix rules
+fix = true
+
+[tool.mypy]
+python_version = 3.11
+strict = true
+# Use per-module ignores in large repos to avoid scanning unrelated code
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = ["E203"]
+
+[tool.bandit]
+# Bandit doesn't use pyproject by default; use bandit config file if needed.
+
+# Add other tool configs as needed (ruff, isort, mypy.ini, .flake8 can coexist)
