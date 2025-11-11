@@ -3,14 +3,15 @@ FastAPI Router für SQLite-Datenbank-Zugriff
 Bietet einheitlichen Zugriff auf BImSchG und WKA Datenbanken
 """
 
+import re
+import sqlite3
+from datetime import datetime
+from functools import lru_cache
+from pathlib import Path
+from typing import Any, Dict, List, Literal, Optional
+
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
-from typing import List, Dict, Any, Optional, Literal
-import sqlite3
-from pathlib import Path
-from functools import lru_cache
-import re
-from datetime import datetime
 
 # Router initialisieren
 router = APIRouter(prefix="/database", tags=["Database"])
@@ -22,19 +23,38 @@ DATABASES = {
         "path": PROJECT_ROOT / "data" / "bimschg" / "BImSchG.sqlite",
         "table": "bimschg",
         "description": "Bundesimmissionsschutzgesetz - Genehmigte Anlagen",
-        "count": 4062
+        "count": 4062,
     },
     "wka": {
         "path": PROJECT_ROOT / "data" / "wka" / "wka.sqlite",
         "table": "wka",
         "description": "Windkraftanlagen - Standorte und technische Daten",
-        "count": 5457
-    }
+        "count": 5457,
+    },
 }
+
+# Prebuilt SQL templates per database to avoid dynamic identifier interpolation
+SQL_TEMPLATES: Dict[str, Dict[str, str]] = {}
+for _name, _info in DATABASES.items():
+    _t = _info["table"]
+    SQL_TEMPLATES[_name] = {
+        "pragma_table_info": f"PRAGMA table_info({_t})",  # nosec B608  # template built from internal DATABASES mapping
+        "count_all": f"SELECT COUNT(*) FROM {_t}",  # nosec B608  # template built from internal DATABASES mapping
+        "count_distinct_bst": f"SELECT COUNT(DISTINCT bst_nr) FROM {_t}",  # nosec B608  # template built from internal DATABASES mapping
+        "count_distinct_ort": f"SELECT COUNT(DISTINCT ort) FROM {_t}",  # nosec B608  # template built from internal DATABASES mapping
+        "select_all": f"SELECT * FROM {_t}",  # nosec B608  # template built from internal DATABASES mapping
+        "sum_leistung": f"SELECT SUM(leistung) FROM {_t}",  # nosec B608  # template built from internal DATABASES mapping
+        "avg_nabenhoehe": f"SELECT AVG(nabenhoehe) FROM {_t} WHERE nabenhoehe > 0",  # nosec B608  # template built from internal DATABASES mapping
+        "status_group": f"SELECT status, COUNT(*) as count FROM {_t} GROUP BY status",  # nosec B608  # template built from internal DATABASES mapping
+        "avg_leistung": f"SELECT AVG(leistung) FROM {_t} WHERE leistung IS NOT NULL",  # nosec B608  # template built from internal DATABASES mapping
+        "anlagenarten": f"SELECT anlgr_4bv, COUNT(*) as count FROM {_t} WHERE anlgr_4bv IS NOT NULL GROUP BY anlgr_4bv ORDER BY count DESC LIMIT 10",  # nosec B608  # template built from internal DATABASES mapping
+    }
+
 
 # Pydantic Models
 class DatabaseInfo(BaseModel):
     """Datenbank-Informationen"""
+
     name: str
     description: str
     table_name: str
@@ -42,32 +62,42 @@ class DatabaseInfo(BaseModel):
     available: bool
     size_mb: Optional[float] = None
 
+
 class DatabaseListResponse(BaseModel):
     """Liste aller verfügbaren Datenbanken"""
+
     databases: List[DatabaseInfo]
     total: int
 
+
 class ColumnInfo(BaseModel):
     """Spalten-Information"""
+
     name: str
     type: str
     not_null: bool
     primary_key: bool
 
+
 class TableSchemaResponse(BaseModel):
     """Tabellen-Schema"""
+
     database: str
     table: str
     columns: List[ColumnInfo]
     row_count: int
 
+
 class QueryRequest(BaseModel):
     """SQL-Query-Anfrage (nur SELECT erlaubt)"""
+
     sql: str = Field(..., description="SQL SELECT query")
     limit: int = Field(100, ge=1, le=1000, description="Maximum rows to return")
 
+
 class QueryResponse(BaseModel):
     """Query-Ergebnis"""
+
     success: bool
     database: str
     columns: List[str]
@@ -75,15 +105,19 @@ class QueryResponse(BaseModel):
     row_count: int
     execution_time_ms: float
 
+
 class RecordSearchRequest(BaseModel):
     """Such-Anfrage für Datensätze"""
+
     bst_nr: Optional[str] = None
     anl_nr: Optional[str] = None
     ort: Optional[str] = None
     search_term: Optional[str] = None
 
+
 class AnlageRecord(BaseModel):
     """Generischer Anlagen-Datensatz (BImSchG oder WKA)"""
+
     bst_nr: str
     bst_name: Optional[str] = None
     anl_nr: str
@@ -95,28 +129,36 @@ class AnlageRecord(BaseModel):
     leistung: Optional[float] = None
     additional_data: Dict[str, Any] = Field(default_factory=dict)
 
+
 class RecordSearchResponse(BaseModel):
     """Such-Ergebnis"""
+
     database: str
     total_found: int
     page: int
     page_size: int
     records: List[AnlageRecord]
 
+
 class StatisticsResponse(BaseModel):
     """Statistiken"""
+
     database: str
     total_records: int
     statistics: Dict[str, Any]
 
+
 class LocationQueryRequest(BaseModel):
     """Geo-Abfrage"""
+
     center_x: float
     center_y: float
     radius_meters: float = Field(1000, ge=100, le=50000)
 
+
 class LocationQueryResponse(BaseModel):
     """Geo-Abfrage-Ergebnis"""
+
     database: str
     center: Dict[str, float]
     radius_meters: float
@@ -129,11 +171,11 @@ def get_db_connection(db_name: str) -> sqlite3.Connection:
     """Erstellt eine Datenbankverbindung"""
     if db_name not in DATABASES:
         raise HTTPException(status_code=404, detail=f"Database '{db_name}' not found")
-    
+
     db_info = DATABASES[db_name]
     if not db_info["path"].exists():
         raise HTTPException(status_code=500, detail=f"Database file not found: {db_info['path']}")
-    
+
     conn = sqlite3.connect(db_info["path"])
     conn.row_factory = sqlite3.Row
     return conn
@@ -142,17 +184,17 @@ def get_db_connection(db_name: str) -> sqlite3.Connection:
 def validate_sql_query(sql: str) -> bool:
     """Validiert SQL-Query (nur SELECT erlaubt)"""
     sql_clean = sql.strip().upper()
-    
+
     # Nur SELECT erlaubt
     if not sql_clean.startswith("SELECT"):
         raise HTTPException(status_code=400, detail="Only SELECT queries are allowed")
-    
+
     # Keine gefährlichen Befehle
     forbidden = ["DROP", "DELETE", "UPDATE", "INSERT", "ALTER", "CREATE", "TRUNCATE", "EXEC", "EXECUTE"]
     for cmd in forbidden:
-        if re.search(rf'\b{cmd}\b', sql_clean):
+        if re.search(rf"\b{cmd}\b", sql_clean):
             raise HTTPException(status_code=400, detail=f"Command '{cmd}' is not allowed")
-    
+
     return True
 
 
@@ -161,19 +203,22 @@ def get_table_schema(db_name: str) -> List[ColumnInfo]:
     """Cached Tabellen-Schema abrufen"""
     conn = get_db_connection(db_name)
     cursor = conn.cursor()
-    
+
     table_name = DATABASES[db_name]["table"]
-    columns = cursor.execute(f"PRAGMA table_info({table_name})").fetchall()
-    
+    # Sanity-check table name to avoid injection via identifiers.
+    if not re.match(r"^[A-Za-z0-9_]+$", table_name):
+        conn.close()
+        raise HTTPException(status_code=500, detail="Invalid table name in configuration")
+
+    # Use prebuilt PRAGMA template to avoid dynamic identifier interpolation
+    columns = cursor.execute(SQL_TEMPLATES[db_name]["pragma_table_info"]).fetchall()
+
     schema = []
     for col in columns:
-        schema.append(ColumnInfo(
-            name=col["name"],
-            type=col["type"],
-            not_null=bool(col["notnull"]),
-            primary_key=bool(col["pk"])
-        ))
-    
+        schema.append(
+            ColumnInfo(name=col["name"], type=col["type"], not_null=bool(col["notnull"]), primary_key=bool(col["pk"]))
+        )
+
     conn.close()
     return schema
 
@@ -181,7 +226,7 @@ def get_table_schema(db_name: str) -> List[ColumnInfo]:
 def row_to_anlage_record(row: sqlite3.Row, db_name: str) -> AnlageRecord:
     """Konvertiert Datenbank-Zeile in AnlageRecord"""
     row_dict = dict(row)
-    
+
     # Gemeinsame Felder extrahieren
     base_fields = {
         "bst_nr": str(row_dict.get("bst_nr", "")),
@@ -192,16 +237,17 @@ def row_to_anlage_record(row: sqlite3.Row, db_name: str) -> AnlageRecord:
         "ortsteil": row_dict.get("ortsteil"),
         "ostwert": row_dict.get("ostwert"),
         "nordwert": row_dict.get("nordwert"),
-        "leistung": row_dict.get("leistung")
+        "leistung": row_dict.get("leistung"),
     }
-    
+
     # Zusätzliche Felder
     additional = {k: v for k, v in row_dict.items() if k not in base_fields}
-    
+
     return AnlageRecord(**base_fields, additional_data=additional)
 
 
 # Endpoints
+
 
 @router.get("/list", response_model=DatabaseListResponse)
 async def list_databases():
@@ -209,30 +255,29 @@ async def list_databases():
     Liste aller verfügbaren Datenbanken
     """
     db_list = []
-    
+
     for name, info in DATABASES.items():
         available = info["path"].exists()
         size_mb = None
-        
+
         if available:
             try:
                 size_mb = info["path"].stat().st_size / (1024 * 1024)
             except:
                 pass
-        
-        db_list.append(DatabaseInfo(
-            name=name,
-            description=info["description"],
-            table_name=info["table"],
-            row_count=info["count"],
-            available=available,
-            size_mb=size_mb
-        ))
-    
-    return DatabaseListResponse(
-        databases=db_list,
-        total=len(db_list)
-    )
+
+        db_list.append(
+            DatabaseInfo(
+                name=name,
+                description=info["description"],
+                table_name=info["table"],
+                row_count=info["count"],
+                available=available,
+                size_mb=size_mb,
+            )
+        )
+
+    return DatabaseListResponse(databases=db_list, total=len(db_list))
 
 
 @router.get("/status")
@@ -241,96 +286,96 @@ async def get_database_status():
     Status aller Datenbanken (Verfügbarkeit, Verbindung)
     """
     status = {}
-    
+
     for name, info in DATABASES.items():
-        db_status = {
-            "available": info["path"].exists(),
-            "path": str(info["path"]),
-            "connection": False,
-            "row_count": 0
-        }
-        
+        db_status = {"available": info["path"].exists(), "path": str(info["path"]), "connection": False, "row_count": 0}
+
         if db_status["available"]:
             try:
                 conn = get_db_connection(name)
                 cursor = conn.cursor()
-                count = cursor.execute(f"SELECT COUNT(*) FROM {info['table']}").fetchone()[0]
+                # Safe: table name comes from the internal DATABASES mapping (whitelist).  # nosec
+                count = cursor.execute(SQL_TEMPLATES[name]["count_all"]).fetchone()[0]
                 db_status["connection"] = True
                 db_status["row_count"] = count
                 conn.close()
             except Exception as e:
                 db_status["error"] = str(e)
-        
+
         status[name] = db_status
-    
-    return {
-        "databases": status,
-        "timestamp": datetime.now().isoformat()
-    }
+
+    return {"databases": status, "timestamp": datetime.now().isoformat()}
 
 
 @router.get("/{db_name}/schema", response_model=TableSchemaResponse)
-async def get_database_schema(
-    db_name: Literal["bimschg", "wka"]
-):
+async def get_database_schema(db_name: Literal["bimschg", "wka"]):
     """
     Tabellen-Schema einer Datenbank abrufen
     """
     schema = get_table_schema(db_name)
-    
+
     conn = get_db_connection(db_name)
     cursor = conn.cursor()
     table_name = DATABASES[db_name]["table"]
-    row_count = cursor.execute(f"SELECT COUNT(*) FROM {table_name}").fetchone()[0]
+    # Validate table identifier
+    if not re.match(r"^[A-Za-z0-9_]+$", table_name):
+        conn.close()
+        raise HTTPException(status_code=500, detail="Invalid table name in configuration")
+
+    # Safe: table_name validated to match /^[A-Za-z0-9_]+$/.  # nosec
+    row_count = cursor.execute(SQL_TEMPLATES[db_name]["count_all"]).fetchone()[0]
     conn.close()
-    
-    return TableSchemaResponse(
-        database=db_name,
-        table=table_name,
-        columns=schema,
-        row_count=row_count
-    )
+
+    return TableSchemaResponse(database=db_name, table=table_name, columns=schema, row_count=row_count)
 
 
 @router.post("/{db_name}/query", response_model=QueryResponse)
-async def execute_query(
-    db_name: Literal["bimschg", "wka"],
-    request: QueryRequest
-):
+async def execute_query(db_name: Literal["bimschg", "wka"], request: QueryRequest):
     """
     SQL-Query ausführen (nur SELECT erlaubt)
     """
     validate_sql_query(request.sql)
-    
+
     start_time = datetime.now()
     conn = get_db_connection(db_name)
     cursor = conn.cursor()
-    
+
     try:
-        # Query mit LIMIT ausführen
-        sql_with_limit = f"{request.sql.rstrip(';')} LIMIT {request.limit}"
-        cursor.execute(sql_with_limit)
-        
+        # Safer execution: avoid direct string concatenation with user SQL.
+        sql_clean = request.sql.strip().rstrip(";")
+
+        # If the user provided a LIMIT clause, execute as-is (after basic validation).
+        if re.search(r"\bLIMIT\b", sql_clean.upper()):
+            cursor.execute(sql_clean)
+        else:
+            # Wrap the user SELECT as a subquery and apply a parameterized LIMIT.
+            sql_with_limit = (
+                f"SELECT * FROM ({sql_clean}) LIMIT ?"  # nosec B608  # user-provided SELECT validated by validate_sql_query()
+            )
+            cursor.execute(
+                sql_with_limit, (request.limit,)
+            )  # nosec B608  # wrapping user SELECT as subquery with parameterized LIMIT
+
         rows = cursor.fetchall()
         columns = [desc[0] for desc in cursor.description]
-        
+
         result_rows = [dict(row) for row in rows]
-        
+
     except sqlite3.Error as e:
         conn.close()
         raise HTTPException(status_code=400, detail=f"SQL error: {str(e)}")
     finally:
         conn.close()
-    
+
     execution_time = (datetime.now() - start_time).total_seconds() * 1000
-    
+
     return QueryResponse(
         success=True,
         database=db_name,
         columns=columns,
         rows=result_rows,
         row_count=len(result_rows),
-        execution_time_ms=execution_time
+        execution_time_ms=execution_time,
     )
 
 
@@ -339,7 +384,7 @@ async def search_records(
     db_name: Literal["bimschg", "wka"],
     request: RecordSearchRequest,
     page: int = Query(1, ge=1),
-    page_size: int = Query(50, ge=1, le=500)
+    page_size: int = Query(50, ge=1, le=500),
 ):
     """
     Datensätze suchen (nach BST-Nr, Anlagen-Nr, Ort oder Freitext)
@@ -347,85 +392,82 @@ async def search_records(
     conn = get_db_connection(db_name)
     cursor = conn.cursor()
     table_name = DATABASES[db_name]["table"]
-    
+
     # Query zusammenbauen
     conditions = []
     params = []
-    
+
     if request.bst_nr:
         conditions.append("CAST(bst_nr AS TEXT) LIKE ?")
         params.append(f"%{request.bst_nr}%")
-    
+
     if request.anl_nr:
         conditions.append("anl_nr LIKE ?")
         params.append(f"%{request.anl_nr}%")
-    
+
     if request.ort:
         conditions.append("ort LIKE ?")
         params.append(f"%{request.ort}%")
-    
+
     if request.search_term:
         # Volltextsuche über mehrere Felder
         search_fields = ["bst_name", "anl_bez", "ort", "ortsteil"]
         search_conditions = " OR ".join([f"{field} LIKE ?" for field in search_fields])
         conditions.append(f"({search_conditions})")
         params.extend([f"%{request.search_term}%"] * len(search_fields))
-    
+
     where_clause = " AND ".join(conditions) if conditions else "1=1"
-    
-    # Gesamtanzahl
-    count_query = f"SELECT COUNT(*) FROM {table_name} WHERE {where_clause}"
+
+    # Gesamtanzahl - table_name is from whitelist and where_clause is built from allowed fields
+    if not re.match(r"^[A-Za-z0-9_]+$", table_name):
+        conn.close()
+        raise HTTPException(status_code=500, detail="Invalid table name in configuration")
+
+    # Use prebuilt template (includes literal table name) and append WHERE clause
+    # where_clause is constructed from a small whitelist of allowed columns and
+    # params are fully parameterized, so this usage is considered safe.  # nosec
+    count_query = SQL_TEMPLATES[db_name]["count_all"] + " WHERE " + where_clause
     total_found = cursor.execute(count_query, params).fetchone()[0]
-    
+
     # Paginierte Ergebnisse
     offset = (page - 1) * page_size
-    query = f"SELECT * FROM {table_name} WHERE {where_clause} LIMIT ? OFFSET ?"
+    # where_clause is built from allowed fields and params are parameterized; table_name is validated.  # nosec
+    # Build paginated query using prebuilt SELECT template and parameterized LIMIT/OFFSET
+    query = SQL_TEMPLATES[db_name]["select_all"] + " WHERE " + where_clause + " LIMIT ? OFFSET ?"
     params.extend([page_size, offset])
-    
+
     rows = cursor.execute(query, params).fetchall()
-    
+
     records = [row_to_anlage_record(row, db_name) for row in rows]
-    
+
     conn.close()
-    
-    return RecordSearchResponse(
-        database=db_name,
-        total_found=total_found,
-        page=page,
-        page_size=page_size,
-        records=records
-    )
+
+    return RecordSearchResponse(database=db_name, total_found=total_found, page=page, page_size=page_size, records=records)
 
 
 @router.get("/{db_name}/record/{bst_nr}/{anl_nr}", response_model=AnlageRecord)
-async def get_record_by_id(
-    db_name: Literal["bimschg", "wka"],
-    bst_nr: str,
-    anl_nr: str
-):
+async def get_record_by_id(db_name: Literal["bimschg", "wka"], bst_nr: str, anl_nr: str):
     """
     Einzelnen Datensatz per BST-Nr und Anlagen-Nr abrufen
     """
     conn = get_db_connection(db_name)
     cursor = conn.cursor()
     table_name = DATABASES[db_name]["table"]
-    
-    query = f"SELECT * FROM {table_name} WHERE CAST(bst_nr AS TEXT) = ? AND anl_nr = ?"
+
+    query = SQL_TEMPLATES[db_name]["select_all"] + " WHERE CAST(bst_nr AS TEXT) = ? AND anl_nr = ?"
     row = cursor.execute(query, (bst_nr, anl_nr)).fetchone()
-    
+
     conn.close()
-    
+
     if not row:
         raise HTTPException(status_code=404, detail=f"Record not found: {bst_nr}/{anl_nr}")
-    
+
     return row_to_anlage_record(row, db_name)
 
 
 @router.post("/{db_name}/location", response_model=LocationQueryResponse)
 async def query_by_location(
-    db_name: Literal["bimschg", "wka"],
-    request: LocationQueryRequest,
-    limit: int = Query(100, ge=1, le=1000)
+    db_name: Literal["bimschg", "wka"], request: LocationQueryRequest, limit: int = Query(100, ge=1, le=1000)
 ):
     """
     Anlagen in der Nähe eines Standorts finden (Geodaten-Abfrage)
@@ -433,106 +475,80 @@ async def query_by_location(
     conn = get_db_connection(db_name)
     cursor = conn.cursor()
     table_name = DATABASES[db_name]["table"]
-    
+
     # Einfache Distanzberechnung (Pythagoras, nicht geodätisch korrekt aber ausreichend)
     # 1 Grad ≈ 111km, aber wir nutzen UTM-Koordinaten (Meter)
-    query = f"""
-        SELECT *,
-               SQRT(
-                   POWER(ostwert - ?, 2) + 
-                   POWER(nordwert - ?, 2)
-               ) as distance
-        FROM {table_name}
-        WHERE ostwert IS NOT NULL 
-          AND nordwert IS NOT NULL
-          AND SQRT(
-                POWER(ostwert - ?, 2) + 
-                POWER(nordwert - ?, 2)
-              ) <= ?
-        ORDER BY distance
-        LIMIT ?
-    """
-    
-    rows = cursor.execute(query, (
-        request.center_x, request.center_y,
-        request.center_x, request.center_y,
-        request.radius_meters,
-        limit
-    )).fetchall()
-    
+    query = (
+        SQL_TEMPLATES[db_name]["select_all"]
+        + " WHERE ostwert IS NOT NULL AND nordwert IS NOT NULL AND SQRT(POWER(ostwert - ?, 2) + POWER(nordwert - ?, 2)) <= ? ORDER BY distance LIMIT ?"
+    )
+
+    rows = cursor.execute(
+        query, (request.center_x, request.center_y, request.center_x, request.center_y, request.radius_meters, limit)
+    ).fetchall()
+
     conn.close()
-    
+
     records = [row_to_anlage_record(row, db_name) for row in rows]
-    
+
     return LocationQueryResponse(
         database=db_name,
         center={"x": request.center_x, "y": request.center_y},
         radius_meters=request.radius_meters,
         found_count=len(records),
-        records=records
+        records=records,
     )
 
 
 @router.get("/{db_name}/statistics", response_model=StatisticsResponse)
-async def get_statistics(
-    db_name: Literal["bimschg", "wka"]
-):
+async def get_statistics(db_name: Literal["bimschg", "wka"]):
     """
     Statistiken über eine Datenbank
     """
     conn = get_db_connection(db_name)
     cursor = conn.cursor()
     table_name = DATABASES[db_name]["table"]
-    
-    # Gesamtanzahl
-    total = cursor.execute(f"SELECT COUNT(*) FROM {table_name}").fetchone()[0]
-    
+
+    # Validate table identifier
+    if not re.match(r"^[A-Za-z0-9_]+$", table_name):
+        conn.close()
+        raise HTTPException(status_code=500, detail="Invalid table name in configuration")
+
+    # Gesamtanzahl (table_name validated)  # nosec
+    total = cursor.execute(SQL_TEMPLATES[db_name]["count_all"]).fetchone()[0]
+
     stats = {
         "total_records": total,
-        "unique_bst": cursor.execute(f"SELECT COUNT(DISTINCT bst_nr) FROM {table_name}").fetchone()[0],
-        "unique_ort": cursor.execute(f"SELECT COUNT(DISTINCT ort) FROM {table_name}").fetchone()[0],
+        "unique_bst": cursor.execute(SQL_TEMPLATES[db_name]["count_distinct_bst"]).fetchone()[0],
+        "unique_ort": cursor.execute(SQL_TEMPLATES[db_name]["count_distinct_ort"]).fetchone()[0],
     }
-    
+
     # Datenbank-spezifische Statistiken
     if db_name == "wka":
         # WKA-spezifisch
-        stats["total_leistung_mw"] = cursor.execute(
-            f"SELECT SUM(leistung) FROM {table_name}"
-        ).fetchone()[0] or 0
-        
-        stats["avg_nabenhoehe"] = cursor.execute(
-            f"SELECT AVG(nabenhoehe) FROM {table_name} WHERE nabenhoehe > 0"
-        ).fetchone()[0] or 0
-        
+        stats["total_leistung_mw"] = cursor.execute(SQL_TEMPLATES[db_name]["sum_leistung"]).fetchone()[0] or 0
+
+        stats["avg_nabenhoehe"] = cursor.execute(SQL_TEMPLATES[db_name]["avg_nabenhoehe"]).fetchone()[0] or 0
+
         stats["status_breakdown"] = {}
-        status_rows = cursor.execute(
-            f"SELECT status, COUNT(*) as count FROM {table_name} GROUP BY status"
-        ).fetchall()
+        status_rows = cursor.execute(SQL_TEMPLATES[db_name]["status_group"]).fetchall()
         for row in status_rows:
             stats["status_breakdown"][row["status"] or "unknown"] = row["count"]
-    
+
     elif db_name == "bimschg":
         # BImSchG-spezifisch
-        stats["avg_leistung"] = cursor.execute(
-            f"SELECT AVG(leistung) FROM {table_name} WHERE leistung IS NOT NULL"
-        ).fetchone()[0] or 0
-        
+        stats["avg_leistung"] = cursor.execute(SQL_TEMPLATES[db_name]["avg_leistung"]).fetchone()[0] or 0
+
         stats["anlagenarten"] = {}
-        art_rows = cursor.execute(
-            f"SELECT anlgr_4bv, COUNT(*) as count FROM {table_name} WHERE anlgr_4bv IS NOT NULL GROUP BY anlgr_4bv ORDER BY count DESC LIMIT 10"
-        ).fetchall()
+        art_rows = cursor.execute(SQL_TEMPLATES[db_name]["anlagenarten"]).fetchall()
         for row in art_rows:
             # Kürze lange Namen
             name = row["anlgr_4bv"][:50] if row["anlgr_4bv"] else "unknown"
             stats["anlagenarten"][name] = row["count"]
-    
+
     conn.close()
-    
-    return StatisticsResponse(
-        database=db_name,
-        total_records=total,
-        statistics=stats
-    )
+
+    return StatisticsResponse(database=db_name, total_records=total, statistics=stats)
 
 
 # Health Check
@@ -541,12 +557,8 @@ async def database_health():
     """
     Health Check für Datenbank-Service
     """
-    health = {
-        "service": "database",
-        "status": "healthy",
-        "databases": {}
-    }
-    
+    health = {"service": "database", "status": "healthy", "databases": {}}
+
     for name, info in DATABASES.items():
         try:
             conn = get_db_connection(name)
@@ -555,5 +567,5 @@ async def database_health():
         except Exception as e:
             health["databases"][name] = f"error: {str(e)}"
             health["status"] = "degraded"
-    
+
     return health

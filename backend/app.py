@@ -25,23 +25,24 @@ Version: 4.0.0
 Date: 2025-10-19
 """
 
-import os
-import sys
 import logging
+import os
+import ssl
+import sys
 from contextlib import asynccontextmanager
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
 
+import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.staticfiles import StaticFiles
-import uvicorn
-import ssl
 
 # PKI Integration
 try:
     from vcc_pki_client import PKIClient
+
     PKI_AVAILABLE = True
 except ImportError:
     PKI_AVAILABLE = False
@@ -49,7 +50,8 @@ except ImportError:
 
 # TLS/HTTPS Enforcement
 try:
-    from backend.security.tls import add_tls_middleware, TLSConfig
+    from backend.security.tls import TLSConfig, add_tls_middleware
+
     TLS_AVAILABLE = True
 except ImportError:
     TLS_AVAILABLE = False
@@ -66,40 +68,37 @@ if project_root not in sys.path:
 # Logging Setup
 # ============================================================================
 
+
 def setup_logging() -> logging.Logger:
     """Setup logging with console and file handlers"""
     log_level = getattr(logging, os.getenv("VERITAS_LOG_LEVEL", "INFO").upper(), logging.INFO)
-    
+
     # Create data directory
     data_dir = os.path.join(project_root, "data")
     os.makedirs(data_dir, exist_ok=True)
     log_file = os.path.join(data_dir, "veritas_backend.log")
-    
+
     # Format
-    formatter = logging.Formatter(
-        fmt="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S"
-    )
-    
+    formatter = logging.Formatter(fmt="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
+
     # File handler
-    file_handler = RotatingFileHandler(
-        log_file, maxBytes=10*1024*1024, backupCount=5, encoding="utf-8"
-    )
+    file_handler = RotatingFileHandler(log_file, maxBytes=10 * 1024 * 1024, backupCount=5, encoding="utf-8")
     file_handler.setLevel(log_level)
     file_handler.setFormatter(formatter)
-    
+
     # Console handler
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.INFO)
     console_handler.setFormatter(formatter)
-    
+
     # Root logger
     root_logger = logging.getLogger()
     root_logger.setLevel(log_level)
     root_logger.addHandler(file_handler)
     root_logger.addHandler(console_handler)
-    
+
     return root_logger
+
 
 logger = setup_logging()
 
@@ -111,23 +110,22 @@ logger = setup_logging()
 from uds3.core import UDS3PolyglotManager
 
 # Intelligent Pipeline - ZWINGEND ERFORDERLICH!
-from backend.agents.veritas_intelligent_pipeline import (
-    IntelligentMultiAgentPipeline, 
-    get_intelligent_pipeline
-)
-
-# Streaming Progress - ZWINGEND ERFORDERLICH!
-from shared.pipelines.veritas_streaming_progress import create_progress_manager
-
-# Services - ZWINGEND ERFORDERLICH!
-from backend.services.query_service import QueryService
+from backend.agents.veritas_intelligent_pipeline import IntelligentMultiAgentPipeline, get_intelligent_pipeline
 
 # API Router - ZWINGEND ERFORDERLICH!
 from backend.api import api_router, get_api_info
 
+# Services - ZWINGEND ERFORDERLICH!
+from backend.services.query_service import QueryService
+
+# Streaming Progress - ZWINGEND ERFORDERLICH!
+from shared.pipelines.veritas_streaming_progress import create_progress_manager
+
 # SSE Endpoints - SERVER-SENT EVENTS (NEU!)
 try:
-    from backend.api.sse_endpoints import router as sse_router, init_sse_endpoints
+    from backend.api.sse_endpoints import init_sse_endpoints
+    from backend.api.sse_endpoints import router as sse_router
+
     SSE_AVAILABLE = True
 except ImportError:
     SSE_AVAILABLE = False
@@ -138,6 +136,7 @@ except ImportError:
 # MCP HTTP Bridge (für Office Add-ins)
 try:
     from backend.api.mcp_http_endpoints import router as mcp_http_router
+
     MCP_HTTP_AVAILABLE = True
 except ImportError:
     MCP_HTTP_AVAILABLE = False
@@ -147,6 +146,7 @@ except ImportError:
 # Office Ingestion (RAG Upload für Word/Excel/PowerPoint)
 try:
     from backend.api.office_ingestion import router as office_ingestion_router
+
     OFFICE_INGESTION_AVAILABLE = True
 except ImportError:
     OFFICE_INGESTION_AVAILABLE = False
@@ -165,10 +165,11 @@ STREAMING_AVAILABLE = True  # Required dependency
 # Application Lifecycle
 # ============================================================================
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application Lifespan - Startup and Shutdown"""
-    
+
     # ===== STARTUP =====
     logger.info("=" * 80)
     logger.info("🚀 VERITAS Unified Backend - Starting")
@@ -177,45 +178,38 @@ async def lifespan(app: FastAPI):
     logger.info(f"🐍 Python: {sys.version.split()[0]}")
     logger.info(f"📁 Project Root: {project_root}")
     logger.info("=" * 80)
-    
+
     # ============================================================================
     # PKI Integration - Certificate Management
     # ============================================================================
     if PKI_AVAILABLE:
         try:
             logger.info("🔐 Initializing PKI Client...")
-            
+
             # Import secrets manager for secure CA password retrieval
             from backend.security.secrets import get_vcc_ca_password
-            
+
             pki_server_url = os.getenv("PKI_SERVER_URL", "https://localhost:8443")
             service_id = os.getenv("SERVICE_ID", "veritas-backend")
             ca_password = get_vcc_ca_password()  # Securely retrieve from encrypted storage
-            
+
             if not ca_password:
                 logger.warning("⚠️  VCC_CA_PASSWORD not set - using default")
                 ca_password = "your-secure-ca-password"
-            
+
             # Initialize PKI client
-            pki_client = PKIClient(
-                pki_server_url=pki_server_url,
-                service_id=service_id,
-                ca_password=ca_password
-            )
-            
+            pki_client = PKIClient(pki_server_url=pki_server_url, service_id=service_id, ca_password=ca_password)
+
             # Request certificate (auto-renewal enabled)
             logger.info(f"📋 Requesting certificate for service: {service_id}")
-            cert_result = pki_client.request_certificate(
-                common_name=service_id,
-                validity_days=365
-            )
-            
+            cert_result = pki_client.request_certificate(common_name=service_id, validity_days=365)
+
             if cert_result.get("success"):
                 logger.info("✅ Certificate obtained successfully")
                 logger.info(f"   Serial: {cert_result.get('serial_number')}")
                 logger.info(f"   Valid until: {cert_result.get('valid_until')}")
                 logger.info(f"   Auto-renewal: Enabled")
-                
+
                 # Store PKI client in app state
                 app.state.pki_client = pki_client
                 app.state.pki_enabled = True
@@ -224,7 +218,7 @@ async def lifespan(app: FastAPI):
                 logger.error(f"❌ Certificate request failed: {cert_result.get('error')}")
                 logger.warning("⚠️  Falling back to HTTP mode")
                 app.state.pki_enabled = False
-                
+
         except Exception as e:
             logger.error(f"❌ PKI initialization failed: {e}")
             logger.warning("⚠️  Falling back to HTTP mode")
@@ -232,13 +226,13 @@ async def lifespan(app: FastAPI):
     else:
         logger.info("ℹ️  PKI not available - running in HTTP mode")
         app.state.pki_enabled = False
-    
+
     logger.info("=" * 80)
-    
+
     # Initialize UDS3 PolyglotManager - DIRECT INTEGRATION!
     # NO WRAPPERS, NO STUBS, NO FALLBACKS - PRODUCTION READY!
     logger.info("🔄 Initialisiere UDS3 PolyglotManager (DIRECT)...")
-    
+
     # ============================================================================
     # DIRECT UDS3 INTEGRATION:
     # ============================================================================
@@ -247,63 +241,63 @@ async def lifespan(app: FastAPI):
     # - Echte DB-Credentials aus uds3/config_local.py
     # - KEINE Fallbacks, KEINE Stubs!
     # ============================================================================
-    
+
     try:
         # DIRECT: UDS3PolyglotManager (Legacy stable version)
         # Minimal Config - DatabaseManager lädt echte Credentials aus uds3/config.py
         backend_config = {
-            "vector": {"enabled": True},      # ChromaDB - Embeddings/Semantic Search
-            "graph": {"enabled": True},       # Neo4j - Knowledge Graph
+            "vector": {"enabled": True},  # ChromaDB - Embeddings/Semantic Search
+            "graph": {"enabled": True},  # Neo4j - Knowledge Graph
             "relational": {"enabled": True},  # PostgreSQL - Structured Data
-            "file": {"enabled": True}         # CouchDB - Original Files/Documents
+            "file": {"enabled": True},  # CouchDB - Original Files/Documents
         }
-        
-        app.state.uds3 = UDS3PolyglotManager(
-            backend_config=backend_config,
-            enable_rag=True
-        )
-        
+
+        app.state.uds3 = UDS3PolyglotManager(backend_config=backend_config, enable_rag=True)
+
         logger.info("✅ UDS3 PolyglotManager initialisiert (Direct Integration)")
-        
+
         # Check database backends (optional logging)
-        if hasattr(app.state.uds3, 'db_manager'):
+        if hasattr(app.state.uds3, "db_manager"):
             try:
                 dm = app.state.uds3.db_manager
                 logger.info("📊 UDS3 DatabaseManager:")
-                
+
                 try:
                     from database.config import DatabaseType
-                    
+
                     vector_dbs = dm.get_databases_by_type(DatabaseType.VECTOR)
                     graph_dbs = dm.get_databases_by_type(DatabaseType.GRAPH)
                     relational_dbs = dm.get_databases_by_type(DatabaseType.RELATIONAL)
                     file_dbs = dm.get_databases_by_type(DatabaseType.FILE)
-                    
+
                     logger.info(f"   Vector DBs: {len(vector_dbs)} backends")
                     logger.info(f"   Graph DBs: {len(graph_dbs)} backends")
                     logger.info(f"   Relational DBs: {len(relational_dbs)} backends")
                     logger.info(f"   File DBs: {len(file_dbs)} backends")
-                    
+
                     # Log connection details
                     if vector_dbs:
                         logger.info(f"   → Vector: {vector_dbs[0].backend.value} @ {vector_dbs[0].host}:{vector_dbs[0].port}")
                     if graph_dbs:
                         logger.info(f"   → Graph: {graph_dbs[0].backend.value} @ {graph_dbs[0].host}:{graph_dbs[0].port}")
                     if relational_dbs:
-                        logger.info(f"   → Relational: {relational_dbs[0].backend.value} @ {relational_dbs[0].host}:{relational_dbs[0].port}")
+                        logger.info(
+                            f"   → Relational: {relational_dbs[0].backend.value} @ {relational_dbs[0].host}:{relational_dbs[0].port}"
+                        )
                     if file_dbs:
                         logger.info(f"   → File: {file_dbs[0].backend.value} @ {file_dbs[0].host}:{file_dbs[0].port}")
-                        
+
                 except (ImportError, AttributeError) as ie:
                     logger.debug(f"Backend details not available: {ie}")
             except Exception as db_err:
                 logger.debug(f"DatabaseManager not accessible: {db_err}")
-        
+
         # Share UDS3 instance with agent framework (DIRECT - NO WRAPPER!)
         from backend.database.uds3_integration import set_uds3_instance
+
         set_uds3_instance(app.state.uds3)
         logger.info("✅ UDS3 shared with agents (direct access)")
-        
+
     except Exception as e:
         logger.error("=" * 80)
         logger.error("❌ KRITISCHER FEHLER: UDS3 Initialisierung fehlgeschlagen!")
@@ -336,10 +330,10 @@ async def lifespan(app: FastAPI):
             "VERITAS Backend kann ohne UDS3 Microservice nicht starten! "
             "UDS3 muss verfügbar sein und alle Datenbankverbindungen bereitstellen."
         )
-    
+
     # Initialize Intelligent Multi-Agent Pipeline - REQUIRED!
     logger.info("🔄 Initialisiere Intelligent Multi-Agent Pipeline...")
-    
+
     try:
         app.state.pipeline = await get_intelligent_pipeline()
         logger.info("✅ Intelligent Pipeline initialisiert")
@@ -347,10 +341,10 @@ async def lifespan(app: FastAPI):
         logger.error(f"❌ KRITISCHER FEHLER: Pipeline konnte nicht initialisiert werden!")
         logger.error(f"   Fehler: {e}")
         raise RuntimeError("Pipeline initialization failed - cannot start VERITAS") from e
-    
+
     # Initialize Streaming Progress - REQUIRED!
     logger.info("🔄 Initialisiere Streaming Progress Manager...")
-    
+
     try:
         app.state.streaming = create_progress_manager()
         logger.info("✅ Streaming Progress Manager initialisiert")
@@ -358,27 +352,25 @@ async def lifespan(app: FastAPI):
         logger.error(f"❌ KRITISCHER FEHLER: Streaming konnte nicht initialisiert werden!")
         logger.error(f"   Fehler: {e}")
         raise RuntimeError("Streaming initialization failed - cannot start VERITAS") from e
-    
+
     # Initialize Query Service - REQUIRED!
     logger.info("🔄 Initialisiere Query Service...")
-    
+
     try:
         app.state.query_service = QueryService(
-            uds3=app.state.uds3,  # FIXED: richtige Parameter-Namen!
-            pipeline=app.state.pipeline,
-            streaming=app.state.streaming
+            uds3=app.state.uds3, pipeline=app.state.pipeline, streaming=app.state.streaming  # FIXED: richtige Parameter-Namen!
         )
         logger.info("✅ Query Service initialisiert")
     except Exception as e:
         logger.error(f"❌ KRITISCHER FEHLER: Query Service konnte nicht initialisiert werden!")
         logger.error(f"   Fehler: {e}")
         raise RuntimeError("Query Service initialization failed - cannot start VERITAS") from e
-    
+
     # Startup Summary
     logger.info("=" * 80)
     logger.info("✅ VERITAS Backend Ready!")
     logger.info("=" * 80)
-    
+
     # Determine protocol based on PKI status
     protocol = "https" if app.state.pki_enabled else "http"
     logger.info(f"📍 API Base: {protocol}://localhost:5000/api")
@@ -393,7 +385,7 @@ async def lifespan(app: FastAPI):
     logger.info(f"   SSE: {'✅ Active' if SSE_AVAILABLE else 'ℹ️  Not available'}")
     logger.info(f"   Query Service: ✅ Active")
     logger.info("=" * 80)
-    
+
     api_info = get_api_info()
     logger.info(f"🎯 API Version: {api_info['version']}")
     logger.info(f"📦 Modules: {', '.join(api_info['modules'])}")
@@ -414,16 +406,16 @@ async def lifespan(app: FastAPI):
         logger.info("   GET  /api/sse/jobs/{job_id} - Job Progress")
         logger.info("   GET  /api/sse/quality/{session_id} - Quality Gates")
     logger.info("=" * 80)
-    
+
     yield
-    
+
     # ===== SHUTDOWN =====
     logger.info("=" * 80)
     logger.info("🛑 VERITAS Backend - Shutting Down")
     logger.info("=" * 80)
-    
+
     # PKI Cleanup
-    if hasattr(app.state, 'pki_client') and app.state.pki_client:
+    if hasattr(app.state, "pki_client") and app.state.pki_client:
         try:
             logger.info("🔐 Cleaning up PKI client...")
             # PKI client cleanup (if needed)
@@ -431,28 +423,29 @@ async def lifespan(app: FastAPI):
             logger.info("✅ PKI client cleaned up")
         except Exception as e:
             logger.warning(f"⚠️  PKI cleanup error: {e}")
-    
+
     # Shutdown UDS3 PolyglotManager
-    if hasattr(app.state, 'uds3') and app.state.uds3:
+    if hasattr(app.state, "uds3") and app.state.uds3:
         try:
-            if hasattr(app.state.uds3, 'shutdown'):
+            if hasattr(app.state.uds3, "shutdown"):
                 app.state.uds3.shutdown()
             logger.info("✅ UDS3 PolyglotManager heruntergefahren")
         except Exception as e:
             logger.warning(f"⚠️  UDS3 Shutdown: {e}")
     logger.info("=" * 80)
-    
+
     # Cleanup
-    if hasattr(app.state, 'uds3') and app.state.uds3:
+    if hasattr(app.state, "uds3") and app.state.uds3:
         try:
             logger.info("🔄 Closing UDS3 connections...")
             # UDS3 cleanup if needed
             logger.info("✅ UDS3 closed")
         except Exception as e:
             logger.error(f"❌ UDS3 cleanup error: {e}")
-    
+
     logger.info("✅ Shutdown complete")
     logger.info("=" * 80)
+
 
 # ============================================================================
 # FastAPI Application
@@ -472,7 +465,7 @@ app = FastAPI(
     version="4.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 # ============================================================================
@@ -514,7 +507,7 @@ logger.info("✅ API Router mounted at /api")
 if SSE_AVAILABLE and sse_router:
     app.include_router(sse_router)
     logger.info("✅ SSE Router mounted at /api/sse")
-    
+
     # Initialize SSE endpoints with StreamingManager (if available)
     # Note: StreamingManager initialized later in lifespan, this is OK
     # SSE endpoints work standalone or with StreamingManager
@@ -557,6 +550,7 @@ except Exception as e:
 
 try:
     from backend.api.auth_endpoints import router as auth_router
+
     app.include_router(auth_router)
     logger.info("✅ Authentication Router mounted at /auth")
 except ImportError as e:
@@ -566,38 +560,28 @@ except ImportError as e:
 # Root Endpoints
 # ============================================================================
 
+
 @app.get("/")
 async def root():
     """Root endpoint - System information"""
     api_info = get_api_info()
-    
+
     return {
         "service": "VERITAS Unified Backend",
         "version": "4.0.0",
         "description": "Konsolidiertes Backend mit Unified Response Model",
-        "api": {
-            "base": "/api",
-            "version": api_info["version"],
-            "modules": api_info["modules"]
-        },
-        "documentation": {
-            "swagger": "/docs",
-            "redoc": "/redoc"
-        },
-        "endpoints": {
-            "query": "/api/query",
-            "health": "/api/system/health",
-            "info": "/api/system/info"
-        },
+        "api": {"base": "/api", "version": api_info["version"], "modules": api_info["modules"]},
+        "documentation": {"swagger": "/docs", "redoc": "/redoc"},
+        "endpoints": {"query": "/api/query", "health": "/api/system/health", "info": "/api/system/info"},
         "features": {
             "unified_response": True,
             "ieee_citations": True,
             "multi_mode": True,
             "uds3_v2": UDS3_AVAILABLE,
             "intelligent_pipeline": INTELLIGENT_PIPELINE_AVAILABLE,
-            "streaming": STREAMING_AVAILABLE
+            "streaming": STREAMING_AVAILABLE,
         },
-        "timestamp": datetime.now().isoformat()
+        "timestamp": datetime.now().isoformat(),
     }
 
 
@@ -610,27 +594,26 @@ async def health():
         "components": {
             "uds3": UDS3_AVAILABLE and app.state.uds3 is not None,
             "pipeline": INTELLIGENT_PIPELINE_AVAILABLE and app.state.pipeline is not None,
-            "streaming": STREAMING_AVAILABLE and app.state.streaming is not None
-        }
+            "streaming": STREAMING_AVAILABLE and app.state.streaming is not None,
+        },
     }
+
 
 # ============================================================================
 # Error Handlers
 # ============================================================================
 
+
 @app.exception_handler(Exception)
 async def global_exception_handler(request, exc):
     """Global exception handler"""
     logger.error(f"Unhandled exception: {exc}", exc_info=True)
-    
+
     return JSONResponse(
         status_code=500,
-        content={
-            "error": "Internal Server Error",
-            "message": str(exc),
-            "timestamp": datetime.now().isoformat()
-        }
+        content={"error": "Internal Server Error", "message": str(exc), "timestamp": datetime.now().isoformat()},
     )
+
 
 # ============================================================================
 # Main Entry Point
@@ -638,14 +621,14 @@ async def global_exception_handler(request, exc):
 
 if __name__ == "__main__":
     # Configuration
-    host = os.getenv("VERITAS_API_HOST", "0.0.0.0")
+    host = os.getenv("VERITAS_API_HOST", "127.0.0.1")
     port = int(os.getenv("VERITAS_API_PORT", "5000"))
     reload = os.getenv("VERITAS_API_RELOAD", "true").lower() == "true"
-    
+
     # Check if PKI is configured
     use_https = PKI_AVAILABLE and os.getenv("PKI_SERVER_URL") is not None
     protocol = "https" if use_https else "http"
-    
+
     logger.info("=" * 80)
     logger.info("🚀 Starting VERITAS Unified Backend")
     logger.info("=" * 80)
@@ -656,12 +639,12 @@ if __name__ == "__main__":
     logger.info(f"API Base: {protocol}://{host}:{port}/api")
     logger.info(f"Docs: {protocol}://{host}:{port}/docs")
     logger.info("=" * 80)
-    
+
     # Prepare SSL configuration if PKI is available
     ssl_keyfile = None
     ssl_certfile = None
     ssl_ca_certs = None
-    
+
     if use_https:
         try:
             # Initialize temporary PKI client to get certificate paths
@@ -670,16 +653,13 @@ if __name__ == "__main__":
             # Retrieve CA password securely via SecretsManager
             try:
                 from backend.security.secrets import get_vcc_ca_password
+
                 ca_password = get_vcc_ca_password() or "your-secure-ca-password"
             except Exception:
                 ca_password = os.getenv("VCC_CA_PASSWORD", "your-secure-ca-password")
-            
-            temp_pki = PKIClient(
-                pki_server_url=pki_server_url,
-                service_id=service_id,
-                ca_password=ca_password
-            )
-            
+
+            temp_pki = PKIClient(pki_server_url=pki_server_url, service_id=service_id, ca_password=ca_password)
+
             cert_paths = temp_pki.get_certificate_paths()
             if cert_paths:
                 ssl_keyfile = cert_paths.get("key")
@@ -698,9 +678,9 @@ if __name__ == "__main__":
             logger.warning("⚠️  Falling back to HTTP")
             use_https = False
             protocol = "http"
-    
+
     logger.info("=" * 80)
-    
+
     uvicorn.run(
         "backend.app:app",
         host=host,
@@ -709,5 +689,5 @@ if __name__ == "__main__":
         log_level="info",
         ssl_keyfile=ssl_keyfile if use_https else None,
         ssl_certfile=ssl_certfile if use_https else None,
-        ssl_ca_certs=ssl_ca_certs if use_https else None
+        ssl_ca_certs=ssl_ca_certs if use_https else None,
     )

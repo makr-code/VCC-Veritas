@@ -17,13 +17,13 @@ Features:
 Usage:
     # Start the API server
     uvicorn backend.api.streaming_api:app --host 0.0.0.0 --port 8000
-    
+
     # Connect from client
     ws = websocket.connect("ws://localhost:8000/ws/process/session_123")
-    
+
     # Send query
     ws.send(json.dumps({"query": "Bauantrag für Stuttgart"}))
-    
+
     # Receive progress updates
     while True:
         message = ws.recv()
@@ -33,12 +33,12 @@ Usage:
 Created: 2025-10-14
 """
 
-import logging
-import sys
-import os
-import json
 import asyncio
-from typing import Optional, Dict, Any
+import json
+import logging
+import os
+import sys
+from typing import Any, Dict, Optional
 from uuid import uuid4
 
 # Add project root to path
@@ -48,8 +48,9 @@ if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
 try:
-    from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
+    from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
     from fastapi.responses import HTMLResponse
+
     FASTAPI_AVAILABLE = True
 except ImportError:
     FASTAPI_AVAILABLE = False
@@ -57,10 +58,11 @@ except ImportError:
 
 # Import NLP services
 try:
+    from backend.models.streaming_progress import ProgressCallback
     from backend.services.nlp_service import NLPService
     from backend.services.process_builder import ProcessBuilder
     from backend.services.process_executor import ProcessExecutor
-    from backend.models.streaming_progress import ProgressCallback
+
     NLP_SERVICES_AVAILABLE = True
 except ImportError as e:
     NLP_SERVICES_AVAILABLE = False
@@ -69,6 +71,7 @@ except ImportError as e:
 # Import WebSocket bridge
 try:
     from backend.services.websocket_progress_bridge import WebSocketProgressBridge
+
     BRIDGE_AVAILABLE = True
 except ImportError:
     BRIDGE_AVAILABLE = False
@@ -91,9 +94,9 @@ active_sessions: Dict[str, Dict[str, Any]] = {}
 async def startup_event():
     """Initialize services on startup."""
     global nlp_service, process_builder, process_executor
-    
+
     logger.info("Initializing VERITAS NLP services...")
-    
+
     if NLP_SERVICES_AVAILABLE:
         try:
             nlp_service = NLPService()
@@ -112,16 +115,8 @@ async def root():
     return {
         "name": "VERITAS NLP Streaming API",
         "version": "1.0.0",
-        "endpoints": {
-            "websocket": "/ws/process/{session_id}",
-            "test_page": "/test",
-            "health": "/health"
-        },
-        "status": {
-            "nlp_services": NLP_SERVICES_AVAILABLE,
-            "fastapi": FASTAPI_AVAILABLE,
-            "bridge": BRIDGE_AVAILABLE
-        }
+        "endpoints": {"websocket": "/ws/process/{session_id}", "test_page": "/test", "health": "/health"},
+        "status": {"nlp_services": NLP_SERVICES_AVAILABLE, "fastapi": FASTAPI_AVAILABLE, "bridge": BRIDGE_AVAILABLE},
     }
 
 
@@ -133,9 +128,9 @@ async def health_check():
         "services": {
             "nlp": nlp_service is not None,
             "builder": process_builder is not None,
-            "executor": process_executor is not None
+            "executor": process_executor is not None,
         },
-        "active_sessions": len(active_sessions)
+        "active_sessions": len(active_sessions),
     }
 
 
@@ -143,87 +138,88 @@ async def health_check():
 async def websocket_endpoint(websocket: WebSocket, session_id: str):
     """
     WebSocket endpoint for real-time process execution streaming.
-    
+
     Protocol:
         Client → Server: {"query": "Bauantrag für Stuttgart"}
         Server → Client: {"event_type": "plan_started", "data": {...}}
         Server → Client: {"event_type": "step_progress", "data": {...}}
         Server → Client: {"event_type": "plan_completed", "data": {...}}
-    
+
     Args:
         websocket: WebSocket connection
         session_id: Unique session identifier
     """
     logger.info(f"WebSocket connection request for session: {session_id}")
-    
+
     # Accept connection
     await websocket.accept()
-    
+
     # Register session
     active_sessions[session_id] = {
         "websocket": websocket,
         "connected_at": asyncio.get_event_loop().time(),
-        "queries_processed": 0
+        "queries_processed": 0,
     }
-    
+
     try:
         # Send welcome message
-        await websocket.send_json({
-            "event_type": "connected",
-            "session_id": session_id,
-            "message": "Connected to VERITAS NLP Streaming API",
-            "services_available": NLP_SERVICES_AVAILABLE
-        })
-        
+        await websocket.send_json(
+            {
+                "event_type": "connected",
+                "session_id": session_id,
+                "message": "Connected to VERITAS NLP Streaming API",
+                "services_available": NLP_SERVICES_AVAILABLE,
+            }
+        )
+
         logger.info(f"✅ WebSocket connected: {session_id}")
-        
+
         # Listen for queries
         while True:
             # Receive message from client
             message = await websocket.receive_text()
             data = json.loads(message)
-            
+
             logger.info(f"Received query from {session_id}: {data}")
-            
+
             # Extract query
             if "query" not in data:
-                await websocket.send_json({
-                    "event_type": "error",
-                    "message": "Missing 'query' field in request"
-                })
+                await websocket.send_json({"event_type": "error", "message": "Missing 'query' field in request"})
                 continue
-            
+
             query = data["query"]
-            
+
             # Process query with streaming
             if NLP_SERVICES_AVAILABLE and nlp_service and process_builder and process_executor:
                 try:
                     # Create progress callback with WebSocket sender
                     callback = ProgressCallback()
-                    
+
                     async def send_progress(event):
                         """Send progress event to WebSocket client."""
                         try:
-                            await websocket.send_json({
-                                "event_type": event.event_type.value,
-                                "session_id": session_id,
-                                "data": {
-                                    "step_id": event.step_id,
-                                    "step_name": event.step_name,
-                                    "current_step": event.current_step,
-                                    "total_steps": event.total_steps,
-                                    "percentage": event.percentage,
-                                    "status": event.status.value,
-                                    "message": event.message,
-                                    "execution_time": event.execution_time,
-                                    "timestamp": event.timestamp,
-                                    "error": event.error,
-                                    "metadata": event.metadata
+                            await websocket.send_json(
+                                {
+                                    "event_type": event.event_type.value,
+                                    "session_id": session_id,
+                                    "data": {
+                                        "step_id": event.step_id,
+                                        "step_name": event.step_name,
+                                        "current_step": event.current_step,
+                                        "total_steps": event.total_steps,
+                                        "percentage": event.percentage,
+                                        "status": event.status.value,
+                                        "message": event.message,
+                                        "execution_time": event.execution_time,
+                                        "timestamp": event.timestamp,
+                                        "error": event.error,
+                                        "metadata": event.metadata,
+                                    },
                                 }
-                            })
+                            )
                         except Exception as e:
                             logger.error(f"Failed to send progress event: {e}")
-                    
+
                     # Add async handler wrapper
                     def on_progress(event):
                         """Sync wrapper for async send_progress."""
@@ -232,53 +228,51 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                             asyncio.create_task(send_progress(event))
                         except Exception as e:
                             logger.error(f"Failed to schedule progress send: {e}")
-                    
+
                     callback.add_handler(on_progress)
-                    
+
                     # Execute query with streaming
                     logger.info(f"Processing query: {query}")
-                    
+
                     # Build process tree
                     tree = process_builder.build_process_tree(query)
-                    
+
                     # Execute with progress callback
                     result = process_executor.execute_process(tree, progress_callback=callback)
-                    
+
                     # Send final result
-                    await websocket.send_json({
-                        "event_type": "result",
-                        "session_id": session_id,
-                        "success": result["success"],
-                        "data": result["data"],
-                        "execution_time": result["execution_time"],
-                        "steps_completed": result["steps_completed"],
-                        "steps_failed": result["steps_failed"]
-                    })
-                    
+                    await websocket.send_json(
+                        {
+                            "event_type": "result",
+                            "session_id": session_id,
+                            "success": result["success"],
+                            "data": result["data"],
+                            "execution_time": result["execution_time"],
+                            "steps_completed": result["steps_completed"],
+                            "steps_failed": result["steps_failed"],
+                        }
+                    )
+
                     # Update session stats
                     active_sessions[session_id]["queries_processed"] += 1
                     logger.info(f"✅ Query processed: {query} ({result['execution_time']:.2f}s)")
-                    
+
                 except Exception as e:
                     logger.error(f"Error processing query: {e}", exc_info=True)
-                    await websocket.send_json({
-                        "event_type": "error",
-                        "session_id": session_id,
-                        "message": f"Processing error: {str(e)}"
-                    })
+                    await websocket.send_json(
+                        {"event_type": "error", "session_id": session_id, "message": f"Processing error: {str(e)}"}
+                    )
             else:
                 # Services not available - send error
-                await websocket.send_json({
-                    "event_type": "error",
-                    "session_id": session_id,
-                    "message": "NLP services not available"
-                })
-    
+                await websocket.send_json(
+                    {"event_type": "error", "session_id": session_id, "message": "NLP services not available"}
+                )
+
     except WebSocketDisconnect:
         logger.info(f"WebSocket disconnected: {session_id}")
         if session_id in active_sessions:
             del active_sessions[session_id]
-    
+
     except Exception as e:
         logger.error(f"WebSocket error for {session_id}: {e}", exc_info=True)
         if session_id in active_sessions:
@@ -384,30 +378,30 @@ async def test_page():
         <body>
             <div class="container">
                 <h1>🚀 VERITAS NLP Streaming Test</h1>
-                
+
                 <div>
                     <span id="status" class="status disconnected">Disconnected</span>
                     <span id="progress"></span>
                 </div>
-                
+
                 <input type="text" id="query" placeholder="Enter query (e.g., 'Bauantrag für Stuttgart')" />
                 <button id="connect" onclick="connect()">Connect</button>
                 <button id="send" onclick="sendQuery()" disabled>Send Query</button>
                 <button onclick="clearLog()">Clear Log</button>
-                
+
                 <div id="log"></div>
             </div>
-            
+
             <script>
                 let ws = null;
                 const sessionId = 'test_session_' + Date.now();
-                
+
                 function connect() {
                     const wsUrl = `ws://${window.location.host}/ws/process/${sessionId}`;
                     log(`Connecting to ${wsUrl}...`);
-                    
+
                     ws = new WebSocket(wsUrl);
-                    
+
                     ws.onopen = function() {
                         log('✅ WebSocket connected!', 'success');
                         document.getElementById('status').className = 'status connected';
@@ -415,16 +409,16 @@ async def test_page():
                         document.getElementById('send').disabled = false;
                         document.getElementById('connect').disabled = true;
                     };
-                    
+
                     ws.onmessage = function(event) {
                         const data = JSON.parse(event.data);
                         handleMessage(data);
                     };
-                    
+
                     ws.onerror = function(error) {
                         log('❌ WebSocket error!', 'error');
                     };
-                    
+
                     ws.onclose = function() {
                         log('WebSocket closed');
                         document.getElementById('status').className = 'status disconnected';
@@ -433,21 +427,21 @@ async def test_page():
                         document.getElementById('connect').disabled = false;
                     };
                 }
-                
+
                 function sendQuery() {
                     const query = document.getElementById('query').value;
                     if (!query) {
                         alert('Please enter a query');
                         return;
                     }
-                    
+
                     log(`📤 Sending query: ${query}`);
                     ws.send(JSON.stringify({ query: query }));
                 }
-                
+
                 function handleMessage(data) {
                     const eventType = data.event_type;
-                    
+
                     if (eventType === 'connected') {
                         log(`🔗 ${data.message}`, 'success');
                     }
@@ -489,7 +483,7 @@ async def test_page():
                         const time = data.execution_time.toFixed(3);
                         const completed = data.steps_completed;
                         const failed = data.steps_failed;
-                        log(`📊 Result: ${completed} completed, ${failed} failed (${time}s)`, 
+                        log(`📊 Result: ${completed} completed, ${failed} failed (${time}s)`,
                             success ? 'success' : 'error');
                     }
                     else if (eventType === 'error') {
@@ -499,12 +493,12 @@ async def test_page():
                         log(`Unknown event: ${eventType}`);
                     }
                 }
-                
+
                 function updateProgress(percentage) {
-                    document.getElementById('progress').textContent = 
+                    document.getElementById('progress').textContent =
                         `Progress: ${percentage.toFixed(1)}%`;
                 }
-                
+
                 function log(message, type = '') {
                     const logDiv = document.getElementById('log');
                     const entry = document.createElement('div');
@@ -513,11 +507,11 @@ async def test_page():
                     logDiv.appendChild(entry);
                     logDiv.scrollTop = logDiv.scrollHeight;
                 }
-                
+
                 function clearLog() {
                     document.getElementById('log').innerHTML = '';
                 }
-                
+
                 // Allow Enter key to send query
                 document.getElementById('query').addEventListener('keypress', function(e) {
                     if (e.key === 'Enter' && !document.getElementById('send').disabled) {
@@ -534,7 +528,7 @@ async def test_page():
 # Run with: uvicorn backend.api.streaming_api:app --reload
 if __name__ == "__main__":
     import uvicorn
-    
+
     print("=" * 80)
     print("VERITAS NLP STREAMING API")
     print("=" * 80)
@@ -543,5 +537,10 @@ if __name__ == "__main__":
     print(f"   Test page: http://localhost:8000/test")
     print(f"   Health check: http://localhost:8000/health")
     print("\n" + "=" * 80)
-    
-    uvicorn.run(app, host="0.0.0.0", port=8000, log_level="info")
+
+    import os
+
+    host = os.getenv("VERITAS_API_HOST", "127.0.0.1")
+    port = int(os.getenv("VERITAS_API_PORT", "8000"))
+    logger.info(f"Starting streaming API on {host}:{port}")
+    uvicorn.run(app, host=host, port=port, log_level="info")
