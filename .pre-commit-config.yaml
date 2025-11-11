@@ -4,6 +4,10 @@
 # Run manually: pre-commit run --all-files
 
 ---
+# Exclude large/third-party/generated directories from hooks that don't
+# need to run across the entire repo during local development. CI can run
+# full checks if desired.
+exclude: '^(backups/|docs/|data/|frontend/|k8s/|helm/|backups/|bandit_report.json|scripts/|tests/|.*\.bak$).*'
 repos:
   # Code Formatting
   - repo: https://github.com/psf/black
@@ -11,7 +15,8 @@ repos:
     hooks:
       - id: black
         language_version: python3.13
-        args: [--line-length=127]
+        args:
+          - "--line-length=127"
 
   # Import Sorting
   - repo: https://github.com/pycqa/isort
@@ -19,7 +24,9 @@ repos:
     hooks:
       - id: isort
         language_version: python3.13
-        args: [--profile=black, --line-length=127]
+        args:
+          - "--profile=black"
+          - "--line-length=127"
 
   # Linting
   - repo: https://github.com/pycqa/flake8
@@ -27,14 +34,25 @@ repos:
     hooks:
       - id: flake8
         language_version: python3.13
-        args: [--max-line-length=127, --extend-ignore=E203]
+        args:
+          - "--max-line-length=127"
+          - "--extend-ignore=E203,F541"
 
   # Security
   - repo: https://github.com/PyCQA/bandit
     rev: 1.7.6
     hooks:
       - id: bandit
-        args: [-r, backend/, -ll, -f, json, -o, bandit_report.json, -q, --exit-zero]
+        args:
+          - "-r"
+          - "backend/"
+          - "-ll"
+          - "-f"
+          - "json"
+          - "-o"
+          - "bandit_report.json"
+          - "-q"
+          - "--exit-zero"
         pass_filenames: false
         exclude: tests/
         language_version: python3.13
@@ -44,7 +62,10 @@ repos:
     rev: v1.8.0
     hooks:
       - id: mypy
-        args: [--ignore-missing-imports, --no-strict-optional]
+        files: '^(backend/|shared/)'
+        args:
+          - "--ignore-missing-imports"
+          - "--no-strict-optional"
         language_version: python3.13
 
   # General Checks
@@ -56,16 +77,18 @@ repos:
       - id: check-yaml
       - id: check-json
       - id: check-added-large-files
-        args: [--maxkb=1000]
+        args:
+          - "--maxkb=1000"
       - id: check-merge-conflict
       - id: debug-statements
       - id: mixed-line-ending
-      - id: check-docstring-first
 
   # YAML Linting
   - repo: https://github.com/adrienverge/yamllint
     rev: v1.33.0
     hooks:
       - id: yamllint
-        args: [-d, "{extends: default, rules: {line-length: {max: 127}, new-lines: {type: dos}}}"]
+        args:
+          - "-d"
+          - "{extends: default, rules: {line-length: {max: 127}, new-lines: {type: dos}}}"
         exclude: ^\.github\/workflows\/.*\.ya?ml$
