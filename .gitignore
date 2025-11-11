@@ -45,6 +45,14 @@ logs/
 *.err.log
 
 # ========================================
+# Backup files
+# Automatically generated backups (e.g. by convenience scripts) should not be
+# committed. This ignores both '*.bak' and numbered backup suffixes like '.bak1'.
+# ========================================
+*.bak
+*.bak*
+
+# ========================================
 # IDE & Editor Files
 # Added: 20251025 - Cleanup
 # ========================================
