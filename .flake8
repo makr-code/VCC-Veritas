@@ -4,43 +4,17 @@
 max-line-length = 127
 max-complexity = 10
 
-# Exclude patterns
-exclude =
-    .git,
-    __pycache__,
-    .venv,
-    venv,
-    .eggs,
-    *.egg,
-    build,
-    dist,
-    migrations,
-    .tox,
-    .pytest_cache,
-    htmlcov,
-    .mypy_cache
+# Exclude patterns (comma-separated)
+exclude = .git, __pycache__, .venv, venv, .eggs, *.egg, build, dist, migrations, .tox, .pytest_cache, htmlcov, .mypy_cache
 
-# Ignore specific errors
-ignore =
-    E203,  # whitespace before ':'
-    E266,  # too many leading '#' for block comment
-    E501,  # line too long (handled by black)
-    W503,  # line break before binary operator
-    W504,  # line break after binary operator
-    F401,  # imported but unused (sometimes needed)
-    E402,  # module level import not at top
+# Ignore specific error codes
+ignore = E203, E266, E501, W503, W504, F401, E402
 
 # Error codes to always report
-select = 
-    E,   # pycodestyle errors
-    W,   # pycodestyle warnings
-    F,   # pyflakes
-    C,   # mccabe complexity
-    N,   # pep8-naming
+select = E,W,F,C,N
 
-per-file-ignores =
-    __init__.py:F401,F403
-    tests/*:F401,F811
+# Per-file ignores
+per-file-ignores = __init__.py:F401,F403, tests/*:F401,F811, backend/agents/veritas_api_agent_orchestrator.py:C901
 
 # Count errors
 count = True

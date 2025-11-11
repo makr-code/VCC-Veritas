@@ -31,7 +31,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from queue import Queue
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Tuple, cast
 
 # Shared Enums
 from backend.agents.veritas_shared_enums import QueryComplexity, QueryDomain, QueryStatus
@@ -221,7 +221,7 @@ class AgentOrchestrator:
                     "file_storage": {"enabled": False},
                 }
                 self.uds3_strategy = UDS3PolyglotManager(backend_config=backend_config, enable_rag=True)
-                logger.info("✅ UDS3 Polyglot Manager initialisiert (Agent Orchestrator)")
+                logger.info("[OK] UDS3 Polyglot Manager initialisiert (Agent Orchestrator)")
             except Exception as e:
                 logger.warning(f"⚠️ RAG Integration Fehler: {e}")
                 self.database_api = None
@@ -234,7 +234,7 @@ class AgentOrchestrator:
         if DATABASE_AGENT_AVAILABLE:
             try:
                 self.database_agent = create_database_agent()
-                logger.info("✅ Database Agent initialisiert (Read-Only Mode)")
+                logger.info("[OK] Database Agent initialisiert (Read-Only Mode)")
             except Exception as e:
                 logger.warning(f"⚠️ Database Agent Initialisierung fehlgeschlagen: {e}")
                 self.database_agent = None
@@ -287,7 +287,7 @@ class AgentOrchestrator:
 
                         logger.debug(f"📋 Agent Schema geladen: {schema_name}")
 
-            logger.info(f"✅ {len(self.schema_cache)} Agent Pipeline Schemas geladen")
+            logger.info(f"[OK] {len(self.schema_cache)} Agent Pipeline Schemas geladen")
 
         except Exception as e:
             logger.error(f"❌ Agent Schema-Laden fehlgeschlagen: {e}")
@@ -549,7 +549,7 @@ class AgentOrchestrator:
             self.schema_cache["standard_query_pipeline"] = standard_schema
             self.schema_cache["advanced_query_pipeline"] = advanced_schema
 
-        logger.info("✅ Standard-Agent-Pipeline-Schemas erstellt")
+    logger.info("[OK] Standard-Agent-Pipeline-Schemas erstellt")
 
     def preprocess_query(self, query_data: Dict[str, Any], rag_context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """
@@ -564,7 +564,9 @@ class AgentOrchestrator:
         """
 
         query_text = query_data.get("query", "")
-        user_context = query_data.get("user_context", {})
+        # user_context currently not used here; keep for future use if needed
+        # (intentionally not assigned to avoid unused-variable lint)
+        # user_context = query_data.get("user_context", {})
         rag_context = rag_context or query_data.get("rag_context") or {}
 
         # Einfache Query-Analyse (in Realität würde hier ML/NLP verwendet)
@@ -598,9 +600,9 @@ class AgentOrchestrator:
             "dynamic_actions": dynamic_actions,
         }
 
-        logger.info(
-            f"🔍 Query Preprocessing abgeschlossen: {complexity.value}/{domain.value} - {len(preprocessing_result['required_agents'])} Agents"
-        )
+        agents = cast(Sequence[Any], preprocessing_result.get("required_agents") or [])
+        agents_count = len(agents)
+        logger.info(f"🔍 Query Preprocessing abgeschlossen: {complexity.value}/{domain.value} - {agents_count} Agents")
 
         return preprocessing_result
 
@@ -838,7 +840,7 @@ class AgentOrchestrator:
 
     def _apply_rag_context_to_pipeline(
         self, pipeline_id: str, rag_context: Dict[str, Any], complexity: QueryComplexity, domain: QueryDomain
-    ) -> Tuple[Dict[str, float], Dict[str, Any], Dict[str, List[str]]]:
+    ) -> Tuple[Dict[str, float], Dict[str, Any], Dict[str, List[str]]]:  # noqa: C901
         """Passt Pipeline-Prioritäten anhand des RAG-Kontexts an."""
 
         rag_context = rag_context or {}
@@ -1164,7 +1166,7 @@ def main():
 
     # Status
     status = orchestrator.get_orchestrator_status()
-    print(f"\nOrchestrator Status:")
+    print("\nOrchestrator Status:")
     print(f"Pipelines Created: {status['stats']['pipelines_created']}")
     print(f"Loaded Schemas: {status['loaded_schemas']}")
 

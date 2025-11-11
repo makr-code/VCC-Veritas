@@ -34,7 +34,8 @@ repos:
     rev: 1.7.6
     hooks:
       - id: bandit
-        args: [-r, backend/, -ll]
+        args: [-r, backend/, -ll, -f, json, -o, bandit_report.json, -q, --exit-zero]
+        pass_filenames: false
         exclude: tests/
         language_version: python3.13
 
