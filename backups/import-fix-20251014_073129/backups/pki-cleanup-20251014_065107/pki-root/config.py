@@ -8,18 +8,14 @@ Unterstützt Mock-Mode für Entwicklung und echte PKI für Produktion.
 
 import os
 from pathlib import Path
-from typing import Dict, Any
-
+from typing import Any, Dict
 
 # ============================================================================
 # PKI Base Configuration
 # ============================================================================
 
 # PKI Base Path (eine Ebene über VERITAS: C:\VCC\PKI)
-PKI_BASE_PATH = Path(os.getenv(
-    "PKI_BASE_PATH",
-    r"C:\VCC\PKI"
-))
+PKI_BASE_PATH = Path(os.getenv("PKI_BASE_PATH", r"C:\VCC\PKI"))
 
 # Mock Mode (für Entwicklung ohne echte PKI)
 # Wenn True: In-Memory Mock-Implementierung
@@ -61,7 +57,7 @@ CERT_TYPES = {
     "server": "Server Certificate",
     "client": "Client Certificate",
     "code_signing": "Code Signing Certificate",
-    "email": "Email Certificate"
+    "email": "Email Certificate",
 }
 
 
@@ -114,10 +110,11 @@ MOCK_FINGERPRINT_LENGTH = 64  # SHA256 Hex-Length
 # Helper Functions
 # ============================================================================
 
+
 def get_pki_config() -> Dict[str, Any]:
     """
     Gibt die komplette PKI-Konfiguration als Dictionary zurück.
-    
+
     Returns:
         Dict mit allen Konfigurationswerten
     """
@@ -126,7 +123,6 @@ def get_pki_config() -> Dict[str, Any]:
         "pki_base_path": str(PKI_BASE_PATH),
         "pki_mock_mode": PKI_MOCK_MODE,
         "pki_enabled": PKI_ENABLED,
-        
         # Directories
         "ca_dir": str(PKI_CA_DIR),
         "certs_dir": str(PKI_CERTS_DIR),
@@ -134,12 +130,10 @@ def get_pki_config() -> Dict[str, Any]:
         "config_dir": str(PKI_CONFIG_DIR),
         "crl_dir": str(PKI_CRL_DIR),
         "csr_dir": str(PKI_CSR_DIR),
-        
         # Certificate Settings
         "cert_validity_days": CERT_VALIDITY_DAYS,
         "cert_key_size": CERT_KEY_SIZE,
         "cert_hash_algorithm": CERT_HASH_ALGORITHM,
-        
         # CA Settings
         "ca_name": CA_NAME,
         "ca_country": CA_COUNTRY,
@@ -150,49 +144,47 @@ def get_pki_config() -> Dict[str, Any]:
         "ca_email": CA_EMAIL,
         "ca_validity_years": CA_VALIDITY_YEARS,
         "crl_update_interval_hours": CRL_UPDATE_INTERVAL_HOURS,
-        
         # Crypto Settings
         "supported_hash_algorithms": SUPPORTED_HASH_ALGORITHMS,
         "supported_key_sizes": SUPPORTED_KEY_SIZES,
         "encryption_padding": ENCRYPTION_PADDING,
-        
         # Mock Settings
         "mock_max_certificates": MOCK_MAX_CERTIFICATES,
-        "mock_fingerprint_length": MOCK_FINGERPRINT_LENGTH
+        "mock_fingerprint_length": MOCK_FINGERPRINT_LENGTH,
     }
 
 
 def validate_config() -> bool:
     """
     Validiert die PKI-Konfiguration.
-    
+
     Returns:
         True wenn Konfiguration valide, sonst False
     """
     # Prüfe Key Size
     if CERT_KEY_SIZE not in SUPPORTED_KEY_SIZES:
         return False
-    
+
     # Prüfe Hash Algorithm
     if CERT_HASH_ALGORITHM not in SUPPORTED_HASH_ALGORITHMS:
         return False
-    
+
     # Prüfe Validity Days
     if CERT_VALIDITY_DAYS < 1 or CERT_VALIDITY_DAYS > 3650:
         return False
-    
+
     # Wenn nicht Mock-Mode: Prüfe ob PKI-Verzeichnis existiert
     if not PKI_MOCK_MODE and PKI_ENABLED:
         if not PKI_BASE_PATH.exists():
             return False
-    
+
     return True
 
 
 def is_mock_mode() -> bool:
     """
     Prüft ob PKI im Mock-Mode läuft.
-    
+
     Returns:
         True wenn Mock-Mode aktiv
     """
@@ -202,7 +194,7 @@ def is_mock_mode() -> bool:
 def get_ca_distinguished_name() -> Dict[str, str]:
     """
     Gibt den Distinguished Name (DN) der CA zurück.
-    
+
     Returns:
         Dict mit DN-Komponenten
     """
@@ -213,7 +205,7 @@ def get_ca_distinguished_name() -> Dict[str, str]:
         "locality": CA_LOCALITY,
         "organization": CA_ORGANIZATION,
         "organizational_unit": CA_ORGANIZATIONAL_UNIT,
-        "email": CA_EMAIL
+        "email": CA_EMAIL,
     }
 
 
@@ -223,7 +215,5 @@ def get_ca_distinguished_name() -> Dict[str, str]:
 
 if not validate_config():
     import warnings
-    warnings.warn(
-        "PKI configuration validation failed! Check PKI_* environment variables.",
-        RuntimeWarning
-    )
+
+    warnings.warn("PKI configuration validation failed! Check PKI_* environment variables.", RuntimeWarning)

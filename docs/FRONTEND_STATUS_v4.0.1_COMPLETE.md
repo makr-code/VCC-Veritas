@@ -1,8 +1,8 @@
 # VERITAS Frontend - Vollständiger Status-Bericht
 
-**Version:** 4.0.1  
-**Datum:** 20. Oktober 2025  
-**Status:** 🚀 **PRODUCTION READY** mit aktiven Optimierungen  
+**Version:** 4.0.1
+**Datum:** 20. Oktober 2025
+**Status:** 🚀 **PRODUCTION READY** mit aktiven Optimierungen
 **Letzte Updates:** Backend v4.0 Integration, Content/Response_Text Compatibility
 
 ---
@@ -212,29 +212,29 @@ for event in client.stream_query("Baugenehmigung"):
 def _load_backend_capabilities(self):
     """
     Lädt Backend-Capabilities vom Backend (v4.0.0 Format)
-    
+
     Flow:
     1. Health Check: Ist Backend verfügbar?
     2. Capabilities: Welche Features sind verfügbar?
     3. Endpoints: Welche Endpoints kann Frontend nutzen?
     """
-    
+
     # Health Check
     health_response = requests.get(f"{API_BASE_URL}/system/health", timeout=5)
     if health_response.status_code != 200:
         logger.error("❌ Backend nicht verfügbar!")
         self.capabilities = {"available": False}
         return
-    
+
     # Capabilities
     cap_response = requests.get(f"{API_BASE_URL}/system/capabilities", timeout=10)
     if cap_response.status_code == 200:
         self.capabilities = cap_response.json()
-        
+
         query_modes = self.capabilities.get('query_modes', [])
         features = self.capabilities.get('features', {})
         endpoints = self.capabilities.get('endpoints', {})
-        
+
         logger.info(f"✅ Backend Capabilities geladen:")
         logger.info(f"   Query-Modi: {', '.join(query_modes)}")
         logger.info(f"   Features: {features}")
@@ -312,34 +312,34 @@ class AssistantFullWidthLayout:
         # Header
         text_widget.insert("end", "🤖 VERITAS\n", "assistant_header")
         text_widget.insert("end", "─" * 60 + "\n", "separator")
-        
+
         # Content (Markdown Rendered)
         content = response_data.get('content', '')
         markdown_renderer.render(text_widget, content)
-        
+
         # Sources (IEEE Citations)
         if response_data.get('sources'):
             text_widget.insert("end", "\n📚 Quellen:\n", "sources_header")
             for i, source in enumerate(response_data['sources'], 1):
                 citation = source.get('ieee_citation', source['title'])
                 similarity = source.get('similarity_score', 0.0)
-                
+
                 # Clickable Link
                 link_tag = f"source_link_{i}"
                 text_widget.insert("end", f"[{i}] {citation} ", "source_text")
                 text_widget.insert("end", f"(Similarity: {similarity:.2f}) 🔗\n", link_tag)
-                
+
                 # Bind Click Event
-                text_widget.tag_bind(link_tag, "<Button-1>", 
+                text_widget.tag_bind(link_tag, "<Button-1>",
                     lambda e, s=source: self.open_source(s))
-        
+
         # Metadata Footer
         metadata = response_data.get('metadata', {})
         duration = metadata.get('duration', 0)
         model = metadata.get('model', 'unknown')
         sources_count = metadata.get('sources_count', 0)
-        
-        text_widget.insert("end", 
+
+        text_widget.insert("end",
             f"\n⏱️ {duration:.1f}s  |  🤖 {model}  |  📖 {sources_count} Quellen\n",
             "metadata_compact"
         )
@@ -351,7 +351,7 @@ class MetadataCompactWrapper:
         duration = metadata.get('duration', 0)
         model = metadata.get('model', 'unknown')
         confidence = metadata.get('confidence', 0.0)
-        
+
         text_widget.insert("end",
             f"⏱️ {duration:.1f}s  |  🤖 {model}  |  🎯 {confidence:.2f}",
             "metadata_line"
@@ -413,7 +413,7 @@ renderer.render(text_widget, markdown_text)
 
 **IEEE Citation Format:**
 ```
-[1] Deutscher Bundestag, "Bundes-Immissionsschutzgesetz (BImSchG)," 
+[1] Deutscher Bundestag, "Bundes-Immissionsschutzgesetz (BImSchG),"
     BGBl. I S. 1193, 2024. [Online]. Available: https://gesetze.de/bimschg
     [Accessed: Oct. 20, 2025].
 ```
@@ -423,64 +423,64 @@ renderer.render(text_widget, markdown_text)
 ```python
 class IEEECitationRenderer:
     """Renders IEEE-style citations in Tkinter Text Widget"""
-    
+
     def render_citation(self, text_widget, source: SourceMetadata, index: int):
         """
         Render single IEEE citation
-        
+
         Format:
         [1] Authors, "Title," Publisher, Year. [Type]. Available: URL.
             Quality: ★★★★☆ (0.92) | Relevance: Very High
         """
         # Citation Number
         text_widget.insert("end", f"[{index}] ", "citation_number")
-        
+
         # Authors
         if source.authors:
             text_widget.insert("end", f"{source.authors}, ", "citation_authors")
-        
+
         # Title (Bold)
         text_widget.insert("end", f'"{source.title}," ', "citation_title")
-        
+
         # Publisher & Year
         if source.publisher:
             text_widget.insert("end", f"{source.publisher}, ", "citation_pub")
         if source.year:
             text_widget.insert("end", f"{source.year}. ", "citation_year")
-        
+
         # Type
         text_widget.insert("end", f"[{source.type}]. ", "citation_type")
-        
+
         # URL (Clickable)
         if source.url:
             text_widget.insert("end", f"Available: ", "citation_text")
             text_widget.insert("end", f"{source.url}", f"citation_url_{index}")
             text_widget.tag_bind(f"citation_url_{index}", "<Button-1>",
                 lambda e: webbrowser.open(source.url))
-        
+
         # Access Date
         text_widget.insert("end", f"\n    [Accessed: {datetime.now().strftime('%b. %d, %Y')}].\n")
-        
+
         # Quality Metrics (Inline)
         if source.similarity_score:
             stars = "★" * int(source.similarity_score * 5)
             text_widget.insert("end", f"    Quality: {stars} ({source.similarity_score:.2f}) | ")
-        
+
         if source.relevance:
             text_widget.insert("end", f"Relevance: {source.relevance}\n")
-        
+
         text_widget.insert("end", "\n")
 
 class IEEEReferenceFormatter:
     """Formats IEEE reference list"""
-    
+
     def format_references(self, sources: List[SourceMetadata]) -> str:
         """Generate full IEEE reference list"""
         refs = []
         for i, source in enumerate(sources, 1):
             ref = self._format_single_ref(source, i)
             refs.append(ref)
-        
+
         return "\n".join(refs)
 ```
 
@@ -489,25 +489,25 @@ class IEEEReferenceFormatter:
 ```python
 class SourceLinkHandler:
     """Handles clickable source links in chat"""
-    
+
     def create_link(self, text_widget, source: SourceMetadata, index: int):
         """Create clickable link for source"""
         tag = f"source_{index}"
-        
+
         # Insert link text
         text_widget.insert("end", f"[{index}] ", tag)
-        
+
         # Style link (blue, underline on hover)
         text_widget.tag_config(tag, foreground="blue", underline=0)
-        text_widget.tag_bind(tag, "<Enter>", 
+        text_widget.tag_bind(tag, "<Enter>",
             lambda e: text_widget.tag_config(tag, underline=1))
-        text_widget.tag_bind(tag, "<Leave>", 
+        text_widget.tag_bind(tag, "<Leave>",
             lambda e: text_widget.tag_config(tag, underline=0))
-        
+
         # Bind click event
-        text_widget.tag_bind(tag, "<Button-1>", 
+        text_widget.tag_bind(tag, "<Button-1>",
             lambda e: self.on_source_click(source))
-    
+
     def on_source_click(self, source: SourceMetadata):
         """Handle source click - open URL or show details"""
         if source.url:
@@ -515,12 +515,12 @@ class SourceLinkHandler:
         else:
             # Show Source Details Dialog
             self.show_source_details(source)
-    
+
     def show_source_details(self, source: SourceMetadata):
         """Show detailed source information in dialog"""
         dialog = tk.Toplevel()
         dialog.title(f"Source: {source.title}")
-        
+
         # Display all 35+ IEEE fields
         for field_name, field_value in source.__dict__.items():
             if field_value is not None:
@@ -528,18 +528,18 @@ class SourceLinkHandler:
 
 class SourceTooltip:
     """Tooltip for source links (shows excerpt on hover)"""
-    
+
     def bind_tooltip(self, widget, source: SourceMetadata):
         """Bind tooltip to widget"""
         widget.bind("<Enter>", lambda e: self.show_tooltip(e, source))
         widget.bind("<Leave>", lambda e: self.hide_tooltip())
-    
+
     def show_tooltip(self, event, source: SourceMetadata):
         """Show tooltip with source excerpt"""
         tooltip = tk.Toplevel()
         tooltip.wm_overrideredirect(True)
         tooltip.wm_geometry(f"+{event.x_root+10}+{event.y_root+10}")
-        
+
         # Excerpt
         excerpt = source.excerpt or "Keine Vorschau verfügbar"
         tk.Label(tooltip, text=excerpt, wraplength=300).pack()
@@ -583,7 +583,7 @@ Frontend                          Backend
 # In ChatWindowBase (veritas_app.py)
 def send_query_streaming(self, query: str):
     """Send streaming query with progress updates"""
-    
+
     # Start background thread
     thread = threading.Thread(
         target=self._streaming_worker,
@@ -601,14 +601,14 @@ def _streaming_worker(self, query: str):
             json={"query": query},
             stream=True
         )
-        
+
         for line in response.iter_lines():
             if line:
                 event = json.loads(line.decode('utf-8'))
-                
+
                 # Dispatch to UI thread
                 self.root.after(0, self._handle_streaming_event, event)
-    
+
     except Exception as e:
         logger.error(f"Streaming error: {e}")
         self.root.after(0, self._show_error, str(e))
@@ -617,19 +617,19 @@ def _handle_streaming_event(self, event: Dict[str, Any]):
     """Handle streaming event in UI thread"""
     event_type = event['event']
     data = event['data']
-    
+
     if event_type == 'progress':
         # Update progress bar
         progress = data['progress']
         message = data.get('message', '')
         self.progress_bar['value'] = progress
         self.status_label['text'] = message
-    
+
     elif event_type == 'agent_start':
         # Show agent activity
         agent_name = data['agent_name']
         self.status_label['text'] = f"Agent: {agent_name}..."
-    
+
     elif event_type == 'complete':
         # Display final response
         response = data['response']
@@ -651,7 +651,7 @@ result = dialog.show()
 
 if result:
     export_service = OfficeExportService()
-    
+
     # Export to Word
     export_service.export_to_word(
         conversation=conversation_data,
@@ -662,7 +662,7 @@ if result:
             "ieee_citations": True
         }
     )
-    
+
     # Export to Excel
     export_service.export_to_excel(
         conversation=conversation_data,
@@ -794,7 +794,7 @@ class VeritasApp:
     def __init__(self):
         self.main_window: Optional[MainChatWindow] = None
         self.child_windows: Dict[str, ChildChatWindow] = {}
-    
+
     def create_child_window(self, session_id: Optional[str] = None):
         """Create new child window"""
         child = ChildChatWindow(
@@ -802,11 +802,11 @@ class VeritasApp:
             session_id=session_id or self._generate_session_id()
         )
         self.child_windows[child.session_id] = child
-        
+
         # Cleanup on close
-        child.protocol("WM_DELETE_WINDOW", 
+        child.protocol("WM_DELETE_WINDOW",
             lambda: self._on_child_close(child.session_id))
-    
+
     def _on_child_close(self, session_id: str):
         """Handle child window close"""
         if session_id in self.child_windows:
@@ -902,7 +902,7 @@ FOREST_DARK = {
 response_text = response_data['response_text']
 
 # NACH (Backend v4.0 compatible):
-response_text = response_data.get('content', 
+response_text = response_data.get('content',
     response_data.get('response_text', 'Keine Antwort'))
 ```
 
@@ -919,7 +919,7 @@ response_text = response_data.get('content',
 **Example:**
 ```
 📚 Quellen:
-[1] Deutscher Bundestag, "BImSchG", BGBl. I S. 1193, 2024. 
+[1] Deutscher Bundestag, "BImSchG", BGBl. I S. 1193, 2024.
     Quality: ★★★★☆ (0.92) | Relevance: Very High
     🔗 https://gesetze.de/bimschg
 ```
@@ -1110,7 +1110,7 @@ tests/frontend/
    - HTML Rendering: Limited (nur via tkinterweb, optional)
    - Canvas Performance: Laggy bei >500 Messages
    - Screen Reader Support: Eingeschränkt (Tkinter-native Issue)
-   
+
    **Mitigation:**
    - Message Pagination (zeige nur letzte 100 Messages)
    - Virtualisierung (lazy loading)
@@ -1119,14 +1119,14 @@ tests/frontend/
 2. **Office Export:**
    - Große Conversations (>1000 Messages): Slow (>10s)
    - Complex Markdown: Nicht alle Features in Word (z.B. Mermaid)
-   
+
    **Mitigation:**
    - Background Export (Threading)
    - Export-Optionen: "Last N Messages only"
 
 3. **Session Management:**
    - SQLite Concurrency: Single Writer (Lock Contention)
-   
+
    **Mitigation:**
    - WAL Mode (Write-Ahead Logging)
    - Connection Pooling
@@ -1135,7 +1135,7 @@ tests/frontend/
 
 1. Markdown Tables: Alignment Issues bei sehr breiten Tabellen
    - **Workaround:** Horizontal Scrollbar
-   
+
 2. Source Link Tooltips: Flicker bei schnellem Hover
    - **Workaround:** Debounce Tooltip Show (300ms delay)
 
@@ -1189,10 +1189,10 @@ python start_frontend.py
 
 ## 🎓 Team & Kontakt
 
-**Lead Developer:** makr-code  
-**Repository:** github.com/makr-code/VCC-Veritas  
-**Branch:** main  
-**Version:** 4.0.1  
+**Lead Developer:** makr-code
+**Repository:** github.com/makr-code/VCC-Veritas
+**Branch:** main
+**Version:** 4.0.1
 **Last Update:** 20. Oktober 2025
 
 **Contact:**

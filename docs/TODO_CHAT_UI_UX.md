@@ -1,7 +1,7 @@
 # TODO: Chat Interface UX/UI Verbesserungen 💬
 
-**Erstellt:** 17. Oktober 2025  
-**Priorität:** 🟠 Hoch  
+**Erstellt:** 17. Oktober 2025
+**Priorität:** 🟠 Hoch
 **Ziel:** Moderne, benutzerfreundliche Chat-Oberfläche
 
 ---
@@ -10,7 +10,7 @@
 
 Das aktuelle Chat-Interface (veritas_app.py, 5182 LOC) hat eine solide Funktionsbasis mit 15/15 Rich-Text Features. Jetzt verbessern wir die User Experience und modernisieren das Design.
 
-**Aktuelle Version:** v3.15.0  
+**Aktuelle Version:** v3.15.0
 **Ziel-Version:** v3.16.0 (UX/UI Enhanced)
 
 ---
@@ -100,7 +100,7 @@ def render_assistant_bubble(self, text, sources=None, metadata=None):
 - [ ] **Character Counter**
   - Zeigt: "0 / 5000" unten rechts
   - Färbt sich rot bei >4800 Zeichen
-  
+
 - [ ] **Send-Button Design**
   - Moderner Icon-Button (➤ oder 📤)
   - Nur enabled wenn Text vorhanden
@@ -182,7 +182,7 @@ def render_assistant_bubble(self, text, sources=None, metadata=None):
   - Ctrl+K: Clear
   - Ctrl+L: Focus Input
   - Ctrl+/: Show Shortcuts
-  
+
 - [ ] **Screen Reader Support**
   - ARIA labels
   - Alt-Texte
@@ -202,8 +202,8 @@ class ChatBubbleRenderer:
     def render_user_bubble(self, text, timestamp)
     def render_assistant_bubble(self, text, sources, metadata)
     def render_system_bubble(self, text, type)
-    
-# frontend/ui/veritas_ui_input_enhanced.py  
+
+# frontend/ui/veritas_ui_input_enhanced.py
 class EnhancedInputField:
     """Smart Input mit Auto-Grow, Counter, etc."""
     def setup_auto_grow(self)
@@ -240,7 +240,7 @@ style.configure('User.TFrame',
     borderwidth=0
 )
 
-# Assistant Bubble Style  
+# Assistant Bubble Style
 style.configure('Assistant.TFrame',
     background='#FFFFFF',
     relief='solid',
@@ -398,7 +398,7 @@ python frontend/veritas_app.py
 
 ---
 
-**Erstellt:** 17. Oktober 2025  
-**Status:** 📋 Ready to Start  
-**Verantwortlich:** Team Frontend  
+**Erstellt:** 17. Oktober 2025
+**Status:** 📋 Ready to Start
+**Verantwortlich:** Team Frontend
 **Review:** Nach Sprint 1

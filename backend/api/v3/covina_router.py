@@ -97,8 +97,13 @@ async def covina_query(
             statistics = generate_mock_statistics()
         
         # Reports (falls vorhanden)
+<<<<<<< Updated upstream
         reports = []
         
+=======
+        reports: List[COVINAReport] = []
+
+>>>>>>> Stashed changes
         # Metadata erweitern
         metadata = pipeline_result.get("metadata", {})
         if query_req.time_range:

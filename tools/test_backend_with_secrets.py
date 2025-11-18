@@ -7,8 +7,9 @@ secrets from encrypted DPAPI storage.
 
 import sys
 import time
-import requests
 from pathlib import Path
+
+import requests
 
 # Add project root to path
 project_root = Path(__file__).parent.parent
@@ -20,7 +21,7 @@ print("=" * 80)
 
 # Test 1: Verify secrets available
 print("\n→ Test 1: Verify encrypted secrets...")
-from backend.security.secrets import get_secrets_manager, get_jwt_secret
+from backend.security.secrets import get_jwt_secret, get_secrets_manager
 
 manager = get_secrets_manager()
 secrets = manager.list_secrets()
@@ -62,36 +63,25 @@ print("\n→ Test 3: Test JWT authentication...")
 
 try:
     # Try to login with default admin user
-    auth_data = {
-        "username": "admin",
-        "password": "admin123"
-    }
-    
-    response = requests.post(
-        f"{backend_url}/auth/token",
-        data=auth_data,
-        timeout=5
-    )
-    
+    auth_data = {"username": "admin", "password": "admin123"}
+
+    response = requests.post(f"{backend_url}/auth/token", data=auth_data, timeout=5)
+
     if response.status_code == 200:
         token_data = response.json()
         access_token = token_data.get("access_token")
-        
+
         if access_token:
             print(f"✅ Authentication successful")
             print(f"   Token: {access_token[:30]}...")
             print(f"   Type: {token_data.get('token_type')}")
-            
+
             # Test 4: Verify token works
             print("\n→ Test 4: Verify token access...")
-            
+
             headers = {"Authorization": f"Bearer {access_token}"}
-            response = requests.get(
-                f"{backend_url}/auth/me",
-                headers=headers,
-                timeout=5
-            )
-            
+            response = requests.get(f"{backend_url}/auth/me", headers=headers, timeout=5)
+
             if response.status_code == 200:
                 user_data = response.json()
                 print(f"✅ Token verified successfully")
@@ -107,7 +97,7 @@ try:
         print(f"❌ Authentication failed: {response.status_code}")
         print(f"   Response: {response.text}")
         sys.exit(1)
-        
+
 except Exception as e:
     print(f"❌ Authentication test failed: {e}")
     sys.exit(1)

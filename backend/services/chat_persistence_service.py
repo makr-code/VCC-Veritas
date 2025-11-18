@@ -141,8 +141,13 @@ class ChatPersistenceService:
         """
         try:
             session_files = list(self.sessions_dir.glob("*.json"))
+<<<<<<< Updated upstream
             sessions_info = []
             
+=======
+            sessions_info: List[Dict[str, Any]] = []
+
+>>>>>>> Stashed changes
             for session_file in session_files:
                 try:
                     # Lade nur Metadaten (nicht alle Messages)

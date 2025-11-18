@@ -1,7 +1,7 @@
 # 🔬 JSON-basierte wissenschaftliche Methodik - Orchestrator-Integration
 
-**Version:** v7.0 (Configuration-Driven Scientific Reasoning)  
-**Erstellt:** 12. Oktober 2025, 21:15 Uhr  
+**Version:** v7.0 (Configuration-Driven Scientific Reasoning)
+**Erstellt:** 12. Oktober 2025, 21:15 Uhr
 **Status:** 📋 DESIGN - Paradigmenwechsel zu JSON-Konfiguration
 
 ---
@@ -105,7 +105,7 @@ class ValidationService:
   "version": "1.0",
   "description": "Standard wissenschaftliches Vorgehen: Hypothese → Synthese → Analyse → Validation → Conclusion → Metacognition",
   "created_at": "2025-10-12T21:00:00Z",
-  
+
   "base_prompts": {
     "user_query_enhancement": {
       "template_file": "prompts/scientific/user_query_enhancement.txt",
@@ -118,19 +118,19 @@ class ValidationService:
       "content": "Du bist ein wissenschaftlicher Assistent. Deine Aufgabe ist es, Fragen systematisch und evidenzbasiert zu beantworten. Befolge die wissenschaftliche Methodik: Hypothese → Evidenz sammeln → Analysieren → Validieren → Schlussfolgern."
     }
   },
-  
+
   "phases": [
     {
       "phase_id": "hypothesis",
       "phase_number": 1,
       "phase_name": "Hypothesengenerierung",
       "description": "Erste Vermutung basierend auf Query + RAG",
-      
+
       "dependencies": {
         "requires_phases": [],
         "requires_data": ["user_query", "rag_results"]
       },
-      
+
       "execution": {
         "type": "llm_call",
         "model": "llama3.1:latest",
@@ -138,7 +138,7 @@ class ValidationService:
         "max_tokens": 1000,
         "timeout_seconds": 30
       },
-      
+
       "prompt_construction": {
         "template_file": "prompts/scientific/phase1_hypothesis.txt",
         "input_mapping": {
@@ -150,7 +150,7 @@ class ValidationService:
           "previous_phases": false
         }
       },
-      
+
       "output_schema": {
         "type": "object",
         "required": ["hypothesis", "required_criteria", "missing_information", "confidence"],
@@ -180,7 +180,7 @@ class ValidationService:
           }
         }
       },
-      
+
       "validation_rules": [
         {
           "rule": "confidence_in_range",
@@ -194,25 +194,25 @@ class ValidationService:
           "min_items": 1
         }
       ],
-      
+
       "retry_policy": {
         "max_retries": 2,
         "retry_on": ["invalid_json", "validation_failed"],
         "backoff_seconds": 1
       }
     },
-    
+
     {
       "phase_id": "synthesis",
       "phase_number": 2,
       "phase_name": "Evidenz-Synthese",
       "description": "Aggregiere und verknüpfe RAG-Ergebnisse",
-      
+
       "dependencies": {
         "requires_phases": ["hypothesis"],
         "requires_data": ["hypothesis_output", "rag_results"]
       },
-      
+
       "execution": {
         "type": "llm_call",
         "model": "llama3.1:latest",
@@ -220,7 +220,7 @@ class ValidationService:
         "max_tokens": 2000,
         "timeout_seconds": 45
       },
-      
+
       "prompt_construction": {
         "template_file": "prompts/scientific/phase2_synthesis.txt",
         "input_mapping": {
@@ -232,7 +232,7 @@ class ValidationService:
           "previous_phases": ["hypothesis"]
         }
       },
-      
+
       "output_schema": {
         "type": "object",
         "required": ["evidence_clusters", "cross_references", "gaps"],
@@ -268,18 +268,18 @@ class ValidationService:
         }
       }
     },
-    
+
     {
       "phase_id": "analysis",
       "phase_number": 3,
       "phase_name": "Muster-Analyse",
       "description": "Erkenne Muster, Konflikte, Anomalien in Evidence",
-      
+
       "dependencies": {
         "requires_phases": ["synthesis"],
         "requires_data": ["synthesis_output"]
       },
-      
+
       "execution": {
         "type": "llm_call",
         "model": "llama3.1:latest",
@@ -287,7 +287,7 @@ class ValidationService:
         "max_tokens": 2000,
         "timeout_seconds": 45
       },
-      
+
       "prompt_construction": {
         "template_file": "prompts/scientific/phase3_analysis.txt",
         "input_mapping": {
@@ -298,7 +298,7 @@ class ValidationService:
           "previous_phases": ["hypothesis", "synthesis"]
         }
       },
-      
+
       "output_schema": {
         "type": "object",
         "required": ["patterns", "conflicts", "anomalies"],
@@ -340,18 +340,18 @@ class ValidationService:
         }
       }
     },
-    
+
     {
       "phase_id": "validation",
       "phase_number": 4,
       "phase_name": "Hypothesen-Validierung",
       "description": "Teste Hypothese gegen Evidence, update Confidence",
-      
+
       "dependencies": {
         "requires_phases": ["hypothesis", "synthesis", "analysis"],
         "requires_data": ["hypothesis_output", "synthesis_output", "analysis_output"]
       },
-      
+
       "execution": {
         "type": "llm_call",
         "model": "llama3.1:latest",
@@ -359,7 +359,7 @@ class ValidationService:
         "max_tokens": 1500,
         "timeout_seconds": 40
       },
-      
+
       "prompt_construction": {
         "template_file": "prompts/scientific/phase4_validation.txt",
         "input_mapping": {
@@ -372,7 +372,7 @@ class ValidationService:
           "previous_phases": ["hypothesis", "synthesis", "analysis"]
         }
       },
-      
+
       "output_schema": {
         "type": "object",
         "required": ["hypothesis_test", "validation_checks"],
@@ -416,18 +416,18 @@ class ValidationService:
         }
       }
     },
-    
+
     {
       "phase_id": "conclusion",
       "phase_number": 5,
       "phase_name": "Schlussfolgerung",
       "description": "Finale Antwort-Generierung mit allen wissenschaftlichen Schritten",
-      
+
       "dependencies": {
         "requires_phases": ["validation"],
         "requires_data": ["validation_output", "synthesis_output", "analysis_output"]
       },
-      
+
       "execution": {
         "type": "llm_call",
         "model": "llama3.1:latest",
@@ -435,7 +435,7 @@ class ValidationService:
         "max_tokens": 4000,
         "timeout_seconds": 60
       },
-      
+
       "prompt_construction": {
         "template_file": "prompts/scientific/phase5_conclusion.txt",
         "input_mapping": {
@@ -448,7 +448,7 @@ class ValidationService:
           "previous_phases": ["hypothesis", "synthesis", "analysis", "validation"]
         }
       },
-      
+
       "output_schema": {
         "type": "object",
         "required": ["conclusion", "conditions", "next_steps"],
@@ -481,18 +481,18 @@ class ValidationService:
         }
       }
     },
-    
+
     {
       "phase_id": "metacognition",
       "phase_number": 6,
       "phase_name": "Selbstreflexion",
       "description": "Bewerte Reasoning Quality, identifiziere Unsicherheiten",
-      
+
       "dependencies": {
         "requires_phases": ["conclusion"],
         "requires_data": ["all_phases_output"]
       },
-      
+
       "execution": {
         "type": "llm_call",
         "model": "llama3.1:latest",
@@ -500,7 +500,7 @@ class ValidationService:
         "max_tokens": 2000,
         "timeout_seconds": 45
       },
-      
+
       "prompt_construction": {
         "template_file": "prompts/scientific/phase6_metacognition.txt",
         "input_mapping": {
@@ -511,7 +511,7 @@ class ValidationService:
           "previous_phases": ["hypothesis", "synthesis", "analysis", "validation", "conclusion"]
         }
       },
-      
+
       "output_schema": {
         "type": "object",
         "required": ["metacognitive_assessment", "quality_metrics"],
@@ -547,7 +547,7 @@ class ValidationService:
       }
     }
   ],
-  
+
   "orchestration_config": {
     "parallel_execution": {
       "enabled": true,
@@ -560,13 +560,13 @@ class ValidationService:
         }
       ]
     },
-    
+
     "error_handling": {
       "phase_failure_strategy": "continue_with_warning",
       "critical_phases": ["hypothesis", "validation", "conclusion"],
       "optional_phases": ["metacognition"]
     },
-    
+
     "streaming": {
       "enabled": true,
       "stream_phase_start": true,
@@ -589,7 +589,7 @@ class ValidationService:
     "version": "1.0.0",
     "last_updated": "2025-10-12T21:30:00Z",
     "improvement_iteration": 1,
-    
+
     "core_principles": {
       "title": "Wissenschaftliche Grundprinzipien",
       "description": "Du bist ein wissenschaftlicher Assistent...",
@@ -607,7 +607,7 @@ class ValidationService:
         ...
       ]
     },
-    
+
     "scientific_method": {
       "title": "Die 6 Schritte wissenschaftlichen Arbeitens",
       "steps": [
@@ -621,7 +621,7 @@ class ValidationService:
         ...
       ]
     },
-    
+
     "source_quality_hierarchy": {
       "levels": [
         {
@@ -634,7 +634,7 @@ class ValidationService:
       ],
       "conflict_resolution_rules": [...]
     },
-    
+
     "prompt_improvement": {
       "improvement_metrics": [
         {
@@ -959,14 +959,14 @@ class PhaseExecutionContext:
 class ScientificPhaseExecutor:
     """
     Generic Executor für wissenschaftliche Phasen
-    
+
     CONFIGURATION-DRIVEN:
     - Lädt Phase-Config aus JSON
     - Konstruiert Prompts via Jinja2 Templates
     - Ruft LLM mit Config-Parameters
     - Validiert Output gegen JSON Schema
     """
-    
+
     def __init__(
         self,
         method_config_path: str,
@@ -982,34 +982,34 @@ class ScientificPhaseExecutor:
         self.method_config_path = method_config_path
         self.prompts_dir = Path(prompts_dir)
         self.ollama_client = ollama_client
-        
+
         # Load Scientific Method Config
         with open(method_config_path, 'r', encoding='utf-8') as f:
             self.method_config = json.load(f)
-        
+
         # Load Base Prompts
         self.base_prompts = self._load_base_prompts()
-        
+
         logger.info(f"✅ Scientific Method loaded: {self.method_config['method_id']}")
         logger.info(f"📋 Phases: {len(self.method_config['phases'])}")
-    
+
     def _load_base_prompts(self) -> Dict[str, str]:
         """Lade Base Prompts (scientific_foundation, user_query_enhancement)"""
         base_prompts = {}
-        
+
         for prompt_id, prompt_config in self.method_config["base_prompts"].items():
             template_file = prompt_config["template_file"]
             template_path = self.prompts_dir / template_file
-            
+
             if template_path.exists():
                 with open(template_path, 'r', encoding='utf-8') as f:
                     base_prompts[prompt_id] = f.read()
                 logger.info(f"  ✅ Loaded base prompt: {prompt_id}")
             else:
                 logger.warning(f"  ⚠️ Base prompt not found: {template_path}")
-        
+
         return base_prompts
-    
+
     async def execute_phase(
         self,
         phase_id: str,
@@ -1017,11 +1017,11 @@ class ScientificPhaseExecutor:
     ) -> Dict[str, Any]:
         """
         Execute eine wissenschaftliche Phase
-        
+
         Args:
             phase_id: ID der Phase (z.B. "hypothesis", "synthesis")
             context: Execution Context (Query, RAG, Previous Phases)
-        
+
         Returns:
             {
                 "phase_id": "hypothesis",
@@ -1031,24 +1031,24 @@ class ScientificPhaseExecutor:
                 "llm_tokens": 850
             }
         """
-        
+
         # 1. Get Phase Config
         phase_config = self._get_phase_config(phase_id)
         if not phase_config:
             raise ValueError(f"Phase '{phase_id}' not found in method config")
-        
+
         # 2. Check Dependencies
         self._check_dependencies(phase_config, context)
-        
+
         # 3. Construct Prompt
         prompt = await self._construct_prompt(phase_config, context)
-        
+
         # 4. Execute LLM Call
         llm_response = await self._execute_llm_call(phase_config, prompt)
-        
+
         # 5. Parse & Validate Output
         output = self._parse_and_validate_output(phase_config, llm_response)
-        
+
         # 6. Return Result
         return {
             "phase_id": phase_id,
@@ -1057,14 +1057,14 @@ class ScientificPhaseExecutor:
             "execution_time": llm_response.get("execution_time", 0),
             "llm_tokens": llm_response.get("tokens_used", 0)
         }
-    
+
     def _get_phase_config(self, phase_id: str) -> Optional[Dict]:
         """Finde Phase Config by ID"""
         for phase in self.method_config["phases"]:
             if phase["phase_id"] == phase_id:
                 return phase
         return None
-    
+
     def _check_dependencies(
         self,
         phase_config: Dict,
@@ -1072,14 +1072,14 @@ class ScientificPhaseExecutor:
     ):
         """Check ob required phases bereits executed sind"""
         required_phases = phase_config["dependencies"]["requires_phases"]
-        
+
         for required_phase_id in required_phases:
             if required_phase_id not in context.previous_phases:
                 raise ValueError(
                     f"Phase '{phase_config['phase_id']}' requires '{required_phase_id}' "
                     f"but it has not been executed yet"
                 )
-    
+
     async def _construct_prompt(
         self,
         phase_config: Dict,
@@ -1087,78 +1087,78 @@ class ScientificPhaseExecutor:
     ) -> str:
         """
         Konstruiere Prompt via Jinja2 Template
-        
+
         Schritte:
         1. Load Phase Template (z.B. phase1_hypothesis.txt)
         2. Include Base Prompts (scientific_foundation)
         3. Map Input Variables (user_query, rag_results, previous_phases)
         4. Render Jinja2 Template
         """
-        
+
         prompt_config = phase_config["prompt_construction"]
-        
+
         # 1. Load Template
         template_file = prompt_config["template_file"]
         template_path = self.prompts_dir / template_file
-        
+
         if not template_path.exists():
             raise FileNotFoundError(f"Prompt template not found: {template_path}")
-        
+
         with open(template_path, 'r', encoding='utf-8') as f:
             template_content = f.read()
-        
+
         # 2. Prepare Template Variables
         template_vars = {}
-        
+
         # Include Base Prompts
         if prompt_config["context_inclusion"]["scientific_foundation"]:
             template_vars["scientific_foundation"] = self.base_prompts.get("scientific_foundation", "")
-        
+
         # Include Previous Phases
         if prompt_config["context_inclusion"]["previous_phases"]:
             template_vars["phases"] = {}
             for prev_phase_id in prompt_config["context_inclusion"]["previous_phases"]:
                 if prev_phase_id in context.previous_phases:
                     template_vars["phases"][prev_phase_id] = context.previous_phases[prev_phase_id]
-        
+
         # Map Input Variables
         input_mapping = prompt_config["input_mapping"]
         for template_var, data_path in input_mapping.items():
             # Resolve data path (z.B. "phases.hypothesis.output")
             value = self._resolve_data_path(data_path, context)
             template_vars[template_var] = value
-        
+
         # 3. Render Template
         template = Template(template_content)
         prompt = template.render(**template_vars)
-        
+
         return prompt
-    
+
     def _resolve_data_path(self, data_path: str, context: PhaseExecutionContext) -> Any:
         """
         Resolve data path like "phases.hypothesis.output" to actual value
-        
+
         Supported paths:
         - "query_text" → context.user_query
         - "rag_context" → context.rag_results
         - "phases.{phase_id}.output" → context.previous_phases[phase_id]["output"]
         """
-        
+
         if data_path == "query_text":
             return context.user_query
-        
+
         elif data_path == "rag_context":
             return json.dumps(context.rag_results, indent=2, ensure_ascii=False)
-        
+
         elif data_path.startswith("phases."):
             # Extract phase_id and field
             parts = data_path.split(".")
             phase_id = parts[1]
             field = ".".join(parts[2:]) if len(parts) > 2 else "output"
-            
+
             if phase_id in context.previous_phases:
                 phase_data = context.previous_phases[phase_id]
-                
+
                 # Navigate nested dict
                 current = phase_data
                 for key in field.split("."):
@@ -1166,24 +1166,24 @@ class ScientificPhaseExecutor:
                         current = current[key]
                     else:
                         return None
-                
+
                 # Convert to JSON if dict/list
                 if isinstance(current, (dict, list)):
                     return json.dumps(current, indent=2, ensure_ascii=False)
                 else:
                     return current
-        
+
         return None
-    
+
     async def _execute_llm_call(
         self,
         phase_config: Dict,
         prompt: str
     ) -> Dict:
         """Execute LLM Call mit Config-Parameters"""
-        
+
         execution_config = phase_config["execution"]
-        
+
         # LLM Call via Ollama Client
         response = await self.ollama_client.generate(
             prompt=prompt,
@@ -1192,9 +1192,9 @@ class ScientificPhaseExecutor:
             max_tokens=execution_config["max_tokens"],
             timeout=execution_config.get("timeout_seconds", 60)
         )
-        
+
         return response
-    
+
     def _parse_and_validate_output(
         self,
         phase_config: Dict,
@@ -1202,17 +1202,17 @@ class ScientificPhaseExecutor:
     ) -> Dict:
         """
         Parse LLM Response (JSON) und validiere gegen Schema
-        
+
         Schritte:
         1. Extract JSON from LLM response
         2. Parse JSON
         3. Validate against output_schema (jsonschema)
         4. Apply validation_rules
         """
-        
+
         # 1. Extract JSON (LLM response ist plain text)
         response_text = llm_response.get("response", "")
-        
+
         # Find JSON in response (zwischen ```json und ```)
         import re
         json_match = re.search(r'```json\s*(.*?)\s*```', response_text, re.DOTALL)
@@ -1221,7 +1221,7 @@ class ScientificPhaseExecutor:
         else:
             # Fallback: Assume entire response is JSON
             json_str = response_text.strip()
-        
+
         # 2. Parse JSON
         try:
             output = json.loads(json_str)
@@ -1229,33 +1229,33 @@ class ScientificPhaseExecutor:
             logger.error(f"❌ JSON Parse Error: {e}")
             logger.error(f"Response: {response_text[:500]}")
             raise ValueError(f"LLM did not return valid JSON: {e}")
-        
+
         # 3. Validate against output_schema
         output_schema = phase_config["output_schema"]
         self._validate_schema(output, output_schema)
-        
+
         # 4. Apply validation_rules
         if "validation_rules" in phase_config:
             self._apply_validation_rules(output, phase_config["validation_rules"])
-        
+
         return output
-    
+
     def _validate_schema(self, output: Dict, schema: Dict):
         """Validate output against JSON Schema (simple implementation)"""
-        
+
         # Check required fields
         if "required" in schema:
             for field in schema["required"]:
                 if field not in output:
                     raise ValueError(f"Required field '{field}' missing in output")
-        
+
         # Check properties (type validation)
         if "properties" in schema:
             for field, field_schema in schema["properties"].items():
                 if field in output:
                     value = output[field]
                     expected_type = field_schema.get("type")
-                    
+
                     # Simple type check
                     if expected_type == "string" and not isinstance(value, str):
                         raise ValueError(f"Field '{field}' must be string, got {type(value)}")
@@ -1265,14 +1265,14 @@ class ScientificPhaseExecutor:
                         raise ValueError(f"Field '{field}' must be array, got {type(value)}")
                     elif expected_type == "object" and not isinstance(value, dict):
                         raise ValueError(f"Field '{field}' must be object, got {type(value)}")
-    
+
     def _apply_validation_rules(self, output: Dict, rules: List[Dict]):
         """Apply custom validation rules"""
-        
+
         for rule in rules:
             rule_type = rule["rule"]
             field = rule["field"]
-            
+
             if rule_type == "confidence_in_range":
                 value = output.get(field)
                 if value is not None:
@@ -1281,7 +1281,7 @@ class ScientificPhaseExecutor:
                             f"Field '{field}' must be in range [{rule['min']}, {rule['max']}], "
                             f"got {value}"
                         )
-            
+
             elif rule_type == "required_criteria_not_empty":
                 value = output.get(field, [])
                 min_items = rule.get("min_items", 1)
@@ -1325,7 +1325,7 @@ logger = logging.getLogger(__name__)
 class UnifiedOrchestratorV7:
     """
     Unified Orchestrator mit JSON-basierter wissenschaftlicher Methodik
-    
+
     ARCHITEKTUR:
     1. Load Scientific Method Config (JSON)
     2. Enhance User Query mit Base Prompt
@@ -1333,7 +1333,7 @@ class UnifiedOrchestratorV7:
     4. Coordinate Agent Tasks (Parallel)
     5. Aggregate Results
     """
-    
+
     def __init__(
         self,
         method_config_path: str,
@@ -1350,23 +1350,23 @@ class UnifiedOrchestratorV7:
             agent_orchestrator: Existing Agent Orchestrator
             rag_service: RAG Service für semantic/graph search
         """
-        
+
         self.scientific_executor = ScientificPhaseExecutor(
             method_config_path=method_config_path,
             prompts_dir=prompts_dir,
             ollama_client=ollama_client
         )
-        
+
         self.agent_orchestrator = agent_orchestrator
         self.rag_service = rag_service
         self.ollama_client = ollama_client
-        
+
         logger.info("✅ Unified Orchestrator v7.0 initialized (Configuration-Driven)")
-    
+
     async def process_query(self, user_query: str, user_id: str) -> Dict[str, Any]:
         """
         Main Entry Point: Process User Query mit wissenschaftlicher Methodik
-        
+
         Returns:
             {
                 "query": "...",
@@ -1383,28 +1383,28 @@ class UnifiedOrchestratorV7:
                 "confidence": 0.90
             }
         """
-        
+
         logger.info(f"🔬 Processing Query (Scientific Method): {user_query}")
-        
+
         # Step 1: NLP Preprocessing (existing)
         nlp_result = await self._nlp_preprocessing(user_query)
-        
+
         # Step 2: RAG Retrieval (parallel: semantic + graph)
         rag_results = await self._rag_retrieval(user_query, nlp_result)
-        
+
         # Step 3: Enhance User Query with Base Prompt
         enhanced_query = self._enhance_user_query(user_query, nlp_result)
-        
+
         # Step 4: Initialize Execution Context
         context = PhaseExecutionContext(
             user_query=enhanced_query,
             rag_results=rag_results,
             previous_phases={}
         )
-        
+
         # Step 5: Execute Scientific Phases (Sequential with Dependencies)
         scientific_results = {}
-        
+
         phases_to_execute = [
             "hypothesis",
             "synthesis",
@@ -1413,29 +1413,29 @@ class UnifiedOrchestratorV7:
             "conclusion",
             "metacognition"
         ]
-        
+
         for phase_id in phases_to_execute:
             logger.info(f"  🔬 Executing Phase: {phase_id}")
-            
+
             phase_result = await self.scientific_executor.execute_phase(
                 phase_id=phase_id,
                 context=context
             )
-            
+
             scientific_results[phase_id] = phase_result
-            
+
             # Update context for next phase
             context.previous_phases[phase_id] = phase_result
-            
+
             logger.info(f"  ✅ Phase '{phase_id}' completed in {phase_result['execution_time']:.2f}s")
-        
+
         # Step 6: Coordinate Agent Tasks (Parallel wenn möglich)
         agent_results = await self._coordinate_agents(
             user_query,
             nlp_result,
             scientific_results
         )
-        
+
         # Step 7: Final Response
         return {
             "query": user_query,
@@ -1448,26 +1448,26 @@ class UnifiedOrchestratorV7:
             "confidence": scientific_results["metacognition"]["output"]["metacognitive_assessment"]["overall_confidence"],
             "quality_metrics": scientific_results["metacognition"]["output"]["quality_metrics"]
         }
-    
+
     def _enhance_user_query(self, user_query: str, nlp_result: Dict) -> str:
         """Enhance User Query mit Base Prompt (user_query_enhancement.txt)"""
-        
+
         # Load enhancement template
         enhancement_template = self.scientific_executor.base_prompts.get("user_query_enhancement", "")
-        
+
         # Render with Jinja2
         from jinja2 import Template
         template = Template(enhancement_template)
-        
+
         enhanced = template.render(
             user_query=user_query,
             detected_domain=nlp_result.get("domain", "general"),
             complexity_estimate=nlp_result.get("complexity", "medium"),
             available_agents=["Environmental", "Database", "Transport", "Health"]
         )
-        
+
         return enhanced
-    
+
     async def _coordinate_agents(
         self,
         user_query: str,
@@ -1476,24 +1476,24 @@ class UnifiedOrchestratorV7:
     ) -> Dict:
         """
         Coordinate Agent Tasks basierend auf Scientific Results
-        
+
         Strategie:
         - Hypothesis identifiziert required_criteria
         - Für jedes Criterion: Prüfe ob Domain-Agent benötigt
         - Dispatch Agents parallel
         """
-        
+
         hypothesis = scientific_results["hypothesis"]["output"]
         required_criteria = hypothesis.get("required_criteria", [])
-        
+
         # Determine which agents to call
         agents_to_call = self._determine_required_agents(required_criteria, nlp_result)
-        
+
         # Dispatch agents (via existing AgentOrchestrator)
         agent_results = {}
         for agent_type in agents_to_call:
             logger.info(f"  🤖 Dispatching Agent: {agent_type}")
-            
+
             # Create agent task via AgentOrchestrator
             result = await self.agent_orchestrator.execute_agent_task(
                 agent_type=agent_type,
@@ -1503,32 +1503,32 @@ class UnifiedOrchestratorV7:
                     "nlp_result": nlp_result
                 }
             )
-            
+
             agent_results[agent_type] = result
-        
+
         return agent_results
-    
+
     def _determine_required_agents(
         self,
         required_criteria: List[str],
         nlp_result: Dict
     ) -> List[str]:
         """Determine which agents are needed based on criteria"""
-        
+
         agents = []
-        
+
         # Domain detection (keywords)
         domain = nlp_result.get("domain", "general")
-        
+
         if domain == "environmental" or any("umwelt" in c.lower() for c in required_criteria):
             agents.append("environmental")
-        
+
         if domain == "transport" or any("verkehr" in c.lower() for c in required_criteria):
             agents.append("transport")
-        
+
         # Always call database agent (for structured data)
         agents.append("database")
-        
+
         return agents
 ```
 
@@ -1617,7 +1617,7 @@ class UnifiedOrchestratorV7:
 ## 🎯 Benefits: v7.0 vs. v5.0/v6.0
 
 | Metric | v5.0/v6.0 (Hard-Coded) | v7.0 (JSON-Driven + Self-Improving) | Improvement |
-|--------|------------------------|-------------------------------------|-------------| 
+|--------|------------------------|-------------------------------------|-------------|
 | **Code Complexity** | 10,500-13,900 LOC | **~2,300 LOC** | **-78-83%** |
 | **Flexibility** | ❌ Code-Änderungen nötig | ✅ JSON-Config ändern | ✅ |
 | **LLM Optimization** | ❌ Nicht möglich | ✅ Prompts + Ablauf anpassbar | ✅ |
@@ -1635,7 +1635,7 @@ class UnifiedOrchestratorV7:
 Query 1-10 (v1.0.0) → Metrics: Confidence Error 22%
                     → Analysis: Target 15%, Gap 7%
                     → Apply Improvements → v1.1.0
-                    
+
 Query 11-20 (v1.1.0) → Metrics: Confidence Error 13% ✅
                      → Quality Score: 0.85 → 0.89 (+4.7%)
 ```

@@ -67,19 +67,19 @@ def _run_agent_task_sync(self, request, task, rag_context):
 
 ```python
 def _execute_real_agent(
-    self, 
-    agent_type: str, 
-    query: str, 
+    self,
+    agent_type: str,
+    query: str,
     rag_context: Dict[str, Any]
 ) -> Dict[str, Any]:
     """
     Führt echten VERITAS Agent aus mit UDS3 Hybrid Search
-    
+
     Args:
         agent_type: Agent-Typ (z.B. 'environmental', 'construction')
         query: User Query
         rag_context: RAG-Kontext mit relevanten Dokumenten
-        
+
     Returns:
         Agent-Result mit echten Daten aus UDS3
     """
@@ -87,7 +87,7 @@ def _execute_real_agent(
         # 1. Agent-Registry nutzen
         from backend.agents.veritas_api_agent_registry import AgentRegistry
         registry = AgentRegistry()
-        
+
         # 2. Agent-Typ mapping
         agent_type_map = {
             'geo_context': 'environmental',
@@ -99,29 +99,29 @@ def _execute_real_agent(
             'financial': 'financial',
             'social': 'social'
         }
-        
+
         mapped_type = agent_type_map.get(agent_type, agent_type)
-        
+
         # 3. Agent erstellen
         agent = registry.create_agent(mapped_type)
-        
+
         if not agent:
             logger.warning(f"⚠️ Agent {agent_type} nicht verfügbar, Fallback auf Mock")
             return self._generate_mock_agent_result(agent_type, query)
-        
+
         # 4. Query-Request erstellen
         from backend.agents.veritas_api_agent_core_components import TemplateQueryRequest
-        
+
         request = TemplateQueryRequest(
             query_id=f"agent_{agent_type}_{int(time.time())}",
             query_text=query,
             context=rag_context,
             parameters={'top_k': 5, 'threshold': 0.5}
         )
-        
+
         # 5. Agent ausführen
         response = agent.execute_query(request)
-        
+
         # 6. Result transformieren
         if response.success:
             return {
@@ -144,7 +144,7 @@ def _execute_real_agent(
             # Error Fallback
             logger.error(f"❌ Agent {agent_type} failed: {response.error_message}")
             return self._generate_mock_agent_result(agent_type, query)
-            
+
     except Exception as e:
         logger.error(f"❌ Real Agent Execution Error: {e}")
         # Graceful Degradation zu Mock
@@ -163,7 +163,7 @@ def _generate_agent_result(agent_type: str, query: str, complexity: str):
     if uds3_strategy is not None:
         # ... UDS3 Query
         pass
-    
+
     # Fallback: Simulierte Daten
     agent_specialties = {...}  # Hardcoded
 ```
@@ -172,16 +172,16 @@ def _generate_agent_result(agent_type: str, query: str, complexity: str):
 ```python
 def _generate_agent_result(agent_type: str, query: str, complexity: str):
     global uds3_strategy
-    
+
     # 1. Prüfe ob UDS3 verfügbar
     if uds3_strategy is None:
         logger.warning("⚠️ UDS3 nicht verfügbar, verwende Mock-Daten")
         return _generate_mock_agent_result(agent_type, query, complexity)
-    
+
     # 2. UDS3 Hybrid Search ausführen
     try:
         category = agent_to_category.get(agent_type, 'general')
-        
+
         search_result = uds3_strategy.query_across_databases(
             vector_params={
                 "query_text": query,
@@ -193,11 +193,11 @@ def _generate_agent_result(agent_type: str, query: str, complexity: str):
             relational_params=None,
             join_strategy="union"
         )
-        
+
         # 3. Ergebnisse transformieren
         if search_result.success and search_result.joined_results:
             documents = search_result.joined_results[:5]
-            
+
             return {
                 'agent_type': agent_type,
                 'confidence_score': documents[0].get('score', 0.8),
@@ -214,7 +214,7 @@ def _generate_agent_result(agent_type: str, query: str, complexity: str):
         else:
             logger.info(f"ℹ️ UDS3 Query für {agent_type} lieferte keine Ergebnisse")
             return _generate_mock_agent_result(agent_type, query, complexity)
-            
+
     except Exception as e:
         logger.error(f"❌ UDS3 Query Error für {agent_type}: {e}")
         return _generate_mock_agent_result(agent_type, query, complexity)
@@ -261,7 +261,7 @@ python test_dual_prompt_stuttgart.py
 # Stuttgart Query
 python test_dual_prompt_stuttgart.py
 
-# Brandenburg Query  
+# Brandenburg Query
 python test_dual_prompt_brandenburg.py
 ```
 

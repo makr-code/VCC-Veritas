@@ -1,9 +1,10 @@
 # Test: Frontend Conversation History Display
 # Prüft ob der Gesprächskontext auch im echten Frontend angezeigt wird
 
-import requests
 import json
 import time
+
+import requests
 
 print("🧪 Frontend Conversation History Display Test\n")
 print("=" * 80)
@@ -29,31 +30,26 @@ query_without_history = {
     "session_id": "test_no_history",
     "enable_streaming": True,
     "enable_intermediate_results": True,
-    "enable_llm_thinking": True
+    "enable_llm_thinking": True,
 }
 
-response = requests.post(
-    f"{BASE_URL}/v2/query/stream",
-    json=query_without_history,
-    stream=True,
-    timeout=60
-)
+response = requests.post(f"{BASE_URL}/v2/query/stream", json=query_without_history, stream=True, timeout=60)
 
 print("📡 Warte auf SSE Events...")
 final_response_without_history = None
 
 for line in response.iter_lines():
     if line:
-        line = line.decode('utf-8')
-        if line.startswith('data: '):
+        line = line.decode("utf-8")
+        if line.startswith("data: "):
             data_str = line[6:]
-            if data_str.strip() == '[DONE]':
+            if data_str.strip() == "[DONE]":
                 break
             try:
                 event = json.loads(data_str)
-                if event.get('type') == 'stream_complete':
-                    final_data = event.get('data', {}).get('final_result', {})
-                    final_response_without_history = final_data.get('response_text', '')
+                if event.get("type") == "stream_complete":
+                    final_data = event.get("data", {}).get("final_result", {})
+                    final_response_without_history = final_data.get("response_text", "")
                     print(f"✅ Antwort empfangen: {len(final_response_without_history)} Zeichen")
                     break
             except:
@@ -64,18 +60,12 @@ print("\n3️⃣ Test 2: Query MIT Conversation History")
 print("-" * 80)
 
 conversation_history = [
-    {
-        "role": "user",
-        "content": "Wie funktioniert das Baugenehmigungsverfahren in München?"
-    },
+    {"role": "user", "content": "Wie funktioniert das Baugenehmigungsverfahren in München?"},
     {
         "role": "assistant",
-        "content": "Das Baugenehmigungsverfahren in München umfasst mehrere Schritte: 1. Bauantrag stellen, 2. Prüfung durch Bauamt, 3. Genehmigung oder Ablehnung."
+        "content": "Das Baugenehmigungsverfahren in München umfasst mehrere Schritte: 1. Bauantrag stellen, 2. Prüfung durch Bauamt, 3. Genehmigung oder Ablehnung.",
     },
-    {
-        "role": "user",
-        "content": "Welche Unterlagen benötige ich dafür?"
-    }
+    {"role": "user", "content": "Welche Unterlagen benötige ich dafür?"},
 ]
 
 query_with_history = {
@@ -84,33 +74,28 @@ query_with_history = {
     "enable_streaming": True,
     "enable_intermediate_results": True,
     "enable_llm_thinking": True,
-    "conversation_history": conversation_history
+    "conversation_history": conversation_history,
 }
 
 print(f"📚 Sende Query mit {len(conversation_history)} Nachrichten Kontext...")
 
-response = requests.post(
-    f"{BASE_URL}/v2/query/stream",
-    json=query_with_history,
-    stream=True,
-    timeout=60
-)
+response = requests.post(f"{BASE_URL}/v2/query/stream", json=query_with_history, stream=True, timeout=60)
 
 print("📡 Warte auf SSE Events...")
 final_response_with_history = None
 
 for line in response.iter_lines():
     if line:
-        line = line.decode('utf-8')
-        if line.startswith('data: '):
+        line = line.decode("utf-8")
+        if line.startswith("data: "):
             data_str = line[6:]
-            if data_str.strip() == '[DONE]':
+            if data_str.strip() == "[DONE]":
                 break
             try:
                 event = json.loads(data_str)
-                if event.get('type') == 'stream_complete':
-                    final_data = event.get('data', {}).get('final_result', {})
-                    final_response_with_history = final_data.get('response_text', '')
+                if event.get("type") == "stream_complete":
+                    final_data = event.get("data", {}).get("final_result", {})
+                    final_response_with_history = final_data.get("response_text", "")
                     print(f"✅ Antwort empfangen: {len(final_response_with_history)} Zeichen")
                     break
             except:
@@ -128,7 +113,7 @@ if final_response_without_history:
     print(preview)
     if len(final_response_without_history) > 500:
         print(f"\n... ({len(final_response_without_history) - 500} weitere Zeichen)")
-    
+
     has_context_section_1 = "**Gesprächskontext**" in final_response_without_history
     print(f"\n   Gesprächskontext-Abschnitt: {'✅ JA' if has_context_section_1 else '❌ NEIN'}")
 
@@ -139,7 +124,7 @@ if final_response_with_history:
     print(preview)
     if len(final_response_with_history) > 500:
         print(f"\n... ({len(final_response_with_history) - 500} weitere Zeichen)")
-    
+
     has_context_section_2 = "**Gesprächskontext**" in final_response_with_history
     print(f"\n   Gesprächskontext-Abschnitt: {'✅ JA' if has_context_section_2 else '❌ NEIN'}")
 
@@ -153,7 +138,7 @@ if final_response_with_history and has_context_section_2:
     print("   - Conversation History wird korrekt verarbeitet")
     print("   - Gesprächskontext-Abschnitt wird in Antwort eingefügt")
     print("   - Frontend sollte den Kontext anzeigen")
-    
+
     # Extrahiere Kontext-Abschnitt
     if "**Gesprächskontext**" in final_response_with_history:
         start = final_response_with_history.find("**Gesprächskontext**")
@@ -163,7 +148,7 @@ if final_response_with_history and has_context_section_2:
         context_section = final_response_with_history[start:end]
         print("\n   📝 Kontext-Abschnitt:")
         print("   " + "─" * 76)
-        for line in context_section.split('\n'):
+        for line in context_section.split("\n"):
             print(f"   {line}")
         print("   " + "─" * 76)
 elif final_response_with_history and not has_context_section_2:

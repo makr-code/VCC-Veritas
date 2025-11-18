@@ -253,10 +253,10 @@ def _on_feedback_thumbs_up(self, message_id, widget):
     # 1. Visual Feedback
     widget.clear()
     widget.show_thank_you("✓ Danke für Ihr Feedback! 👍")
-    
+
     # 2. State speichern
     self._feedback_states[message_id] = {'rating': 1, 'submitted': True}
-    
+
     # 3. Backend-Call (threaded)
     self._submit_feedback_to_backend(message_id, rating=1, category='helpful')
 ```
@@ -266,9 +266,9 @@ def _on_feedback_thumbs_up(self, message_id, widget):
 ```python
 def _submit_feedback_to_backend(self, message_id, rating, category=None, comment=None):
     """Sendet Feedback an Backend (non-blocking)"""
-    
+
     import threading
-    
+
     def submit_async():
         response = self.feedback_api.submit_feedback(
             message_id=message_id,
@@ -276,12 +276,12 @@ def _submit_feedback_to_backend(self, message_id, rating, category=None, comment
             category=category,
             comment=comment
         )
-        
+
         if response.get('success'):
             logger.info(f"✅ Feedback gesendet: ID {response['feedback_id']}")
         else:
             logger.error(f"❌ Fehler: {response.get('error')}")
-    
+
     # Start thread (daemon=True für sauberes Shutdown)
     thread = threading.Thread(target=submit_async, daemon=True)
     thread.start()
@@ -358,7 +358,7 @@ Total: 6, Passed: 6, Failed: 0
 **Example Query:**
 ```sql
 -- Top 5 Messages mit niedrigster Positive Ratio
-SELECT 
+SELECT
     message_id,
     COUNT(*) as total,
     SUM(CASE WHEN rating = 1 THEN 1 ELSE 0 END) as positive,
@@ -606,12 +606,12 @@ async def submit_feedback(...):
 
 ## 📞 Support
 
-**Issues:** GitHub Issues  
-**Dokumentation:** `docs/FEEDBACK_SYSTEM.md`  
+**Issues:** GitHub Issues
+**Dokumentation:** `docs/FEEDBACK_SYSTEM.md`
 **Logs:** `data/veritas_auto_server.log`
 
 ---
 
-**Status:** ✅ **Production-Ready** (v3.16.0)  
-**License:** MIT  
+**Status:** ✅ **Production-Ready** (v3.16.0)
+**License:** MIT
 **Author:** VERITAS Team

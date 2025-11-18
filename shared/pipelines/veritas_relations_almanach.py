@@ -9,7 +9,12 @@ Basis für Knowledge Graph Embedding (KGE), Retrofitting und Graph Neural Networ
 from typing import Dict, List, Tuple, Optional
 from dataclasses import dataclass
 from enum import Enum
+<<<<<<< Updated upstream
 import json
+=======
+from typing import Any, Dict, List, Optional, Tuple
+
+>>>>>>> Stashed changes
 
 class RelationType(Enum):
     """Kategorien von Relationship-Typen"""
@@ -799,10 +804,15 @@ class VERITASRelationAlmanach:
             rdf_lines.append("")
         
         return "\n".join(rdf_lines)
+<<<<<<< Updated upstream
     
     def generate_kge_training_schema(self) -> Dict:
+=======
+
+    def generate_kge_training_schema(self) -> Dict[str, Any]:
+>>>>>>> Stashed changes
         """Generiert Schema für Knowledge Graph Embedding Training"""
-        kge_schema = {
+        kge_schema: Dict[str, Any] = {
             "relation_types": {},
             "node_types": set(),
             "critical_relations": [],
@@ -842,7 +852,9 @@ class VERITASRelationAlmanach:
         print("=" * 60)
         
         # Statistiken nach Typ
-        type_counts = {}
+        from typing import Dict
+
+        type_counts: Dict[str, int] = {}
         for rel in self.relations.values():
             type_counts[rel.type.value] = type_counts.get(rel.type.value, 0) + 1
         
@@ -851,7 +863,7 @@ class VERITASRelationAlmanach:
             print(f"  {rel_type:15}: {count:3} Relations")
         
         # Statistiken nach Level
-        level_counts = {}
+        level_counts: Dict[str, int] = {}
         for rel in self.relations.values():
             level_counts[rel.level.value] = level_counts.get(rel.level.value, 0) + 1
         
@@ -860,7 +872,7 @@ class VERITASRelationAlmanach:
             print(f"  {level:10}: {count:3} Relations")
         
         # KGE-kritische Relations
-        kge_counts = {}
+        kge_counts: Dict[str, int] = {}
         for rel in self.relations.values():
             kge_counts[rel.kge_importance] = kge_counts.get(rel.kge_importance, 0) + 1
         

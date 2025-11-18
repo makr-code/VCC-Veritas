@@ -53,25 +53,25 @@ function Find-ServerProcess {
     $processes = Get-Process python -ErrorAction SilentlyContinue | Where-Object {
         $_.CommandLine -like "*immissionsschutz_test_server.py*"
     }
-    
+
     if ($processes) {
         return $processes[0]
     }
-    
+
     # Alternative: Port prüfen
     $connections = Get-NetTCPConnection -LocalPort $ServerPort -ErrorAction SilentlyContinue
     if ($connections) {
         $pid = $connections[0].OwningProcess
         return Get-Process -Id $pid -ErrorAction SilentlyContinue
     }
-    
+
     return $null
 }
 
 # Health Check
 function Test-ServerHealth {
     param([int]$MaxRetries = 5)
-    
+
     for ($i = 1; $i -le $MaxRetries; $i++) {
         try {
             $response = Invoke-RestMethod -Uri "http://localhost:$ServerPort/health" -TimeoutSec 2
@@ -94,23 +94,23 @@ function Start-Server {
     Show-Banner
     Write-Info "🚀 Starte $ServerName..."
     Write-Host ""
-    
+
     # Prüfe ob bereits läuft
     $existingProcess = Find-ServerProcess
     if ($existingProcess) {
         Write-Warning "⚠️  Server läuft bereits (PID: $($existingProcess.Id))"
         return
     }
-    
+
     # Prüfe ob Script existiert
     if (-not (Test-Path $ServerScript)) {
         Write-Error-Custom "❌ Server-Script nicht gefunden: $ServerScript"
         return
     }
-    
+
     # Starte im Hintergrund
     Write-Info "📦 Starte Python-Prozess..."
-    
+
     $startInfo = New-Object System.Diagnostics.ProcessStartInfo
     $startInfo.FileName = "python"
     $startInfo.Arguments = $ServerScript
@@ -118,10 +118,10 @@ function Start-Server {
     $startInfo.RedirectStandardOutput = $true
     $startInfo.RedirectStandardError = $true
     $startInfo.CreateNoWindow = $true
-    
+
     $process = New-Object System.Diagnostics.Process
     $process.StartInfo = $startInfo
-    
+
     # Log-Handler
     $outHandler = {
         if (-not [string]::IsNullOrWhiteSpace($EventArgs.Data)) {
@@ -133,25 +133,25 @@ function Start-Server {
             Add-Content -Path $LogFile -Value "[ERR] $($EventArgs.Data)"
         }
     }
-    
+
     Register-ObjectEvent -InputObject $process -EventName OutputDataReceived -Action $outHandler | Out-Null
     Register-ObjectEvent -InputObject $process -EventName ErrorDataReceived -Action $errHandler | Out-Null
-    
+
     $success = $process.Start()
-    
+
     if ($success) {
         $process.BeginOutputReadLine()
         $process.BeginErrorReadLine()
-        
+
         Set-ServerPid -Pid $process.Id
-        
+
         Write-Success "✅ Prozess gestartet (PID: $($process.Id))"
         Write-Info "📝 Log-Datei: $LogFile"
         Write-Host ""
-        
+
         Write-Info "🔍 Warte auf Server-Bereitschaft..."
         Start-Sleep -Seconds 3
-        
+
         if (Test-ServerHealth) {
             Write-Host ""
             Write-Success "="*70
@@ -171,7 +171,7 @@ function Start-Server {
     else {
         Write-Error-Custom "❌ Fehler beim Starten des Servers"
     }
-    
+
     Write-Host ""
 }
 
@@ -180,34 +180,34 @@ function Stop-Server {
     Show-Banner
     Write-Info "🛑 Stoppe $ServerName..."
     Write-Host ""
-    
+
     $process = Find-ServerProcess
-    
+
     if (-not $process) {
         Write-Warning "⚠️  Server läuft nicht"
         Remove-ServerPid
         return
     }
-    
+
     Write-Info "🔍 Gefundener Prozess: PID $($process.Id)"
     Write-Info "📋 Versuche graceful shutdown..."
-    
+
     try {
         $process.CloseMainWindow() | Out-Null
         Start-Sleep -Seconds 2
-        
+
         if (-not $process.HasExited) {
             Write-Warning "⚠️  Graceful shutdown fehlgeschlagen, erzwinge Beendigung..."
             $process.Kill()
             Start-Sleep -Seconds 1
         }
-        
+
         Write-Success "✅ Server erfolgreich gestoppt"
     }
     catch {
         Write-Warning "⚠️  Fehler beim Stoppen: $_"
         Write-Info "Versuche Force-Kill..."
-        
+
         try {
             Stop-Process -Id $process.Id -Force
             Write-Success "✅ Server erzwungen gestoppt"
@@ -216,7 +216,7 @@ function Stop-Server {
             Write-Error-Custom "❌ Konnte Prozess nicht stoppen: $_"
         }
     }
-    
+
     Remove-ServerPid
     Write-Host ""
 }
@@ -226,7 +226,7 @@ function Restart-Server {
     Show-Banner
     Write-Info "🔄 Starte $ServerName neu..."
     Write-Host ""
-    
+
     Stop-Server
     Start-Sleep -Seconds 2
     Start-Server
@@ -237,9 +237,9 @@ function Get-ServerStatus {
     Show-Banner
     Write-Info "📊 Server Status"
     Write-Host ""
-    
+
     $process = Find-ServerProcess
-    
+
     if ($process) {
         Write-Success "✅ Server läuft"
         Write-Host ""
@@ -249,13 +249,13 @@ function Get-ServerStatus {
         Write-Host "  CPU:              $([math]::Round($process.CPU, 2))s"
         Write-Host "  Memory:           $([math]::Round($process.WorkingSet64 / 1MB, 2)) MB"
         Write-Host "  Start Time:       $($process.StartTime)"
-        
+
         $uptime = (Get-Date) - $process.StartTime
         Write-Host "  Uptime:           $($uptime.Days)d $($uptime.Hours)h $($uptime.Minutes)m"
-        
+
         Write-Host ""
         Write-Info "🔍 Health-Check..."
-        
+
         if (Test-ServerHealth -MaxRetries 1) {
             try {
                 $health = Invoke-RestMethod -Uri "http://localhost:$ServerPort/health" -TimeoutSec 2
@@ -266,7 +266,7 @@ function Get-ServerStatus {
                     $status = if ($db.Value -eq "ok") { "✅" } else { "❌" }
                     Write-Host "  $status $($db.Name): $($db.Value)"
                 }
-                
+
                 # Statistik abrufen
                 Write-Host ""
                 Write-Info "📊 Statistik:"
@@ -288,7 +288,7 @@ function Get-ServerStatus {
         else {
             Write-Warning "⚠️  Server läuft, aber antwortet nicht"
         }
-        
+
         Write-Host ""
         Write-Info "Endpoints:"
         Write-Host "  📍 Base:          http://localhost:$ServerPort"
@@ -298,7 +298,7 @@ function Get-ServerStatus {
     }
     else {
         Write-Warning "⚠️  Server läuft nicht"
-        
+
         # Prüfe PID-Datei
         $pidFromFile = Get-ServerPid
         if ($pidFromFile) {
@@ -307,7 +307,7 @@ function Get-ServerStatus {
             Remove-ServerPid
         }
     }
-    
+
     Write-Host ""
 }
 
@@ -316,15 +316,15 @@ function Test-Server {
     Show-Banner
     Write-Info "🧪 Teste $ServerName"
     Write-Host ""
-    
+
     $process = Find-ServerProcess
     if (-not $process) {
         Write-Error-Custom "❌ Server läuft nicht. Starte mit: -Action start"
         return
     }
-    
+
     $testResults = @()
-    
+
     # Test 1: Health
     Write-Info "Test 1/6: Health Check..."
     try {
@@ -342,7 +342,7 @@ function Test-Server {
         Write-Error-Custom "  ❌ Fehler: $_"
         $testResults += $false
     }
-    
+
     # Test 2: Datenbanken Liste
     Write-Info "Test 2/6: Datenbanken Liste..."
     try {
@@ -360,7 +360,7 @@ function Test-Server {
         Write-Error-Custom "  ❌ Fehler: $_"
         $testResults += $false
     }
-    
+
     # Test 3: Anlagen Suche
     Write-Info "Test 3/6: Anlagen Suche..."
     try {
@@ -378,7 +378,7 @@ function Test-Server {
         Write-Error-Custom "  ❌ Fehler: $_"
         $testResults += $false
     }
-    
+
     # Test 4: Verfahren Suche
     Write-Info "Test 4/6: Verfahren Suche..."
     try {
@@ -396,7 +396,7 @@ function Test-Server {
         Write-Error-Custom "  ❌ Fehler: $_"
         $testResults += $false
     }
-    
+
     # Test 5: Messungen Suche
     Write-Info "Test 5/6: Messungen Suche..."
     try {
@@ -414,7 +414,7 @@ function Test-Server {
         Write-Error-Custom "  ❌ Fehler: $_"
         $testResults += $false
     }
-    
+
     # Test 6: Statistik
     Write-Info "Test 6/6: Statistik..."
     try {
@@ -432,13 +432,13 @@ function Test-Server {
         Write-Error-Custom "  ❌ Fehler: $_"
         $testResults += $false
     }
-    
+
     # Ergebnis
     Write-Host ""
     Write-Host "="*70 -ForegroundColor Cyan
     $passed = ($testResults | Where-Object { $_ -eq $true }).Count
     $total = $testResults.Count
-    
+
     if ($passed -eq $total) {
         Write-Success "✅ Alle Tests bestanden ($passed/$total)"
     }

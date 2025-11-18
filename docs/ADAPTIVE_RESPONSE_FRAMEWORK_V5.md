@@ -1,7 +1,7 @@
 # 🧠 VERITAS Adaptive Response Framework - Konzept v5.0
 
-**Version:** v5.0.0 (LLM-Generierte Adaptive Templates)  
-**Created:** 12. Oktober 2025, 18:30 Uhr  
+**Version:** v5.0.0 (LLM-Generierte Adaptive Templates)
+**Created:** 12. Oktober 2025, 18:30 Uhr
 **Status:** 📋 KONZEPTPHASE - Paradigmenwechsel
 
 ---
@@ -363,7 +363,7 @@ class AdaptiveTemplateGenerator:
     2. RAG Kontext (Semantic + Process Graph)
     3. LLM Hypothesis
     """
-    
+
     BASIC_FRAMEWORKS = {
         'verwaltungsrechtliche_frage': Framework(...),
         'vollstaendigkeitspruefung': Framework(...),
@@ -371,7 +371,7 @@ class AdaptiveTemplateGenerator:
         'vergleichsanalyse': Framework(...),
         'detaillierte_rechtsanalyse': Framework(...)
     }
-    
+
     async def generate_from_query(
         self,
         user_query: str,
@@ -380,22 +380,22 @@ class AdaptiveTemplateGenerator:
         """
         Generiert adaptives Template in 3 Schritten
         """
-        
+
         # STEP 1: Hypothesis Generation (LLM Call 1 - SCHNELL ~500 Tokens)
         hypothesis = await self._generate_hypothesis(user_query, rag_context)
-        
+
         # STEP 2: Framework Selection
         base_framework = self.BASIC_FRAMEWORKS[hypothesis['suggested_structure']['base_framework']]
-        
+
         # STEP 3: Template Construction
         adaptive_template = self._construct_template(
             hypothesis=hypothesis,
             base_framework=base_framework,
             rag_context=rag_context
         )
-        
+
         return adaptive_template
-    
+
     async def _generate_hypothesis(
         self,
         user_query: str,
@@ -404,11 +404,11 @@ class AdaptiveTemplateGenerator:
         """
         LLM Call 1: Hypothesis Generation
         """
-        
+
         # Format RAG results
         rag_semantic = self._format_semantic_results(rag_context.get('semantic', []))
         rag_graph = self._format_graph_results(rag_context.get('graph', []))
-        
+
         # LLM Prompt
         prompt = HYPOTHESIS_GENERATION_PROMPT.format(
             user_query=user_query,
@@ -416,7 +416,7 @@ class AdaptiveTemplateGenerator:
             rag_process_graph=rag_graph,
             framework_ids=list(self.BASIC_FRAMEWORKS.keys())
         )
-        
+
         # Call Ollama (FAST, nur ~500 Tokens)
         response = await ollama_client.generate_response(
             OllamaRequest(
@@ -428,16 +428,16 @@ class AdaptiveTemplateGenerator:
             ),
             stream=False  # Kein Streaming für Hypothesis
         )
-        
+
         # Parse JSON
         hypothesis = json.loads(response.response)
-        
+
         logger.info(f"📊 Hypothesis: Confidence={hypothesis['confidence_estimate']}, "
                     f"Complexity={hypothesis['estimated_complexity']}, "
                     f"Tokens={hypothesis['recommended_token_budget']}")
-        
+
         return hypothesis
-    
+
     def _construct_template(
         self,
         hypothesis: Dict,
@@ -447,15 +447,15 @@ class AdaptiveTemplateGenerator:
         """
         Konstruiert adaptives Template aus Hypothesis + Framework
         """
-        
+
         # Start mit Base Framework
         sections = base_framework.structure['required_sections'].copy()
-        
+
         # Füge Hypothesis-basierte Sections hinzu
         for suggested_section in hypothesis['suggested_structure']['sections']:
             section_id = suggested_section['id']
             section_type = suggested_section['type']
-            
+
             # Konstruiere Section-Spec
             if section_type == 'interactive_form':
                 # Auto-generiere Form basierend auf missing_information
@@ -483,19 +483,19 @@ class AdaptiveTemplateGenerator:
                     'type': 'markdown',
                     'id': section_id
                 }
-            
+
             sections.append(section_spec)
-        
+
         # Sortiere nach Priority
         sections.sort(key=lambda s: suggested_section.get('priority', 999))
-        
+
         # Konstruiere System Prompt
         system_prompt = self._generate_system_prompt(
             hypothesis=hypothesis,
             sections=sections,
             base_framework=base_framework
         )
-        
+
         # Return Adaptive Template
         return AdaptiveTemplate(
             template_id=f"adaptive_{hash(user_query)}_{datetime.now().isoformat()}",
@@ -506,14 +506,14 @@ class AdaptiveTemplateGenerator:
             quality_checks=hypothesis['quality_checks_required'],
             confidence_estimate=hypothesis['confidence_estimate']
         )
-    
+
     def _create_interactive_form(self, missing_info: List[str]) -> Dict:
         """
         Auto-generiert Interactive Form aus fehlenden Informationen
-        
+
         Beispiel:
         missing_info = ["Bundesland nicht angegeben", "Carport-Größe fehlt"]
-        
+
         →
         {
           "type": "interactive_form",
@@ -523,9 +523,9 @@ class AdaptiveTemplateGenerator:
           ]
         }
         """
-        
+
         fields = []
-        
+
         for info in missing_info:
             # Einfaches Keyword-Matching (später NLP)
             if 'bundesland' in info.lower():
@@ -550,14 +550,14 @@ class AdaptiveTemplateGenerator:
                     'placeholder': 'z.B. 2.5m'
                 })
             # ... weitere Muster
-        
+
         return {
             'type': 'interactive_form',
             'title': 'Fehlende Informationen',
             'description': 'Bitte ergänze folgende Angaben für eine präzise Antwort:',
             'fields': fields
         }
-    
+
     def _generate_system_prompt(
         self,
         hypothesis: Dict,
@@ -567,7 +567,7 @@ class AdaptiveTemplateGenerator:
         """
         Generiert System Prompt aus Hypothesis + Sections
         """
-        
+
         prompt = f"""
 Du bist VERITAS, ein Experte für deutsches Verwaltungsrecht.
 
@@ -580,17 +580,17 @@ WICHTIG - HYPOTHESE-BASIERTE STRUKTUR:
 
 ANTWORT-STRUKTUR (ZWINGEND):
 """
-        
+
         for i, section in enumerate(sections, 1):
             prompt += f"\n{i}. {section.get('title', section['id'])} ({section['type']})"
-            
+
             if section['type'] == 'interactive_form':
                 prompt += "\n   → Erstelle interaktives Formular für fehlende Infos"
             elif section['type'] == 'process_graph':
                 prompt += "\n   → Zeige Prozess-Graph aus Neo4j RAG"
             elif section['type'] == 'table':
                 prompt += "\n   → Erstelle Vergleichstabelle"
-        
+
         prompt += f"""
 
 QUALITÄTS-CHECKS (während Generation):
@@ -608,7 +608,7 @@ OUTPUT-FORMAT (NDJSON Streaming):
 
 Beantworte jetzt die User-Frage.
 """
-        
+
         return prompt
 ```
 
@@ -622,32 +622,32 @@ class ResponseQualityMonitor:
     Überwacht LLM-Response während Streaming
     Prüft: Vollständigkeit, Accuracy, Konsistenz
     """
-    
+
     def __init__(self, hypothesis: Dict, rag_context: Dict):
         self.hypothesis = hypothesis
         self.rag_context = rag_context
         self.sections_completed = set()
         self.criteria_addressed = set()
         self.sources_cited = set()
-    
+
     async def check_chunk(self, chunk: Dict) -> QualityCheckResult:
         """
         Prüft einzelnen NDJSON-Chunk während Streaming
         """
-        
+
         chunk_type = chunk.get('type')
-        
+
         if chunk_type == 'section_end':
             section_id = chunk.get('section_id')
             self.sections_completed.add(section_id)
-            
+
         elif chunk_type == 'text_chunk':
             # Prüfe ob required_criteria erwähnt werden
             content = chunk.get('content', '')
             for criterion in self.hypothesis['required_criteria']:
                 if self._criterion_mentioned(criterion, content):
                     self.criteria_addressed.add(criterion)
-            
+
             # Prüfe RAG-Source-Citations
             sources = self._extract_sources(content)
             for source in sources:
@@ -661,11 +661,11 @@ class ResponseQualityMonitor:
                         details=f"Quelle '{source}' nicht in RAG-Kontext gefunden",
                         action="request_correction"
                     )
-        
+
         # Vollständigkeits-Check (am Ende)
         if chunk_type == 'response_end':
             completeness = len(self.criteria_addressed) / len(self.hypothesis['required_criteria'])
-            
+
             if completeness < 0.8:  # Weniger als 80% der Kriterien behandelt
                 return QualityCheckResult(
                     passed=False,
@@ -674,15 +674,15 @@ class ResponseQualityMonitor:
                     missing_criteria=set(self.hypothesis['required_criteria']) - self.criteria_addressed,
                     action="request_completion"
                 )
-        
+
         # Alles OK
         return QualityCheckResult(passed=True)
-    
+
     def get_final_quality_metrics(self) -> Dict:
         """
         Berechnet finale Qualitäts-Metriken
         """
-        
+
         return {
             'completeness': len(self.criteria_addressed) / len(self.hypothesis['required_criteria']),
             'accuracy': len(self.sources_cited) / max(1, len(self._extract_all_citations())),

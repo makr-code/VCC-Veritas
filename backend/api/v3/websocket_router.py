@@ -9,12 +9,22 @@ Features:
 - Bidirektionale Kommunikation
 """
 
+<<<<<<< Updated upstream
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query
 from typing import Dict, List, Optional, Set
 from datetime import datetime
 import json
 import asyncio
 import logging
+=======
+import asyncio
+import json
+import logging
+from datetime import datetime
+from typing import Any, Dict, List, Optional, Set
+
+from fastapi import APIRouter, Query, WebSocket, WebSocketDisconnect
+>>>>>>> Stashed changes
 from pydantic import BaseModel
 
 from backend.adapters.adapter_factory import get_database_adapter, is_themisdb_available, is_uds3_available
@@ -212,10 +222,17 @@ async def websocket_search(
                 start_time = datetime.now()
                 
                 try:
+<<<<<<< Updated upstream
                     # Adapter abrufen
                     adapter = await get_database_adapter()
                     adapter_name = "themis" if await is_themisdb_available() else "uds3"
                     
+=======
+                    # Adapter abrufen (synchrones factory-API)
+                    adapter = get_database_adapter()
+                    adapter_name = "themis" if is_themisdb_available() else "uds3"
+
+>>>>>>> Stashed changes
                     # Search Started
                     await websocket.send_json({
                         "type": "search_started",
@@ -330,14 +347,21 @@ async def websocket_adapter_status(
         while True:
             try:
                 # Adapter Status sammeln
+<<<<<<< Updated upstream
                 adapter = await get_database_adapter()
                 themis_available = await is_themisdb_available()
                 uds3_available = await is_uds3_available()
                 
+=======
+                adapter = get_database_adapter()
+                themis_available = is_themisdb_available()
+                uds3_available = is_uds3_available()
+
+>>>>>>> Stashed changes
                 current_adapter = "themis" if themis_available else "uds3"
                 
                 # Status-Nachricht
-                status_update = {
+                status_update: Dict[str, Any] = {
                     "type": "status_update",
                     "timestamp": datetime.now().isoformat(),
                     "current_adapter": current_adapter,

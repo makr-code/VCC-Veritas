@@ -6,17 +6,19 @@ Based on actual API from backend/pki/ca_service.py
 """
 
 import os
-import pytest
-import tempfile
 import shutil
+import tempfile
+
+import pytest
+
 from backend.pki.ca_service import CAService
 from backend.pki.cert_manager import CertificateManager
-from backend.pki.crypto_utils import generate_keypair, generate_csr
-
+from backend.pki.crypto_utils import generate_csr, generate_keypair
 
 # ============================================================================
 # Fixtures
 # ============================================================================
+
 
 @pytest.fixture
 def temp_storage():
@@ -46,11 +48,7 @@ def ca_service(temp_storage, cert_manager):
 def end_entity_csr():
     """Generate end-entity CSR"""
     private_key, _ = generate_keypair(2048)
-    csr = generate_csr(
-        private_key,
-        common_name="test.example.com",
-        organization="Test Corp"
-    )
+    csr = generate_csr(private_key, common_name="test.example.com", organization="Test Corp")
     return csr, private_key
 
 
@@ -58,30 +56,28 @@ def end_entity_csr():
 # Root CA Tests
 # ============================================================================
 
+
 class TestRootCA:
     """Test Root CA operations"""
-    
+
     def test_initialize_root_ca(self, ca_service):
         """Test Root CA initialization"""
-        ca_info = ca_service.initialize_root_ca(
-            common_name="Test Root CA",
-            validity_days=3650
-        )
-        
+        ca_info = ca_service.initialize_root_ca(common_name="Test Root CA", validity_days=3650)
+
         assert ca_info is not None
         assert isinstance(ca_info, dict)
         assert ca_info["common_name"] == "Test Root CA"
         assert "serial_number" in ca_info
         assert "key_size" in ca_info
-    
+
     def test_get_ca_certificate(self, ca_service):
         """Test get CA certificate"""
         # Initialize first
         ca_service.initialize_root_ca("Test Root CA", 3650)
-        
+
         # Get certificate
         ca_cert = ca_service.get_ca_certificate()
-        
+
         assert ca_cert is not None
         assert isinstance(ca_cert, bytes)
         assert b"BEGIN CERTIFICATE" in ca_cert
@@ -91,22 +87,19 @@ class TestRootCA:
 # CSR Signing Tests
 # ============================================================================
 
+
 class TestCSRSigning:
     """Test CSR signing"""
-    
+
     def test_sign_csr(self, ca_service, end_entity_csr):
         """Test CSR signing"""
         # Initialize CA
         ca_service.initialize_root_ca("Test Root CA", 3650)
-        
+
         # Sign CSR
         csr_pem, _ = end_entity_csr
-        cert_id, cert_pem = ca_service.sign_csr(
-            csr_pem=csr_pem,
-            validity_days=365,
-            is_ca=False
-        )
-        
+        cert_id, cert_pem = ca_service.sign_csr(csr_pem=csr_pem, validity_days=365, is_ca=False)
+
         assert cert_id is not None
         assert cert_pem is not None
         assert b"BEGIN CERTIFICATE" in cert_pem

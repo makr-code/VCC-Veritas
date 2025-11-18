@@ -1,6 +1,6 @@
 # VERITAS: Wissenschaftliches Pipeline-Konzept - Status & Analyse
-**Datum:** 16. Oktober 2025  
-**Analysiert von:** GitHub Copilot  
+**Datum:** 16. Oktober 2025
+**Analysiert von:** GitHub Copilot
 **Kontext:** Ursprüngliches wissenschaftliches Konzept vs. aktuelle Implementierung
 
 ---
@@ -49,18 +49,18 @@
 class HypothesisService:
     """
     Generiert strukturierte Hypothesen über Query-Intent
-    
+
     Features:
     - LLM-basierte Intent-Analyse
     - Information Gap Identification
     - Confidence Scoring
     - Clarification Questions
     """
-    
+
     def generate_hypothesis(query, rag_context) -> Hypothesis:
         """
         Analysiert Query und generiert Hypothese:
-        
+
         Returns:
             Hypothesis:
                 - question_type: QuestionType (FACTUAL, PROCEDURAL, etc.)
@@ -143,7 +143,7 @@ class StageReflection:
 async def process_intelligent_query(request):
     """
     WISSENSCHAFTLICHE PIPELINE MIT AGENT-ORCHESTRIERUNG
-    
+
     Stages:
     1. Query Analysis (→ Hypothese implizit)
     2. RAG Search (→ Informationsbeschaffung)
@@ -155,7 +155,7 @@ async def process_intelligent_query(request):
        └─ ...
     5. Result Aggregation (→ Synthese)
     6. LLM Synthesis (→ Konklusion)
-    
+
     Optional:
     - LLM Commentary pro Step
     - Stage Reflection (Meta-Analyse)
@@ -187,32 +187,32 @@ STEP_PROGRESS_MAPPING = {
 async def _process_streaming_query(session_id, query_id, request):
     """
     SSE-Stream mit wissenschaftlichen Stages:
-    
+
     1. Query Analysis → Hypothese
        progress_manager.update_stage(ANALYZING_QUERY)
-       
+
     2. (Optional) Hypothesis Reflection
        if enable_llm_thinking:
            hypothesis_reflection = await reflection_service.reflect_on_stage(
                stage=ReflectionStage.HYPOTHESIS,
                ...
            )
-    
+
     3. Agent Selection → Informationsbeschaffung
        progress_manager.update_stage(SELECTING_AGENTS)
-       
+
     4. Agent Execution → Parallele Analyse
        intelligent_pipeline._step_parallel_agent_execution()
-       
+
     5. Context Gathering → Informationskonsolidierung
        progress_manager.update_stage(GATHERING_CONTEXT)
-       
+
     6. LLM Reasoning (optional) → Meta-Analyse
        progress_manager.update_stage(LLM_REASONING)
-       
+
     7. Synthesis → Konklusion
        progress_manager.update_stage(SYNTHESIZING)
-       
+
     8. Finalization → Qualitätssicherung
        progress_manager.update_stage(FINALIZING)
     """
@@ -400,13 +400,13 @@ async def _process_streaming_query(...):
         query=request.query,
         rag_context=[]  # Ohne RAG-Kontext für reine Hypothese
     )
-    
+
     # Sende Hypothesis als Progress-Event
     progress_manager.add_hypothesis(
         session_id=session_id,
         hypothesis=hypothesis
     )
-    
+
     # DANN: Bestehende Pipeline fortsetzen
     # Stage 1: Query Analysis...
 ```
@@ -419,7 +419,7 @@ async def _process_streaming_query(...):
 def _synthesize_with_dialectic(agent_results):
     """
     Dialektische Synthese:
-    
+
     1. Thesis: Identifiziere Haupt-Aussagen der Agents
     2. Antithesis: Finde Widersprüche/Konflikte
     3. Synthesis: Löse Widersprüche auf (LLM)
@@ -438,11 +438,11 @@ def _synthesize_with_dialectic(agent_results):
 async def _peer_review_validation(final_response):
     """
     Multi-LLM Peer Review:
-    
+
     1. Reviewer 1: llama3.1:8b
     2. Reviewer 2: mixtral:latest
     3. Reviewer 3: gemma3:latest
-    
+
     Consensus: Mindestens 2/3 müssen zustimmen
     """
     reviews = await asyncio.gather(
@@ -516,17 +516,17 @@ Die **dialektische Methode** nach Hegel folgt dem Dreischritt:
 class DialecticalSynthesisService:
     """
     Dialektische Synthese für wissenschaftliche Antwort-Generierung
-    
+
     Prozess:
     1. Extraction: Extrahiere Kern-Aussagen (Thesen) aus Agent-Results
     2. Contradiction Detection: Identifiziere Widersprüche (Antithesen)
     3. Synthesis: LLM löst Widersprüche auf höherer Abstraktionsebene auf
     """
-    
+
     def synthesize(self, agent_results: List[AgentResult]) -> DialecticalSynthesis:
         """
         Führt dialektische Synthese durch
-        
+
         Returns:
             DialecticalSynthesis:
                 - theses: List[Thesis] - Extrahierte Kern-Aussagen
@@ -557,7 +557,7 @@ class Contradiction:
     contradiction_type: str     # "legal", "factual", "temporal", "regional"
     severity: str               # "critical", "moderate", "minor"
     description: str            # Was widerspricht sich?
-    
+
 @dataclass
 class DialecticalSynthesis:
     """Ergebnis der dialektischen Synthese"""
@@ -640,22 +640,22 @@ Format: Strukturierte Antwort mit Begründung
 # STAGE 4.1: Dialektische Analyse (NEU)
 if VERITAS_SCIENTIFIC_MODE:
     dialectical_service = DialecticalSynthesisService(ollama_client)
-    
+
     # Extrahiere Thesen
     theses = dialectical_service.extract_theses(agent_results)
     progress_manager.add_message(session_id, "📚 Thesen extrahiert: " + str(len(theses)))
-    
+
     # Identifiziere Widersprüche
     contradictions = dialectical_service.detect_contradictions(theses)
     if contradictions:
         progress_manager.add_message(
-            session_id, 
+            session_id,
             f"⚠️ {len(contradictions)} Widersprüche identifiziert"
         )
-    
+
     # Synthese
     dialectical_result = dialectical_service.synthesize(theses, contradictions)
-    
+
     # Update Final Response
     final_response = dialectical_result.synthesis
     metadata['dialectical_analysis'] = {
@@ -691,29 +691,29 @@ else:
 class PeerReviewValidationService:
     """
     Multi-LLM Peer-Review für wissenschaftliche Validierung
-    
+
     Prozess:
     1. Independent Review: Jedes LLM bewertet die Response unabhängig
     2. Review Criteria: Faktentreue, Vollständigkeit, Kohärenz, Rechtskonformität
     3. Consensus Calculation: Berechne Übereinstimmung (0-1)
     4. Conflict Resolution: Bei Uneinigkeit → Tiefenanalyse
     """
-    
+
     def __init__(self):
         self.reviewers = [
             ("llama3.1:8b", "Generalist, stark in Rechtsfragen"),
             ("mixtral:latest", "Multi-lingual, ausgewogen"),
             ("gemma3:latest", "Faktenfokussiert, konservativ")
         ]
-    
-    async def peer_review(self, 
+
+    async def peer_review(self,
                          query: str,
                          final_response: str,
                          agent_results: List[AgentResult],
                          sources: List[str]) -> PeerReviewResult:
         """
         Führt Multi-LLM Peer-Review durch
-        
+
         Returns:
             PeerReviewResult:
                 - reviews: List[Review] - Einzelne Reviews
@@ -737,7 +737,7 @@ class Review:
     weaknesses: List[str]       # Was fehlt/ist falsch?
     recommendation: str         # "approve", "revise", "reject"
     comments: str               # Detaillierte Begründung
-    
+
 @dataclass
 class ReviewConflict:
     """Uneinigkeit zwischen Reviewern"""
@@ -747,7 +747,7 @@ class ReviewConflict:
     reviewer_b: str
     score_b: float
     difference: float           # Wie groß ist die Differenz?
-    
+
 @dataclass
 class PeerReviewResult:
     """Gesamt-Ergebnis des Peer-Reviews"""
@@ -855,9 +855,9 @@ Format: JSON mit Review-Objekt
 if VERITAS_SCIENTIFIC_MODE:
     progress_manager.update_stage(session_id, ProgressStage.VALIDATING)
     progress_manager.add_message(session_id, "🔍 Starte Multi-LLM Peer-Review...")
-    
+
     peer_review_service = PeerReviewValidationService()
-    
+
     # Führe parallele Reviews durch (3 LLMs)
     review_result = await peer_review_service.peer_review(
         query=request.query,
@@ -865,14 +865,14 @@ if VERITAS_SCIENTIFIC_MODE:
         agent_results=agent_results,
         sources=sources
     )
-    
+
     # Sende Review-Status
     progress_manager.add_message(
         session_id,
         f"📊 Consensus Score: {review_result.consensus_score:.2f} | "
         f"Status: {review_result.approval_status}"
     )
-    
+
     # Bei niedrigem Consensus oder Ablehnung → Warnung
     if review_result.approval_status == "rejected":
         progress_manager.add_message(
@@ -881,22 +881,22 @@ if VERITAS_SCIENTIFIC_MODE:
         )
         # Optional: Revision-Loop starten
         final_response = await _revise_response(
-            final_response, 
+            final_response,
             review_result.recommendations
         )
-    
+
     elif review_result.approval_status == "conditional":
         progress_manager.add_message(
             session_id,
             f"⚠️ Peer-Review MIT VORBEHALTEN - {len(review_result.conflicts)} Konflikte"
         )
-    
+
     else:
         progress_manager.add_message(
             session_id,
             "✅ Peer-Review BESTANDEN - Hohe Übereinstimmung"
         )
-    
+
     # Füge Review-Metadaten zur Response hinzu
     metadata['peer_review'] = {
         'consensus_score': review_result.consensus_score,
@@ -961,7 +961,7 @@ if (response.metadata.scientific_mode) {
             resolution: response.metadata.dialectical_analysis.resolution_strategy
         });
     }
-    
+
     // Zeige Peer-Review-Status
     if (response.metadata.peer_review) {
         showPeerReviewBadge({
@@ -1032,6 +1032,6 @@ FINAL RESPONSE (wissenschaftlich validiert)
 
 ---
 
-**Aktualisiert am:** 16. Oktober 2025  
-**Version:** VERITAS Backend v1.1.0-scientific  
+**Aktualisiert am:** 16. Oktober 2025
+**Version:** VERITAS Backend v1.1.0-scientific
 **Status:** Konzept erweitert, Implementation in Arbeit

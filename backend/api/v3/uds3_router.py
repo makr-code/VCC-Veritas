@@ -13,8 +13,16 @@ Status: Implementation
 from fastapi import APIRouter, Request, HTTPException, Query as QueryParam
 from typing import Dict, Any, List, Optional
 from datetime import datetime
+<<<<<<< Updated upstream
 import uuid
 import time
+=======
+from typing import Any, Dict, List, Optional, cast
+
+from fastapi import APIRouter, HTTPException
+from fastapi import Query as QueryParam
+from fastapi import Request
+>>>>>>> Stashed changes
 
 from backend.api.v3.models import (
     UDS3QueryRequest, UDS3QueryResponse,
@@ -267,6 +275,7 @@ async def vector_search(
         ]
         
         # Filter by threshold
+<<<<<<< Updated upstream
         results = [r for r in results if r["score"] >= search_req.similarity_threshold]
         
         duration = time.time() - start_time
@@ -274,6 +283,35 @@ async def vector_search(
         return VectorSearchResponse(
             results=results[:search_req.top_k],
             count=len(results[:search_req.top_k]),
+=======
+        try:
+            threshold_val = float(search_req.similarity_threshold)
+        except Exception:
+            threshold_val = 0.0
+
+        filtered_results = []
+        for r in results:
+            try:
+                r_score = cast(Any, r.get("score", 0.0))
+                r_score_val = float(r_score)
+            except Exception:
+                r_score_val = 0.0
+            if r_score_val >= threshold_val:
+                filtered_results.append(r)
+
+        results = filtered_results
+
+        duration = time.time() - start_time
+
+        try:
+            top_k_val = int(search_req.top_k)
+        except Exception:
+            top_k_val = 5
+
+        return VectorSearchResponse(
+            results=results[:top_k_val],
+            count=len(results[:top_k_val]),
+>>>>>>> Stashed changes
             query_vector=search_req.query_vector,
             duration=duration
         )

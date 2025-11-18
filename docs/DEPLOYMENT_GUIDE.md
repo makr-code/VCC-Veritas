@@ -224,10 +224,10 @@ kubectl logs -f deployment/veritas-api -n veritas-production
 **API Deployment** (`k8s/deployment-api.yaml`):
 - **Replicas**: 3 (production), 1 (staging)
 - **Strategy**: RollingUpdate (maxSurge: 1, maxUnavailable: 0)
-- **Resources**: 
+- **Resources**:
   - Requests: 500m CPU, 512Mi RAM
   - Limits: 2000m CPU, 2Gi RAM
-- **Probes**: 
+- **Probes**:
   - Liveness: HTTP GET `/api/v1/health` (30s delay, 10s interval)
   - Readiness: HTTP GET `/api/v1/health` (10s delay, 5s interval)
 
@@ -690,7 +690,7 @@ replicas: 5
 env:
   - name: WORKER_CONCURRENCY
     value: "8"
-  
+
 # Add more workers
 replicas: 4
 ```

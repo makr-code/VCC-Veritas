@@ -1,6 +1,6 @@
 # Hamburger-Menü & Export Test-Guide
 
-**Datum:** 12. Oktober 2025  
+**Datum:** 12. Oktober 2025
 **Status:** Debugging
 
 ## Problem-Beschreibung
@@ -213,6 +213,6 @@ Wenn Problem weiterhin besteht:
 
 ---
 
-**Datum:** 12. Oktober 2025  
-**Version:** VERITAS v3.19.0  
+**Datum:** 12. Oktober 2025
+**Version:** VERITAS v3.19.0
 **Status:** Code ist korrekt - User-Test erforderlich

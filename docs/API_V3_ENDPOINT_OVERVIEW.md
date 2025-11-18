@@ -1,7 +1,7 @@
 # 📊 API v3 - Endpoint Übersicht
 
-**Datum:** 17. Oktober 2025  
-**Version:** 3.0  
+**Datum:** 17. Oktober 2025
+**Version:** 3.0
 **Status:** Proposal
 
 ---
@@ -251,6 +251,6 @@ await client.governance_access_grant(
 
 ---
 
-**Erstellt:** 17. Oktober 2025, 21:50 Uhr  
-**Version:** 1.0  
+**Erstellt:** 17. Oktober 2025, 21:50 Uhr
+**Version:** 1.0
 **Status:** ✅ Ready for Implementation

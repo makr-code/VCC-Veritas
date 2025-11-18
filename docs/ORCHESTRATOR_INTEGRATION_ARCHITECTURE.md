@@ -1,7 +1,7 @@
 # ORCHESTRATOR INTEGRATION ARCHITECTURE
 
-**Projekt:** VERITAS v5.0 - Dependency-Driven Process Tree ↔ Agent Orchestrator Integration  
-**Erstellt:** 12. Oktober 2025, 20:10 Uhr  
+**Projekt:** VERITAS v5.0 - Dependency-Driven Process Tree ↔ Agent Orchestrator Integration
+**Erstellt:** 12. Oktober 2025, 20:10 Uhr
 **Status:** 🟡 Design Phase - Integration Strategy
 
 ---
@@ -191,7 +191,7 @@
    def plan_execution(self, query: str) -> UnifiedExecutionPlan:
        """
        Analyze query → Create dual-track plan
-       
+
        Returns:
        {
            "generic_steps": [  # For ProcessExecutor
@@ -217,10 +217,10 @@
        """
        # Create ProcessTree for generic steps
        process_tree = self._create_process_tree(plan.generic_steps)
-       
+
        # Create AgentPipeline for agent tasks
        agent_pipeline = self._create_agent_pipeline(plan.agent_tasks)
-       
+
        # Execute both in parallel with dependency coordination
        process_future = asyncio.create_task(
            self.process_executor.execute_process(process_tree)
@@ -228,24 +228,24 @@
        agent_future = asyncio.create_task(
            self.agent_orchestrator.execute_pipeline(agent_pipeline)
        )
-       
+
        # Coordinate execution (wait for dependencies across systems)
        results = await self._coordinate_execution(process_future, agent_future, plan.dependencies)
-       
+
        return results
    ```
 
 3. **Result Synchronization:**
    ```python
    async def _coordinate_execution(
-       self, 
-       process_future, 
-       agent_future, 
+       self,
+       process_future,
+       agent_future,
        cross_dependencies: Dict[str, List[str]]
    ) -> Dict[str, Any]:
        """
        Coordinate execution when steps depend on results from other system
-       
+
        Example:
        - "hypothesis" step needs: nlp (process) + rag (process) + env_agent (agent)
        - Wait for all 3 to complete before starting hypothesis
@@ -266,29 +266,29 @@ class ResultAggregator:
     """
     Aggregate results from ProcessExecutor and AgentOrchestrator
     """
-    
+
     def aggregate_results(
-        self, 
+        self,
         process_results: Dict[str, Any],
         agent_results: Dict[str, Any]
     ) -> AggregatedResult:
         """
         Merge results from both systems
-        
+
         Handle:
         - Duplicate data (same info from process RAG + database agent)
         - Confidence scores (which source is more reliable?)
         - Schema mapping (process result → agent result format)
         """
         pass
-    
+
     def resolve_conflicts(
-        self, 
+        self,
         sources: List[ResultSource]
     ) -> ResolvedResult:
         """
         Resolve conflicts when multiple sources provide same data
-        
+
         Strategy:
         - Highest confidence wins
         - Agent results preferred over generic process (domain expertise)
@@ -310,11 +310,11 @@ class ExecutionPlanBuilder:
     """
     Analyze user query → Decide which steps go where
     """
-    
+
     def build_plan(self, query: str, hypothesis: Hypothesis) -> UnifiedExecutionPlan:
         """
         Decision Logic:
-        
+
         Generic Steps (ProcessExecutor):
         - NLP Analysis (always)
         - RAG Semantic Search (always)
@@ -322,7 +322,7 @@ class ExecutionPlanBuilder:
         - Hypothesis Generation (always)
         - Template Construction (always)
         - LLM Response Generation (always)
-        
+
         Agent Tasks (AgentOrchestrator):
         - Domain-Specific Processing (if hypothesis.domain in [environmental, financial, ...])
         - Database Queries (if hypothesis.requires_exact_data)
@@ -330,16 +330,16 @@ class ExecutionPlanBuilder:
         - Authority Mapping (if hypothesis.requires_legal_references)
         - Wikipedia Agent (if hypothesis.requires_general_knowledge)
         """
-        
+
         plan = UnifiedExecutionPlan()
-        
+
         # Always add generic pipeline
         plan.add_generic_steps([
             {"step_id": "nlp", "type": "nlp_analysis"},
             {"step_id": "rag_semantic", "type": "rag_retrieval", "depends_on": ["nlp"]},
             {"step_id": "hypothesis", "type": "hypothesis_generation", "depends_on": ["rag_*"]}
         ])
-        
+
         # Conditionally add agent tasks
         if hypothesis.domain == QueryDomain.ENVIRONMENTAL:
             plan.add_agent_task({
@@ -348,7 +348,7 @@ class ExecutionPlanBuilder:
                 "depends_on": ["nlp"],  # Can run in parallel with RAG!
                 "parallel_group": "domain_processing"
             })
-        
+
         if hypothesis.requires_exact_data:
             plan.add_agent_task({
                 "task_id": "db_agent",
@@ -356,7 +356,7 @@ class ExecutionPlanBuilder:
                 "depends_on": ["nlp"],
                 "parallel_group": "domain_processing"
             })
-        
+
         return plan
 ```
 
@@ -804,28 +804,28 @@ class UnifiedOrchestrator:
     """
     Unified orchestration layer for generic steps and agent tasks
     """
-    
+
     def __init__(self):
         self.process_executor = ProcessExecutor()
         self.agent_orchestrator = AgentOrchestrator()
         self.plan_builder = ExecutionPlanBuilder()
         self.result_aggregator = ResultAggregator()
-    
+
     async def execute_query(self, query: str) -> Dict[str, Any]:
         """
         Main entry point: Execute query across both systems
         """
         # 1. Build unified plan
         plan = self.plan_builder.build_plan(query)
-        
+
         # 2. Execute dual-track
         results = await self._execute_dual_track(plan)
-        
+
         # 3. Aggregate results
         aggregated = self.result_aggregator.aggregate_results(results)
-        
+
         return aggregated
-    
+
     async def _execute_dual_track(self, plan):
         """Execute process steps and agent tasks with dependency coordination"""
         pass
@@ -845,10 +845,10 @@ from backend.services.unified_orchestrator import UnifiedOrchestrator
 async def test_simple_query_generic_only():
     """Test query that only uses generic steps (no agents)"""
     orchestrator = UnifiedOrchestrator()
-    
+
     query = "What is 2+2?"
     result = await orchestrator.execute_query(query)
-    
+
     assert "nlp" in result
     assert "llm_answer" in result
     # No agent results expected
@@ -857,18 +857,18 @@ async def test_simple_query_generic_only():
 async def test_complex_query_mixed_execution():
     """Test query that uses both generic steps and agents"""
     orchestrator = UnifiedOrchestrator()
-    
+
     query = "Wie ist die Luftqualität in Berlin?"
     result = await orchestrator.execute_query(query)
-    
+
     # Should have generic results
     assert "nlp" in result
     assert "rag_semantic" in result
-    
+
     # Should have agent results
     assert "env_agent" in result
     assert "db_agent" in result
-    
+
     # Should be aggregated
     assert "environmental_data" in result
     assert result["environmental_data"]["air_quality_index"] is not None
@@ -960,15 +960,15 @@ results = await unified.execute_query(query)
    - User guide
    - Migration guide
 
-**Total Timeline:** 7-10 Tage (Integration only)  
+**Total Timeline:** 7-10 Tage (Integration only)
 **Combined with v5.0:** 25-35 Tage (with overlap: 20-28 Tage)
 
 ---
 
 **STATUS:** 🟢 **READY FOR INTEGRATION PHASE**
 
-**Created:** 12. Oktober 2025, 20:10 Uhr  
-**Integration Effort:** ~3,050 LOC in 7-10 Tagen  
+**Created:** 12. Oktober 2025, 20:10 Uhr
+**Integration Effort:** ~3,050 LOC in 7-10 Tagen
 **Combined Effort (v5.0 + Integration):** ~10,500 LOC in 20-28 Tagen
 
 ---

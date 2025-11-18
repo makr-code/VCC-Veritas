@@ -75,7 +75,7 @@ Die Prompts werden aus `config/mcp_prompts.json` geladen. Aktuell verfügbar:
    - Parameter: `fragestellung` (str), `kontext` (str, optional)
    - Beschreibung: Verwaltungsrechtliche Prüfung
 
-**Hinweis:** Prompts können einfach durch Bearbeiten von `config/mcp_prompts.json` 
+**Hinweis:** Prompts können einfach durch Bearbeiten von `config/mcp_prompts.json`
 angepasst oder erweitert werden, ohne den Code zu ändern.
 
 ## Prompt-Konfiguration

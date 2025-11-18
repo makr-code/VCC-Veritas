@@ -7,7 +7,7 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
 
-from backend.agents.veritas_ollama_client import VeritasOllamaClient, OllamaRequest
+from backend.agents.veritas_ollama_client import OllamaRequest, VeritasOllamaClient
 
 
 async def main() -> None:

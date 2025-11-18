@@ -3,6 +3,17 @@ FastAPI Router für SQLite-Datenbank-Zugriff
 Bietet einheitlichen Zugriff auf BImSchG und WKA Datenbanken
 """
 
+<<<<<<< Updated upstream
+=======
+import re
+import sqlite3
+from collections import Counter
+from datetime import datetime
+from functools import lru_cache
+from pathlib import Path
+from typing import Any, Dict, List, Literal, Optional, cast
+
+>>>>>>> Stashed changes
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 from typing import List, Dict, Any, Optional, Literal
@@ -167,6 +178,7 @@ def get_table_schema(db_name: str) -> List[ColumnInfo]:
     
     schema = []
     for col in columns:
+<<<<<<< Updated upstream
         schema.append(ColumnInfo(
             name=col["name"],
             type=col["type"],
@@ -174,6 +186,20 @@ def get_table_schema(db_name: str) -> List[ColumnInfo]:
             primary_key=bool(col["pk"])
         ))
     
+=======
+        # sqlite3.Row can act both like a sequence and a mapping; convert to a dict
+        # so static type checkers see a concrete Mapping[str, Any].
+        col_dict = dict(col)
+        schema.append(
+            ColumnInfo(
+                name=col_dict.get("name"),
+                type=col_dict.get("type"),
+                not_null=bool(col_dict.get("notnull")),
+                primary_key=bool(col_dict.get("pk")),
+            )
+        )
+
+>>>>>>> Stashed changes
     conn.close()
     return schema
 
@@ -217,6 +243,7 @@ async def list_databases():
         if available:
             try:
                 size_mb = info["path"].stat().st_size / (1024 * 1024)
+<<<<<<< Updated upstream
             except:
                 pass
         
@@ -233,6 +260,25 @@ async def list_databases():
         databases=db_list,
         total=len(db_list)
     )
+=======
+            except Exception:
+                # If we cannot stat the file, leave size as None. Avoid silently
+                # swallowing errors with a bare pass to satisfy bandit checks.
+                size_mb = None
+
+        db_list.append(
+            DatabaseInfo(
+                name=name,
+                description=info["description"],
+                table_name=info["table"],
+                row_count=info["count"],
+                available=available,
+                size_mb=size_mb,
+            )
+        )
+
+    return DatabaseListResponse(databases=db_list, total=len(db_list))
+>>>>>>> Stashed changes
 
 
 @router.get("/status")
@@ -496,6 +542,7 @@ async def get_statistics(
     # Datenbank-spezifische Statistiken
     if db_name == "wka":
         # WKA-spezifisch
+<<<<<<< Updated upstream
         stats["total_leistung_mw"] = cursor.execute(
             f"SELECT SUM(leistung) FROM {table_name}"
         ).fetchone()[0] or 0
@@ -526,6 +573,35 @@ async def get_statistics(
             name = row["anlgr_4bv"][:50] if row["anlgr_4bv"] else "unknown"
             stats["anlagenarten"][name] = row["count"]
     
+=======
+        stats["total_leistung_mw"] = cursor.execute(SQL_TEMPLATES[db_name]["sum_leistung"]).fetchone()[0] or 0
+
+        stats["avg_nabenhoehe"] = cursor.execute(SQL_TEMPLATES[db_name]["avg_nabenhoehe"]).fetchone()[0] or 0
+        # build a typed mapping first to satisfy static type checkers
+        # Use Counter for typed, incremental counting to satisfy static checkers
+        status_breakdown: Counter[str] = Counter()
+        status_rows = cursor.execute(SQL_TEMPLATES[db_name]["status_group"].format(table=table_name)).fetchall()
+        for row in status_rows:
+            r = dict(row)
+            key = r.get("status") or "unknown"
+            status_breakdown[key] += int(r.get("count", 0))
+        # Convert to plain dict for JSON/Pydantic compatibility
+        stats["status_breakdown"] = dict(status_breakdown)
+
+    elif db_name == "bimschg":
+        # BImSchG-spezifisch
+        stats["avg_leistung"] = cursor.execute(SQL_TEMPLATES[db_name]["avg_leistung"]).fetchone()[0] or 0
+    anlagenarten: Counter[str] = Counter()
+    art_rows = cursor.execute(SQL_TEMPLATES[db_name]["anlagenarten"].format(table=table_name)).fetchall()
+    for row in art_rows:
+        r = dict(row)
+        # Kürze lange Namen (sicherer Zugriff)
+        raw_name = r.get("anlgr_4bv") or "unknown"
+        name = raw_name[:50]
+        anlagenarten[name] += int(r.get("count", 0))  # ensure int
+    stats["anlagenarten"] = dict(anlagenarten)
+
+>>>>>>> Stashed changes
     conn.close()
     
     return StatisticsResponse(
@@ -541,19 +617,36 @@ async def database_health():
     """
     Health Check für Datenbank-Service
     """
+<<<<<<< Updated upstream
     health = {
         "service": "database",
         "status": "healthy",
         "databases": {}
     }
     
+=======
+    # typed containers to satisfy static type checkers
+    health: Dict[str, Any] = {"service": "database", "status": "healthy"}
+    databases_status: Dict[str, str] = {}
+    overall_status: str = "healthy"
+
+>>>>>>> Stashed changes
     for name, info in DATABASES.items():
         try:
             conn = get_db_connection(name)
             conn.close()
-            health["databases"][name] = "ok"
+            databases_status[name] = "ok"
         except Exception as e:
+<<<<<<< Updated upstream
             health["databases"][name] = f"error: {str(e)}"
             health["status"] = "degraded"
     
+=======
+            databases_status[name] = f"error: {str(e)}"
+            overall_status = "degraded"
+
+    health["databases"] = databases_status
+    health["status"] = overall_status
+
+>>>>>>> Stashed changes
     return health

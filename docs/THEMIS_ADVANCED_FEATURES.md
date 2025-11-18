@@ -1,7 +1,7 @@
 # ThemisDB Adapter - Advanced Features Implementation Guide
 
-**Datum:** 7. November 2025  
-**Version:** 1.0  
+**Datum:** 7. November 2025
+**Version:** 1.0
 **Status:** Planung & Implementierung
 
 ---
@@ -84,12 +84,12 @@ def get_user_or_ip(request: Request) -> str:
     if hasattr(request.state, "user") and request.state.user:
         user_id = request.state.user.get("sub")  # JWT subject
         return f"user:{user_id}"
-    
+
     # Option 2: API Key
     api_key = request.headers.get("X-API-Key")
     if api_key:
         return f"apikey:{api_key}"
-    
+
     # Fallback: IP Address
     return f"ip:{get_remote_address(request)}"
 
@@ -191,7 +191,7 @@ def tier_based_limit(endpoint_name: str):
         async def wrapper(request: Request, *args, **kwargs):
             user_tier = request.state.user.get("tier", UserTier.FREE)
             limit = TIER_LIMITS[user_tier]
-            
+
             # Dynamisches Rate Limiting
             limiter.limit(limit)(func)
             return await func(request, *args, **kwargs)
@@ -231,11 +231,11 @@ from fastapi.testclient import TestClient
 
 def test_rate_limit_exceeded():
     client = TestClient(app)
-    
+
     # Sende 11 Requests (Limit: 10/minute)
     for i in range(11):
         response = client.post("/api/v3/themis/vector/search", json={...})
-        
+
         if i < 10:
             assert response.status_code == 200
         else:
@@ -355,7 +355,7 @@ async def vector_search_v4(query: VectorSearchRequestV4):
     async def event_generator():
         async for result in adapter.vector_search_stream(...):
             yield {"event": "result", "data": result}
-    
+
     return EventSourceResponse(event_generator())
 
 # V4: Neue Required Fields
@@ -380,7 +380,7 @@ async def check_api_version(x_api_version: str = Header(None)):
     if x_api_version == "v3":
         sunset_date = datetime(2026, 12, 31)
         days_remaining = (sunset_date - datetime.now()).days
-        
+
         if days_remaining < 90:
             # Warning in Response Header
             return {
@@ -388,7 +388,7 @@ async def check_api_version(x_api_version: str = Header(None)):
                 "X-API-Sunset-Date": sunset_date.isoformat(),
                 "X-API-Sunset-Days": str(days_remaining)
             }
-    
+
     return {}
 
 # Verwendung
@@ -454,25 +454,25 @@ def setup_tracing(app, service_name: str = "veritas-backend"):
         "service.version": "4.0.0",
         "deployment.environment": "production"
     })
-    
+
     # Tracer Provider
     provider = TracerProvider(resource=resource)
     trace.set_tracer_provider(provider)
-    
+
     # Jaeger Exporter
     jaeger_exporter = JaegerExporter(
         agent_host_name="localhost",
         agent_port=6831,
     )
-    
+
     # Batch Processor (bessere Performance)
     span_processor = BatchSpanProcessor(jaeger_exporter)
     provider.add_span_processor(span_processor)
-    
+
     # Auto-Instrumentation
     FastAPIInstrumentor.instrument_app(app)  # Alle Endpoints
     HTTPXClientInstrumentor().instrument()   # HTTP-Calls zu ThemisDB
-    
+
     return trace.get_tracer(__name__)
 
 # Global Tracer
@@ -516,20 +516,20 @@ class ThemisDBAdapter:
             # Child Span für HTTP Request
             with tracer.start_as_current_span("http.post"):
                 response = await self.client.post("/api/vector/search", ...)
-                
+
                 # Span Attributes
                 span.set_attribute("http.status_code", response.status_code)
                 span.set_attribute("http.response_time_ms", elapsed_ms)
-                
+
                 if response.status_code >= 400:
                     span.set_status(Status(StatusCode.ERROR))
                     span.record_exception(Exception(response.text))
-            
+
             # Child Span für Post-Processing
             with tracer.start_as_current_span("process_results"):
                 results = self._process_response(response.json())
                 span.set_attribute("results.count", len(results))
-            
+
             return results
 ```
 
@@ -544,7 +544,7 @@ async def call_external_service():
     """
     headers = {}
     inject(headers)  # Fügt traceparent/tracestate hinzu
-    
+
     response = await httpx.post(
         "https://external-api.com/endpoint",
         headers=headers  # Trace Context wird weitergegeben
@@ -574,9 +574,9 @@ services:
 
 ### 4.1 Metriken-Typen
 
-**Counter:** Monoton steigende Werte (Requests, Errors)  
-**Gauge:** Aktueller Wert (Connections, Queue Size)  
-**Histogram:** Verteilung (Latency, Response Size)  
+**Counter:** Monoton steigende Werte (Requests, Errors)
+**Gauge:** Aktueller Wert (Connections, Queue Size)
+**Histogram:** Verteilung (Latency, Response Size)
 **Summary:** Quantile (p50, p95, p99)
 
 ### 4.2 Installation
@@ -656,9 +656,9 @@ def setup_metrics(app):
         inprogress_name="http_requests_inprogress",
         inprogress_labels=True
     )
-    
+
     instrumentator.instrument(app).expose(app, endpoint="/metrics")
-    
+
     # Adapter Info setzen
     adapter_info.info({
         "version": "1.0.0",
@@ -684,22 +684,22 @@ class ThemisDBAdapter:
     async def vector_search(self, query: str, top_k: int, **kwargs):
         start_time = time.time()
         status = "success"
-        
+
         try:
             adapter_connections.labels(adapter="themis").inc()
-            
+
             # Query Size Tracking
             query_size = len(query.encode('utf-8'))
             themis_query_size_bytes.observe(query_size)
-            
+
             response = await self.client.post(...)
-            
+
             return response.json()
-            
+
         except Exception as e:
             status = "error"
             raise
-        
+
         finally:
             # Latency Histogram
             duration = time.time() - start_time
@@ -707,14 +707,14 @@ class ThemisDBAdapter:
                 adapter="themis",
                 operation="vector_search"
             ).observe(duration)
-            
+
             # Request Counter
             adapter_requests_total.labels(
                 adapter="themis",
                 operation="vector_search",
                 status=status
             ).inc()
-            
+
             adapter_connections.labels(adapter="themis").dec()
 ```
 
@@ -732,7 +732,7 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:8000']
     metrics_path: '/metrics'
-    
+
   - job_name: 'themis-db'
     static_configs:
       - targets: ['localhost:8765']
@@ -748,11 +748,11 @@ scrape_configs:
 rate(adapter_requests_total[5m])
 
 # Error Rate
-rate(adapter_requests_total{status="error"}[5m]) 
+rate(adapter_requests_total{status="error"}[5m])
   / rate(adapter_requests_total[5m])
 
 # P95 Latency
-histogram_quantile(0.95, 
+histogram_quantile(0.95,
   rate(adapter_latency_seconds_bucket[5m]))
 
 # Active Connections
@@ -837,7 +837,7 @@ class VectorSearchInput:
 class Query:
     @strawberry.field
     async def vector_search(
-        self, 
+        self,
         input: VectorSearchInput
     ) -> List[VectorSearchResult]:
         """
@@ -850,7 +850,7 @@ class Query:
             collection=input.collection,
             threshold=input.threshold
         )
-        
+
         return [
             VectorSearchResult(
                 document_id=r["id"],
@@ -860,7 +860,7 @@ class Query:
             )
             for r in results
         ]
-    
+
     @strawberry.field
     async def graph_traverse(
         self,
@@ -877,7 +877,7 @@ class Query:
             edge_collection=edge_collection,
             max_depth=max_depth
         )
-        
+
         return [
             GraphNode(
                 id=node["_key"],
@@ -886,7 +886,7 @@ class Query:
             )
             for node in result.get("vertices", [])
         ]
-    
+
     @strawberry.field
     async def adapter_status(self) -> List[AdapterStatus]:
         """
@@ -973,7 +973,7 @@ query Dashboard {
     queryCount
     avgLatencyMs
   }
-  
+
   recentSearches: vectorSearch(input: {
     query: "recent updates"
     topK: 3
@@ -1065,23 +1065,23 @@ websocket_router = APIRouter(prefix="/ws", tags=["WebSocket"])
 class ConnectionManager:
     def __init__(self):
         self.active_connections: Dict[str, List[WebSocket]] = {}
-    
+
     async def connect(self, websocket: WebSocket, client_id: str):
         await websocket.accept()
         if client_id not in self.active_connections:
             self.active_connections[client_id] = []
         self.active_connections[client_id].append(websocket)
-    
+
     def disconnect(self, websocket: WebSocket, client_id: str):
         self.active_connections[client_id].remove(websocket)
         if not self.active_connections[client_id]:
             del self.active_connections[client_id]
-    
+
     async def send_personal_message(self, message: dict, client_id: str):
         if client_id in self.active_connections:
             for connection in self.active_connections[client_id]:
                 await connection.send_json(message)
-    
+
     async def broadcast(self, message: dict):
         for client_connections in self.active_connections.values():
             for connection in client_connections:
@@ -1094,14 +1094,14 @@ manager = ConnectionManager()
 async def websocket_search(websocket: WebSocket, client_id: str):
     """
     Real-time vector search mit Streaming Results
-    
+
     Client sendet:
     {
       "action": "search",
       "query": "machine learning",
       "top_k": 10
     }
-    
+
     Server streamt:
     {
       "type": "result",
@@ -1110,27 +1110,27 @@ async def websocket_search(websocket: WebSocket, client_id: str):
     }
     """
     await manager.connect(websocket, client_id)
-    
+
     try:
         while True:
             # Warte auf Client Message
             data = await websocket.receive_json()
-            
+
             if data["action"] == "search":
                 query = data["query"]
                 top_k = data.get("top_k", 5)
-                
+
                 # Adapter Query
                 adapter = await get_database_adapter()
-                
+
                 # Streaming Response
                 await websocket.send_json({
                     "type": "search_started",
                     "query": query
                 })
-                
+
                 results = await adapter.vector_search(query, top_k)
-                
+
                 for i, result in enumerate(results):
                     await websocket.send_json({
                         "type": "result",
@@ -1139,15 +1139,15 @@ async def websocket_search(websocket: WebSocket, client_id: str):
                         "total": len(results)
                     })
                     await asyncio.sleep(0.1)  # Progressive loading
-                
+
                 await websocket.send_json({
                     "type": "search_complete",
                     "total_results": len(results)
                 })
-            
+
             elif data["action"] == "ping":
                 await websocket.send_json({"type": "pong"})
-    
+
     except WebSocketDisconnect:
         manager.disconnect(websocket, client_id)
         await manager.broadcast({
@@ -1163,7 +1163,7 @@ async def websocket_adapter_status(websocket: WebSocket):
     Sendet alle 5 Sekunden Status-Update
     """
     await websocket.accept()
-    
+
     try:
         while True:
             status = await get_adapter_status()
@@ -1173,7 +1173,7 @@ async def websocket_adapter_status(websocket: WebSocket):
                 "data": status
             })
             await asyncio.sleep(5)
-    
+
     except WebSocketDisconnect:
         pass
 
@@ -1184,18 +1184,18 @@ async def websocket_logs(websocket: WebSocket, log_level: str = "INFO"):
     Real-time Log Streaming via WebSocket
     """
     await websocket.accept()
-    
+
     # Custom Log Handler
     from backend.telemetry.logging import WebSocketLogHandler
-    
+
     handler = WebSocketLogHandler(websocket, level=log_level)
     logger.addHandler(handler)
-    
+
     try:
         while True:
             # Keep connection alive
             await websocket.receive_text()
-    
+
     except WebSocketDisconnect:
         logger.removeHandler(handler)
 ```
@@ -1210,7 +1210,7 @@ const ws = new WebSocket('ws://localhost:8000/api/v4/ws/search?client_id=user123
 
 ws.onopen = () => {
   console.log('Connected to WebSocket');
-  
+
   // Send Search Query
   ws.send(JSON.stringify({
     action: 'search',
@@ -1221,17 +1221,17 @@ ws.onopen = () => {
 
 ws.onmessage = (event) => {
   const message = JSON.parse(event.data);
-  
+
   switch (message.type) {
     case 'search_started':
       console.log('Search started:', message.query);
       break;
-    
+
     case 'result':
       console.log(`Result ${message.index + 1}/${message.total}:`, message.data);
       displayResult(message.data);
       break;
-    
+
     case 'search_complete':
       console.log('Search complete:', message.total_results, 'results');
       break;
@@ -1265,7 +1265,7 @@ import json
 
 async def search_websocket():
     uri = "ws://localhost:8000/api/v4/ws/search?client_id=python_client"
-    
+
     async with websockets.connect(uri) as websocket:
         # Send Query
         await websocket.send(json.dumps({
@@ -1273,14 +1273,14 @@ async def search_websocket():
             "query": "machine learning",
             "top_k": 5
         }))
-        
+
         # Receive Results
         async for message in websocket:
             data = json.loads(message)
-            
+
             if data["type"] == "result":
                 print(f"Result {data['index']}: {data['data']}")
-            
+
             elif data["type"] == "search_complete":
                 print(f"Total: {data['total_results']}")
                 break
@@ -1295,7 +1295,7 @@ from fastapi.testclient import TestClient
 
 def test_websocket():
     client = TestClient(app)
-    
+
     with client.websocket_connect("/api/v4/ws/search?client_id=test") as websocket:
         # Send Query
         websocket.send_json({
@@ -1303,11 +1303,11 @@ def test_websocket():
             "query": "test",
             "top_k": 3
         })
-        
+
         # Receive search_started
         data = websocket.receive_json()
         assert data["type"] == "search_started"
-        
+
         # Receive results
         results = []
         while True:
@@ -1316,7 +1316,7 @@ def test_websocket():
                 results.append(data["data"])
             elif data["type"] == "search_complete":
                 break
-        
+
         assert len(results) == 3
 ```
 

@@ -2,9 +2,9 @@
 
 **JSON-basierte wissenschaftliche Methodik mit Selbstverbesserung**
 
-**Erstellt:** 12. Oktober 2025, 22:15 Uhr  
-**Status:** 🟡 **READY TO START** - Implementation Phase  
-**Timeline:** 11-15 Tage (optimiert)  
+**Erstellt:** 12. Oktober 2025, 22:15 Uhr
+**Status:** 🟡 **READY TO START** - Implementation Phase
+**Timeline:** 11-15 Tage (optimiert)
 **LOC:** ~2,300 LOC (78-83% Reduktion vs v5.0/v6.0)
 
 ---
@@ -30,7 +30,7 @@
 
 ## 🎯 PHASE 1: JSON Configuration (2-3 Tage)
 
-**Status:** ✅ **50% COMPLETE** (1 von 2 Komponenten fertig)  
+**Status:** ✅ **50% COMPLETE** (1 von 2 Komponenten fertig)
 **Remaining:** 1-2 Tage
 
 ### ✅ COMPLETED
@@ -113,25 +113,25 @@
 - Anti-Patterns: 4-5 common_mistakes pro Phase mit Korrekturen
 
 **Next:** Phase 2 - ScientificPhaseExecutor (lädt diese JSONs + führt LLM-Calls aus)
-    
+
     - [ ] `config/prompts/scientific/phase3_analysis.txt` (70 Zeilen)
       - **Content:**
         - Task: "Erkenne Muster + Widersprüche in Evidence Clusters"
         - Input: {{synthesis_result}}
         - Output: patterns, contradictions, conflict_resolution
-    
+
     - [ ] `config/prompts/scientific/phase4_validation.txt` (70 Zeilen)
       - **Content:**
         - Task: "Teste Hypothese gegen Evidenzen"
         - Input: {{hypothesis}}, {{analysis_result}}
         - Output: validation_status, supporting_evidence, contradicting_evidence
-    
+
     - [ ] `config/prompts/scientific/phase5_conclusion.txt` (70 Zeilen)
       - **Content:**
         - Task: "Finale Synthese → Gesicherte Antwort"
         - Input: {{validation_result}}, {{all_evidences}}
         - Output: main_answer, action_recommendations, confidence
-    
+
     - [ ] `config/prompts/scientific/phase6_metacognition.txt` (70 Zeilen)
       - **Content:**
         - Task: "Selbstbewertung → Confidence + Gaps"
@@ -144,26 +144,26 @@
   - **Content:**
     ```text
     # USER QUERY ENHANCEMENT
-    
+
     Original Query: {{user_query}}
     Detected Domain: {{detected_domain}}
     Estimated Complexity: {{complexity_estimate}}
-    
+
     ## Wissenschaftliche Fragestellung
-    
+
     Die Nutzer-Frage wird nun im wissenschaftlichen Kontext bearbeitet:
-    
+
     **Kernanliegen:** {{user_query}}
-    
+
     **Wissenschaftliche Zielsetzung:**
     - Evidenzbasierte Beantwortung
     - Identifikation fehlender Informationen
     - Strukturierte Schlussfolgerung mit Handlungsempfehlungen
-    
+
     **Verfügbare Ressourcen:**
     - RAG-System: Semantische Suche + Graph-basierte Prozess-Navigation
     - Domain-Agents: {{available_agents}}
-    
+
     Beginne mit Phase 1: Hypothesengenerierung.
     ```
 
@@ -171,21 +171,21 @@
 
 ## 🛠️ PHASE 2: Scientific Phase Executor (3-4 Tage)
 
-**Status:** ⏳ **0% COMPLETE** - Design fertig, Implementation TODO  
-**LOC:** ~400 LOC  
+**Status:** ⏳ **0% COMPLETE** - Design fertig, Implementation TODO
+**LOC:** ~400 LOC
 **Dependency:** Phase 1 (JSON Configs) muss fertig sein
 
 ### Tasks
 
 - [ ] **Create: backend/services/scientific_phase_executor.py** (~400 LOC)
   - **Aufwand:** 3-4 Tage
-  
+
   - [ ] **1. Class Definition + Initialization** (~50 LOC)
     ```python
     class ScientificPhaseExecutor:
         """
         Generic Executor für wissenschaftliche Phasen.
-        
+
         FEATURES:
         - Lädt JSON-Konfiguration (default_method.json + scientific_foundation.json)
         - Jinja2 Template Rendering
@@ -193,7 +193,7 @@
         - JSON Schema Validation
         - Retry Logic
         """
-        
+
         def __init__(
             self,
             method_config_path: str,
@@ -203,23 +203,23 @@
         ):
             # Load method config
             self.method_config = self._load_json(method_config_path)
-            
+
             # Load scientific foundation
             self.scientific_foundation = self._load_json(foundation_path)
-            
+
             # Setup Jinja2 environment
             self.jinja_env = jinja2.Environment(
                 loader=jinja2.FileSystemLoader(prompts_dir)
             )
-            
+
             # LLM client
             self.ollama_client = ollama_client
-            
+
             logger.info(f"✅ ScientificPhaseExecutor initialized")
             logger.info(f"   Method: {self.method_config['method_id']}")
             logger.info(f"   Phases: {len(self.method_config['phases'])}")
     ```
-  
+
   - [ ] **2. Execute Phase (Main Method)** (~80 LOC)
     ```python
     async def execute_phase(
@@ -229,29 +229,29 @@
     ) -> PhaseResult:
         """
         Execute eine wissenschaftliche Phase.
-        
+
         Args:
             phase_id: "hypothesis", "synthesis", "analysis", etc.
             context: PhaseExecutionContext mit previous_phases, rag_results, etc.
-        
+
         Returns:
             PhaseResult mit output, confidence, metadata
         """
         phase_config = self._get_phase_config(phase_id)
-        
+
         # 1. Construct Prompt
         prompt = self._construct_prompt(phase_config, context)
-        
+
         # 2. Execute LLM Call (with retry)
         response = await self._execute_llm_call_with_retry(
             prompt, phase_config
         )
-        
+
         # 3. Parse & Validate Output
         output = self._parse_and_validate_output(
             response, phase_config["output_schema"]
         )
-        
+
         # 4. Create Result
         result = PhaseResult(
             phase_id=phase_id,
@@ -264,10 +264,10 @@
                 "retries": retry_count
             }
         )
-        
+
         return result
     ```
-  
+
   - [ ] **3. Construct Prompt (Jinja2 Rendering)** (~60 LOC)
     ```python
     def _construct_prompt(
@@ -277,7 +277,7 @@
     ) -> str:
         """
         Konstruiere Prompt via Jinja2 Template.
-        
+
         Template Variables:
         - {{scientific_foundation}}: JSON als String
         - {{user_query}}: Original User Query
@@ -286,7 +286,7 @@
         """
         template_path = phase_config["prompt_template"]
         template = self.jinja_env.get_template(template_path)
-        
+
         # Resolve data paths (e.g., "phases.hypothesis.output")
         template_vars = {
             "scientific_foundation": json.dumps(
@@ -298,21 +298,21 @@
             "complexity_estimate": context.complexity_estimate,
             "available_agents": context.available_agents
         }
-        
+
         # Add previous phase outputs
         for prev_phase_id, prev_result in context.previous_phases.items():
             # {{hypothesis}} → previous_phases["hypothesis"]["output"]
             template_vars[prev_phase_id] = prev_result.output
-        
+
         # Render
         prompt = template.render(**template_vars)
-        
+
         logger.debug(f"Prompt constructed for {phase_config['phase_id']}")
         logger.debug(f"Prompt length: {len(prompt)} chars")
-        
+
         return prompt
     ```
-  
+
   - [ ] **4. Execute LLM Call with Retry** (~80 LOC)
     ```python
     async def _execute_llm_call_with_retry(
@@ -322,7 +322,7 @@
     ) -> str:
         """
         Execute LLM Call mit Retry-Logik.
-        
+
         Retry bei:
         - JSON Parse Error
         - Schema Validation Error
@@ -331,7 +331,7 @@
         retry_policy = phase_config["retry_policy"]
         max_retries = retry_policy["max_retries"]
         validation_rules = retry_policy["validation_rules"]
-        
+
         for attempt in range(max_retries):
             try:
                 # LLM Call
@@ -341,29 +341,29 @@
                     temperature=phase_config["execution"]["temperature"],
                     max_tokens=phase_config["execution"]["max_tokens"]
                 )
-                
+
                 # Pre-Validation
                 if "json_valid" in validation_rules:
                     self._validate_json(response)
-                
+
                 if "schema_valid" in validation_rules:
                     self._validate_schema(response, phase_config["output_schema"])
-                
+
                 logger.info(f"✅ LLM Call successful (attempt {attempt + 1})")
                 return response
-                
+
             except (json.JSONDecodeError, ValidationError) as e:
                 logger.warning(f"Retry {attempt + 1}/{max_retries}: {e}")
-                
+
                 if attempt == max_retries - 1:
                     raise RuntimeError(f"Max retries exceeded: {e}")
-                
+
                 # Adjust temperature für Retry
                 phase_config["execution"]["temperature"] *= 0.8
-        
+
         raise RuntimeError("Unexpected retry loop exit")
     ```
-  
+
   - [ ] **5. Parse & Validate Output** (~60 LOC)
     ```python
     def _parse_and_validate_output(
@@ -381,7 +381,7 @@
         else:
             # Try raw JSON
             json_str = response.strip()
-        
+
         # Parse JSON
         try:
             output = json.loads(json_str)
@@ -389,7 +389,7 @@
             logger.error(f"JSON Parse Error: {e}")
             logger.error(f"Response: {response[:500]}")
             raise
-        
+
         # Validate Schema (jsonschema)
         try:
             jsonschema.validate(instance=output, schema=schema)
@@ -397,10 +397,10 @@
             logger.error(f"Schema Validation Error: {e}")
             logger.error(f"Output: {json.dumps(output, indent=2)}")
             raise
-        
+
         return output
     ```
-  
+
   - [ ] **6. Helper Methods** (~70 LOC)
     ```python
     def _get_phase_config(self, phase_id: str) -> Dict:
@@ -409,16 +409,16 @@
             if phase["phase_id"] == phase_id:
                 return phase
         raise ValueError(f"Phase {phase_id} not found")
-    
+
     def _load_json(self, path: str) -> Dict:
         """Load JSON file."""
         with open(path, 'r', encoding='utf-8') as f:
             return json.load(f)
-    
+
     def _validate_json(self, response: str):
         """Validate JSON syntax."""
         json.loads(response)  # Raises JSONDecodeError
-    
+
     def _validate_schema(self, response: str, schema: Dict):
         """Validate JSON schema."""
         output = json.loads(response)
@@ -436,7 +436,7 @@
       complexity_estimate: str
       available_agents: List[str]
       previous_phases: Dict[str, PhaseResult] = field(default_factory=dict)
-  
+
   @dataclass
   class PhaseResult:
       """Result einer Phase."""
@@ -451,8 +451,8 @@
 
 ## ✅ PHASE 3: Prompt Improvement Engine (0 Tage)
 
-**Status:** ✅ **100% COMPLETE** - Already implemented  
-**LOC:** 500 LOC  
+**Status:** ✅ **100% COMPLETE** - Already implemented
+**LOC:** 500 LOC
 **Files:**
 - ✅ `backend/services/prompt_improvement_engine.py` (500 LOC)
 - ✅ `docs/PROMPT_IMPROVEMENT_SYSTEM.md` (1,500 Zeilen)
@@ -463,8 +463,8 @@
 
 ## 🎯 PHASE 4: Unified Orchestrator v7.0 (REAL Systems)
 
-**Status:** ✅ **100% COMPLETE** (Aufwand: 4.5 Stunden, 13. Oktober 2025)  
-**LOC:** ~840 LOC (570 orchestrator + 150 integration + 120 test)  
+**Status:** ✅ **100% COMPLETE** (Aufwand: 4.5 Stunden, 13. Oktober 2025)
+**LOC:** ~840 LOC (570 orchestrator + 150 integration + 120 test)
 **Real Integration:** UDS3 (ChromaDB + Neo4j) + Ollama (llama3.2)
 
 ### ✅ COMPLETED
@@ -552,20 +552,20 @@ UnifiedOrchestratorV7
 └─ Phase 6: Metacognition (REAL Ollama)
     ↓
 Final Answer (from Phase 5)
-  
+
   - [ ] **1. Class Definition + Initialization** (~80 LOC)
     ```python
     class UnifiedOrchestratorV7:
         """
         Unified Orchestrator für v7.0 JSON-Driven Architecture.
-        
+
         FEATURES:
         - Koordiniert Scientific Phases (ScientificPhaseExecutor)
         - Koordiniert Agent Tasks (AgentOrchestrator)
         - Integriert Prompt Improvement (PromptImprovementEngine)
         - Dual-Track Execution (Generic + Agent)
         """
-        
+
         def __init__(
             self,
             scientific_executor: ScientificPhaseExecutor,
@@ -577,16 +577,16 @@ Final Answer (from Phase 5)
             self.agent_orchestrator = agent_orchestrator
             self.improvement_engine = improvement_engine
             self.rag_service = rag_service
-            
+
             logger.info("✅ UnifiedOrchestratorV7 initialized")
     ```
-  
+
   - [ ] **2. Process Query (Main Entry Point)** (~120 LOC)
     ```python
     async def process_query(self, user_query: str) -> Dict:
         """
         Process Query mit Scientific Method + Agent Coordination.
-        
+
         WORKFLOW:
         1. Load scientific_foundation.json
         2. Enhance user query mit base prompt
@@ -595,7 +595,7 @@ Final Answer (from Phase 5)
         5. Coordinate Agent Tasks (parallel)
         6. Collect Quality Metrics
         7. Record to PromptImprovementEngine
-        
+
         Returns:
             {
                 "scientific_process": {...},
@@ -606,13 +606,13 @@ Final Answer (from Phase 5)
         """
         query_id = str(uuid.uuid4())
         start_time = time.time()
-        
+
         # 1. Enhance Query
         enhanced_query = self._enhance_user_query(user_query)
-        
+
         # 2. RAG Retrieval
         rag_results = await self.rag_service.retrieve(enhanced_query)
-        
+
         # 3. Create Execution Context
         context = PhaseExecutionContext(
             user_query=user_query,
@@ -621,23 +621,23 @@ Final Answer (from Phase 5)
             complexity_estimate=self._estimate_complexity(user_query),
             available_agents=self._get_available_agents()
         )
-        
+
         # 4. Execute Scientific Phases (sequential)
         scientific_results = await self._execute_scientific_phases(context)
-        
+
         # 5. Coordinate Agent Tasks (parallel)
         agent_results = await self._coordinate_agents(scientific_results, context)
-        
+
         # 6. Collect Quality Metrics
         metrics = self._collect_quality_metrics(
             query_id, scientific_results, agent_results
         )
-        
+
         # 7. Record Metrics (triggers improvement after 10 queries)
         self.improvement_engine.record_query_metrics(metrics)
-        
+
         execution_time = time.time() - start_time
-        
+
         return {
             "query_id": query_id,
             "scientific_process": scientific_results,
@@ -647,7 +647,7 @@ Final Answer (from Phase 5)
             "execution_time": execution_time
         }
     ```
-  
+
   - [ ] **3. Execute Scientific Phases** (~80 LOC)
     ```python
     async def _execute_scientific_phases(
@@ -657,28 +657,28 @@ Final Answer (from Phase 5)
         """
         Execute alle 6 wissenschaftlichen Phasen sequenziell.
         """
-        phases = ["hypothesis", "synthesis", "analysis", 
+        phases = ["hypothesis", "synthesis", "analysis",
                   "validation", "conclusion", "metacognition"]
-        
+
         results = {}
-        
+
         for phase_id in phases:
             logger.info(f"🔬 Executing Phase: {phase_id}")
-            
+
             result = await self.scientific_executor.execute_phase(
                 phase_id, context
             )
-            
+
             results[phase_id] = result
-            
+
             # Update context mit neuem Result
             context.previous_phases[phase_id] = result
-            
+
             logger.info(f"✅ Phase {phase_id} completed in {result.execution_time:.2f}s")
-        
+
         return results
     ```
-  
+
   - [ ] **4. Coordinate Agents** (~60 LOC)
     ```python
     async def _coordinate_agents(
@@ -688,16 +688,16 @@ Final Answer (from Phase 5)
     ) -> Dict:
         """
         Koordiniere Agent Tasks basierend auf Hypothesis.
-        
+
         Example:
         - Hypothesis identifiziert "Environmental Domain"
         → Dispatch Environmental Agent + Database Agent
         """
         hypothesis = scientific_results["hypothesis"].output
-        
+
         # Identify Required Agents
         required_agents = self._identify_required_agents(hypothesis)
-        
+
         # Dispatch Agents (via existing AgentOrchestrator)
         agent_results = await self.agent_orchestrator.execute_pipeline(
             query=context.user_query,
@@ -707,10 +707,10 @@ Final Answer (from Phase 5)
                 "rag_results": context.rag_results
             }
         )
-        
+
         return agent_results
     ```
-  
+
   - [ ] **5. Collect Quality Metrics** (~100 LOC)
     ```python
     def _collect_quality_metrics(
@@ -724,27 +724,27 @@ Final Answer (from Phase 5)
         """
         # Extract Conclusion
         conclusion = scientific_results["conclusion"].output
-        
+
         # Extract Metacognition
         metacognition = scientific_results["metacognition"].output
-        
+
         # Calculate Metrics
         metrics = QualityMetrics(
             query_id=query_id,
             timestamp=datetime.now().isoformat(),
-            
+
             # JSON Validity (alle Phasen valid?)
             json_valid=all(
                 r.output is not None for r in scientific_results.values()
             ),
-            
+
             # Schema Compliance
             schema_valid=True,  # Already validated in executor
-            
+
             # Confidence Calibration
             predicted_confidence=conclusion.get("confidence", 0.0),
             actual_confidence=None,  # User-Feedback (optional)
-            
+
             # Required Criteria Quality
             num_criteria=len(
                 scientific_results["hypothesis"].output.get("required_criteria", [])
@@ -752,20 +752,20 @@ Final Answer (from Phase 5)
             vague_criteria=self._detect_vague_criteria(
                 scientific_results["hypothesis"].output.get("required_criteria", [])
             ),
-            
+
             # Source Citation
             citations_found=self._count_citations(conclusion),
             citations_expected=len(scientific_results["synthesis"].output.get("evidence_clusters", [])),
-            
+
             # Improvement Suggestions
             improvement_suggestions=metacognition.get(
                 "metacognitive_assessment", {}
             ).get("improvement_suggestions", [])
         )
-        
+
         return metrics
     ```
-  
+
   - [ ] **6. Helper Methods** (~80 LOC)
     ```python
     def _enhance_user_query(self, user_query: str) -> str:
@@ -775,26 +775,26 @@ Final Answer (from Phase 5)
             "scientific/user_query_enhancement.txt"
         )
         return template.render(user_query=user_query)
-    
+
     def _detect_domain(self, query: str) -> str:
         """Simple domain detection."""
         # TODO: NLP-based domain detection
         return "administrative"
-    
+
     def _estimate_complexity(self, query: str) -> str:
         """Estimate query complexity."""
         # TODO: Complexity estimation (low/medium/high)
         return "medium"
-    
+
     def _get_available_agents(self) -> List[str]:
         """Get list of available agents."""
         return ["environmental", "database", "quality_assessor"]
-    
+
     def _identify_required_agents(self, hypothesis: Dict) -> List[str]:
         """Identify required agents basierend auf hypothesis."""
         # TODO: Smart agent selection
         return ["database"]
-    
+
     def _detect_vague_criteria(self, criteria: List[str]) -> List[str]:
         """Detect vage formulierte Kriterien."""
         vague_words = ["vielleicht", "eventuell", "möglicherweise", "ungefähr"]
@@ -803,7 +803,7 @@ Final Answer (from Phase 5)
             if any(word in criterion.lower() for word in vague_words):
                 vague.append(criterion)
         return vague
-    
+
     def _count_citations(self, conclusion: Dict) -> int:
         """Count source citations in conclusion."""
         # Count references to sources
@@ -815,8 +815,8 @@ Final Answer (from Phase 5)
 
 ## 🧪 PHASE 5: Testing & Refinement (3-4 Tage)
 
-**Status:** ⏳ **0% COMPLETE**  
-**LOC:** ~800 LOC  
+**Status:** ⏳ **0% COMPLETE**
+**LOC:** ~800 LOC
 **Dependency:** Phase 2+4 müssen fertig sein
 
 ### Tasks
@@ -925,7 +925,7 @@ Final Answer (from Phase 5)
 
 ### Option 1: Complete Phase 1 (Recommended ⭐)
 
-**Timeline:** 1-2 Tage  
+**Timeline:** 1-2 Tage
 **Priority:** HIGH
 
 ```powershell
@@ -949,7 +949,7 @@ python -c "import json; json.load(open('config/scientific_methods/default_method
 
 ### Option 2: Start Phase 2 (Parallel Möglich)
 
-**Timeline:** 3-4 Tage  
+**Timeline:** 3-4 Tage
 **Priority:** MEDIUM
 
 ```powershell
@@ -967,7 +967,7 @@ python backend\services\scientific_phase_executor.py
 
 ### Option 3: Review & Refine (Low Priority)
 
-**Timeline:** 1 Tag  
+**Timeline:** 1 Tag
 **Priority:** LOW
 
 ```powershell
@@ -1062,5 +1062,5 @@ Total TODO: 15 files, ~2,350 Zeilen/LOC
 
 **Viel Erfolg bei der Implementation!** 💪
 
-**Letzte Aktualisierung:** 12. Oktober 2025, 22:15 Uhr  
+**Letzte Aktualisierung:** 12. Oktober 2025, 22:15 Uhr
 **Version:** 1.0 (Initial Implementation TODO)

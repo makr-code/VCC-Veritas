@@ -211,17 +211,54 @@ class QueryService:
         
         for idx, src in enumerate(sources, start=1):
             try:
-                # Ensure numeric ID (not "src_1")
-                if "id" not in src or str(src["id"]).startswith("src_"):
+                # Ensure string ID (Pydantic requires string type)
+                if "id" not in src:
+                    src["id"] = str(idx)
+                elif not isinstance(src["id"], str):
+                    src["id"] = str(src["id"])
+                elif src["id"].startswith("src_"):
                     src["id"] = str(idx)
                 
                 # Ensure required fields
                 if "title" not in src:
                     src["title"] = f"Dokument {idx}"
+<<<<<<< Updated upstream
                 
                 if "type" not in src:
                     src["type"] = SourceType.DOCUMENT
                 
+=======
+
+                # Normalize type field to valid SourceType enum
+                if "type" not in src:
+                    src["type"] = SourceType.DOCUMENT
+                elif isinstance(src["type"], str):
+                    # Map string values to SourceType enum
+                    type_mapping = {
+                        "agent_source": SourceType.DOCUMENT,
+                        "document": SourceType.DOCUMENT,
+                        "web": SourceType.WEB,
+                        "database": SourceType.DATABASE,
+                        "api": SourceType.API,
+                        "citation": SourceType.CITATION,
+                    }
+                    src["type"] = type_mapping.get(src["type"].lower(), SourceType.DOCUMENT)
+
+                # Normalize relevance field (should be enum string, not float)
+                if "relevance" in src and isinstance(src["relevance"], (float, int)):
+                    # Convert numeric relevance to enum
+                    if src["relevance"] >= 0.9:
+                        src["relevance"] = "Very High"
+                    elif src["relevance"] >= 0.7:
+                        src["relevance"] = "High"
+                    elif src["relevance"] >= 0.5:
+                        src["relevance"] = "Medium"
+                    elif src["relevance"] >= 0.3:
+                        src["relevance"] = "Low"
+                    else:
+                        src["relevance"] = "Unknown"
+
+>>>>>>> Stashed changes
                 # Create UnifiedSourceMetadata (extra="allow" accepts all fields)
                 normalized.append(UnifiedSourceMetadata(**src))
                 
@@ -375,8 +412,11 @@ class QueryService:
     
     async def _process_ask(self, request: UnifiedQueryRequest) -> Dict[str, Any]:
         """
-        Simple Ask (Direct LLM ohne RAG)
+        Simple Ask (Direct LLM with RAG context)
+        
+        Uses full RAG pipeline but with direct question-answer flow.
         """
+<<<<<<< Updated upstream
         logger.debug("Processing Simple Ask query...")
         
         # TODO: Implement Direct LLM Call
@@ -394,6 +434,14 @@ class QueryService:
         query: str,
         top_k: int = 20
     ) -> HybridSearchResult:
+=======
+        logger.debug("Processing Ask query with RAG...")
+
+        # Ask mode should use full RAG pipeline
+        return await self._process_rag(request)
+
+    async def _apply_reranking(self, hybrid_result: HybridSearchResult, query: str, top_k: int = 20) -> HybridSearchResult:
+>>>>>>> Stashed changes
         """
         Apply semantic re-ranking to hybrid search results
         
@@ -494,8 +542,13 @@ class QueryService:
         logger.debug("Converting HybridSearchResult to UnifiedResponse format...")
         
         # Convert search results to sources
+<<<<<<< Updated upstream
         sources = []
         for idx, result in enumerate(hybrid_result.results[:request.max_results or 20], start=1):
+=======
+        sources: List[Dict[str, Any]] = []
+        for idx, result in enumerate(hybrid_result.results[: request.max_results or 20], start=1):
+>>>>>>> Stashed changes
             metadata = result.metadata
             
             # Build IEEE citation

@@ -265,6 +265,6 @@ MIT License - siehe [LICENSE](LICENSE)
 
 ## Support
 
-**Issues:** [GitHub Issues](https://github.com/makr-code/VCC-AAT/issues)  
-**Docs:** [docs/TESTING_GUIDE.md](docs/TESTING_GUIDE.md)  
+**Issues:** [GitHub Issues](https://github.com/makr-code/VCC-AAT/issues)
+**Docs:** [docs/TESTING_GUIDE.md](docs/TESTING_GUIDE.md)
 **Contact:** development@vcc.ai

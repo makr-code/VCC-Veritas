@@ -9,24 +9,22 @@ Provides:
 """
 
 import os
-import pytest
-import tempfile
 import shutil
+import tempfile
 from datetime import datetime, timedelta
 
-# Import PKI modules
-from backend.pki.crypto_utils import (
-    generate_keypair,
-    generate_csr,
-    generate_random_key
-)
-from backend.pki.cert_manager import CertificateManager
-from backend.pki.ca_service import CAService
+import pytest
 
+from backend.pki.ca_service import CAService
+from backend.pki.cert_manager import CertificateManager
+
+# Import PKI modules
+from backend.pki.crypto_utils import generate_csr, generate_keypair, generate_random_key
 
 # ============================================================================
 # Storage Fixtures
 # ============================================================================
+
 
 @pytest.fixture(scope="function")
 def temp_pki_storage():
@@ -64,6 +62,7 @@ def temp_ca_storage_session():
 # PKI Component Fixtures
 # ============================================================================
 
+
 @pytest.fixture(scope="function")
 def cert_manager(temp_pki_storage):
     """Create CertificateManager instance (function-scoped)"""
@@ -91,6 +90,7 @@ def ca_service_session(temp_ca_storage_session, cert_manager_session):
 # ============================================================================
 # Keypair Fixtures
 # ============================================================================
+
 
 @pytest.fixture(scope="function")
 def rsa_2048_keypair():
@@ -120,17 +120,13 @@ def rsa_2048_keypair_session():
 # CSR Fixtures
 # ============================================================================
 
+
 @pytest.fixture(scope="function")
 def end_entity_csr(rsa_2048_keypair):
     """Generate end-entity CSR"""
     private_key, _ = rsa_2048_keypair
     csr = generate_csr(
-        private_key,
-        common_name="test.example.com",
-        organization="Test Corp",
-        country="DE",
-        state="Bavaria",
-        locality="Munich"
+        private_key, common_name="test.example.com", organization="Test Corp", country="DE", state="Bavaria", locality="Munich"
     )
     return csr, private_key
 
@@ -139,12 +135,7 @@ def end_entity_csr(rsa_2048_keypair):
 def intermediate_ca_csr(rsa_3072_keypair):
     """Generate intermediate CA CSR"""
     private_key, _ = rsa_3072_keypair
-    csr = generate_csr(
-        private_key,
-        common_name="Intermediate CA",
-        organization="Test Corp",
-        country="DE"
-    )
+    csr = generate_csr(private_key, common_name="Intermediate CA", organization="Test Corp", country="DE")
     return csr, private_key
 
 
@@ -152,11 +143,7 @@ def intermediate_ca_csr(rsa_3072_keypair):
 def server_csr(rsa_2048_keypair):
     """Generate server certificate CSR"""
     private_key, _ = rsa_2048_keypair
-    csr = generate_csr(
-        private_key,
-        common_name="server.example.com",
-        organization="Test Corp"
-    )
+    csr = generate_csr(private_key, common_name="server.example.com", organization="Test Corp")
     return csr, private_key
 
 
@@ -164,12 +151,7 @@ def server_csr(rsa_2048_keypair):
 def client_csr(rsa_2048_keypair):
     """Generate client certificate CSR"""
     private_key, _ = rsa_2048_keypair
-    csr = generate_csr(
-        private_key,
-        common_name="client@example.com",
-        organization="Test Corp",
-        email="client@example.com"
-    )
+    csr = generate_csr(private_key, common_name="client@example.com", organization="Test Corp", email="client@example.com")
     return csr, private_key
 
 
@@ -177,13 +159,12 @@ def client_csr(rsa_2048_keypair):
 # Certificate Fixtures
 # ============================================================================
 
+
 @pytest.fixture(scope="function")
 def self_signed_cert(cert_manager):
     """Create self-signed certificate"""
     cert_id, cert_pem = cert_manager.create_certificate(
-        subject_name="selfsigned.example.com",
-        validity_days=365,
-        key_size=2048
+        subject_name="selfsigned.example.com", validity_days=365, key_size=2048
     )
     return cert_id, cert_pem
 
@@ -192,10 +173,7 @@ def self_signed_cert(cert_manager):
 def root_ca(ca_service):
     """Create Root CA"""
     ca_id, ca_cert_pem, ca_key_pem = ca_service.initialize_root_ca(
-        common_name="Test Root CA",
-        validity_days=3650,
-        key_size=4096,
-        organization="Test Corp"
+        common_name="Test Root CA", validity_days=3650, key_size=4096, organization="Test Corp"
     )
     return ca_id, ca_cert_pem, ca_key_pem
 
@@ -205,13 +183,8 @@ def ca_signed_cert(ca_service, root_ca, end_entity_csr):
     """Create CA-signed certificate"""
     ca_id, _, _ = root_ca
     csr_pem, _ = end_entity_csr
-    
-    cert_id, cert_pem = ca_service.sign_csr(
-        csr_pem=csr_pem,
-        validity_days=365,
-        is_ca=False,
-        ca_id=ca_id
-    )
+
+    cert_id, cert_pem = ca_service.sign_csr(csr_pem=csr_pem, validity_days=365, is_ca=False, ca_id=ca_id)
     return cert_id, cert_pem, ca_id
 
 
@@ -219,9 +192,7 @@ def ca_signed_cert(ca_service, root_ca, end_entity_csr):
 def root_ca_session(ca_service_session):
     """Create Root CA (session-scoped)"""
     ca_id, ca_cert_pem, ca_key_pem = ca_service_session.initialize_root_ca(
-        common_name="Test Root CA (Session)",
-        validity_days=3650,
-        key_size=4096
+        common_name="Test Root CA (Session)", validity_days=3650, key_size=4096
     )
     return ca_id, ca_cert_pem, ca_key_pem
 
@@ -229,6 +200,7 @@ def root_ca_session(ca_service_session):
 # ============================================================================
 # Encryption Key Fixtures
 # ============================================================================
+
 
 @pytest.fixture(scope="function")
 def aes_256_key():
@@ -246,51 +218,35 @@ def aes_128_key():
 # Test Data Fixtures
 # ============================================================================
 
+
 @pytest.fixture(scope="function")
 def sample_data():
     """Sample data for encryption/signing"""
-    return {
-        "small": b"Hello, World!",
-        "medium": b"X" * 1000,  # 1KB
-        "large": b"Y" * 100000,  # 100KB
-        "empty": b""
-    }
+    return {"small": b"Hello, World!", "medium": b"X" * 1000, "large": b"Y" * 100000, "empty": b""}  # 1KB  # 100KB
 
 
 @pytest.fixture(scope="function")
 def revocation_reasons():
     """Valid revocation reasons"""
-    return [
-        "unspecified",
-        "keyCompromise",
-        "affiliationChanged",
-        "superseded",
-        "cessationOfOperation"
-    ]
+    return ["unspecified", "keyCompromise", "affiliationChanged", "superseded", "cessationOfOperation"]
 
 
 # ============================================================================
 # Utility Functions
 # ============================================================================
 
+
 def create_test_certificate(cert_manager, name, validity=365, key_size=2048, is_ca=False):
     """Utility function to create test certificate"""
     cert_id, cert_pem = cert_manager.create_certificate(
-        subject_name=name,
-        validity_days=validity,
-        key_size=key_size,
-        is_ca=is_ca
+        subject_name=name, validity_days=validity, key_size=key_size, is_ca=is_ca
     )
     return cert_id, cert_pem
 
 
 def create_test_ca(ca_service, name, validity=3650, key_size=4096):
     """Utility function to create test CA"""
-    ca_id, ca_cert_pem, ca_key_pem = ca_service.initialize_root_ca(
-        common_name=name,
-        validity_days=validity,
-        key_size=key_size
-    )
+    ca_id, ca_cert_pem, ca_key_pem = ca_service.initialize_root_ca(common_name=name, validity_days=validity, key_size=key_size)
     return ca_id, ca_cert_pem, ca_key_pem
 
 
@@ -298,20 +254,12 @@ def create_test_ca(ca_service, name, validity=3650, key_size=4096):
 # Pytest Configuration
 # ============================================================================
 
+
 def pytest_configure(config):
     """Configure pytest"""
-    config.addinivalue_line(
-        "markers",
-        "slow: marks tests as slow (deselect with '-m \"not slow\"')"
-    )
-    config.addinivalue_line(
-        "markers",
-        "integration: marks tests as integration tests"
-    )
-    config.addinivalue_line(
-        "markers",
-        "performance: marks tests as performance tests"
-    )
+    config.addinivalue_line("markers", "slow: marks tests as slow (deselect with '-m \"not slow\"')")
+    config.addinivalue_line("markers", "integration: marks tests as integration tests")
+    config.addinivalue_line("markers", "performance: marks tests as performance tests")
 
 
 def pytest_collection_modifyitems(config, items):
@@ -321,12 +269,12 @@ def pytest_collection_modifyitems(config, items):
         # Mark integration tests
         if "integration" in item.nodeid.lower():
             item.add_marker(pytest.mark.integration)
-        
+
         # Mark performance tests
         if "performance" in item.nodeid.lower():
             item.add_marker(pytest.mark.performance)
             item.add_marker(pytest.mark.slow)
-        
+
         # Mark slow tests (>1s expected)
         if any(keyword in item.nodeid.lower() for keyword in ["4096", "large", "benchmark"]):
             item.add_marker(pytest.mark.slow)
@@ -335,6 +283,7 @@ def pytest_collection_modifyitems(config, items):
 # ============================================================================
 # Session Fixtures for Report
 # ============================================================================
+
 
 @pytest.fixture(scope="session", autouse=True)
 def test_session_info(request):
@@ -345,9 +294,9 @@ def test_session_info(request):
     print(f"Start Time: {datetime.now().isoformat()}")
     print(f"Test Directory: {os.path.dirname(__file__)}")
     print("=" * 80 + "\n")
-    
+
     yield
-    
+
     print("\n" + "=" * 80)
     print(f"End Time: {datetime.now().isoformat()}")
     print("=" * 80)
@@ -356,6 +305,7 @@ def test_session_info(request):
 # ============================================================================
 # Autouse Fixtures for Cleanup
 # ============================================================================
+
 
 @pytest.fixture(autouse=True)
 def cleanup_temp_files():
@@ -368,6 +318,7 @@ def cleanup_temp_files():
 # ============================================================================
 # Custom Assertions
 # ============================================================================
+
 
 def assert_valid_pem(pem_data, marker="BEGIN"):
     """Assert PEM data is valid"""

@@ -7,17 +7,15 @@ Demonstriert alle verfügbaren SQL-Features
 """
 
 import asyncio
-from backend.agents.veritas_api_agent_database import (
-    create_database_agent,
-    DatabaseQueryRequest,
-    DatabaseConfig
-)
+
+from backend.agents.veritas_api_agent_database import DatabaseConfig, DatabaseQueryRequest, create_database_agent
+
 
 async def test_sql_syntax():
     """Testet verschiedene SQL-Syntax-Features"""
-    
+
     agent = create_database_agent(DatabaseConfig(log_all_queries=False))
-    
+
     # Test-Queries (würden mit echter DB funktionieren)
     test_queries = {
         "INNER JOIN": """
@@ -26,14 +24,12 @@ async def test_sql_syntax():
             INNER JOIN documents d ON u.id = d.user_id
             WHERE u.status = 'active'
         """,
-        
         "LEFT JOIN": """
             SELECT u.username, COUNT(d.id) as doc_count
             FROM users u
             LEFT JOIN documents d ON u.id = d.user_id
             GROUP BY u.id, u.username
         """,
-        
         "Multiple JOINs": """
             SELECT u.username, d.title, c.comment
             FROM users u
@@ -42,9 +38,8 @@ async def test_sql_syntax():
             WHERE u.status = 'active'
             ORDER BY d.created_at DESC
         """,
-        
         "Aggregate Functions": """
-            SELECT 
+            SELECT
                 category,
                 COUNT(*) as total_docs,
                 AVG(file_size) as avg_size,
@@ -54,21 +49,19 @@ async def test_sql_syntax():
             HAVING COUNT(*) > 5
             ORDER BY total_docs DESC
         """,
-        
         "Subquery": """
             SELECT username
             FROM users
             WHERE id IN (
-                SELECT DISTINCT user_id 
-                FROM documents 
+                SELECT DISTINCT user_id
+                FROM documents
                 WHERE category = 'environmental'
             )
         """,
-        
         "CTE (Common Table Expression)": """
             WITH active_users AS (
-                SELECT id, username 
-                FROM users 
+                SELECT id, username
+                FROM users
                 WHERE status = 'active'
             ),
             user_docs AS (
@@ -81,23 +74,20 @@ async def test_sql_syntax():
             LEFT JOIN user_docs ud ON au.id = ud.user_id
             ORDER BY documents DESC
         """,
-        
         "UNION": """
             SELECT 'User' as type, username as name FROM users
             UNION ALL
             SELECT 'Document' as type, title as name FROM documents
             ORDER BY name
         """,
-        
         "Window Function": """
-            SELECT 
+            SELECT
                 username,
                 created_at,
                 ROW_NUMBER() OVER (ORDER BY created_at) as row_num,
                 RANK() OVER (ORDER BY created_at) as rank
             FROM users
         """,
-        
         "Complex WHERE": """
             SELECT *
             FROM documents
@@ -108,35 +98,34 @@ async def test_sql_syntax():
             ORDER BY created_at DESC
             LIMIT 10 OFFSET 5
         """,
-        
         "CASE Statement": """
-            SELECT 
+            SELECT
                 username,
-                CASE 
+                CASE
                     WHEN status = 'active' THEN 'Active User'
                     WHEN status = 'inactive' THEN 'Inactive User'
                     ELSE 'Unknown'
                 END as user_status
             FROM users
-        """
+        """,
     }
-    
+
     print("🗄️  Database Agent - SQL Syntax Test")
     print("=" * 70)
-    
+
     for name, query in test_queries.items():
         print(f"\n📋 Test: {name}")
         print("-" * 70)
-        
+
         # Validate Query (without executing - no real DB needed)
         is_valid, error_msg, operation = agent.sql_validator.validate_query(query)
-        
+
         if is_valid:
             print(f"   ✅ VALID - Operation: {operation.value}")
             print(f"   SQL Preview: {query.strip()[:80]}...")
         else:
             print(f"   ❌ BLOCKED - Reason: {error_msg}")
-    
+
     print("\n" + "=" * 70)
     print("✅ All SQL syntax tests completed!")
     print("\nSupported Features:")

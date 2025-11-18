@@ -1,8 +1,8 @@
 # VERITAS Performance Testing & Systematic Optimization
 
-**Version:** v3.20.0  
-**Priorität:** ⭐⭐ MEDIUM  
-**Geschätzter Aufwand:** 6-8 Stunden  
+**Version:** v3.20.0
+**Priorität:** ⭐⭐ MEDIUM
+**Geschätzter Aufwand:** 6-8 Stunden
 **Status:** 🔄 TODO (Nach Chat-Persistierung)
 
 ---
@@ -46,7 +46,7 @@ from statistics import mean, median, stdev
 
 class QueryPerformanceTest:
     """Systematische Query-Performance-Messungen"""
-    
+
     @pytest.fixture
     def test_queries(self):
         """Standard-Testfragen mit unterschiedlicher Komplexität"""
@@ -67,25 +67,25 @@ class QueryPerformanceTest:
                 "expected_sources": 12
             }
         ]
-    
+
     def test_query_response_time_simple(self, test_queries):
         """Misst Response-Zeit für einfache Queries"""
         simple_queries = [q for q in test_queries if q['complexity'] == 'simple']
-        
+
         response_times = []
         for test_case in simple_queries:
             start_time = time.perf_counter()
-            
+
             response = await ollama_client.query(test_case['query'])
-            
+
             end_time = time.perf_counter()
             duration = end_time - start_time
-            
+
             response_times.append(duration)
-            
+
             # Metrics sammeln
             assert duration < 10.0, f"Simple query too slow: {duration:.2f}s"
-        
+
         # Statistiken
         print(f"\n📊 Simple Query Performance:")
         print(f"  Mean: {mean(response_times):.2f}s")
@@ -93,39 +93,39 @@ class QueryPerformanceTest:
         print(f"  Std Dev: {stdev(response_times):.2f}s")
         print(f"  Min: {min(response_times):.2f}s")
         print(f"  Max: {max(response_times):.2f}s")
-    
+
     def test_query_response_time_medium(self, test_queries):
         """Misst Response-Zeit für mittelschwere Queries"""
         # Analog zu simple, Target: <15s
         ...
-    
+
     def test_query_response_time_complex(self, test_queries):
         """Misst Response-Zeit für komplexe Queries"""
         # Analog zu simple, Target: <30s
         ...
-    
+
     def test_concurrent_queries(self):
         """Misst Performance bei parallelen Queries"""
         import asyncio
-        
+
         queries = ["Was ist das BImSchG?"] * 10
-        
+
         start_time = time.perf_counter()
-        
+
         # 10 parallele Queries
         tasks = [ollama_client.query(q) for q in queries]
         results = await asyncio.gather(*tasks)
-        
+
         end_time = time.perf_counter()
         total_duration = end_time - start_time
-        
+
         throughput = len(queries) / total_duration
-        
+
         print(f"\n📊 Concurrent Query Performance:")
         print(f"  Total Duration: {total_duration:.2f}s")
         print(f"  Throughput: {throughput:.2f} queries/s")
         print(f"  Avg per Query: {total_duration/len(queries):.2f}s")
-        
+
         assert throughput > 1.0, "Throughput should be >1 query/s"
 ```
 
@@ -133,7 +133,7 @@ class QueryPerformanceTest:
 ```python
 class ComponentPerformanceTest:
     """Isolierte Performance-Tests für Komponenten"""
-    
+
     def test_uds3_search_performance(self):
         """UDS3 Search API Performance"""
         queries = [
@@ -141,34 +141,34 @@ class ComponentPerformanceTest:
             "Windkraftanlagen Genehmigung",
             "Umweltverträglichkeitsprüfung"
         ]
-        
+
         timings = {
             'vector_search': [],
             'graph_search': [],
             'hybrid_search': []
         }
-        
+
         for query in queries:
             # Vector Search
             start = time.perf_counter()
             vector_results = await strategy.search_api.vector_search(query, top_k=10)
             timings['vector_search'].append(time.perf_counter() - start)
-            
+
             # Graph Search
             start = time.perf_counter()
             graph_results = await strategy.search_api.graph_search(query, limit=10)
             timings['graph_search'].append(time.perf_counter() - start)
-            
+
             # Hybrid Search
             start = time.perf_counter()
             hybrid_results = await strategy.search_api.hybrid_search(query, top_k=10)
             timings['hybrid_search'].append(time.perf_counter() - start)
-        
+
         # Report
         print("\n📊 UDS3 Search Performance:")
         for search_type, times in timings.items():
             print(f"  {search_type}: {mean(times)*1000:.2f}ms (avg)")
-    
+
     def test_llm_inference_performance(self):
         """Ollama LLM Inference Performance"""
         prompts = [
@@ -176,26 +176,26 @@ class ComponentPerformanceTest:
             "Was sind die Hauptziele des BImSchG?",
             "Welche Behörden sind für die Umsetzung des BImSchG zuständig?"
         ]
-        
+
         timings = []
         token_counts = []
-        
+
         for prompt in prompts:
             start = time.perf_counter()
             response = await ollama.generate(model="llama3.1:8b", prompt=prompt)
             duration = time.perf_counter() - start
-            
+
             timings.append(duration)
             # Token-Schätzung
             token_counts.append(len(response['response']) // 4)
-        
+
         tokens_per_second = sum(token_counts) / sum(timings)
-        
+
         print(f"\n📊 LLM Inference Performance:")
         print(f"  Avg Response Time: {mean(timings):.2f}s")
         print(f"  Tokens/Second: {tokens_per_second:.2f}")
         print(f"  Avg Token Count: {mean(token_counts):.0f}")
-    
+
     def test_embedding_generation_performance(self):
         """Embedding-Generierung Performance"""
         texts = [
@@ -203,14 +203,14 @@ class ComponentPerformanceTest:
             "Windkraftanlagen unterliegen der Genehmigungspflicht...",
             # ... mehr Test-Texte
         ]
-        
+
         start = time.perf_counter()
-        embeddings = [await ollama.embeddings(model="all-MiniLM-L6-v2", prompt=text) 
+        embeddings = [await ollama.embeddings(model="all-MiniLM-L6-v2", prompt=text)
                      for text in texts]
         duration = time.perf_counter() - start
-        
+
         throughput = len(texts) / duration
-        
+
         print(f"\n📊 Embedding Generation Performance:")
         print(f"  Throughput: {throughput:.2f} docs/s")
         print(f"  Avg per Doc: {duration/len(texts)*1000:.2f}ms")
@@ -244,35 +244,35 @@ from io import StringIO
 
 async def profile_query_execution():
     """Profiling eines kompletten Query-Ablaufs"""
-    
+
     # Setup
     from backend.agents.veritas_ollama_client import VeritasOllamaClient
     from uds3 import get_optimized_unified_strategy
-    
+
     ollama_client = VeritasOllamaClient()
     strategy = get_optimized_unified_strategy()
-    
+
     # Query
     test_query = "Was ist das BImSchG?"
-    
+
     # Start Profiling
     profiler = cProfile.Profile()
     profiler.enable()
-    
+
     # Ausführung
     response = await ollama_client.query(test_query)
-    
+
     # Stop Profiling
     profiler.disable()
-    
+
     # Results
     s = StringIO()
     stats = pstats.Stats(profiler, stream=s)
     stats.sort_stats('cumulative')
     stats.print_stats(50)  # Top 50 Funktionen
-    
+
     print(s.getvalue())
-    
+
     # Save to file
     with open('data/profiles/query_profile.txt', 'w') as f:
         f.write(s.getvalue())
@@ -291,16 +291,16 @@ import asyncio
 @profile
 async def profile_memory_usage():
     """Memory-Profiling für Query-Execution"""
-    
+
     # Load large model
     ollama_client = VeritasOllamaClient(model="llama3.1:8b")
-    
+
     # Execute query
     response = await ollama_client.query("Was ist das BImSchG?")
-    
+
     # Process response
     formatted = format_response(response)
-    
+
     return formatted
 
 if __name__ == "__main__":
@@ -320,7 +320,7 @@ if __name__ == "__main__":
 ```markdown
 # Performance Baseline Report - v3.19.0
 
-**Messzeitpunkt:** 12. Oktober 2025  
+**Messzeitpunkt:** 12. Oktober 2025
 **System:** VERITAS v3.19.0 Production
 
 ## Executive Summary
@@ -467,46 +467,46 @@ from datetime import datetime, timedelta
 
 class QueryCacheService:
     """In-Memory Query-Cache mit TTL"""
-    
+
     def __init__(self, max_size: int = 1000, ttl_minutes: int = 60):
         self.cache = {}  # {query_hash: {response, timestamp}}
         self.max_size = max_size
         self.ttl = timedelta(minutes=ttl_minutes)
-    
+
     def get(self, query: str, context: dict = None) -> Optional[dict]:
         """Lädt gecachte Response (falls vorhanden und nicht expired)"""
         cache_key = self._generate_cache_key(query, context)
-        
+
         if cache_key not in self.cache:
             return None
-        
+
         entry = self.cache[cache_key]
-        
+
         # TTL Check
         if datetime.now() - entry['timestamp'] > self.ttl:
             del self.cache[cache_key]
             return None
-        
+
         entry['hit_count'] = entry.get('hit_count', 0) + 1
         return entry['response']
-    
+
     def set(self, query: str, response: dict, context: dict = None):
         """Speichert Response im Cache"""
         cache_key = self._generate_cache_key(query, context)
-        
+
         # Eviction bei Max-Size
         if len(self.cache) >= self.max_size:
             # LRU: Entferne ältesten Eintrag
-            oldest_key = min(self.cache.keys(), 
+            oldest_key = min(self.cache.keys(),
                            key=lambda k: self.cache[k]['timestamp'])
             del self.cache[oldest_key]
-        
+
         self.cache[cache_key] = {
             'response': response,
             'timestamp': datetime.now(),
             'hit_count': 0
         }
-    
+
     def _generate_cache_key(self, query: str, context: dict = None) -> str:
         """Generiert Cache-Key (SHA256 von Query + Context)"""
         cache_input = {
@@ -515,7 +515,7 @@ class QueryCacheService:
         }
         cache_str = json.dumps(cache_input, sort_keys=True)
         return hashlib.sha256(cache_str.encode()).hexdigest()
-    
+
     def get_stats(self) -> dict:
         """Cache-Statistiken"""
         total_hits = sum(entry.get('hit_count', 0) for entry in self.cache.values())
@@ -532,24 +532,24 @@ class VeritasOllamaClient:
     def __init__(self):
         # ... existing code ...
         self.query_cache = QueryCacheService(max_size=1000, ttl_minutes=60)
-    
+
     async def query(self, query_text: str, use_cache: bool = True):
         """Query mit Cache-Support"""
-        
+
         # Cache-Lookup
         if use_cache:
             cached_response = self.query_cache.get(query_text)
             if cached_response:
                 logger.info(f"✅ Cache Hit für Query: {query_text[:50]}...")
                 return cached_response
-        
+
         # Cache Miss: Führe normale Query aus
         response = await self._execute_query(query_text)
-        
+
         # Speichere in Cache
         if use_cache:
             self.query_cache.set(query_text, response)
-        
+
         return response
 ```
 
@@ -573,9 +573,9 @@ class VeritasOllamaClient:
 async def warm_up_models():
     """Lädt und warmed Ollama-Models beim Backend-Start"""
     logger.info("🔥 Warming up Ollama models...")
-    
+
     ollama_client = VeritasOllamaClient()
-    
+
     # Dummy-Query zum Model-Loading
     try:
         await ollama_client.query("Hello", use_cache=False)
@@ -598,12 +598,12 @@ async def warm_up_models():
 ```cypher
 -- Neo4j Full-Text-Index erstellen
 CREATE FULLTEXT INDEX document_content_index IF NOT EXISTS
-FOR (n:Document) 
+FOR (n:Document)
 ON EACH [n.content, n.title];
 
 -- Optimierte Query (mit Full-Text-Index):
 CALL db.index.fulltext.queryNodes(
-  'document_content_index', 
+  'document_content_index',
   'BImSchG'
 ) YIELD node, score
 RETURN node, score
@@ -620,19 +620,19 @@ class Neo4jGraphBackend:
         """Full-Text Search mit Index"""
         cypher = """
         CALL db.index.fulltext.queryNodes(
-          'document_content_index', 
+          'document_content_index',
           $query
         ) YIELD node, score
         RETURN node, score
         ORDER BY score DESC
         LIMIT $limit
         """
-        
+
         results = await self.execute_query(
-            cypher, 
+            cypher,
             params={'query': query, 'limit': limit}
         )
-        
+
         return results
 ```
 
@@ -701,27 +701,27 @@ Preliminary LLM (24.8s) ┘
 ```python
 async def optimized_query_flow(query: str):
     """Parallel UDS3 Search + Preliminary LLM Response"""
-    
+
     # Task 1: UDS3 Search
     uds3_task = asyncio.create_task(
         strategy.search_api.hybrid_search(query, top_k=10)
     )
-    
+
     # Task 2: Preliminary LLM Response (ohne Sources)
     prelim_llm_task = asyncio.create_task(
         ollama_client.query(query, include_sources=False)
     )
-    
+
     # Warte auf beide Tasks
     uds3_results, prelim_response = await asyncio.gather(
         uds3_task, prelim_llm_task
     )
-    
+
     # Merge: Erweitere Preliminary Response mit Sources
     final_response = enhance_response_with_sources(
         prelim_response, uds3_results
     )
-    
+
     return final_response
 ```
 
@@ -742,61 +742,61 @@ async def optimized_query_flow(query: str):
 
 class ModelComparisonTest:
     """A/B Testing verschiedener Ollama-Models"""
-    
+
     test_queries = [
         "Was ist das BImSchG?",
         "Welche Grenzwerte gelten für Windkraftanlagen?",
         "Erkläre die Umweltverträglichkeitsprüfung."
     ]
-    
+
     def test_llama31_8b_performance(self):
         """Baseline: llama3.1:8b (4.9 GB)"""
         results = []
-        
+
         for query in self.test_queries:
             start = time.perf_counter()
             response = await ollama.generate(model="llama3.1:8b", prompt=query)
             duration = time.perf_counter() - start
-            
+
             results.append({
                 'query': query,
                 'duration': duration,
                 'response_length': len(response['response']),
                 'model': 'llama3.1:8b'
             })
-        
+
         self._save_results('llama31_8b_results.json', results)
-    
+
     def test_llama3_latest_performance(self):
         """Candidate: llama3:latest (4.7 GB)"""
         results = []
-        
+
         for query in self.test_queries:
             start = time.perf_counter()
             response = await ollama.generate(model="llama3:latest", prompt=query)
             duration = time.perf_counter() - start
-            
+
             results.append({
                 'query': query,
                 'duration': duration,
                 'response_length': len(response['response']),
                 'model': 'llama3:latest'
             })
-        
+
         self._save_results('llama3_latest_results.json', results)
-    
+
     def compare_models(self):
         """Vergleicht Performance beider Modelle"""
         llama31_results = self._load_results('llama31_8b_results.json')
         llama3_results = self._load_results('llama3_latest_results.json')
-        
+
         print("\n📊 Model Comparison:")
         print(f"  llama3.1:8b - Avg Duration: {mean([r['duration'] for r in llama31_results]):.2f}s")
         print(f"  llama3:latest - Avg Duration: {mean([r['duration'] for r in llama3_results]):.2f}s")
-        
-        improvement = (1 - mean([r['duration'] for r in llama3_results]) / 
+
+        improvement = (1 - mean([r['duration'] for r in llama3_results]) /
                           mean([r['duration'] for r in llama31_results])) * 100
-        
+
         print(f"  Improvement: {improvement:.1f}%")
 ```
 
@@ -850,7 +850,7 @@ pytest tests/performance/ -v --tb=short
 
 class PerformanceRegressionTest:
     """Performance-Regression Tests (CI/CD)"""
-    
+
     # Performance-Schwellwerte (Failure bei Überschreitung)
     THRESHOLDS = {
         'simple_query_max': 10.0,  # seconds
@@ -859,22 +859,22 @@ class PerformanceRegressionTest:
         'health_check_max': 0.05,  # 50ms
         'export_1000msg_max': 2.0
     }
-    
+
     def test_simple_query_performance(self):
         """Regression Test: Simple Query <10s"""
         duration = self._measure_query_time("Was ist das BImSchG?")
-        
+
         assert duration < self.THRESHOLDS['simple_query_max'], \
             f"Simple query too slow: {duration:.2f}s (max: {self.THRESHOLDS['simple_query_max']}s)"
-    
+
     def test_health_check_performance(self):
         """Regression Test: Health Check <50ms"""
         import requests
-        
+
         start = time.perf_counter()
         response = requests.get("http://localhost:5000/api/feedback/health")
         duration = time.perf_counter() - start
-        
+
         assert duration < self.THRESHOLDS['health_check_max'], \
             f"Health check too slow: {duration*1000:.2f}ms (max: {self.THRESHOLDS['health_check_max']*1000}ms)"
 ```
@@ -893,7 +893,7 @@ class PerformanceRegressionTest:
 
 class PerformanceMonitor:
     """Sammelt und exportiert Performance-Metriken"""
-    
+
     def __init__(self):
         self.metrics = {
             'query_count': 0,
@@ -902,27 +902,27 @@ class PerformanceMonitor:
             'cache_misses': 0,
             'query_times': []  # Rolling window (last 100 queries)
         }
-    
+
     def record_query(self, duration: float, cache_hit: bool):
         """Zeichnet Query-Metrik auf"""
         self.metrics['query_count'] += 1
         self.metrics['total_query_time'] += duration
-        
+
         if cache_hit:
             self.metrics['cache_hits'] += 1
         else:
             self.metrics['cache_misses'] += 1
-        
+
         # Rolling window
         self.metrics['query_times'].append(duration)
         if len(self.metrics['query_times']) > 100:
             self.metrics['query_times'].pop(0)
-    
+
     def get_stats(self) -> dict:
         """Performance-Statistiken"""
         if not self.metrics['query_times']:
             return {}
-        
+
         return {
             'total_queries': self.metrics['query_count'],
             'avg_query_time': self.metrics['total_query_time'] / self.metrics['query_count'],
@@ -955,17 +955,17 @@ async def get_performance_stats():
 ```python
 class PerformanceAlerter:
     """Warnt bei Performance-Problemen"""
-    
+
     THRESHOLDS = {
         'avg_query_time_warning': 15.0,  # 15s
         'avg_query_time_critical': 30.0,  # 30s
         'cache_hit_rate_warning': 15.0,  # 15%
     }
-    
+
     def check_performance(self, stats: dict):
         """Prüft Performance-Metriken und warnt"""
         alerts = []
-        
+
         # Query Time Check
         if stats['recent_avg_query_time'] > self.THRESHOLDS['avg_query_time_critical']:
             alerts.append({
@@ -977,14 +977,14 @@ class PerformanceAlerter:
                 'level': 'WARNING',
                 'message': f"Query time high: {stats['recent_avg_query_time']:.2f}s"
             })
-        
+
         # Cache Hit Rate Check
         if stats['cache_hit_rate'] < self.THRESHOLDS['cache_hit_rate_warning']:
             alerts.append({
                 'level': 'WARNING',
                 'message': f"Low cache hit rate: {stats['cache_hit_rate']:.1f}%"
             })
-        
+
         return alerts
 ```
 
@@ -1075,8 +1075,8 @@ docs/
 
 ---
 
-**Geschätzter Gesamt-Aufwand:** 6-8 Stunden  
-**Priorität:** ⭐⭐ MEDIUM (nach Chat-Persistierung)  
+**Geschätzter Gesamt-Aufwand:** 6-8 Stunden
+**Priorität:** ⭐⭐ MEDIUM (nach Chat-Persistierung)
 **Erwartetes Ergebnis:** -73% Latenz, +191% Throughput
 
 **Dependencies:**

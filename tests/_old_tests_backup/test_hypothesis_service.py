@@ -8,27 +8,22 @@ Version: 1.0.0
 Phase: 5 (v5.0 Hypothesis Generation)
 """
 
-import pytest
 import sys
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import MagicMock, Mock, patch
+
+import pytest
 
 # Add backend to path
 sys.path.append(str(Path(__file__).parent.parent / "backend"))
 
+from models.hypothesis import ConfidenceLevel, GapSeverity, Hypothesis, InformationGap, QuestionType
 from services.hypothesis_service import HypothesisService
-from models.hypothesis import (
-    Hypothesis,
-    QuestionType,
-    ConfidenceLevel,
-    InformationGap,
-    GapSeverity
-)
-
 
 # ============================================================================
 # FIXTURES
 # ============================================================================
+
 
 @pytest.fixture
 def mock_ollama_client():
@@ -40,7 +35,7 @@ def mock_ollama_client():
 @pytest.fixture
 def hypothesis_service(mock_ollama_client):
     """Create HypothesisService with mocked Ollama client."""
-    with patch('services.hypothesis_service.DirectOllamaLLM', return_value=mock_ollama_client):
+    with patch("services.hypothesis_service.DirectOllamaLLM", return_value=mock_ollama_client):
         service = HypothesisService(model_name="llama3.1:8b")
         service.ollama_client = mock_ollama_client
         return service
@@ -110,17 +105,18 @@ def sample_llm_response_malformed():
 # TEST GROUP 1: HYPOTHESIS GENERATION (5 tests)
 # ============================================================================
 
+
 def test_generate_hypothesis_high_confidence(hypothesis_service, mock_ollama_client, sample_llm_response_high_confidence):
     """Test hypothesis generation with high confidence query."""
     # Setup mock
     mock_result = Mock()
     mock_result.content = sample_llm_response_high_confidence
     mock_ollama_client.invoke.return_value = mock_result
-    
+
     # Generate hypothesis
     query = "Bauantrag für Einfamilienhaus in Stuttgart"
     hypothesis = hypothesis_service.generate_hypothesis(query)
-    
+
     # Assertions
     assert hypothesis.query == query
     assert hypothesis.question_type == QuestionType.PROCEDURAL
@@ -129,7 +125,7 @@ def test_generate_hypothesis_high_confidence(hypothesis_service, mock_ollama_cli
     assert not hypothesis.requires_clarification()
     assert hypothesis.is_high_confidence()
     assert len(hypothesis.suggested_steps) == 3
-    
+
     # Verify LLM was called
     mock_ollama_client.invoke.assert_called_once()
 
@@ -140,11 +136,11 @@ def test_generate_hypothesis_with_gaps(hypothesis_service, mock_ollama_client, s
     mock_result = Mock()
     mock_result.content = sample_llm_response_low_confidence
     mock_ollama_client.invoke.return_value = mock_result
-    
+
     # Generate hypothesis
     query = "Wie viel kostet ein Bauantrag?"
     hypothesis = hypothesis_service.generate_hypothesis(query)
-    
+
     # Assertions
     assert hypothesis.query == query
     assert hypothesis.question_type == QuestionType.CALCULATION
@@ -153,12 +149,12 @@ def test_generate_hypothesis_with_gaps(hypothesis_service, mock_ollama_client, s
     assert hypothesis.requires_clarification()
     assert hypothesis.has_critical_gaps()
     assert not hypothesis.is_high_confidence()
-    
+
     # Check gaps
     critical_gaps = [g for g in hypothesis.information_gaps if g.severity == GapSeverity.CRITICAL]
     assert len(critical_gaps) == 1
     assert critical_gaps[0].gap_type == "location"
-    
+
     # Check clarification questions
     questions = hypothesis.get_clarification_questions()
     assert len(questions) == 2
@@ -171,24 +167,24 @@ def test_generate_hypothesis_with_rag_context(hypothesis_service, mock_ollama_cl
     mock_result = Mock()
     mock_result.content = sample_llm_response_high_confidence
     mock_ollama_client.invoke.return_value = mock_result
-    
+
     # Generate hypothesis with context
     query = "Bauantrag Stuttgart"
     rag_context = [
         "Building permits in Stuttgart require 3 documents",
         "Processing time: 6-8 weeks",
-        "Cost: €500-800 depending on project size"
+        "Cost: €500-800 depending on project size",
     ]
     hypothesis = hypothesis_service.generate_hypothesis(query, rag_context=rag_context)
-    
+
     # Assertions
     assert hypothesis.query == query
     assert hypothesis.confidence == ConfidenceLevel.HIGH
-    
+
     # Verify LLM was called with context
     mock_ollama_client.invoke.assert_called_once()
     call_args = mock_ollama_client.invoke.call_args
-    prompt = call_args.kwargs['prompt']
+    prompt = call_args.kwargs["prompt"]
     assert "6-8 weeks" in prompt  # Context should be in prompt
     assert "€500-800" in prompt
 
@@ -212,11 +208,11 @@ def test_generate_hypothesis_comparison_query(hypothesis_service, mock_ollama_cl
   "expected_response_type": "comparison"
 }"""
     mock_ollama_client.invoke.return_value = mock_result
-    
+
     # Generate hypothesis
     query = "Holz oder Stein für Gartenhaus?"
     hypothesis = hypothesis_service.generate_hypothesis(query)
-    
+
     # Assertions
     assert hypothesis.question_type == QuestionType.COMPARISON
     assert hypothesis.confidence == ConfidenceLevel.HIGH
@@ -249,11 +245,11 @@ def test_generate_hypothesis_timeline_query(hypothesis_service, mock_ollama_clie
   "expected_response_type": "text"
 }"""
     mock_ollama_client.invoke.return_value = mock_result
-    
+
     # Generate hypothesis
     query = "Wie lange dauert die Baugenehmigung?"
     hypothesis = hypothesis_service.generate_hypothesis(query)
-    
+
     # Assertions
     assert hypothesis.question_type == QuestionType.TIMELINE
     assert hypothesis.confidence == ConfidenceLevel.MEDIUM
@@ -263,6 +259,7 @@ def test_generate_hypothesis_timeline_query(hypothesis_service, mock_ollama_clie
 # ============================================================================
 # TEST GROUP 2: CONFIDENCE SCORING (3 tests)
 # ============================================================================
+
 
 def test_confidence_high_no_gaps(hypothesis_service, mock_ollama_client):
     """Test that high confidence queries have no critical gaps."""
@@ -279,10 +276,10 @@ def test_confidence_high_no_gaps(hypothesis_service, mock_ollama_client):
   "expected_response_type": "list"
 }"""
     mock_ollama_client.invoke.return_value = mock_result
-    
+
     # Generate
     hypothesis = hypothesis_service.generate_hypothesis("Clear specific query")
-    
+
     # Assertions
     assert hypothesis.is_high_confidence()
     assert not hypothesis.has_critical_gaps()
@@ -311,10 +308,10 @@ def test_confidence_medium_some_gaps(hypothesis_service, mock_ollama_client):
   "expected_response_type": "text"
 }"""
     mock_ollama_client.invoke.return_value = mock_result
-    
+
     # Generate
     hypothesis = hypothesis_service.generate_hypothesis("Somewhat ambiguous query")
-    
+
     # Assertions
     assert hypothesis.confidence == ConfidenceLevel.MEDIUM
     assert not hypothesis.is_high_confidence()
@@ -344,10 +341,10 @@ def test_confidence_low_critical_gaps(hypothesis_service, mock_ollama_client):
   "expected_response_type": "text"
 }"""
     mock_ollama_client.invoke.return_value = mock_result
-    
+
     # Generate
     hypothesis = hypothesis_service.generate_hypothesis("Vague query")
-    
+
     # Assertions
     assert hypothesis.confidence == ConfidenceLevel.LOW
     assert not hypothesis.is_high_confidence()
@@ -359,15 +356,16 @@ def test_confidence_low_critical_gaps(hypothesis_service, mock_ollama_client):
 # TEST GROUP 3: ERROR HANDLING (2 tests)
 # ============================================================================
 
+
 def test_fallback_on_llm_error(hypothesis_service, mock_ollama_client):
     """Test fallback hypothesis when LLM fails."""
     # Setup mock to raise exception
     mock_ollama_client.invoke.side_effect = Exception("Connection error")
-    
+
     # Generate hypothesis (should not raise)
     query = "Test query"
     hypothesis = hypothesis_service.generate_hypothesis(query)
-    
+
     # Assertions
     assert hypothesis.query == query
     assert hypothesis.confidence == ConfidenceLevel.UNKNOWN
@@ -383,11 +381,11 @@ def test_fallback_on_malformed_json(hypothesis_service, mock_ollama_client, samp
     mock_result = Mock()
     mock_result.content = sample_llm_response_malformed
     mock_ollama_client.invoke.return_value = mock_result
-    
+
     # Generate hypothesis (should fallback due to missing fields)
     query = "Test query"
     hypothesis = hypothesis_service.generate_hypothesis(query)
-    
+
     # Assertions
     assert hypothesis.query == query
     assert hypothesis.confidence == ConfidenceLevel.UNKNOWN
@@ -397,23 +395,24 @@ def test_fallback_on_malformed_json(hypothesis_service, mock_ollama_client, samp
 # TEST GROUP 4: STATISTICS (2 tests)
 # ============================================================================
 
+
 def test_statistics_tracking(hypothesis_service, mock_ollama_client, sample_llm_response_high_confidence):
     """Test that statistics are tracked correctly."""
     # Setup mock
     mock_result = Mock()
     mock_result.content = sample_llm_response_high_confidence
     mock_ollama_client.invoke.return_value = mock_result
-    
+
     # Reset stats
     hypothesis_service.reset_statistics()
-    
+
     # Generate multiple hypotheses
     for i in range(3):
         hypothesis_service.generate_hypothesis(f"Query {i}")
-    
+
     # Get stats
     stats = hypothesis_service.get_statistics()
-    
+
     # Assertions
     assert stats["total_hypotheses"] == 3
     assert stats["high_confidence"] == 3
@@ -426,13 +425,13 @@ def test_statistics_reset(hypothesis_service):
     """Test statistics reset functionality."""
     # Get initial stats
     stats_before = hypothesis_service.get_statistics()
-    
+
     # Reset
     hypothesis_service.reset_statistics()
-    
+
     # Get stats after reset
     stats_after = hypothesis_service.get_statistics()
-    
+
     # Assertions
     assert stats_after["total_hypotheses"] == 0
     assert stats_after["high_confidence"] == 0
@@ -442,6 +441,7 @@ def test_statistics_reset(hypothesis_service):
 # ============================================================================
 # TEST GROUP 5: INTEGRATION (2 tests)
 # ============================================================================
+
 
 def test_json_parsing_with_markdown(hypothesis_service, mock_ollama_client):
     """Test JSON parsing with markdown code blocks."""
@@ -464,10 +464,10 @@ def test_json_parsing_with_markdown(hypothesis_service, mock_ollama_client):
 
 Hope this helps!"""
     mock_ollama_client.invoke.return_value = mock_result
-    
+
     # Generate hypothesis
     hypothesis = hypothesis_service.generate_hypothesis("Test query")
-    
+
     # Assertions
     assert hypothesis.question_type == QuestionType.PROCEDURAL
     assert hypothesis.confidence == ConfidenceLevel.HIGH
@@ -495,10 +495,10 @@ def test_case_insensitive_enum_parsing(hypothesis_service, mock_ollama_client):
   "expected_response_type": "text"
 }"""
     mock_ollama_client.invoke.return_value = mock_result
-    
+
     # Generate hypothesis (should handle uppercase)
     hypothesis = hypothesis_service.generate_hypothesis("Test query")
-    
+
     # Assertions
     assert hypothesis.question_type == QuestionType.PROCEDURAL
     assert hypothesis.confidence == ConfidenceLevel.HIGH

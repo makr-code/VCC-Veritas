@@ -3,23 +3,23 @@
 VERITAS Backend Launcher
 Startet das VERITAS Backend-API mit korrekter Pfad-Konfiguration
 """
-import sys
-import os
-import warnings
 import logging
+import os
+import sys
+import warnings
 
 # Unterdrücke UDS3 Module Warnings (optional)
-warnings.filterwarnings('ignore', message='.*module not available.*')
+warnings.filterwarnings("ignore", message=".*module not available.*")
 logging.getLogger().setLevel(logging.ERROR)  # Nur Errors anzeigen
 
 # Setup Python-Pfade
 project_root = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, project_root)
-sys.path.insert(0, os.path.join(project_root, 'frontend'))
-sys.path.insert(0, os.path.join(project_root, 'backend'))
-sys.path.insert(0, os.path.join(project_root, 'shared'))
-sys.path.insert(0, os.path.join(project_root, 'database'))
-sys.path.insert(0, os.path.join(project_root, 'uds3'))
+sys.path.insert(0, os.path.join(project_root, "frontend"))
+sys.path.insert(0, os.path.join(project_root, "backend"))
+sys.path.insert(0, os.path.join(project_root, "shared"))
+sys.path.insert(0, os.path.join(project_root, "database"))
+sys.path.insert(0, os.path.join(project_root, "uds3"))
 
 print("⚙️ Starte VERITAS Backend API...")
 print("📁 Project Root:", project_root)
@@ -27,17 +27,18 @@ print("🌐 API wird verfügbar unter: http://localhost:5000")
 
 try:
     # Wechsel zum Backend-Verzeichnis
-    os.chdir(os.path.join(project_root, 'backend', 'api'))
-    
+    os.chdir(os.path.join(project_root, "backend", "api"))
+
     # Führe veritas_api_backend.py aus
-    with open('veritas_api_backend.py', 'r', encoding='utf-8') as f:
+    with open("veritas_api_backend.py", "r", encoding="utf-8") as f:
         exec(f.read())
-    
+
 except Exception as e:
     print(f"❌ Fehler beim Starten des Backends: {e}")
     import traceback
+
     traceback.print_exc()
-    
+
     print("\n🔧 Mögliche Lösungen:")
     print("1. Fehlende Dependencies installieren:")
     print("   pip install fastapi uvicorn requests")

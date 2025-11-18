@@ -39,7 +39,7 @@ import logging
 import time
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, cast
 
 logger = logging.getLogger(__name__)
 
@@ -323,9 +323,14 @@ class QueryExpander:
             
             # Cleanup: Entferne Anführungszeichen, Präfixe, etc.
             variant = self._cleanup_variant(variant)
+<<<<<<< Updated upstream
             
             return variant
     
+=======
+            return cast(str, variant)
+
+>>>>>>> Stashed changes
     def _cleanup_variant(self, text: str) -> str:
         """Bereinigt LLM-Output."""
         
@@ -443,9 +448,15 @@ class MultiQueryGenerator:
             Dict mit Perspektive → Query Mapping
         """
         perspectives = perspectives or ["rechtlich", "technisch", "prozessual"]
+<<<<<<< Updated upstream
         
         multi_queries = {}
         
+=======
+
+        multi_queries: Dict[str, str] = {}
+
+>>>>>>> Stashed changes
         for perspective in perspectives:
             # Custom-Prompt für Perspektive
             prompt = (

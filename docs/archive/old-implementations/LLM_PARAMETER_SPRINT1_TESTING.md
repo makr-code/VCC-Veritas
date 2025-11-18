@@ -1,8 +1,8 @@
 # 🧪 LLM-Parameter UI Sprint 1 - Testing Guide
 
-**Version:** v3.18.2  
-**Erstellt:** 10.10.2025  
-**Features:** Preset-Buttons, Token-Counter, Antwortzeit-Prädiktion  
+**Version:** v3.18.2
+**Erstellt:** 10.10.2025
+**Features:** Preset-Buttons, Token-Counter, Antwortzeit-Prädiktion
 **Status:** 🟢 IMPLEMENTATION COMPLETE - READY FOR TESTING
 
 ---
@@ -105,7 +105,7 @@ Hover über jeden Button und prüfe Tooltip:
 
 **Test 2.1: Spinbox Änderungen**
 1. Ändere Max Tokens Spinbox schrittweise:
-   
+
    | Tokens | Erwartete Anzeige | Farbe | Indikator |
    |--------|-------------------|-------|-----------|
    | 100 | `💬 ~75 Wörter` | Grün | 💬 |
@@ -204,7 +204,7 @@ Range (±20%): 3.86s - 5.80s → Display: "~4-6s" ✅
 
 ### Test I3: Preset-Wechsel (mehrfach)
 1. Klicke: Präzise → Standard → Ausführlich → Kreativ
-2. **Erwartung:** 
+2. **Erwartung:**
    - Jeder Klick erzeugt System-Message
    - Alle Labels aktualisieren sich korrekt
    - Keine Fehler im Log
@@ -234,14 +234,14 @@ Range (±20%): 3.86s - 5.80s → Display: "~4-6s" ✅
 
 ### Test E2: Schneller Preset-Wechsel
 1. Klicke alle 4 Presets in < 2 Sekunden
-2. **Erwartung:** 
+2. **Erwartung:**
    - Alle Updates korrekt
    - Keine Race Conditions
    - 4 System-Messages im Chat
 
 ### Test E3: Gleichzeitige Änderungen
 1. Ändere gleichzeitig: Tokens (Spinbox) + Modell (Dropdown)
-2. **Erwartung:** 
+2. **Erwartung:**
    - Beide Updates reflektiert
    - Korrekte finale Antwortzeit
 
@@ -255,7 +255,7 @@ Range (±20%): 3.86s - 5.80s → Display: "~4-6s" ✅
 
 ### Test EH2: Fehlender Tooltip-Support
 1. Teste ohne `UI_COMPONENTS_AVAILABLE`
-2. **Erwartung:** 
+2. **Erwartung:**
    - Buttons funktionieren trotzdem
    - Keine Tooltips, aber keine Crashes
 
@@ -378,7 +378,7 @@ MODEL_BENCHMARKS = {
 
 ---
 
-**Tester:** _________________  
-**Datum:** _________________  
-**Ergebnis:** ☐ PASS | ☐ FAIL | ☐ PARTIAL  
+**Tester:** _________________
+**Datum:** _________________
+**Ergebnis:** ☐ PASS | ☐ FAIL | ☐ PARTIAL
 **Kommentare:** _________________________________

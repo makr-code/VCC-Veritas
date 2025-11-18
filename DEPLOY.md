@@ -1,7 +1,7 @@
 # 🚀 VERITAS v3.20.0 - Quick Deployment Guide
 
-**Version:** v3.20.0 (Chat Persistence)  
-**Last Updated:** 12. Oktober 2025, 17:00 Uhr  
+**Version:** v3.20.0 (Chat Persistence)
+**Last Updated:** 12. Oktober 2025, 17:00 Uhr
 **Status:** 🟢 **READY TO DEPLOY**
 
 ---
@@ -99,7 +99,7 @@ python frontend/veritas_app.py
 [ ] 7. Session wiederherstellen → Chat-History geladen
 ```
 
-**If ALL ✅:** 🎉 **DEPLOYMENT SUCCESSFUL**  
+**If ALL ✅:** 🎉 **DEPLOYMENT SUCCESSFUL**
 **If ANY ❌:** See Troubleshooting below
 
 ---

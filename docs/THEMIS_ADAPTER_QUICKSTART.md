@@ -114,10 +114,10 @@ class RAGService:
     def __init__(self):
         # Auto-selects ThemisDB or UDS3 based on env
         self.db_adapter = get_database_adapter(enable_fallback=True)
-        
+
         adapter_name = self.db_adapter.__class__.__name__
         logger.info(f"✅ RAG Service initialized with {adapter_name}")
-    
+
     async def search_documents(self, query: str) -> List[Dict]:
         # Same interface for both adapters
         return await self.db_adapter.vector_search(query, top_k=5)
@@ -145,7 +145,7 @@ async def vector_search(query: str, top_k: int = 5):
         query=query,
         top_k=top_k
     )
-    
+
     return {
         "results": results,
         "adapter": rag_service.db_adapter.__class__.__name__,
@@ -196,9 +196,9 @@ async def test_themis_vector_search():
         adapter_type=DatabaseAdapterType.THEMIS,
         enable_fallback=False
     )
-    
+
     results = await adapter.vector_search("BGB Vertragsrecht", top_k=3)
-    
+
     assert len(results) <= 3
     assert all('doc_id' in r for r in results)
     assert all('score' in r for r in results)
@@ -214,7 +214,7 @@ from backend.adapters import is_themisdb_available, is_uds3_available
 async def main():
     themis_ok = is_themisdb_available()
     uds3_ok = is_uds3_available()
-    
+
     print(f"ThemisDB: {'✅' if themis_ok else '❌'}")
     print(f"UDS3:     {'✅' if uds3_ok else '❌'}")
 

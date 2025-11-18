@@ -1,6 +1,6 @@
 # VERITAS v5.0 Structured Response System - Documentation Index
 
-**Created:** 12. Oktober 2025, 19:55 Uhr  
+**Created:** 12. Oktober 2025, 19:55 Uhr
 **Status:** 🟢 Design Complete - Ready for Implementation
 
 ---
@@ -265,7 +265,7 @@ class NLPService:
     def extract_entities(self, query: str) -> List[Entity]:
         """Extract named entities (dates, locations, persons)"""
         pass
-    
+
     def detect_question_type(self, query: str) -> QuestionType:
         """Classify question type (fact, comparison, timeline, etc.)"""
         pass
@@ -400,8 +400,8 @@ class ProcessExecutor:
 
 **STATUS:** 🟢 **READY TO IMPLEMENT**
 
-**Created:** 12. Oktober 2025, 19:55 Uhr  
-**Total Design Effort:** 20,000+ lines documentation  
+**Created:** 12. Oktober 2025, 19:55 Uhr
+**Total Design Effort:** 20,000+ lines documentation
 **Implementation Timeline:** 18-25 Tage (Full) oder 10-12 Tage (MVP)
 
 ---

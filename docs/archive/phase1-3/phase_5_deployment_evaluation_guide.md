@@ -1,7 +1,7 @@
 # Phase 5 Deployment & Evaluation Guide
 
-**Version:** 1.0  
-**Datum:** 7. Oktober 2025  
+**Version:** 1.0
+**Datum:** 7. Oktober 2025
 **Strategie:** Staging (Phase 1 + Phase 2) + Evaluation mit echten Daten
 
 ---
@@ -153,7 +153,7 @@ pytest tests/test_phase5_integration.py::TestABComparison -v
    # Latenz-Statistiken
    Select-String -Path data/veritas_auto_server.log -Pattern "Phase5.*latency" | Select-Object -Last 20
    ```
-   
+
    **Targets:**
    - Hybrid Total: <120ms (Avg), <200ms (P95)
    - Sparse Retrieval: <50ms
@@ -164,7 +164,7 @@ pytest tests/test_phase5_integration.py::TestABComparison -v
    # Error Rate
    Select-String -Path data/veritas_auto_server.log -Pattern "ERROR.*Phase5"
    ```
-   
+
    **Target:** <1% Error Rate
 
 3. **BM25 Cache Hit Rate:**
@@ -172,7 +172,7 @@ pytest tests/test_phase5_integration.py::TestABComparison -v
    # Cache Performance
    Select-String -Path data/veritas_auto_server.log -Pattern "cache_hit_rate"
    ```
-   
+
    **Target:** >60% Cache Hit Rate (nach Warmup)
 
 ### 2.6 Success-Kriterien Phase 1

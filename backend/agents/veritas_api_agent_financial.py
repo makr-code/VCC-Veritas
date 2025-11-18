@@ -7,6 +7,10 @@ import logging
 import asyncio
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
+<<<<<<< Updated upstream
+=======
+from typing import Any, Dict, List, Optional, cast
+>>>>>>> Stashed changes
 
 # Import base classes from framework
 try:
@@ -25,7 +29,12 @@ class TaxAssessmentWorker(ExternalAPIWorker):
     
     def __init__(self):
         from covina_core import WorkerType
+<<<<<<< Updated upstream
         super().__init__(WorkerType.TAX_ASSESSMENT, "https://api.finanzverwaltung.de/", cache_ttl=7200)  # 2 Stunden Cache
+=======
+
+        super().__init__(agent_id=str(WorkerType.TAX_ASSESSMENT), db_path=None, config={"api_base": "https://api.finanzverwaltung.de/", "cache_ttl": 7200})  # 2 Stunden Cache
+>>>>>>> Stashed changes
         self.tax_apis = {
             "federal_tax": "https://api.bundesfinanzministerium.de/",
             "state_tax": "https://api.landesfinanzverwaltung.de/",
@@ -339,7 +348,12 @@ class FundingOpportunitiesWorker(ExternalAPIWorker):
     
     def __init__(self):
         from covina_core import WorkerType
+<<<<<<< Updated upstream
         super().__init__(WorkerType.FUNDING_OPPORTUNITIES, "https://api.finanzverwaltung.de/", cache_ttl=3600)  # 1 Stunde Cache
+=======
+
+        super().__init__(agent_id=str(WorkerType.FUNDING_OPPORTUNITIES), db_path=None, config={"api_base": "https://api.finanzverwaltung.de/", "cache_ttl": 3600})  # 1 Stunde Cache
+>>>>>>> Stashed changes
         self.funding_apis = {
             "federal_funding": "https://api.foerderdatenbank.de/",
             "state_funding": "https://api.landesfoerderung.de/",
@@ -552,6 +566,7 @@ class FundingOpportunitiesWorker(ExternalAPIWorker):
         })
         
         return programs
+<<<<<<< Updated upstream
     
     async def _analyze_combination_options(self, programs: List) -> Dict[str, Any]:
         """Analysiert Kombinationsmöglichkeiten von Förderungen"""
@@ -563,6 +578,15 @@ class FundingOpportunitiesWorker(ExternalAPIWorker):
             "optimization_strategies": []
         }
         
+=======
+
+    async def _analyze_combination_options(self, programs: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Analysiert Kombinationsmöglichkeiten von Förderungen"""
+        await asyncio.sleep(0.3)
+
+        combinations: Dict[str, Any] = {"possible_combinations": [], "restrictions": [], "optimization_strategies": []}
+
+>>>>>>> Stashed changes
         # Finde kompatible Kombinationen
         kfw_programs = [p for p in programs if p["provider"] == "KfW"]
         bafa_programs = [p for p in programs if p["provider"] == "BAFA"]
@@ -607,12 +631,21 @@ class FundingOpportunitiesWorker(ExternalAPIWorker):
         ]
         
         return combinations
+<<<<<<< Updated upstream
     
     async def _evaluate_application_processes(self, programs: List) -> Dict[str, Any]:
         """Bewertet Antragsverfahren"""
         await asyncio.sleep(0.2)
         
         evaluation = {
+=======
+
+    async def _evaluate_application_processes(self, programs: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Bewertet Antragsverfahren"""
+        await asyncio.sleep(0.2)
+
+        evaluation: Dict[str, Any] = {
+>>>>>>> Stashed changes
             "complexity_ranking": [],
             "timing_requirements": {},
             "documentation_requirements": {},
@@ -665,6 +698,7 @@ class FundingOpportunitiesWorker(ExternalAPIWorker):
     
     def _assess_success_probability(self, request: Dict, programs: List) -> Dict[str, Any]:
         """Schätzt Erfolgschancen ein"""
+<<<<<<< Updated upstream
         
         assessment = {
             "overall_probability": "medium",
@@ -673,6 +707,14 @@ class FundingOpportunitiesWorker(ExternalAPIWorker):
             "risk_factors": []
         }
         
+=======
+
+        assessment: Dict[str, Any] = {"overall_probability": "medium", "program_assessments": [], "success_factors": [], "risk_factors": []}
+
+        # Use a mutable list for program assessments (mypy-safe)
+        program_assessments: List[Dict[str, Any]] = list(cast(List[Dict[str, Any]], assessment.get("program_assessments") or []))
+
+>>>>>>> Stashed changes
         for program in programs:
             probability = "medium"
             
@@ -681,6 +723,7 @@ class FundingOpportunitiesWorker(ExternalAPIWorker):
                 probability = "high"  # KfW-Kredite meist bewilligt
             if program.get("budget_limited"):
                 probability = "medium"  # Abhängig von Antragszeitpunkt
+<<<<<<< Updated upstream
             
             assessment["program_assessments"].append({
                 "program": program["name"],
@@ -688,6 +731,17 @@ class FundingOpportunitiesWorker(ExternalAPIWorker):
                 "key_factors": program.get("requirements", [])[:3]  # Top 3 Anforderungen
             })
         
+=======
+
+            program_assessments.append(
+                {
+                    "program": program["name"],
+                    "probability": probability,
+                    "key_factors": program.get("requirements", [])[:3],  # Top 3 Anforderungen
+                }
+            )
+
+>>>>>>> Stashed changes
         # Allgemeine Erfolgsfaktoren
         assessment["success_factors"] = [
             "Vollständige und korrekte Antragstellung",
@@ -703,7 +757,14 @@ class FundingOpportunitiesWorker(ExternalAPIWorker):
             "Unvollständige oder zu späte Antragstellung",
             "Nichteinhaltung technischer Mindestanforderungen"
         ]
+<<<<<<< Updated upstream
         
+=======
+
+        # Reassign the collected list back into the assessment dict
+        assessment["program_assessments"] = program_assessments
+
+>>>>>>> Stashed changes
         return assessment
 
 class BusinessTaxOptimizationWorker(BaseWorker):
@@ -711,8 +772,14 @@ class BusinessTaxOptimizationWorker(BaseWorker):
     
     def __init__(self):
         from covina_core import WorkerType
+<<<<<<< Updated upstream
         super().__init__(WorkerType.BUSINESS_TAX, cache_ttl=7200)  # 2 Stunden Cache
     
+=======
+
+        super().__init__(agent_id=str(WorkerType.BUSINESS_TAX), db_path=None, config={"cache_ttl": 7200})  # 2 Stunden Cache
+
+>>>>>>> Stashed changes
     def _extract_location(self, query: str) -> Dict[str, Any]:
         """Extrahiert Standortinformationen aus der Anfrage"""
         location = {
@@ -793,12 +860,28 @@ class BusinessTaxOptimizationWorker(BaseWorker):
         
         # Prioritäten
         if any(word in query.lower() for word in ["günstig", "niedrig", "steuer"]):
-            inquiry["priority_factors"].append("low_taxes")
+            pass
         if any(word in query.lower() for word in ["infrastruktur", "verkehr", "anbindung"]):
-            inquiry["priority_factors"].append("infrastructure")
+            pass
         if any(word in query.lower() for word in ["fachkräfte", "personal", "arbeitskräfte"]):
+<<<<<<< Updated upstream
             inquiry["priority_factors"].append("workforce")
         
+=======
+            pass
+
+        # Ensure correct typing for priority_factors before mutating
+        priority_factors: List[str] = list(cast(List[str], inquiry.get("priority_factors") or []))
+        if any(word in query.lower() for word in ["günstig", "niedrig", "steuer"]):
+            priority_factors.append("low_taxes")
+        if any(word in query.lower() for word in ["infrastruktur", "verkehr", "anbindung"]):
+            priority_factors.append("infrastructure")
+        if any(word in query.lower() for word in ["fachkräfte", "personal", "arbeitskräfte"]):
+            priority_factors.append("workforce")
+
+        inquiry["priority_factors"] = priority_factors
+
+>>>>>>> Stashed changes
         return inquiry
     
     async def _compare_business_tax_rates(self, location: Dict, inquiry: Dict) -> Dict[str, Any]:
@@ -851,7 +934,7 @@ class BusinessTaxOptimizationWorker(BaseWorker):
         
         comparison = {
             "municipalities": municipalities,
-            "ranking_by_tax_burden": sorted(municipalities, key=lambda x: x["hebesatz"]),
+            "ranking_by_tax_burden": sorted(municipalities, key=lambda x: cast(int, x.get("hebesatz", 0))),
             "state_average": 345,
             "federal_average": 356,
             "potential_savings": {
@@ -868,8 +951,13 @@ class BusinessTaxOptimizationWorker(BaseWorker):
     async def _evaluate_location_factors(self, location: Dict, inquiry: Dict) -> Dict[str, Any]:
         """Bewertet Standortfaktoren über Steuern hinaus"""
         await asyncio.sleep(0.3)
+<<<<<<< Updated upstream
         
         factors = {
+=======
+
+        factors: Dict[str, Any] = {
+>>>>>>> Stashed changes
             "infrastructure": {
                 "score": 8.5,  # 1-10
                 "details": {
@@ -917,16 +1005,27 @@ class BusinessTaxOptimizationWorker(BaseWorker):
         }
         
         # Gewichtung basierend auf Unternehmensprioritäten
+<<<<<<< Updated upstream
         priorities = inquiry.get("priority_factors", [])
         weighted_score = 0
         
+=======
+        priorities: List[str] = list(cast(List[str], inquiry.get("priority_factors") or []))
+        weighted_score: float = 0.0
+
+>>>>>>> Stashed changes
         if "low_taxes" in priorities:
-            weighted_score += factors["business_environment"]["score"] * 0.4
+            weighted_score += float(cast(float, factors.get("business_environment", {}).get("score", 0.0))) * 0.4
         if "infrastructure" in priorities:
-            weighted_score += factors["infrastructure"]["score"] * 0.4
+            weighted_score += float(cast(float, factors.get("infrastructure", {}).get("score", 0.0))) * 0.4
         if "workforce" in priorities:
+<<<<<<< Updated upstream
             weighted_score += factors["workforce"]["score"] * 0.4
         
+=======
+            weighted_score += float(cast(float, factors.get("workforce", {}).get("score", 0.0))) * 0.4
+
+>>>>>>> Stashed changes
         factors["overall_weighted_score"] = weighted_score / len(priorities) if priorities else 7.5
         
         return factors
@@ -934,6 +1033,7 @@ class BusinessTaxOptimizationWorker(BaseWorker):
     async def _develop_optimization_strategies(self, inquiry: Dict, tax_comparison: Dict) -> List[Dict]:
         """Entwickelt Optimierungsstrategien"""
         await asyncio.sleep(0.2)
+<<<<<<< Updated upstream
         
         strategies = []
         
@@ -960,6 +1060,36 @@ class BusinessTaxOptimizationWorker(BaseWorker):
             "break_even_years": 2  # Abhängig von Umzugskosten
         })
         
+=======
+
+        strategies: List[Dict[str, Any]] = []
+
+        # Standortwechsel-Strategie
+        best_tax_location = min(tax_comparison["municipalities"], key=lambda x: int(x.get("hebesatz", 0)))
+        current_location = max(tax_comparison["municipalities"], key=lambda x: int(x.get("hebesatz", 0)))  # Annahme: aktuell München
+
+        strategies.append(
+            {
+                "strategy": "Standortverlagerung",
+                "description": f"Umzug von {current_location['name']} nach {best_tax_location['name']}",
+                "tax_savings_annual": tax_comparison["potential_savings"]["best_vs_worst"]["annual_savings_100k_profit"],
+                "implementation_effort": "high",
+                "pros": [
+                    f"Jährliche Steuerersparnis: {tax_comparison['potential_savings']['best_vs_worst']['annual_savings_100k_profit']}€",
+                    "Niedrigere Betriebskosten möglich",
+                    "Weniger Verkehr und Stress",
+                ],
+                "cons": [
+                    "Umzugskosten",
+                    "Verlust etablierter Geschäftsbeziehungen",
+                    "Möglicherweise weniger Infrastruktur",
+                    "Mitarbeiter-Akzeptanz fraglich",
+                ],
+                "break_even_years": 2,  # Abhängig von Umzugskosten
+            }
+        )
+
+>>>>>>> Stashed changes
         # Rechtsform-Optimierung
         strategies.append({
             "strategy": "Rechtsform-Optimierung",
@@ -1001,6 +1131,7 @@ class BusinessTaxOptimizationWorker(BaseWorker):
     
     def _perform_cost_benefit_analysis(self, tax_comparison: Dict, location_factors: Dict) -> Dict[str, Any]:
         """Führt Kosten-Nutzen-Analyse durch"""
+<<<<<<< Updated upstream
         
         analysis = {
             "total_cost_calculation": {},
@@ -1008,14 +1139,20 @@ class BusinessTaxOptimizationWorker(BaseWorker):
             "sensitivity_analysis": {}
         }
         
+=======
+
+        analysis: Dict[str, Any] = {"total_cost_calculation": {}, "recommendation": {}, "sensitivity_analysis": {}}
+
+>>>>>>> Stashed changes
         # Beispiel-Berechnung für verschiedene Szenarien
-        business_scenarios = [
+        business_scenarios: List[Dict[str, Any]] = [
             {"name": "Startup (50k Gewinn)", "annual_profit": 50000},
             {"name": "Mittelstand (200k Gewinn)", "annual_profit": 200000},
             {"name": "Großunternehmen (1M Gewinn)", "annual_profit": 1000000}
         ]
         
         for scenario in business_scenarios:
+<<<<<<< Updated upstream
             profit = scenario["annual_profit"]
             
             scenario_costs = {}
@@ -1037,6 +1174,25 @@ class BusinessTaxOptimizationWorker(BaseWorker):
                     "gewerbesteuer": annual_tax,
                     "estimated_operating_costs": profit * 0.1 * location_cost_factor,
                     "total_cost": total_annual_cost
+=======
+            profit: float = float(cast(float, scenario.get("annual_profit", 0)))
+
+            scenario_costs = {}
+            for municipality in tax_comparison["municipalities"]:
+                # Gewerbesteuer berechnen
+                taxable_profit = max(0.0, profit - 24500.0)  # Freibetrag
+                annual_tax = taxable_profit * float(cast(float, municipality.get("effective_rate_percent", 0.0))) / 100.0
+
+                # Weitere Standortkosten einschätzen
+                location_cost_factor = {"München": 1.2, "Augsburg": 1.0, "Garching": 1.1}.get(municipality["name"], 1.0)
+
+                total_annual_cost = annual_tax + (float(profit) * 0.1 * float(location_cost_factor))  # 10% Betriebskosten
+
+                scenario_costs[municipality["name"]] = {
+                    "gewerbesteuer": annual_tax,
+                    "estimated_operating_costs": float(profit) * 0.1 * float(location_cost_factor),
+                    "total_cost": total_annual_cost,
+>>>>>>> Stashed changes
                 }
             
             analysis["total_cost_calculation"][scenario["name"]] = scenario_costs

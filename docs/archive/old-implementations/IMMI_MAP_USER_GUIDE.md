@@ -1,7 +1,7 @@
 # IMMI-Karte - Benutzerhandbuch
 
-**Version:** 1.0  
-**Datum:** 10. Oktober 2025  
+**Version:** 1.0
+**Datum:** 10. Oktober 2025
 **Integration:** VERITAS App + tkintermapview
 
 ---
@@ -12,8 +12,8 @@ Die **IMMI-Karte** (Immissionsschutz-Karte) visualisiert Geodaten von:
 - **🏭 BImSchG-Anlagen:** 4,062 Umweltgenehmigungen nach Bundesimmissionsschutzgesetz
 - **🌬️ Windkraftanlagen (WKA):** 5,457 Windenergieanlagen
 
-**Koordinatensystem:** ETRS89 UTM Zone 33N → WGS84 (automatische Transformation)  
-**Abdeckung:** Brandenburg (51.37°-53.52°N, 12.01°-14.73°E)  
+**Koordinatensystem:** ETRS89 UTM Zone 33N → WGS84 (automatische Transformation)
+**Abdeckung:** Brandenburg (51.37°-53.52°N, 12.01°-14.73°E)
 **Performance:** Native Tkinter Canvas (kein Browser-Widget)
 
 ---
@@ -193,8 +193,8 @@ Zoom 13 (Stadt-Detail):
 
 ### Marker-Limit
 
-**Standard:** 500 Marker  
-**Maximum:** 5000 Marker  
+**Standard:** 500 Marker
+**Maximum:** 5000 Marker
 **Empfehlung:**
 - **Übersicht (Zoom 7-9):** 500 Marker
 - **Detail (Zoom 10-13):** 1000 Marker
@@ -205,7 +205,7 @@ Sidebar → Marker-Limit Slider → Automatisches Neu-Laden
 
 ### Viewport-basiertes Laden (Geplant)
 
-**Aktuell:** Alle Marker werden geladen  
+**Aktuell:** Alle Marker werden geladen
 **Geplant:** Nur sichtbare Marker (bounds-Filter)
 
 **Vorteile:**
@@ -486,7 +486,7 @@ Bitte in `TODO_MAP_INTEGRATION.md` dokumentieren
 
 ---
 
-**Version:** 1.0  
-**Erstellt:** 10. Oktober 2025  
-**Autor:** VERITAS Agent System  
+**Version:** 1.0
+**Erstellt:** 10. Oktober 2025
+**Autor:** VERITAS Agent System
 **Lizenz:** Projektintern

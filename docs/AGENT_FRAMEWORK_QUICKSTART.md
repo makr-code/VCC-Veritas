@@ -1,8 +1,8 @@
 # VERITAS Agent Framework - Quick Start Guide
 
-**Status:** ✅ Production Ready  
-**Database:** PostgreSQL with JSON Fallback  
-**Version:** 1.0  
+**Status:** ✅ Production Ready
+**Database:** PostgreSQL with JSON Fallback
+**Version:** 1.0
 **Last Updated:** 2025-10-22
 
 ---
@@ -139,19 +139,19 @@ from backend.agents.framework.base_agent import BaseAgent
 
 class MyCustomAgent(BaseAgent):
     """Custom agent for specific domain."""
-    
+
     def get_agent_type(self) -> str:
         """Return unique agent type identifier."""
         return "my_custom_agent"
-    
+
     def get_capabilities(self) -> list:
         """Return list of capabilities."""
         return ["capability_1", "capability_2", "capability_3"]
-    
+
     def execute_step(self, step: dict, context: dict) -> dict:
         """
         Execute a single step.
-        
+
         Args:
             step: Step configuration with:
                 - step_id: Unique step identifier
@@ -159,13 +159,13 @@ class MyCustomAgent(BaseAgent):
                 - step_type: Type of step
                 - step_config: JSON configuration
                 - depends_on: List of step_ids
-            
+
             context: Execution context with:
                 - plan_id: Research plan ID
                 - previous_results: Results from dependencies
                 - uds3_databases: Available databases
                 - phase5_hybrid_search: Enable hybrid search
-        
+
         Returns:
             Result dictionary with:
                 - status: "success" or "error"
@@ -174,15 +174,15 @@ class MyCustomAgent(BaseAgent):
                 - quality_score: 0.0-1.0 (optional)
                 - error_message: Error details (if failed)
         """
-        
+
         # Your domain-specific logic here
         try:
             # Example: Query UDS3 database
             results = self._query_database(step)
-            
+
             # Example: Process results
             processed = self._process_results(results)
-            
+
             return {
                 "status": "success",
                 "data": {
@@ -192,7 +192,7 @@ class MyCustomAgent(BaseAgent):
                 "confidence_score": 0.9,
                 "quality_score": 0.85
             }
-        
+
         except Exception as e:
             return {
                 "status": "error",
@@ -244,7 +244,7 @@ plan = {
     "research_question": "What is the air quality in Munich?",
     "status": "pending",  # pending/running/paused/completed/failed
     "total_steps": 3,
-    
+
     # JSON document with full plan
     "plan_document": json.dumps({
         "schema_version": "1.0",
@@ -259,11 +259,11 @@ plan = {
             # ... more steps
         ]
     }),
-    
+
     # UDS3 Integration
     "uds3_databases": ["chromadb", "neo4j", "postgres"],
     "phase5_hybrid_search": True,
-    
+
     # Security & Metadata
     "security_level": "internal",  # public/internal/confidential/secret
     "source_domains": ["environmental"],
@@ -278,21 +278,21 @@ step = {
     "step_id": "unique_step_id",
     "plan_id": "parent_plan_id",
     "step_index": 0,  # Execution order
-    
+
     # Step details
     "step_name": "Query Environmental Data",
     "step_type": "data_retrieval",  # Custom type
-    
+
     # Agent assignment
     "agent_name": "environmental_agent",
     "agent_type": "EnvironmentalAgent",
-    
+
     # Execution state
     "status": "pending",  # pending/running/completed/failed/skipped
-    
+
     # Dependencies
     "depends_on": ["step_000"],  # List of step_ids
-    
+
     # Configuration
     "step_config": json.dumps({
         "databases": ["chromadb"],
@@ -349,10 +349,10 @@ storage.update_plan("plan_001", {"status": "running"})
 for step in [step1, step2]:
     # Update status
     storage.update_step(step['step_id'], {"status": "running"})
-    
+
     # Execute
     result = agent.execute_step(step, {"plan_id": "plan_001"})
-    
+
     # Store result
     storage.update_step(step['step_id'], {
         "status": "completed",
@@ -503,7 +503,7 @@ Step execution statistics per plan.
 
 ```sql
 CREATE VIEW step_execution_summary AS
-SELECT 
+SELECT
     rp.plan_id,
     rp.research_question,
     COUNT(rps.step_id) as total_steps,
@@ -519,7 +519,7 @@ Agent performance metrics.
 
 ```sql
 CREATE VIEW agent_performance_stats AS
-SELECT 
+SELECT
     agent_type,
     COUNT(*) as total_executions,
     AVG(execution_time_ms) as avg_execution_time_ms,
@@ -709,6 +709,6 @@ data/fallback_db/
 
 ---
 
-**Version:** 1.0  
-**Status:** ✅ Production Ready  
+**Version:** 1.0
+**Status:** ✅ Production Ready
 **Last Test:** 2025-10-22 (All tests passed)

@@ -1,9 +1,9 @@
 # Quellen-Hover-Preview - Implementierungsdokumentation
 
-**Feature**: #7 aus Rich-Text Enhancements TODO  
-**Version**: v3.7.0  
-**Datum**: 2025-10-09  
-**Status**: ✅ Implementiert  
+**Feature**: #7 aus Rich-Text Enhancements TODO
+**Version**: v3.7.0
+**Datum**: 2025-10-09
+**Status**: ✅ Implementiert
 
 ---
 
@@ -86,12 +86,12 @@ def _extract_source_metadata(self, source: str) -> Dict[str, Any]:
     Format: "Title [confidence: 0.85] [page: 5] [type: pdf]"
     """
     metadata = {}
-    
+
     # Regex-Patterns für:
     # - confidence: \[confidence:\s*([\d.]+)\]
     # - page: \[page:\s*(\d+)\]
     # - type: \[type:\s*(\w+)\]
-    
+
     return metadata
 ```
 
@@ -104,7 +104,7 @@ def _add_source_hover_tooltip(
     metadata: Dict[str, Any]
 ) -> None:
     """Fügt Hover-Tooltip zu Text-Tag hinzu"""
-    
+
     def show_tooltip(event):
         tooltip = self.source_link_handler.create_hover_tooltip(
             widget=self.text_widget,
@@ -112,7 +112,7 @@ def _add_source_hover_tooltip(
             preview_text=None,  # Wird vom Backend geladen
             metadata=metadata
         )
-    
+
     self.text_widget.tag_bind(tag_name, "<Enter>", show_tooltip)
 ```
 
@@ -333,7 +333,7 @@ Die Implementierung ist vollständig rückwärtskompatibel:
    ```python
    # Alt (weiterhin unterstützt)
    tooltip = SourceTooltip(widget, "Source", "Preview")
-   
+
    # Neu (optional)
    tooltip = SourceTooltip(
        widget, "Source", "Preview",
@@ -357,16 +357,16 @@ def get_snippet():
     data = request.json
     source_id = data.get('source_id')
     max_length = data.get('max_length', 300)
-    
+
     # Datenbank-Lookup
     doc = db.find_document(source_id)
-    
+
     if not doc:
         return jsonify({'error': 'Source not found'}), 404
-    
+
     # Snippet extrahieren
     snippet = doc.content[:max_length]
-    
+
     return jsonify({
         'snippet': snippet,
         'metadata': {

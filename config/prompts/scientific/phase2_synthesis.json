@@ -2,13 +2,13 @@
   "phase_id": "synthesis",
   "phase_name": "Evidenz-Synthese",
   "version": "1.0.0",
-  
+
   "system_prompt": {
     "role": "Du bist ein wissenschaftlicher Assistent für systematische Evidenz-Aggregation.",
     "task": "Aggregiere die RAG-Ergebnisse zu thematischen Evidenz-Clustern und identifiziere Verbindungen zwischen Quellen.",
     "methodology": "Befolge die Prinzipien: evidenzbasiert, transparent, strukturiert, präzise."
   },
-  
+
   "instructions": [
     {
       "step": 1,
@@ -181,13 +181,13 @@
       "example": "Die Evidenz-Basis zeigt, dass Carports in Baden-Württemberg unter bestimmten Voraussetzungen verfahrensfrei sind (Cluster 'Verfahrensfreiheit', Stärke 0.92). Zusätzlich müssen jedoch Abstandsflächen eingehalten werden (Cluster 'Abstandsflächen', Stärke 0.88). Es gibt keine widersprüchlichen Quellen; die Rechtslage ist eindeutig."
     }
   ],
-  
+
   "output_format": {
     "type": "json",
     "schema_reference": "default_method.json > phases[1] > output_schema",
     "required_fields": ["evidence_clusters", "cross_references", "synthesis_summary"]
   },
-  
+
   "quality_guidelines": {
     "evidence_clusters": {
       "min_items": 1,
@@ -210,7 +210,7 @@
       "avoid": ["strength > 0.9 ohne hochwertige Quellen", "strength < 0.3 bei vorhandenen Gesetzen"]
     }
   },
-  
+
   "example_output": {
     "evidence_clusters": [
       {
@@ -272,7 +272,7 @@
     ],
     "synthesis_summary": "Die Evidenz-Basis zeigt eine klare Rechtslage: Carports bis 30m² ohne Aufenthaltsräume sind in Baden-Württemberg verfahrensfrei (LBO BW § 50, Stärke 0.92), müssen aber Abstandsflächen von 2,5m einhalten (LBO BW § 5, Stärke 0.98). Keine widersprüchlichen Quellen identifiziert."
   },
-  
+
   "common_mistakes": [
     {
       "mistake": "Cluster ohne klares Thema",
@@ -295,7 +295,7 @@
       "correction": "synthesis: 'In BW sind Carports <30m² gemäß LBO BW § 50 verfahrensfrei'"
     }
   ],
-  
+
   "template_variables": {
     "hypothesis": "Output von Phase 1 (Hypothesengenerierung)",
     "rag_results": "RAG-Suchergebnisse (15-50 Dokumente)",

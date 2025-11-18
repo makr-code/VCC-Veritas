@@ -1,8 +1,8 @@
 # Dynamic Token Budget System - Implementation Summary
 
-**Status**: ✅ **IMPLEMENTED AND INTEGRATED**  
-**Date**: 2025-10-17  
-**Files**: 
+**Status**: ✅ **IMPLEMENTED AND INTEGRATED**
+**Date**: 2025-10-17
+**Files**:
 - `backend/services/token_budget_calculator.py`
 - `backend/services/intent_classifier.py`
 - `backend/agents/veritas_intelligent_pipeline.py`
@@ -71,7 +71,7 @@ TokenBudgetConfig:
 ```python
 budget = base_tokens * complexity_factor + chunk_bonus
 budget *= source_diversity
-budget *= agent_factor  
+budget *= agent_factor
 budget *= intent_weight
 budget *= user_preference
 if confidence:
@@ -255,9 +255,9 @@ synthesis_result = await self.ollama_client.synthesize_agent_results(
 
 **Query**:
 ```
-Welche verwaltungsrechtlichen Voraussetzungen müssen für einen Bescheid 
-zur Baugenehmigung einer Windkraftanlage erfüllt sein? Dabei ist insbesondere 
-die Abwägung zwischen Ermessensspielraum der Behörde und Verhältnismäßigkeitsgrundsatz 
+Welche verwaltungsrechtlichen Voraussetzungen müssen für einen Bescheid
+zur Baugenehmigung einer Windkraftanlage erfüllt sein? Dabei ist insbesondere
+die Abwägung zwischen Ermessensspielraum der Behörde und Verhältnismäßigkeitsgrundsatz
 zu beachten.
 ```
 
@@ -346,6 +346,6 @@ print(f"Intent: {intent.intent.value}")
 
 ---
 
-**Author**: VERITAS System  
-**Date**: 2025-10-17  
+**Author**: VERITAS System
+**Date**: 2025-10-17
 **Status**: ✅ Production-Ready

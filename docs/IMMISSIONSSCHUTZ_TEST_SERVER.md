@@ -75,7 +75,7 @@ uvicorn immissionsschutz_test_server:app --host 0.0.0.0 --port 5001
 ### Root & Health
 
 ```http
-GET / 
+GET /
 # Service-Info
 
 GET /health
@@ -291,7 +291,7 @@ for bescheid in anlage['bescheide']:
     for auflage in bescheid['auflagen']:
         if auflage['status'] == 'überfällig':
             # WARNUNG: Auflage nicht erfüllt!
-            
+
 # 4. Prüfe Messungen auf Überschreitungen
 ueberschreitungen = [m for m in anlage['messungen'] if m['ueberschreitung']]
 
@@ -301,7 +301,7 @@ offene_maengel = [m for m in anlage['maengel'] if m['status'] == 'offen']
 
 **Agent-Prompt**:
 ```
-"Prüfe die Compliance-Status der Anlage 10650200000/4001. 
+"Prüfe die Compliance-Status der Anlage 10650200000/4001.
 Berücksichtige:
 - Überfällige Auflagen
 - Grenzwertüberschreitungen in Messungen
@@ -326,7 +326,7 @@ messungen = get("/messungen/search", params={
 for messung in messungen:
     if messung['ueberschreitung']:
         # Grenzwertüberschreitung!
-        
+
 # 3. Mit Grenzwert vergleichen
 durchschnitt = mean([m['messwert'] for m in messungen])
 ```
@@ -352,7 +352,7 @@ heute = datetime.now()
 for v in verfahren:
     antrag_datum = datetime.fromisoformat(v['antragsdatum'])
     dauer = (heute - antrag_datum).days
-    
+
     if dauer > 365:  # Länger als 1 Jahr
         # WARNUNG: Überlange Bearbeitungszeit!
 ```
@@ -380,9 +380,9 @@ for mangel in anlagen_mit_maengeln:
         "bst_nr": mangel['bst_nr'],
         "anl_nr": mangel['anl_nr']
     })
-    
+
     letzte_ueberwachung = max(ueberwachungen, key=lambda u: u['durchgefuehrt_datum'])
-    
+
     # Wenn länger als 6 Monate her: Priorität hoch!
 ```
 
@@ -406,7 +406,7 @@ anlagen = get("/anlagen/search", params={"db": "bimschg", "ort": "Gransee"})
 # 2. Für jede Anlage: Statistik
 for anlage in anlagen['results']:
     complete = get(f"/anlage-complete/{anlage['bst_nr']}/{anlage['anl_nr']}")
-    
+
     # Vergleiche:
     # - Anzahl Grenzwertüberschreitungen
     # - Offene Mängel
@@ -525,19 +525,19 @@ import requests
 
 class ImmissionsschutzAgent:
     TEST_SERVER = "http://localhost:5001"
-    
+
     def query_verfahren(self, bst_nr, anl_nr):
         response = requests.get(
             f"{self.TEST_SERVER}/verfahren/search",
             params={"bst_nr": bst_nr, "anl_nr": anl_nr}
         )
         return response.json()
-    
+
     def check_compliance(self, bst_nr, anl_nr):
         anlage = requests.get(
             f"{self.TEST_SERVER}/anlage-complete/{bst_nr}/{anl_nr}"
         ).json()
-        
+
         # Analyse...
         return compliance_report
 ```
@@ -636,6 +636,6 @@ Test-Path data/test_databases/immissionsschutz_test.sqlite
 
 ---
 
-**Version**: 1.0.0  
-**Erstellt**: 18. Oktober 2025  
+**Version**: 1.0.0
+**Erstellt**: 18. Oktober 2025
 **Status**: ✅ Produktiv

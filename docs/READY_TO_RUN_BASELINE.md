@@ -1,7 +1,7 @@
 # 🎉 Baseline-Evaluation Ready to Run!
 
-**Status:** ✅ **COMPLETE & READY FOR TESTING**  
-**Datum:** 06.10.2025  
+**Status:** ✅ **COMPLETE & READY FOR TESTING**
+**Datum:** 06.10.2025
 
 ---
 
@@ -130,7 +130,7 @@ RuntimeError: Ollama Client Initialisierung fehlgeschlagen
 ```
 Pass Rate: 0% - Alle retrieval_scores = 0
 ```
-**Lösung:** 
+**Lösung:**
 - UDS3-Datenbank mit Dokumenten befüllen, ODER
 - Golden Dataset mit echten Doc-IDs aus UDS3 aktualisieren
 

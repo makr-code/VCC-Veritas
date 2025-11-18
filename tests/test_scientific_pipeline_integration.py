@@ -1,7 +1,10 @@
 import os
+
 import pytest
 from fastapi.testclient import TestClient
+
 from backend.api.veritas_api_backend import app
+
 
 @pytest.fixture(scope="module")
 def client():
@@ -9,6 +12,7 @@ def client():
     with TestClient(app) as c:
         yield c
     os.environ["VERITAS_SCIENTIFIC_MODE"] = "false"
+
 
 def test_scientific_pipeline_full(client):
     """
@@ -21,7 +25,7 @@ def test_scientific_pipeline_full(client):
         "agent_types": ["legal_framework", "environmental", "document_retrieval"],
         "complexity": "advanced",
         "external_sources": True,
-        "quality_level": "high"
+        "quality_level": "high",
     }
     response = client.post("/v2/query", json=payload)
     assert response.status_code == 200

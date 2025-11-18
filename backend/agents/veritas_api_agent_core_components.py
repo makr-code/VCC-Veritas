@@ -43,6 +43,11 @@ from queue import PriorityQueue, Empty
 from concurrent.futures import ThreadPoolExecutor
 import hashlib
 from pathlib import Path
+<<<<<<< Updated upstream
+=======
+from queue import Empty, PriorityQueue
+from typing import Any, Callable, Dict, List, Optional, Set, cast, TYPE_CHECKING
+>>>>>>> Stashed changes
 
 # Agent Registry Integration (In-Memory)
 try:
@@ -301,6 +306,7 @@ class AgentCoordinator:
         # Core Setup
         self.active_agents: Dict[str, Dict[str, Any]] = {}
         self.agent_lock = threading.RLock()
+<<<<<<< Updated upstream
         self.query_queue = PriorityQueue()
         self.result_queue = queue.Queue()
         
@@ -309,6 +315,16 @@ class AgentCoordinator:
         self.coordinator_thread = None
         self.monitor_thread = None
         
+=======
+        self.query_queue: PriorityQueue = PriorityQueue()
+        self.result_queue: queue.Queue = queue.Queue()
+
+        # Threading Control
+        self.is_running = False
+        self.coordinator_thread: Optional[threading.Thread] = None
+        self.monitor_thread: Optional[threading.Thread] = None
+
+>>>>>>> Stashed changes
         # Configuration
         self.check_interval = check_interval
         self.max_concurrent_agents = int(os.getenv('VERITAS_MAX_AGENTS', '10'))
@@ -328,6 +344,7 @@ class AgentCoordinator:
         self.query_analyzer = QueryAnalyzer(self)
         
         # Statistics
+<<<<<<< Updated upstream
         self.stats = {
             'queries_processed': 0,
             'queries_failed': 0,
@@ -336,6 +353,16 @@ class AgentCoordinator:
             'total_processing_time': 0.0,
             'rag_retrievals': 0,
             'llm_generations': 0
+=======
+        self.stats: Dict[str, Any] = {
+            "queries_processed": 0,
+            "queries_failed": 0,
+            "agents_spawned": 0,
+            "agents_terminated": 0,
+            "total_processing_time": 0.0,
+            "rag_retrievals": 0,
+            "llm_generations": 0,
+>>>>>>> Stashed changes
         }
         
         # Agent Registry Integration
@@ -444,9 +471,16 @@ class AgentCoordinator:
         while time.time() - start_time < timeout:
             try:
                 # Prüfe Result-Queue
+<<<<<<< Updated upstream
                 result = self.result_queue.get(timeout=1.0)
                 
                 if result.get('query_id') == query_id:
+=======
+                raw = self.result_queue.get(timeout=1.0)
+                result = cast(Dict[str, Any], raw)
+
+                if result.get("query_id") == query_id:
+>>>>>>> Stashed changes
                     return result
                 else:
                     # Nicht unser Ergebnis, zurück in Queue
@@ -616,7 +650,8 @@ class AgentCoordinator:
             
             # Agent ausführen
             start_time = time.time()
-            result = agent_instance.process_query(query_data, query_id)
+            raw_result = agent_instance.process_query(query_data, query_id)
+            result = cast(Dict[str, Any], raw_result)
             processing_time = time.time() - start_time
             
             # Ergebnis anreichern

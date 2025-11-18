@@ -197,10 +197,10 @@ if result.success:
     print(f"✅ Found {result.joined_count} documents")
     print(f"Databases queried: {result.databases_queried}")
     print(f"Total time: {result.total_execution_time_ms:.2f}ms")
-    
+
     for db, time_ms in result.database_execution_times.items():
         print(f"  {db.value}: {time_ms:.2f}ms")
-    
+
     # Access individual documents
     for doc in result.joined_results[:10]:  # Top 10
         doc_id = doc.get("document_id")
@@ -245,14 +245,14 @@ result = query.join_strategy(JoinStrategy.UNION).execute()
 if result.success:
     print(f"✅ Found {result.joined_count} documents")
     print(f"Query time: {result.total_execution_time_ms:.2f}ms")
-    
+
     # Sort by relevance (if scores available)
     sorted_docs = sorted(
         result.joined_results,
         key=lambda d: d.get("score", 0.0),
         reverse=True
     )
-    
+
     # Display top 10
     for i, doc in enumerate(sorted_docs[:10], 1):
         doc_id = doc.get("document_id", "unknown")
@@ -329,7 +329,7 @@ try:
     query = create_polyglot_query(strategy)
     query.graph().by_relationship("CITES", "OUTGOING")
     result = query.execute()
-    
+
     if not result.success:
         print(f"Query failed: {result.error}")
         print(f"Failed databases: {result.databases_failed}")
@@ -337,7 +337,7 @@ try:
         print("No results found (try different query or join strategy)")
     else:
         print(f"Success! Found {result.joined_count} documents")
-        
+
 except Exception as e:
     print(f"Error executing query: {e}")
     import traceback
@@ -396,6 +396,6 @@ except Exception as e:
 
 ---
 
-**Last Updated:** 2025-01-11  
-**UDS3 Version:** 3.18.4  
+**Last Updated:** 2025-01-11
+**UDS3 Version:** 3.18.4
 **Status:** ✅ Production Ready (Vector search pending)

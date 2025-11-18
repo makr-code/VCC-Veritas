@@ -37,12 +37,22 @@ except ImportError:
     OLLAMA_AVAILABLE = False
     logging.warning("Native Ollama Integration nicht verfügbar")
 
+<<<<<<< Updated upstream
 try:
     from config import DATABASE_CONFIG
+=======
+from typing import Any as _Any
+
+# Predefine DATABASE_CONFIG so it's always available and mypy-friendly
+DATABASE_CONFIG: Dict[str, _Any] = {}
+try:
+    import config
+
+    DATABASE_CONFIG = getattr(config, "DATABASE_CONFIG", DATABASE_CONFIG)
+>>>>>>> Stashed changes
     CONFIG_AVAILABLE = True
-except ImportError:
+except Exception:
     CONFIG_AVAILABLE = False
-    DATABASE_CONFIG = {}
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -196,8 +206,13 @@ class VeritasAgentPreprocessor:
     def _detect_domain(self, query: str) -> str:
         """Erkennt die Domain basierend auf Keywords"""
         query_lower = query.lower()
+<<<<<<< Updated upstream
         
         domain_scores = {}
+=======
+
+        domain_scores: Dict[str, int] = {}
+>>>>>>> Stashed changes
         for domain, keywords in self.domain_keywords.items():
             score = sum(1 for keyword in keywords if keyword in query_lower)
             if score > 0:
@@ -273,9 +288,15 @@ class VeritasAgentEngine:
         self.llm = llm
         self.embeddings = embeddings
         self.preprocessor = VeritasAgentPreprocessor(llm)
+<<<<<<< Updated upstream
         self.workers = {}
         self.session_data = {}
         
+=======
+        self.workers: Dict[str, Any] = {}
+        self.session_data: Dict[str, Any] = {}
+
+>>>>>>> Stashed changes
         # Worker-Registry initialisieren
         self._initialize_worker_registry()
         
@@ -340,7 +361,9 @@ class VeritasAgentEngine:
         results = await asyncio.gather(*tasks, return_exceptions=True)
         
         # Fehlerbehandlung
-        worker_results = []
+        from typing import cast
+
+        worker_results: List[VeritasWorkerResult] = []
         for i, result in enumerate(results):
             if isinstance(result, Exception):
                 logger.error(f"Worker {worker_types[i].value} fehlgeschlagen: {result}")
@@ -354,8 +377,13 @@ class VeritasAgentEngine:
                     error_message=str(result)
                 ))
             else:
+<<<<<<< Updated upstream
                 worker_results.append(result)
         
+=======
+                worker_results.append(cast(VeritasWorkerResult, result))
+
+>>>>>>> Stashed changes
         return worker_results
     
     async def _execute_single_worker(self, 

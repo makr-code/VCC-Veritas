@@ -1,7 +1,7 @@
 # ✅ LLM-Parameter UI-Controls - Implementation Success
 
-**Datum:** 10.10.2025  
-**Status:** ✅ COMPLETE  
+**Datum:** 10.10.2025
+**Status:** ✅ COMPLETE
 **Version:** v3.18.1
 
 ---
@@ -138,11 +138,11 @@ Tooltip(
 def _open_help_docs(self, doc_name):
     """Öffnet Hilfedokumentation"""
     docs_path = os.path.join(
-        os.path.dirname(os.path.dirname(__file__)), 
-        'docs', 
+        os.path.dirname(os.path.dirname(__file__)),
+        'docs',
         f'{doc_name}.md'
     )
-    
+
     if os.path.exists(docs_path):
         # Windows: os.startfile()
         # macOS: open
@@ -465,7 +465,7 @@ payload = {
 
 ---
 
-**Autor:** VERITAS System  
-**Version:** v3.18.1  
-**Datum:** 10.10.2025  
+**Autor:** VERITAS System
+**Version:** v3.18.1
+**Datum:** 10.10.2025
 **Status:** ✅ PRODUCTION READY

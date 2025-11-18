@@ -1,6 +1,6 @@
 # VERITAS Streaming bei Agenten-Tätigkeit
 
-Datum: 21. September 2025  
+Datum: 21. September 2025
 Version: 1.0
 
 > Kurz erklärt: Stellen Sie sich eine Paketverfolgung vor. Sie sehen live, wo Ihr Paket ist (abgeholt, sortiert, unterwegs). Genauso zeigt VERITAS live an, in welchem Bearbeitungsschritt Ihre Frage gerade ist – inklusive Zwischenresultaten.

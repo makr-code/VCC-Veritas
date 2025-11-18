@@ -3,8 +3,9 @@
 Backend Service Status Test
 Prüft Verfügbarkeit von Services für Hypothesis-Integration
 """
-import requests
 import json
+
+import requests
 
 BASE_URL = "http://localhost:5000"
 
@@ -34,7 +35,7 @@ try:
     response = requests.get(f"{BASE_URL}/capabilities")
     if response.status_code == 200:
         data = response.json()
-        agents = data.get('agents', [])
+        agents = data.get("agents", [])
         print(f"   ✅ {len(agents)} Agents registriert")
     else:
         print(f"   ❌ Capabilities fehlgeschlagen: {response.status_code}")
@@ -48,7 +49,7 @@ try:
     if response.status_code == 200:
         data = response.json()
         print(f"   ✅ Pipeline Status: {data['status']}")
-        ollama_stats = data.get('ollama_stats', {})
+        ollama_stats = data.get("ollama_stats", {})
         if ollama_stats:
             print(f"   • Ollama Client Stats: {ollama_stats.get('total_requests', 0)} requests")
             print(f"   • Ollama Base URL: {ollama_stats.get('base_url', 'N/A')}")
@@ -62,7 +63,8 @@ except Exception as e:
 print("\n" + "=" * 60)
 print("ZUSAMMENFASSUNG")
 print("=" * 60)
-print("""
+print(
+    """
 ERWARTUNG für Hypothesis-Integration:
 - ✅ streaming_available = True
 - ✅ intelligent_pipeline_available = True
@@ -72,4 +74,5 @@ ERWARTUNG für Hypothesis-Integration:
 Falls ollama_client = None:
 → Hypothesis-Stage wird übersprungen!
 → Prüfe: get_ollama_client() in veritas_api_backend.py
-""")
+"""
+)

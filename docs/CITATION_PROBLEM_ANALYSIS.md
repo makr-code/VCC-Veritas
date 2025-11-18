@@ -5,7 +5,7 @@
 ### Test 1: test_prompt_improvement.py (codellama)
 ```
 ❌ Zitationen [1],[2]: 0
-❌ Direkte Zitate: 0  
+❌ Direkte Zitate: 0
 ❌ Legal Refs (§): 0
 ✅ Aspect Coverage: 40% (verbessert von 20%)
 ✅ Antwortlänge: 1125 Zeichen
@@ -90,7 +90,7 @@ Antwort:
 • Bauvorlagen (Grundrisse, Schnitte)[1]
 • Statische Berechnungen[3]
 
-Der Bauantrag wird beim Bauordnungsamt eingereicht[1]. 
+Der Bauantrag wird beim Bauordnungsamt eingereicht[1].
 Die Bearbeitungsdauer beträgt 2-3 Monate[2].
 
 💡 Vorschläge:
@@ -186,7 +186,7 @@ Wenn [N] nicht funktioniert, versuche alternatives Format:
 
 **Realistische Ziele (ohne Fine-Tuning):**
 - **Mit Few-Shot Examples:** 40-60% Citation Rate
-- **Mit Constraint-Based:** 50-70% Citation Rate  
+- **Mit Constraint-Based:** 50-70% Citation Rate
 - **Combined Approach:** 60-80% Citation Rate
 
 **Nicht erreichbar ohne Fine-Tuning:**
@@ -208,4 +208,3 @@ Wenn [N] nicht funktioniert, versuche alternatives Format:
 1. Fine-Tuning Evaluation
 2. Custom Model Training
 3. Deployment mit garantiert 80%+ Citation Rate
-

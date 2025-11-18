@@ -312,6 +312,3 @@ In den zuletzt erstellten/aktualisierten Dokumenten (Phase- & Implementation-Gap
   - Priorität: Mittel-Hoch (Sprint 2).
 
 Diese Ergänzungen wurden dem Bericht als eigenes Kapitel übernommen sowie als ToDos in die priorisierte Roadmap integriert.
-
-
-

@@ -1,6 +1,6 @@
 # VERITAS: Hypothesis-Stage Integration
-**Datum:** 16. Oktober 2025  
-**Version:** v1.1.0-scientific-workflow  
+**Datum:** 16. Oktober 2025
+**Version:** v1.1.0-scientific-workflow
 **Status:** ✅ Implementiert & Getestet
 
 ---
@@ -52,7 +52,7 @@ class ProgressType(Enum):
 @dataclass
 class ProgressUpdate:
     # ... bestehende Felder
-    
+
     # Hypothesis (NEU)
     hypothesis_data: Optional[Dict[str, Any]] = None
     confidence: Optional[str] = None  # "high", "medium", "low"
@@ -103,12 +103,12 @@ def add_hypothesis(self,
                   confidence: str = "medium") -> None:
     """
     Sendet Hypothesen-Generierung als Progress-Event
-    
+
     Args:
         session_id: Session-ID
         hypothesis: Hypothesis object from HypothesisService
         confidence: Confidence level (high/medium/low)
-    
+
     Emits:
         ProgressUpdate mit ProgressType.HYPOTHESIS
         - hypothesis_data: Vollständige Hypothesen-Details
@@ -146,21 +146,21 @@ progress_manager.add_hypothesis(
 async def _process_streaming_query(session_id, query_id, request):
     """
     UPDATED WORKFLOW:
-    
+
     Stage 0: HYPOTHESIS (NEU!)
     ├─ HypothesisService.generate_hypothesis()
     ├─ Progress-Event: ProgressType.HYPOTHESIS
     └─ Optional: Stage Reflection (bei enable_llm_thinking=True)
-    
+
     Stage 1: QUERY ANALYSIS
     ├─ Complexity Detection
     ├─ Domain Detection
     └─ Progress-Event: ProgressStage.ANALYZING_QUERY
-    
+
     Stage 2: AGENT SELECTION
     ...
     """
-    
+
     # ========================================
     # STAGE 0: HYPOTHESIS GENERATION (NEU!)
     # ========================================
@@ -168,20 +168,20 @@ async def _process_streaming_query(session_id, query_id, request):
         model_name="llama3.1:8b",
         temperature=0.3
     )
-    
+
     hypothesis = hypothesis_service.generate_hypothesis(
         query=request.query,
         rag_context=[],  # Reine Hypothese ohne RAG-Kontext
         timeout=15.0
     )
-    
+
     # Sende Hypothesis als Progress-Event
     progress_manager.add_hypothesis(
         session_id=session_id,
         hypothesis=hypothesis,
         confidence=hypothesis.confidence.value
     )
-    
+
     # Optional: Stage Reflection (LLM Meta-Analyse)
     if reflection_service and request.enable_llm_thinking:
         hypothesis_reflection = await reflection_service.reflect_on_stage(
@@ -194,7 +194,7 @@ async def _process_streaming_query(session_id, query_id, request):
                 'assumptions': hypothesis.assumptions
             }
         )
-        
+
         progress_manager.add_stage_reflection(
             session_id=session_id,
             reflection_stage="hypothesis",
@@ -297,17 +297,17 @@ const eventSource = new EventSource(`/v2/query/progress/${sessionId}`);
 
 eventSource.addEventListener('progress', (event) => {
   const data = JSON.parse(event.data);
-  
+
   // Neuer Event-Type: hypothesis
   if (data.type === 'hypothesis') {
     handleHypothesisUpdate(data);
   }
-  
+
   // Bestehende Event-Types
   if (data.type === 'stage_reflection') {
     handleStageReflection(data);
   }
-  
+
   if (data.type === 'agent_complete') {
     handleAgentComplete(data);
   }
@@ -316,18 +316,18 @@ eventSource.addEventListener('progress', (event) => {
 function handleHypothesisUpdate(data) {
   // Zeige Hypothesen-Details
   const hypothesis = data.hypothesis_data;
-  
+
   // UI-Update: Confidence Badge
   updateConfidenceBadge(hypothesis.confidence);
-  
+
   // UI-Update: Information Gaps
   displayInformationGaps(hypothesis.information_gaps);
-  
+
   // UI-Update: Clarification Questions (als Rückfragen)
   if (hypothesis.clarification_questions.length > 0) {
     showClarificationDialog(hypothesis.clarification_questions);
   }
-  
+
   // UI-Update: Assumptions (Transparenz)
   displayAssumptions(hypothesis.assumptions);
 }
@@ -335,7 +335,7 @@ function handleHypothesisUpdate(data) {
 function displayInformationGaps(gaps) {
   const criticalGaps = gaps.filter(g => g.severity === 'critical');
   const importantGaps = gaps.filter(g => g.severity === 'important');
-  
+
   if (criticalGaps.length > 0) {
     // Zeige kritische Lücken prominent (z.B. Modal)
     showCriticalGapsModal(criticalGaps);
@@ -358,7 +358,7 @@ function displayInformationGaps(gaps) {
 @pytest.mark.asyncio
 async def test_hypothesis_generation_in_streaming():
     """Test Hypothesis-Stage in Streaming-Pipeline"""
-    
+
     # Starte Streaming Query
     async with session.post(
         f"{BASE_URL}/v2/query/stream",
@@ -369,41 +369,41 @@ async def test_hypothesis_generation_in_streaming():
     ) as response:
         data = await response.json()
         session_id = data["session_id"]
-    
+
     # Connect zu Progress-Stream
     async with session.get(
         f"{BASE_URL}/v2/query/progress/{session_id}"
     ) as stream_response:
         events = []
-        
+
         async for line in stream_response.content:
             if line.startswith(b"data: "):
                 event_data = json.loads(line[6:])
                 events.append(event_data)
-                
+
                 # Test: Hypothesis Event erkannt
                 if event_data.get("type") == "hypothesis":
                     hypothesis = event_data
-                    
+
                     # Assertions
                     assert "hypothesis_data" in hypothesis
                     assert "question_type" in hypothesis["hypothesis_data"]
                     assert "confidence" in hypothesis["hypothesis_data"]
                     assert "information_gaps" in hypothesis["hypothesis_data"]
                     assert "clarification_questions" in hypothesis["hypothesis_data"]
-                    
+
                     # Validiere Struktur
                     assert hypothesis["confidence"] in ["high", "medium", "low", "unknown"]
-                    
+
                     # Information Gaps haben korrekte Struktur
                     for gap in hypothesis["information_gaps"]:
                         assert "gap_type" in gap
                         assert "severity" in gap
                         assert gap["severity"] in ["critical", "important", "optional"]
-                    
+
                     print(f"✅ Hypothesis Event erfolgreich getestet")
                     break
-        
+
         # Finale Validierung
         hypothesis_events = [e for e in events if e.get("type") == "hypothesis"]
         assert len(hypothesis_events) == 1, "Genau 1 Hypothesis Event erwartet"
@@ -424,7 +424,7 @@ async def test_hypothesis_generation_in_streaming():
 | Synthesis | 3-6s | LLM-Aggregation |
 | **GESAMT (mit Hypothesis)** | **9-20s** | +2-5s durch Hypothesis-Stage |
 
-**Optimierung:** 
+**Optimierung:**
 - Hypothesis-Generation läuft **vor** Agent-Selection → keine Parallellisierung möglich
 - Alternative: Hypothesis parallel zu Query Analysis (falls Performance kritisch)
 
@@ -464,32 +464,32 @@ async def test_hypothesis_generation_in_streaming():
 def _select_agents_for_hypothesis(hypothesis: Hypothesis) -> List[str]:
     """
     Wähle Agents basierend auf Hypothesen-Analyse
-    
+
     Logic:
     - question_type="procedural" → GenehmigungsAgent, VerwaltungsrechtAgent
     - gap_type="location" → GeoAgent, LandesbauordnungAgent
     - required_context_types → Matching nach Agent-Capabilities
     """
     selected_agents = []
-    
+
     # 1. Question-Type basierte Selektion
     if hypothesis.question_type == QuestionType.PROCEDURAL:
         selected_agents.extend(['GenehmigungsAgent', 'VerwaltungsrechtAgent'])
     elif hypothesis.question_type == QuestionType.ANALYTICAL:
         selected_agents.extend(['AnalyseAgent', 'BewertungsAgent'])
-    
+
     # 2. Information-Gap basierte Selektion
     for gap in hypothesis.information_gaps:
         if gap.gap_type == "location":
             selected_agents.append('GeoKontextAgent')
         elif gap.gap_type == "legal_framework":
             selected_agents.append('RechtsrahmenAgent')
-    
+
     # 3. Required-Context-Types → Agent-Capabilities Matching
     for context_type in hypothesis.required_context_types:
         matching_agents = agent_registry.find_by_capability(context_type)
         selected_agents.extend(matching_agents)
-    
+
     return list(set(selected_agents))  # Deduplizieren
 ```
 
@@ -505,10 +505,10 @@ if has_critical_gaps(hypothesis):
         clarification_questions=hypothesis.clarification_questions,
         timeout=60.0  # 1 Minute für Antwort
     )
-    
+
     # Warte auf Nutzer-Antwort
     user_responses = await wait_for_user_input(session_id)
-    
+
     # Re-generate Hypothesis mit zusätzlichem Kontext
     enriched_query = f"{request.query}\n\nZusätzliche Details: {user_responses}"
     hypothesis = hypothesis_service.generate_hypothesis(enriched_query)
@@ -551,5 +551,5 @@ if validation_result.mismatch:
 - [ ] Frontend UI für Hypothesis-Display erweitern
 - [ ] Integration-Tests für Hypothesis-Stage erweitern
 
-**Dokumentiert am:** 16. Oktober 2025  
+**Dokumentiert am:** 16. Oktober 2025
 **Version:** VERITAS Backend v1.1.0-scientific-workflow

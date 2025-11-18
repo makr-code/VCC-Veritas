@@ -10,8 +10,12 @@ Endpoints für Agent Management:
 Integration mit Intelligent Pipeline.
 """
 
+<<<<<<< Updated upstream
 from fastapi import APIRouter, HTTPException, Request, Path
 from typing import List, Dict, Any
+=======
+import asyncio
+>>>>>>> Stashed changes
 import logging
 from datetime import datetime
 

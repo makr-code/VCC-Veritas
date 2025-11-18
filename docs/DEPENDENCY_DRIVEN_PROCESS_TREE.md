@@ -112,28 +112,28 @@ completed_steps = set()
 
 while len(completed_steps) < len(all_steps):
     # 1. Finde Steps, deren Dependencies erfüllt sind
-    ready_steps = [step for step in all_steps 
+    ready_steps = [step for step in all_steps
                    if all(dep in completed_steps for dep in step.dependencies)
                    and step.status == "pending"]
-    
+
     # 2. Gruppiere nach parallel_group
     parallel_groups = {}
     sequential_steps = []
-    
+
     for step in ready_steps:
         if step.parallel_group:
             parallel_groups.setdefault(step.parallel_group, []).append(step)
         else:
             sequential_steps.append(step)
-    
+
     # 3. Starte parallele Groups
     for group_name, group_steps in parallel_groups.items():
         await asyncio.gather(*[execute_step(s) for s in group_steps])
-    
+
     # 4. Starte sequentielle Steps
     for step in sequential_steps:
         await execute_step(step)
-    
+
     # 5. Markiere als completed
     for step in ready_steps:
         completed_steps.add(step.step_id)
@@ -223,7 +223,7 @@ class ProcessStep:
     timestamp_end: Optional[datetime] = None
     duration_ms: Optional[int] = None
     result: Dict[str, Any] = field(default_factory=dict)
-    
+
     def can_start(self, completed_steps: set) -> bool:
         """Check if all dependencies are satisfied"""
         return all(dep in completed_steps for dep in self.dependencies)
@@ -236,61 +236,61 @@ class ProcessExecutor:
     def __init__(self, steps: List[ProcessStep]):
         self.steps = {step.step_id: step for step in steps}
         self.completed_steps = set()
-    
+
     async def execute(self, step_executors: Dict[str, callable]):
         """Execute all steps respecting dependencies"""
         while len(self.completed_steps) < len(self.steps):
             # Find ready steps
-            ready = [s for s in self.steps.values() 
+            ready = [s for s in self.steps.values()
                      if s.can_start(self.completed_steps) and s.status == "pending"]
-            
+
             if not ready:
                 await asyncio.sleep(0.1)
                 continue
-            
+
             # Group by parallel_group
             parallel_groups = defaultdict(list)
             sequential = []
-            
+
             for step in ready:
                 if step.parallel_group:
                     parallel_groups[step.parallel_group].append(step)
                 else:
                     sequential.append(step)
-            
+
             # Execute parallel groups
             tasks = []
             for group_steps in parallel_groups.values():
                 for step in group_steps:
                     tasks.append(self._execute_step(step, step_executors))
-            
+
             # Execute sequential
             for step in sequential:
                 tasks.append(self._execute_step(step, step_executors))
-            
+
             # Wait for all
             await asyncio.gather(*tasks)
-    
+
     async def _execute_step(self, step: ProcessStep, executors: Dict):
         step.status = "in_progress"
         step.timestamp_start = datetime.utcnow()
-        
+
         # Get executor
         executor = executors[step.step_type]
-        
+
         # Get dependency results
-        dep_results = {dep_id: self.steps[dep_id].result 
+        dep_results = {dep_id: self.steps[dep_id].result
                        for dep_id in step.dependencies}
-        
+
         # Execute
         result = await executor(step, dep_results)
-        
+
         # Complete
         step.result = result
         step.status = "completed"
         step.timestamp_end = datetime.utcnow()
         step.duration_ms = int((step.timestamp_end - step.timestamp_start).total_seconds() * 1000)
-        
+
         self.completed_steps.add(step.step_id)
 ```
 
@@ -352,4 +352,3 @@ steps = builder.build_standard_pipeline()
 ```
 
 Was bevorzugst du? 🎯
-

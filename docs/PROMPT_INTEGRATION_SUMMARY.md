@@ -17,7 +17,7 @@
    # ALT: Einfacher Prompt
    main_prompt = f"""Du bist ein erfahrener Rechtsexperte...
    Antwort (WICHTIG: Nutze [1], [2] Zitationen!):"""
-   
+
    # NEU: Enhanced Prompt mit direkten Zitaten
    retrieved_documents = [{'content': chunk.page_content, ...} for ...]
    question_aspects = VerwaltungsrechtPrompts.extract_aspects(query)

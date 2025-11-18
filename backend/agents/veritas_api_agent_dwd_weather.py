@@ -23,7 +23,7 @@ Version: 1.0 (DWD Integration)
 """
 
 import os
-import sys
+from typing import Any, Dict, List, Optional, Tuple, Union, cast
 import time
 import logging
 import json
@@ -256,6 +256,7 @@ class DwdWeatherAgent:
             
         try:
             registry = get_agent_registry()
+<<<<<<< Updated upstream
             registry.register_agent(
                 agent_id=self.agent_id,
                 agent_name=AGENT_NAME,
@@ -270,6 +271,29 @@ class DwdWeatherAgent:
                 }
             )
             self.logger.info(f"✅ Agent registriert: {self.agent_id}")
+=======
+            from typing import cast
+
+            reg_register = cast(Any, getattr(registry, "register_agent", None))
+            if reg_register:
+                try:
+                    reg_register(
+                        agent_id=self.agent_id,
+                        agent_name=AGENT_NAME,
+                        capabilities=AGENT_CAPABILITIES,
+                        lifecycle_type=getattr(AgentLifecycleType, "PERSISTENT", None),
+                        metadata={
+                            "version": AGENT_VERSION,
+                            "domain": AGENT_DOMAIN,
+                            "data_source": self.config.data_source,
+                            "supported_intervals": self.config.supported_intervals,
+                            "config": self.config.__dict__,
+                        },
+                    )
+                    self.logger.info(f"✅ Agent registriert: {self.agent_id}")
+                except Exception:
+                    self.logger.info("ℹ️ Agent-Registrierung übersprungen (Registry API inkompatibel)")
+>>>>>>> Stashed changes
         except Exception as e:
             self.logger.error(f"❌ Agent-Registrierung fehlgeschlagen: {e}")
     
@@ -556,7 +580,7 @@ class DwdWeatherAgent:
         results = []
         
         # Gruppiere Daten nach Station
-        station_data = {}
+        station_data: Dict[str, List[WeatherDataPoint]] = {}
         for data_point in weather_data:
             station_id = data_point.station.station_id
             if station_id not in station_data:
@@ -570,7 +594,7 @@ class DwdWeatherAgent:
                 continue
             
             # Aggregiere Daten
-            result = {
+            result: Dict[str, Any] = {
                 "station": {
                     "id": station.station_id,
                     "name": station.name,
@@ -587,7 +611,7 @@ class DwdWeatherAgent:
             
             # Detaildaten
             for data_point in data_points:
-                point_data = {
+                point_data: Dict[str, Any] = {
                     "timestamp": data_point.timestamp.isoformat(),
                     "date": data_point.timestamp.strftime("%Y-%m-%d"),
                     "time": data_point.timestamp.strftime("%H:%M")
@@ -616,9 +640,15 @@ class DwdWeatherAgent:
         """Berechne zusammenfassende Statistiken"""
         if not data_points:
             return {}
+<<<<<<< Updated upstream
         
         summary = {"data_points": len(data_points)}
         
+=======
+
+        summary: Dict[str, Any] = {"data_points": len(data_points)}
+
+>>>>>>> Stashed changes
         # Temperatur-Statistiken
         temps = [dp.temperature for dp in data_points if dp.temperature is not None]
         if temps:
@@ -738,7 +768,6 @@ class DwdWeatherAgent:
     
     def shutdown(self):
         """Graceful Agent Shutdown"""
-        self.status = AgentStatus.TERMINATING if AGENT_SYSTEM_AVAILABLE else "terminating"
         self.logger.info(f"🔄 Shutting down DWD Weather agent: {self.agent_id}")
         
         # Cleanup
@@ -847,8 +876,13 @@ def main():
         print(f"📋 Test {i}: {test_data['query_text']}")
         
         # Create Request
+<<<<<<< Updated upstream
         request = DwdWeatherQueryRequest(**test_data)
         
+=======
+        request = DwdWeatherQueryRequest(**cast(Dict[str, Any], test_data))
+
+>>>>>>> Stashed changes
         # Execute Query
         print(f"🔄 Executing query...")
         response = agent.execute_query(request)

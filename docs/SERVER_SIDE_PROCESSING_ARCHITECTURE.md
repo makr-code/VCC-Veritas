@@ -111,19 +111,19 @@ User Query
 async def nlp_preprocessing(query: str) -> NLPResult:
     # 1. Spracherkennung (langdetect)
     language = detect_language(query)
-    
+
     # 2. Intent Detection (keyword-based + LLM optional)
     intent = detect_intent(query)  # "rechtliche_bewertung", "prozess_navigation", etc.
-    
+
     # 3. Entity Extraction (spaCy NER + custom rules)
     entities = extract_entities(query)  # ["Carport", "Baugenehmigung"]
-    
+
     # 4. Query Expansion (Synonyme, Abkürzungen)
     keywords = expand_query(query)  # "Carport" → "Stellplatz", "Überdachung"
-    
+
     # 5. Complexity Estimation (heuristic)
     complexity = estimate_complexity(query)  # "simple", "medium", "complex"
-    
+
     return NLPResult(...)
 ```
 
@@ -215,17 +215,17 @@ async def rag_retrieval(nlp_result: NLPResult) -> RAGResult:
         query_texts=[nlp_result.parsed_query.main_topic],
         n_results=15
     )
-    
+
     # 2. Graph Search (Neo4j)
     graph_results = await neo4j_client.run(f"""
         MATCH (n:Concept {{name: '{nlp_result.entities[0]}'}})-[r*1..2]-(related)
         RETURN n, r, related
         LIMIT 20
     """)
-    
+
     # 3. Hybrid Ranking (RRF - Reciprocal Rank Fusion)
     ranked_docs = reciprocal_rank_fusion(semantic_results, graph_results)
-    
+
     return RAGResult(documents=ranked_docs, graph_context=graph_results)
 ```
 
@@ -372,14 +372,14 @@ async def generate_hypothesis(query: str, rag_result: RAGResult) -> Hypothesis:
         semantic_docs=format_semantic_docs(rag_result.documents[:5]),
         graph_context=format_graph_context(rag_result.graph_context)
     )
-    
+
     # LLM Call 1 (FAST, ~500 tokens, no streaming needed)
     response = await ollama_client.generate(
         model="llama3.1:70b",
         prompt=prompt,
         options={"num_predict": 1024, "temperature": 0.3}
     )
-    
+
     hypothesis = json.loads(response['response'])
     return Hypothesis(**hypothesis)
 ```
@@ -423,28 +423,28 @@ async def generate_hypothesis(query: str, rag_result: RAGResult) -> Hypothesis:
 ```python
 async def evaluate_evidence(hypothesis: Hypothesis, rag_result: RAGResult) -> EvidenceEvaluation:
     evaluated_docs = []
-    
+
     for doc in rag_result.documents:
         # Check which required_criteria this document covers
         criteria_coverage = []
         for criterion in hypothesis.required_criteria:
             if criterion_is_covered(doc.content, criterion):
                 criteria_coverage.append(criterion)
-        
+
         # Re-rank based on hypothesis relevance
         hypothesis_score = len(criteria_coverage) / len(hypothesis.required_criteria)
         final_score = (doc.relevance_score + hypothesis_score) / 2
-        
+
         evaluated_docs.append({
             "document_id": doc.id,
             "relevance_score": final_score,
             "criteria_coverage": criteria_coverage,
             "used_in_response": final_score > 0.7
         })
-    
+
     # Sort by final score
     evaluated_docs.sort(key=lambda x: x['relevance_score'], reverse=True)
-    
+
     return EvidenceEvaluation(
         documents_evaluated=len(rag_result.documents),
         documents_relevant=len([d for d in evaluated_docs if d['relevance_score'] > 0.5]),
@@ -521,19 +521,19 @@ class AdaptiveTemplateGenerator:
         },
         # ... other frameworks
     }
-    
+
     async def construct_template(self, hypothesis: Hypothesis, evidence: EvidenceEvaluation) -> AdaptiveTemplate:
         # 1. Select base framework
         base_framework = self.BASIC_FRAMEWORKS[hypothesis.suggested_structure['base_framework']]
-        
+
         # 2. Generate sections from hypothesis
         sections = []
-        
+
         # 2a. Interactive Form (if missing info)
         if hypothesis.missing_information:
             form_section = self._create_interactive_form(hypothesis.missing_information)
             sections.append(form_section)
-        
+
         # 2b. Auto-generate sections from suggested_structure
         for section_spec in hypothesis.suggested_structure['sections']:
             if section_spec['type'] == 'markdown':
@@ -542,19 +542,19 @@ class AdaptiveTemplateGenerator:
                 section = self._create_table_section(section_spec, evidence)
             elif section_spec['type'] == 'neo4j_graph':
                 section = self._create_graph_section(section_spec)
-            
+
             sections.append(section)
-        
+
         # 3. Generate unique system prompt
         system_prompt = self._generate_system_prompt(hypothesis, evidence, base_framework)
-        
+
         return AdaptiveTemplate(
             base_framework=hypothesis.suggested_structure['base_framework'],
             sections=sections,
             system_prompt=system_prompt,
             token_budget=hypothesis.recommended_token_budget
         )
-    
+
     def _create_interactive_form(self, missing_info: List[MissingInfo]) -> FormSection:
         fields = []
         for info in missing_info:
@@ -562,9 +562,9 @@ class AdaptiveTemplateGenerator:
                 field = {"name": info.key, "type": "dropdown", "options": info.options}
             else:
                 field = {"name": info.key, "type": "text", "placeholder": f"z.B. {info.unit}" if info.unit else ""}
-            
+
             fields.append(field)
-        
+
         return FormSection(id="missing_info_form", fields=fields)
 ```
 
@@ -635,10 +635,10 @@ async def generate_answer_streaming(
     hypothesis: Hypothesis,
     evidence: EvidenceEvaluation
 ) -> AsyncGenerator[dict, None]:
-    
+
     # 1. Build system prompt
     system_prompt = template.system_prompt
-    
+
     # 2. Build user prompt with RAG context
     user_prompt = f"""
 USER QUERY: {original_query}
@@ -654,10 +654,10 @@ TEMPLATE STRUCTURE:
 
 Generate response following the template structure.
 """
-    
+
     # 3. Stream LLM response
     quality_monitor = ResponseQualityMonitor(hypothesis, evidence)
-    
+
     async for chunk in ollama_client.generate_stream(
         model="llama3.1:70b",
         system=system_prompt,
@@ -666,7 +666,7 @@ Generate response following the template structure.
     ):
         # Parse NDJSON chunk
         chunk_data = parse_ndjson_chunk(chunk['response'])
-        
+
         # Quality check
         quality_result = await quality_monitor.check_chunk(chunk_data)
         if not quality_result.passed:
@@ -678,15 +678,15 @@ Generate response following the template structure.
                 "details": quality_result.details,
                 "action": quality_result.action
             }
-            
+
             # Handle self-correction if needed
             if quality_result.action == "request_correction":
                 # Pause streaming, request correction, resume
                 pass
-        
+
         # Emit chunk to client
         yield chunk_data
-    
+
     # 4. Final quality check
     final_quality = quality_monitor.final_check()
     yield {
@@ -761,12 +761,12 @@ async def query_stream(request: QueryRequest):
     async def event_generator():
         # Step 1: NLP
         yield {"event": "processing_step", "data": json.dumps({...})}
-        
+
         # Step 2: RAG
         yield {"event": "processing_step", "data": json.dumps({...})}
-        
+
         # ... all 7 steps
-    
+
     return EventSourceResponse(event_generator())
 ```
 
@@ -796,23 +796,23 @@ function handleStreamEvent(event) {
         displayStepResult(event.step_id, event.data);
       }
       break;
-    
+
     case 'text_chunk':
       appendTextToSection(event.section_id, event.content);
       break;
-    
+
     case 'widget':
       renderWidget(event.section_id, event.widget);
       break;
-    
+
     case 'quality_check':
       displayQualityBadge(event.check_type, event.status);
       break;
-    
+
     case 'quality_summary':
       displayFinalQuality(event.data);
       break;
-    
+
     case 'processing_complete':
       hideProgressBar();
       displayMetadata(event.data.metadata);
@@ -822,7 +822,7 @@ function handleStreamEvent(event) {
 
 function renderWidget(sectionId, widget) {
   const container = document.getElementById(sectionId);
-  
+
   switch(widget.type) {
     case 'interactive_form':
       const form = createForm(widget.fields);
@@ -836,12 +836,12 @@ function renderWidget(sectionId, widget) {
       };
       container.appendChild(form);
       break;
-    
+
     case 'table':
       const table = createTable(widget.headers, widget.rows);
       container.appendChild(table);
       break;
-    
+
     case 'neo4j_graph':
       renderNeo4jGraph(container, widget.query);
       break;
@@ -962,24 +962,24 @@ import spacy
 class NLPService:
     def __init__(self):
         self.nlp = spacy.load("de_core_news_lg")
-    
+
     async def process(self, query: str) -> NLPResult:
         # 1. Language detection
         language = detect(query)
-        
+
         # 2. Intent detection (keyword-based for now)
         intent = self._detect_intent(query)
-        
+
         # 3. Entity extraction
         doc = self.nlp(query)
         entities = [ent.text for ent in doc.ents]
-        
+
         # 4. Keyword expansion
         keywords = self._expand_keywords(query)
-        
+
         # 5. Complexity estimation
         complexity = self._estimate_complexity(query)
-        
+
         return NLPResult(
             language=language,
             intent=intent,
@@ -992,7 +992,7 @@ class NLPService:
             estimated_complexity=complexity,
             sentiment="neutral"
         )
-    
+
     def _detect_intent(self, query: str) -> str:
         if any(kw in query.lower() for kw in ["baugenehmigung", "genehmigung", "zulässig"]):
             return "rechtliche_bewertung"
@@ -1012,32 +1012,32 @@ class RAGService:
     def __init__(self, chroma_client: ChromaClient, neo4j_driver):
         self.chroma = chroma_client
         self.neo4j = neo4j_driver
-    
+
     async def retrieve(self, nlp_result: NLPResult) -> RAGResult:
         # 1. Semantic search
         semantic_results = await self._semantic_search(nlp_result)
-        
+
         # 2. Graph search
         graph_results = await self._graph_search(nlp_result)
-        
+
         # 3. Hybrid ranking
         ranked_docs = self._reciprocal_rank_fusion(semantic_results, graph_results)
-        
+
         return RAGResult(
             documents=ranked_docs,
             graph_context=graph_results,
             retrieval_time_ms=...
         )
-    
+
     async def _semantic_search(self, nlp_result: NLPResult) -> List[RAGDocument]:
         collection = self.chroma.get_collection("veritas_knowledge")
         results = collection.query(
             query_texts=[nlp_result.parsed_query['main_topic']],
             n_results=15
         )
-        
+
         return [RAGDocument(...) for ... in results]
-    
+
     async def _graph_search(self, nlp_result: NLPResult) -> List[Dict]:
         async with self.neo4j.session() as session:
             result = await session.run(f"""
@@ -1046,7 +1046,7 @@ class RAGService:
                 RETURN n, r, related
                 LIMIT 20
             """)
-            
+
             return await result.data()
 ```
 
@@ -1061,7 +1061,7 @@ from .prompts import HYPOTHESIS_GENERATION_PROMPT
 class HypothesisService:
     def __init__(self, ollama_client):
         self.ollama = ollama_client
-    
+
     async def generate(self, query: str, rag_result: RAGResult) -> Hypothesis:
         # 1. Format prompt
         prompt = HYPOTHESIS_GENERATION_PROMPT.format(
@@ -1069,7 +1069,7 @@ class HypothesisService:
             semantic_docs=self._format_semantic_docs(rag_result.documents[:5]),
             graph_context=self._format_graph_context(rag_result.graph_context)
         )
-        
+
         # 2. LLM Call 1 (FAST, ~500 tokens)
         response = await self.ollama.generate(
             model="llama3.1:70b",
@@ -1080,10 +1080,10 @@ class HypothesisService:
                 "format": "json"  # Force JSON output
             }
         )
-        
+
         # 3. Parse JSON
         hypothesis_data = json.loads(response['response'])
-        
+
         return Hypothesis(**hypothesis_data)
 ```
 
@@ -1096,25 +1096,25 @@ class HypothesisService:
 # backend/services/template_service.py
 class TemplateService:
     BASIC_FRAMEWORKS = {...}  # As defined in v5.0 spec
-    
+
     async def construct(self, hypothesis: Hypothesis, evidence: EvidenceEvaluation) -> AdaptiveTemplate:
         base_framework = self.BASIC_FRAMEWORKS[hypothesis.suggested_structure['base_framework']]
-        
+
         sections = []
-        
+
         # Auto-generate interactive form
         if hypothesis.missing_information:
             form_section = self._create_interactive_form(hypothesis.missing_information)
             sections.append(form_section)
-        
+
         # Auto-generate other sections
         for section_spec in hypothesis.suggested_structure['sections']:
             section = self._create_section(section_spec, evidence)
             sections.append(section)
-        
+
         # Generate system prompt
         system_prompt = self._generate_system_prompt(hypothesis, evidence, base_framework)
-        
+
         return AdaptiveTemplate(
             base_framework=hypothesis.suggested_structure['base_framework'],
             sections=sections,
@@ -1133,14 +1133,14 @@ class ResponseService:
         hypothesis: Hypothesis,
         evidence: EvidenceEvaluation
     ) -> AsyncGenerator[StreamEvent, None]:
-        
+
         # Build prompts
         system_prompt = template.system_prompt
         user_prompt = self._build_user_prompt(hypothesis, evidence, template)
-        
+
         # Quality monitor
         quality_monitor = ResponseQualityMonitor(hypothesis, evidence)
-        
+
         # Stream LLM response
         async for chunk in self.ollama.generate_stream(
             model="llama3.1:70b",
@@ -1150,13 +1150,13 @@ class ResponseService:
         ):
             # Parse chunk
             chunk_data = parse_ndjson_chunk(chunk['response'])
-            
+
             # Quality check
             quality_result = await quality_monitor.check_chunk(chunk_data)
-            
+
             # Emit events
             yield StreamEvent(type="text_chunk", data=chunk_data, ...)
-            
+
             if not quality_result.passed:
                 yield StreamEvent(type="quality_check", data=quality_result.dict(), ...)
 ```
@@ -1175,15 +1175,15 @@ app = FastAPI()
 @app.websocket("/ws/query")
 async def websocket_query(websocket: WebSocket):
     await websocket.accept()
-    
+
     # Receive query
     data = await websocket.receive_json()
     query_request = QueryRequest(**data)
-    
+
     # Process pipeline
     async for event in query_pipeline(query_request):
         await websocket.send_json(event.dict())
-    
+
     await websocket.close()
 
 @app.post("/api/v1/query/stream")
@@ -1194,34 +1194,34 @@ async def sse_query(request: QueryRequest):
                 "event": event.type,
                 "data": json.dumps(event.data)
             }
-    
+
     return EventSourceResponse(event_generator())
 
 async def query_pipeline(request: QueryRequest):
     # Step 1: NLP
     nlp_result = await nlp_service.process(request.query)
     yield StreamEvent(type="processing_step", step_id="nlp_preprocessing", ...)
-    
+
     # Step 2: RAG
     rag_result = await rag_service.retrieve(nlp_result)
     yield StreamEvent(type="processing_step", step_id="rag_retrieval", ...)
-    
+
     # Step 3: Hypothesis
     hypothesis = await hypothesis_service.generate(request.query, rag_result)
     yield StreamEvent(type="processing_step", step_id="hypothesis_generation", ...)
-    
+
     # Step 4: Evidence
     evidence = await evidence_service.evaluate(hypothesis, rag_result)
     yield StreamEvent(type="processing_step", step_id="evidence_evaluation", ...)
-    
+
     # Step 5: Template
     template = await template_service.construct(hypothesis, evidence)
     yield StreamEvent(type="processing_step", step_id="template_construction", ...)
-    
+
     # Step 6: Answer (streaming)
     async for response_event in response_service.generate_streaming(template, hypothesis, evidence):
         yield response_event
-    
+
     # Step 7: Finalization
     yield StreamEvent(type="processing_complete", ...)
 ```

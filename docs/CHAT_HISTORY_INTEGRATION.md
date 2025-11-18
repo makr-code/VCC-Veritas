@@ -24,9 +24,9 @@ class VeritasStreamingQueryRequest(BaseModel):
 **Zeile 1206**: `_synthesize_final_response()` erweitert:
 ```python
 def _synthesize_final_response(
-    query: str, 
-    agent_results: Dict[str, Any], 
-    complexity: str, 
+    query: str,
+    agent_results: Dict[str, Any],
+    complexity: str,
     domain: str,
     conversation_history: Optional[List[Dict[str, str]]] = None  # 🆕 NEU
 ):
@@ -40,7 +40,7 @@ def _synthesize_final_response(
             content = msg.get('content', '')[:100]
             conversation_context += f"- {role}: {content}...\n"
         conversation_context += "\n"
-    
+
     # Füge in Antwort ein
     main_response = f"""
 **Antwort auf Ihre Frage**: {query}
@@ -57,9 +57,9 @@ def _synthesize_final_response(
 **Zeile 1001**: Übergabe von `conversation_history`:
 ```python
 final_response = _synthesize_final_response(
-    request.query, 
-    agent_results, 
-    complexity, 
+    request.query,
+    agent_results,
+    complexity,
     domain,
     conversation_history=request.conversation_history  # 🆕 NEU
 )
@@ -72,8 +72,8 @@ final_response = _synthesize_final_response(
 **Zeile 118**: `start_streaming_query()` erweitert:
 ```python
 def start_streaming_query(
-    self, 
-    query: str, 
+    self,
+    query: str,
     session_id: str,
     enable_progress: bool = True,
     enable_intermediate: bool = True,
@@ -87,7 +87,7 @@ def start_streaming_query(
         "enable_intermediate_results": enable_intermediate,
         "enable_llm_thinking": enable_thinking
     }
-    
+
     # Füge conversation_history hinzu
     if conversation_history:
         payload["conversation_history"] = conversation_history  # 🆕 NEU
@@ -156,7 +156,7 @@ result = self.streaming_service.start_streaming_query(
 2. **Zweite Nachricht** (mit Kontext):
    ```
    User: "Welche Unterlagen benötige ich dafür?"
-   
+
    → Backend empfängt conversation_history mit erster Nachricht
    → Antwort enthält **Gesprächskontext** Abschnitt
    → Kontext hilft LLM zu verstehen, dass "dafür" = Baugenehmigung München
@@ -210,7 +210,7 @@ Nur relevante Nachrichten übergeben:
 # Filtere nur Nachrichten mit Keywords
 relevant_messages = [
     msg for msg in conversation_history
-    if any(keyword in msg.get('content', '').lower() 
+    if any(keyword in msg.get('content', '').lower()
            for keyword in ['bau', 'genehmigung', 'münchen', 'unterlagen'])
 ]
 ```

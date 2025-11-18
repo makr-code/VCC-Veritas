@@ -1,8 +1,8 @@
 # 🚀 VERITAS v3.17.0 Release Notes
 
-**Release Date:** 09.10.2025  
-**Branch:** main  
-**Build Status:** ✅ Production-Ready  
+**Release Date:** 09.10.2025
+**Branch:** main
+**Build Status:** ✅ Production-Ready
 
 ---
 
@@ -161,7 +161,7 @@ Lines of Code:         ~2,530
 Tests:                 12 total
   - Drag&Drop:         6 visual tests
   - Office Export:     6 automated tests
-  
+
 Test Pass Rate:        100% (6/6 Office tests executed)
 Dependencies:          2 (python-docx, openpyxl)
 Syntax Errors:         0
@@ -461,8 +461,8 @@ Report issues to: [GitHub Issues](https://github.com/veritas/veritas/issues)
 
 ---
 
-**Status:** ✅ **Production-Ready**  
-**Build:** ✅ **0 Errors, 6/6 Tests Passed**  
-**Coverage:** 🎯 **61.1% Features Complete (11/18)**  
+**Status:** ✅ **Production-Ready**
+**Build:** ✅ **0 Errors, 6/6 Tests Passed**
+**Coverage:** 🎯 **61.1% Features Complete (11/18)**
 
 🎉 **Happy Exporting!** 🎉

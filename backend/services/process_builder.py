@@ -16,8 +16,12 @@ Version: 1.0
 
 import logging
 import sys
+<<<<<<< Updated upstream
 import os
 from typing import List, Dict, Set, Optional, Any
+=======
+from typing import Any, Dict, List, Optional, Set, cast
+>>>>>>> Stashed changes
 
 # Add project root to path
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -140,8 +144,13 @@ class ProcessBuilder:
         
         intent = nlp_result.intent.intent_type
         entities = nlp_result.entities
+<<<<<<< Updated upstream
         params = nlp_result.parameters
         
+=======
+        params: Dict[str, Any] = cast(Dict[str, Any], nlp_result.parameters)
+
+>>>>>>> Stashed changes
         # Get step template for this intent
         template = self.step_templates.get(intent, ['search'])
         
@@ -245,7 +254,7 @@ class ProcessBuilder:
         proc_type = nlp_result.parameters.procedure_type
         
         # Step 1: Search regulations/requirements
-        search_params = {}
+        search_params: Dict[str, Any] = {}
         if location:
             search_params['location'] = location
         if doc_type:
@@ -289,7 +298,7 @@ class ProcessBuilder:
         steps = []
         
         # Step 1: Search for pricing/cost information
-        search_params = {}
+        search_params: Dict[str, Any] = {}
         if nlp_result.parameters.document_type:
             search_params['document_type'] = nlp_result.parameters.document_type
         if nlp_result.parameters.location:
@@ -320,8 +329,13 @@ class ProcessBuilder:
                               nlp_result: NLPAnalysisResult) -> List[ProcessStep]:
         """Create default steps from template."""
         steps = []
+<<<<<<< Updated upstream
         previous_ids = []
         
+=======
+        previous_ids: List[str] = []
+
+>>>>>>> Stashed changes
         for step_type_name in template:
             step_type = StepType[step_type_name.upper()]
             

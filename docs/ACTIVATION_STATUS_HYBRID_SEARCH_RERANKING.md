@@ -1,6 +1,6 @@
 # VERITAS Backend - Aktivierungsstatus: Hybrid Search & Re-Ranking
 
-**Prüfungsdatum:** 20. Oktober 2025  
+**Prüfungsdatum:** 20. Oktober 2025
 **Status:** ⚠️ **TEILWEISE IMPLEMENTIERT, NICHT VOLLSTÄNDIG AKTIVIERT**
 
 ---
@@ -36,7 +36,7 @@ async def _process_hybrid(self, request: UnifiedQueryRequest) -> Dict[str, Any]:
     Hybrid Search (BM25 + Dense + RRF)
     """
     logger.debug("Processing Hybrid Search query...")
-    
+
     # TODO: Implement Hybrid Search Service
     # For now: mock response
     return await self._generate_mock_response(request, "hybrid")
@@ -55,10 +55,10 @@ async def _process_rag(self, request: UnifiedQueryRequest) -> Dict[str, Any]:
     if self.pipeline:
         # Build IntelligentPipelineRequest
         pipeline_request = IntelligentPipelineRequest(...)
-        
+
         # Call: process_intelligent_query
         result = await self.pipeline.process_intelligent_query(pipeline_request)
-        
+
         return {
             "response_text": result.response_text,
             "confidence_score": result.confidence_score,
@@ -82,7 +82,7 @@ async def _process_rag(self, request: UnifiedQueryRequest) -> Dict[str, Any]:
 
 ```python
 # Zeile 95-128
-def __init__(self, 
+def __init__(self,
              rag_service: Optional['RAGService'] = None,
              ...):
     # Initialize RAG Service
@@ -112,10 +112,10 @@ async def _retrieve_documents_for_step(
     min_relevance: float = 0.5
 ) -> List[DocumentSource]:
     """Retrieve relevant documents for a process step using RAG"""
-    
+
     if not self.rag_service:
         return []
-    
+
     try:
         # Perform hybrid search
         from backend.services.rag_service import SearchFilters
@@ -123,12 +123,12 @@ async def _retrieve_documents_for_step(
             max_results=max_results,
             min_relevance=min_relevance
         )
-        
+
         search_result = self.rag_service.hybrid_search(
             query=query,
             filters=filters
         )
-        
+
         # Convert search results to DocumentSource objects
         documents = []
         for result in search_result.results:
@@ -140,7 +140,7 @@ async def _retrieve_documents_for_step(
                 ...
             )
             documents.append(doc)
-        
+
         return documents
 ```
 
@@ -308,32 +308,32 @@ async def _process_hybrid(self, request: UnifiedQueryRequest):
 ```python
 async def _process_hybrid(self, request: UnifiedQueryRequest):
     """Hybrid Search (BM25 + Dense + RRF)"""
-    
+
     # Initialize RAG Service if needed
     if not hasattr(self, 'rag_service') or not self.rag_service:
         from backend.services.rag_service import RAGService
         self.rag_service = RAGService()
-    
+
     # Perform Hybrid Search
     from backend.services.rag_service import SearchFilters, SearchWeights
-    
+
     weights = SearchWeights(
         vector_weight=0.6,
         graph_weight=0.2,
         relational_weight=0.2
     )
-    
+
     filters = SearchFilters(
         max_results=20,
         min_relevance=0.5
     )
-    
+
     result = self.rag_service.hybrid_search(
         query=request.query,
         weights=weights,
         filters=filters
     )
-    
+
     # Convert to response format
     sources = []
     for doc in result.results:
@@ -345,7 +345,7 @@ async def _process_hybrid(self, request: UnifiedQueryRequest):
             'search_method': doc.search_method.value,
             'content': doc.content[:500]
         })
-    
+
     return {
         'response_text': f"Gefunden: {len(result.results)} Dokumente via Hybrid Search",
         'sources': sources,
@@ -364,7 +364,7 @@ async def _process_hybrid(self, request: UnifiedQueryRequest):
 ```python
 async def _process_hybrid(self, request: UnifiedQueryRequest):
     # ... Hybrid Search wie oben ...
-    
+
     # Initialize Reranker
     if not hasattr(self, 'reranker') or not self.reranker:
         from backend.services.reranker_service import RerankerService
@@ -372,7 +372,7 @@ async def _process_hybrid(self, request: UnifiedQueryRequest):
             model_name="llama3.1:8b",
             scoring_mode=ScoringMode.COMBINED
         )
-    
+
     # Prepare documents for reranking
     documents = [
         {
@@ -382,14 +382,14 @@ async def _process_hybrid(self, request: UnifiedQueryRequest):
         }
         for doc in result.results
     ]
-    
+
     # Re-rank
     reranked = self.reranker.rerank(
         query=request.query,
         documents=documents,
         top_k=10
     )
-    
+
     # Update sources with reranked scores
     sources = []
     for r in reranked:
@@ -400,7 +400,7 @@ async def _process_hybrid(self, request: UnifiedQueryRequest):
             'score_delta': r.score_delta,
             ...
         })
-    
+
     return {
         'sources': sources,
         'metadata': {
@@ -421,13 +421,13 @@ async def _step_rag(self, request):
     if not hasattr(self, 'rag_service'):
         from backend.services.rag_service import RAGService
         self.rag_service = RAGService()
-    
+
     # Use Hybrid Search instead of default
     result = self.rag_service.hybrid_search(
         query=request.query_text,
         ranking_strategy=RankingStrategy.RECIPROCAL_RANK_FUSION
     )
-    
+
     # ... process results ...
 ```
 
@@ -615,6 +615,6 @@ executor = ProcessExecutor(rag_service=RAGService())
 
 ---
 
-**Erstellt:** 20. Oktober 2025  
-**Autor:** GitHub Copilot  
+**Erstellt:** 20. Oktober 2025
+**Autor:** GitHub Copilot
 **Version:** 1.0

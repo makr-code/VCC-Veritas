@@ -2,6 +2,7 @@
 
 import sys
 from pathlib import Path
+
 sys.path.append(str(Path(__file__).parent.parent))
 
 from native_ollama_integration import DirectOllamaLLM
@@ -14,12 +15,7 @@ prompt = """Respond with this exact JSON (no other text):
 }"""
 
 # Create client
-client = DirectOllamaLLM(
-    model="llama3.1:8b",
-    base_url="http://localhost:11434",
-    temperature=0.1,
-    num_predict=100
-)
+client = DirectOllamaLLM(model="llama3.1:8b", base_url="http://localhost:11434", temperature=0.1, num_predict=100)
 
 # Call
 result = client.invoke(prompt=prompt)
@@ -28,7 +24,7 @@ result = client.invoke(prompt=prompt)
 print("=" * 80)
 print("RAW RESPONSE:")
 print("=" * 80)
-if hasattr(result, 'content'):
+if hasattr(result, "content"):
     print(repr(result.content))
     print("\n" + "=" * 80)
     print("ACTUAL TEXT:")

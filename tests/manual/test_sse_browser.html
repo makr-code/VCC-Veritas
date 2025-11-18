@@ -12,13 +12,13 @@
             padding: 20px;
             background: #f5f5f5;
         }
-        
+
         h1 {
             color: #333;
             border-bottom: 3px solid #0066cc;
             padding-bottom: 10px;
         }
-        
+
         .section {
             background: white;
             padding: 20px;
@@ -26,7 +26,7 @@
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        
+
         .status {
             display: inline-block;
             padding: 5px 15px;
@@ -34,17 +34,17 @@
             font-weight: bold;
             margin-left: 10px;
         }
-        
+
         .status.connected {
             background: #4CAF50;
             color: white;
         }
-        
+
         .status.disconnected {
             background: #f44336;
             color: white;
         }
-        
+
         .log {
             background: #f9f9f9;
             border: 1px solid #ddd;
@@ -55,19 +55,19 @@
             font-family: 'Courier New', monospace;
             font-size: 12px;
         }
-        
+
         .log-entry {
             padding: 5px;
             margin: 2px 0;
             border-left: 3px solid #0066cc;
             padding-left: 10px;
         }
-        
+
         .log-entry.progress { border-color: #2196F3; }
         .log-entry.quality { border-color: #FF9800; }
         .log-entry.error { border-color: #f44336; background: #ffebee; }
         .log-entry.complete { border-color: #4CAF50; background: #e8f5e9; }
-        
+
         button {
             background: #0066cc;
             color: white;
@@ -78,16 +78,16 @@
             font-size: 14px;
             margin: 5px;
         }
-        
+
         button:hover {
             background: #0052a3;
         }
-        
+
         button:disabled {
             background: #cccccc;
             cursor: not-allowed;
         }
-        
+
         input {
             padding: 8px;
             border: 1px solid #ddd;
@@ -95,27 +95,27 @@
             margin: 5px;
             font-size: 14px;
         }
-        
+
         .metrics {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
             margin-top: 15px;
         }
-        
+
         .metric {
             background: #f0f0f0;
             padding: 15px;
             border-radius: 4px;
             text-align: center;
         }
-        
+
         .metric-value {
             font-size: 24px;
             font-weight: bold;
             color: #0066cc;
         }
-        
+
         .metric-label {
             font-size: 12px;
             color: #666;
@@ -125,7 +125,7 @@
 </head>
 <body>
     <h1>🏛️ VERITAS SSE Test Dashboard</h1>
-    
+
     <!-- Agent Progress Test -->
     <div class="section">
         <h2>Agent Progress Stream
@@ -141,7 +141,7 @@
             <div class="log-entry">Waiting for connection...</div>
         </div>
     </div>
-    
+
     <!-- System Metrics Test -->
     <div class="section">
         <h2>System Metrics Stream
@@ -169,7 +169,7 @@
             <div class="log-entry">Waiting for connection...</div>
         </div>
     </div>
-    
+
     <!-- Job Progress Test -->
     <div class="section">
         <h2>Job Progress Stream
@@ -185,25 +185,25 @@
             <div class="log-entry">Waiting for connection...</div>
         </div>
     </div>
-    
+
     <script type="module">
         import { VeritasSSEClient, VeritasMetricsSSEClient, VeritasJobProgressSSEClient } from '../services/sse_client.js';
-        
+
         let progressClient = null;
         let metricsClient = null;
         let jobClient = null;
-        
+
         // ===== Agent Progress =====
-        
+
         document.getElementById('btn-connect-progress').onclick = () => {
             const sessionId = document.getElementById('session-id').value;
-            
+
             if (progressClient) {
                 progressClient.disconnect();
             }
-            
+
             progressClient = new VeritasSSEClient(sessionId);
-            
+
             progressClient
                 .onProgress((data) => {
                     addLogEntry('progress-log', `[${data.type}] ${JSON.stringify(data)}`, 'progress');
@@ -218,12 +218,12 @@
                     addLogEntry('progress-log', `[COMPLETE] ${JSON.stringify(data)}`, 'complete');
                 })
                 .connect();
-            
+
             updateStatus('progress-status', true);
             document.getElementById('btn-connect-progress').disabled = true;
             document.getElementById('btn-disconnect-progress').disabled = false;
         };
-        
+
         document.getElementById('btn-disconnect-progress').onclick = () => {
             if (progressClient) {
                 progressClient.disconnect();
@@ -233,40 +233,40 @@
             document.getElementById('btn-connect-progress').disabled = false;
             document.getElementById('btn-disconnect-progress').disabled = true;
         };
-        
+
         document.getElementById('btn-clear-progress').onclick = () => {
             document.getElementById('progress-log').innerHTML = '';
         };
-        
+
         // ===== System Metrics =====
-        
+
         document.getElementById('btn-connect-metrics').onclick = () => {
             if (metricsClient) {
                 metricsClient.disconnect();
             }
-            
+
             metricsClient = new VeritasMetricsSSEClient({ interval: 2 });
-            
+
             metricsClient
                 .onMetrics((data) => {
                     // Update metrics display
                     document.getElementById('cpu-value').textContent = data.cpu_percent + '%';
                     document.getElementById('memory-value').textContent = Math.round(data.memory_mb);
                     document.getElementById('sessions-value').textContent = data.active_sessions;
-                    
+
                     // Add to log
-                    addLogEntry('metrics-log', 
+                    addLogEntry('metrics-log',
                         `CPU: ${data.cpu_percent}% | Memory: ${Math.round(data.memory_mb)}MB | Sessions: ${data.active_sessions}`,
                         'progress'
                     );
                 })
                 .connect();
-            
+
             updateStatus('metrics-status', true);
             document.getElementById('btn-connect-metrics').disabled = true;
             document.getElementById('btn-disconnect-metrics').disabled = false;
         };
-        
+
         document.getElementById('btn-disconnect-metrics').onclick = () => {
             if (metricsClient) {
                 metricsClient.disconnect();
@@ -276,21 +276,21 @@
             document.getElementById('btn-connect-metrics').disabled = false;
             document.getElementById('btn-disconnect-metrics').disabled = true;
         };
-        
+
         // ===== Job Progress =====
-        
+
         document.getElementById('btn-connect-job').onclick = () => {
             const jobId = document.getElementById('job-id').value;
-            
+
             if (jobClient) {
                 jobClient.disconnect();
             }
-            
+
             jobClient = new VeritasJobProgressSSEClient(jobId);
-            
+
             jobClient
                 .onProgress((data) => {
-                    addLogEntry('job-log', 
+                    addLogEntry('job-log',
                         `[PROGRESS] ${data.percentage}% - ${data.files_processed}/${data.files_total} files - ${data.message}`,
                         'progress'
                     );
@@ -307,12 +307,12 @@
                     addLogEntry('job-log', `[ERROR] ${JSON.stringify(data)}`, 'error');
                 })
                 .connect();
-            
+
             updateStatus('job-status', true);
             document.getElementById('btn-connect-job').disabled = true;
             document.getElementById('btn-disconnect-job').disabled = false;
         };
-        
+
         document.getElementById('btn-disconnect-job').onclick = () => {
             if (jobClient) {
                 jobClient.disconnect();
@@ -322,29 +322,29 @@
             document.getElementById('btn-connect-job').disabled = false;
             document.getElementById('btn-disconnect-job').disabled = true;
         };
-        
+
         document.getElementById('btn-clear-job').onclick = () => {
             document.getElementById('job-log').innerHTML = '';
         };
-        
+
         // ===== Utility Functions =====
-        
+
         function addLogEntry(logId, message, type = 'progress') {
             const log = document.getElementById(logId);
             const entry = document.createElement('div');
             entry.className = `log-entry ${type}`;
             entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
             log.appendChild(entry);
-            
+
             // Auto-scroll to bottom
             log.scrollTop = log.scrollHeight;
-            
+
             // Limit log entries (keep last 100)
             while (log.children.length > 100) {
                 log.removeChild(log.firstChild);
             }
         }
-        
+
         function updateStatus(statusId, connected) {
             const status = document.getElementById(statusId);
             if (connected) {

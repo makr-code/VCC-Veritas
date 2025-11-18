@@ -1,5 +1,5 @@
 # UDS3 Migration - Abschluss-Report
-**Datum:** 2025-10-06  
+**Datum:** 2025-10-06
 **Status:** ✅ ERFOLGREICH ABGESCHLOSSEN
 
 ---
@@ -157,15 +157,15 @@ python scripts/migrate_uds3_imports.py
 ```python
 IMPORT_PATTERNS = [
     # from uds3_X import Y → from uds3.uds3_X import Y
-    (r'^(\s*)from uds3_(\w+) import (.+)$', 
+    (r'^(\s*)from uds3_(\w+) import (.+)$',
      r'\1from uds3.uds3_\2 import \3'),
-    
+
     # import uds3_X → import uds3.uds3_X
-    (r'^(\s*)import uds3_(\w+)(.*)$', 
+    (r'^(\s*)import uds3_(\w+)(.*)$',
      r'\1import uds3.uds3_\2\3'),
-    
+
     # from uds3_X.Y import Z → from uds3.uds3_X.Y import Z
-    (r'^(\s*)from uds3_(\w+)\.(\w+) import (.+)$', 
+    (r'^(\s*)from uds3_(\w+)\.(\w+) import (.+)$',
      r'\1from uds3.uds3_\2.\3 import \4'),
 ]
 ```
@@ -301,7 +301,7 @@ UDS3 ist jetzt:
 
 ---
 
-**Status:** 🟢 PRODUCTION READY  
-**Erstellt:** 2025-10-06  
-**Autor:** GitHub Copilot  
+**Status:** 🟢 PRODUCTION READY
+**Erstellt:** 2025-10-06
+**Autor:** GitHub Copilot
 **Reviewer:** Ready for Code Review

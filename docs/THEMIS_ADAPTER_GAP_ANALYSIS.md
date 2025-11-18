@@ -1,7 +1,7 @@
 # Gap-Analyse: ThemisDB-Adapter für Veritas Backend (ohne UDS3 Polyglot)
 
-**Datum:** 7. November 2025  
-**Autor:** VCC Development Team  
+**Datum:** 7. November 2025
+**Autor:** VCC Development Team
 **Version:** 1.0.0
 
 ---
@@ -153,11 +153,11 @@ class ThemisDBConfig:
 class ThemisDBAdapter:
     """
     Direct Adapter für ThemisDB Multi-Model Database.
-    
+
     Ersetzt UDS3 PolyglotManager für Single-Backend-Szenario.
     Kompatibel mit bestehendem UDS3VectorSearchAdapter-Interface.
     """
-    
+
     def __init__(self, config: ThemisDBConfig = None):
         self.config = config or ThemisDBConfig()
         self.base_url = f"{'https' if self.config.use_ssl else 'http'}://{self.config.host}:{self.config.port}"
@@ -166,7 +166,7 @@ class ThemisDBAdapter:
             timeout=self.config.timeout,
             headers={"Authorization": f"Bearer {self.config.api_token}"} if self.config.api_token else {}
         )
-    
+
     async def vector_search(
         self,
         query: str,
@@ -177,7 +177,7 @@ class ThemisDBAdapter:
     ) -> List[Dict[str, Any]]:
         """
         Vector Similarity Search via ThemisDB HNSW Index.
-        
+
         Kompatibel mit UDS3VectorSearchAdapter.vector_search() Interface.
         """
         response = await self.client.post(
@@ -191,7 +191,7 @@ class ThemisDBAdapter:
             }
         )
         response.raise_for_status()
-        
+
         # Transform ThemisDB Response → Standard Format
         results = response.json()["results"]
         return [
@@ -203,7 +203,7 @@ class ThemisDBAdapter:
             }
             for r in results
         ]
-    
+
     async def graph_traverse(
         self,
         start_vertex: str,
@@ -224,7 +224,7 @@ class ThemisDBAdapter:
             }}
         """
         return await self.execute_aql(aql_query)
-    
+
     async def execute_aql(self, query: str, bind_vars: Dict[str, Any] = None) -> List[Dict[str, Any]]:
         """Execute AQL Query (ThemisDB's Query Language, similar to ArangoDB AQL)."""
         response = await self.client.post(
@@ -236,19 +236,19 @@ class ThemisDBAdapter:
         )
         response.raise_for_status()
         return response.json()["result"]
-    
+
     async def get_document(self, collection: str, key: str) -> Dict[str, Any]:
         """Retrieve single document by key."""
         response = await self.client.get(f"/api/document/{collection}/{key}")
         response.raise_for_status()
         return response.json()
-    
+
     async def health_check(self) -> Dict[str, Any]:
         """Health check for ThemisDB server."""
         response = await self.client.get("/api/health")
         response.raise_for_status()
         return response.json()
-    
+
     async def _embed(self, text: str) -> List[float]:
         """
         Generate embedding (delegiert zu Veritas Embedding Service).
@@ -258,7 +258,7 @@ class ThemisDBAdapter:
         from backend.services.embedding_service import get_embedding_service
         embedding_service = get_embedding_service()
         return await embedding_service.embed_text(text)
-    
+
     async def close(self):
         """Cleanup HTTP client."""
         await self.client.aclose()
@@ -281,7 +281,7 @@ class RAGService:
                 api_token=os.getenv("THEMIS_API_TOKEN")
             )
         )
-    
+
     async def search_documents(self, query: str, top_k: int = 5) -> List[Dict[str, Any]]:
         """RAG Document Search via ThemisDB."""
         # Identisches Interface wie bei UDS3VectorSearchAdapter!
@@ -290,7 +290,7 @@ class RAGService:
             top_k=top_k,
             collection="legal_documents"
         )
-    
+
     async def get_related_documents(self, doc_id: str) -> List[Dict[str, Any]]:
         """Get related documents via Graph Traversal."""
         return await self.db_adapter.graph_traverse(
@@ -312,7 +312,7 @@ class RAGService:
 
 class AQLQueryBuilder:
     """Helper für häufige Query-Patterns (Translation Cypher → AQL)."""
-    
+
     @staticmethod
     def match_traverse(
         start_node: str,
@@ -331,7 +331,7 @@ class AQLQueryBuilder:
             {target_filter}
             RETURN v
         """
-    
+
     @staticmethod
     def shortest_path(start: str, end: str, edge_collection: str) -> str:
         """
@@ -431,29 +431,29 @@ Endpoints:
   POST /api/vector/search
     Body: { collection, query_vector, top_k, min_score }
     Response: { results: [{ id, document, score }] }
-  
+
   POST /api/vector/insert
     Body: { collection, key, vector, document }
-  
+
   # Graph Operations
   POST /api/graph/traverse
     Body: { start_vertex, edge_collection, direction, min_depth, max_depth }
     Response: { paths: [...] }
-  
+
   POST /api/graph/shortest_path
     Body: { start, end, edge_collection }
-  
+
   # AQL Query
   POST /api/aql/query
     Body: { query, bindVars }
     Response: { result: [...] }
-  
+
   # Document CRUD
   GET    /api/document/{collection}/{key}
   POST   /api/document/{collection}
   PUT    /api/document/{collection}/{key}
   DELETE /api/document/{collection}/{key}
-  
+
   # Health & Admin
   GET /api/health
   GET /api/metrics
@@ -468,7 +468,7 @@ Endpoints:
 
 async def rag_query_example():
     """Beispiel für RAG-Workflow mit ThemisDB."""
-    
+
     # 1. Initialize Adapter
     adapter = ThemisDBAdapter(
         config=ThemisDBConfig(
@@ -477,7 +477,7 @@ async def rag_query_example():
             api_token=os.getenv("THEMIS_TOKEN")
         )
     )
-    
+
     # 2. Vector Search (wie bei UDS3VectorSearchAdapter)
     query = "BGB Vertragsrecht Minderjährige"
     results = await adapter.vector_search(
@@ -485,7 +485,7 @@ async def rag_query_example():
         top_k=5,
         collection="legal_documents"
     )
-    
+
     # 3. Graph Traversal für Kontext
     for doc in results[:3]:  # Top-3 Dokumente
         related = await adapter.graph_traverse(
@@ -495,13 +495,13 @@ async def rag_query_example():
             max_depth=2
         )
         doc["related_citations"] = related
-    
+
     # 4. Ranking mit BM25 (bleibt bei Veritas)
     from backend.agents.veritas_sparse_retrieval import SparseRetriever
     bm25 = SparseRetriever()
     bm25.index_corpus([{"id": r["id"], "text": r["content"]} for r in results])
     bm25_scores = bm25.search(query, top_k=5)
-    
+
     # 5. Hybrid Fusion (wie bei Phase 5 Integration)
     from backend.agents.veritas_hybrid_retrieval import HybridRetriever
     hybrid = HybridRetriever(
@@ -509,12 +509,12 @@ async def rag_query_example():
         sparse_retriever=bm25
     )
     final_results = await hybrid.search(query, top_k=5)
-    
+
     return final_results
 ```
 
 ---
 
-**Dokumentversion:** 1.0.0  
-**Letzte Aktualisierung:** 7. November 2025  
+**Dokumentversion:** 1.0.0
+**Letzte Aktualisierung:** 7. November 2025
 **Status:** ✅ Review Ready

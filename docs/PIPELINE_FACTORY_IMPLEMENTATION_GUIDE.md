@@ -1,6 +1,6 @@
 # VERITAS Backend - Implementierungsanleitung: Request-Scoped Pipelines
 
-**Status:** ✅ Vorbereitet, ⚠️ Nicht aktiviert (Kompatibilität mit bestehendem Code)  
+**Status:** ✅ Vorbereitet, ⚠️ Nicht aktiviert (Kompatibilität mit bestehendem Code)
 **Datum:** 16. Oktober 2025
 
 ---
@@ -95,7 +95,7 @@ Backend Stop
 # STATT DIESEM (Zeile 227-245):
 async def initialize_intelligent_pipeline():
     global intelligent_pipeline, ollama_client
-    
+
     if INTELLIGENT_PIPELINE_AVAILABLE:
         intelligent_pipeline = await get_intelligent_pipeline()  # ← Singleton
         ollama_client = await get_ollama_client()
@@ -107,15 +107,15 @@ from backend.agents.veritas_pipeline_factory import create_pipeline_factory
 
 async def initialize_intelligent_pipeline():
     global pipeline_factory, ollama_client  # ← Factory statt Pipeline
-    
+
     if INTELLIGENT_PIPELINE_AVAILABLE:
         # Shared Resources initialisieren
         ollama_client = await get_ollama_client()
         uds3 = get_optimized_unified_strategy()
-        
+
         from backend.agents.agent_registry import get_agent_registry
         registry = get_agent_registry()
-        
+
         # Factory erstellen
         pipeline_factory = create_pipeline_factory(
             ollama_client=ollama_client,
@@ -123,7 +123,7 @@ async def initialize_intelligent_pipeline():
             agent_registry=registry,
             progress_manager=progress_manager  # Falls verfügbar
         )
-        
+
         logger.info("✅ Pipeline Factory initialisiert")
         return True
     return False
@@ -138,12 +138,12 @@ async def initialize_intelligent_pipeline():
 async def veritas_intelligent_query(request: VeritasStreamingQueryRequest):
     if not intelligent_pipeline:  # ← Global Singleton
         raise HTTPException(...)
-    
+
     pipeline_request = IntelligentPipelineRequest(...)
-    
+
     # Nutzt globale Pipeline-Instanz
     pipeline_response = await intelligent_pipeline.process_intelligent_query(pipeline_request)
-    
+
     return response
 ```
 
@@ -154,22 +154,22 @@ async def veritas_intelligent_query(request: VeritasStreamingQueryRequest):
 async def veritas_intelligent_query(request: VeritasStreamingQueryRequest):
     if not pipeline_factory:  # ← Factory statt Pipeline
         raise HTTPException(...)
-    
+
     # ✅ NEUE Pipeline-Instanz für diesen Request
     pipeline = await pipeline_factory.create_pipeline(max_workers=5)
-    
+
     try:
         pipeline_request = IntelligentPipelineRequest(...)
-        
+
         # Query verarbeiten (Cleanup erfolgt automatisch)
         pipeline_response = await pipeline.process_intelligent_query(pipeline_request)
-        
+
         return {
             "query_id": pipeline_request.query_id,
             "answer": pipeline_response.response_text,
             ...
         }
-    
+
     finally:
         # ✅ CLEANUP nach Request
         await pipeline.cleanup()
@@ -189,7 +189,7 @@ finally:
     # ✅ CLEANUP: Request-scoped Ressourcen freigeben
     if request.query_id in self.active_pipelines:
         del self.active_pipelines[request.query_id]
-    
+
     # ✅ AKTIVIERE DIESES (wenn Factory-Pattern genutzt wird):
     await self.cleanup()  # ← Auskommentieren entfernen!
 ```
@@ -233,9 +233,9 @@ async def test_parallel_requests():
             })
             for i in range(3)
         ]
-        
+
         responses = await asyncio.gather(*tasks)
-        
+
         # Alle sollten erfolgreich sein
         assert all(r.status_code == 200 for r in responses)
         print("✅ Parallele Requests erfolgreich")
@@ -355,5 +355,5 @@ Falls Probleme auftreten:
 
 ---
 
-**Bereit für Aktivierung:** ✅ JA (wenn gewünscht)  
+**Bereit für Aktivierung:** ✅ JA (wenn gewünscht)
 **Empfohlener Zeitpunkt:** Nach ausgiebigem Testing in DEV/STAGING

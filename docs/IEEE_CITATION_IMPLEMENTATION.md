@@ -1,7 +1,7 @@
 # 🎓 IEEE Citation System - Implementation Summary
 
-**Datum:** 17. Oktober 2025  
-**Status:** ✅ Vollständig implementiert  
+**Datum:** 17. Oktober 2025
+**Status:** ✅ Vollständig implementiert
 **Version:** 3.16.0
 
 ---
@@ -50,7 +50,7 @@
 
 **Web-URL:**
 ```
-[2] "VERITAS Documentation," https://veritas.example.com, 
+[2] "VERITAS Documentation," https://veritas.example.com,
     accessed Oct. 17, 2025.
 ```
 
@@ -83,7 +83,7 @@ class AssistantFullWidthLayout:
         enable_ieee_citations: bool = True  # ✨ NEU
     ):
         self.citation_renderer = None
-    
+
     def render_assistant_message(
         self,
         content: str,  # Mit {cite:N} Markern
@@ -198,7 +198,7 @@ __all__ = [
     "id": "src_1",              # PFLICHT
     "file": "document.pdf",     # oder "url"
     "confidence": 0.87,         # 0-1
-    
+
     # IEEE-Metadaten (optional, aber empfohlen):
     "author": "J. Smith",
     "title": "Document Title",
@@ -491,7 +491,7 @@ sources = []
 
 ---
 
-**Erstellt:** 17. Oktober 2025, 21:15  
-**Status:** ✅ Implementation Complete  
-**Ready for:** Backend-Integration & Testing  
+**Erstellt:** 17. Oktober 2025, 21:15
+**Status:** ✅ Implementation Complete
+**Ready for:** Backend-Integration & Testing
 **Nächster Schritt:** Backend-Team informieren über Citation-Format

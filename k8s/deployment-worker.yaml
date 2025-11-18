@@ -37,18 +37,18 @@ spec:
         runAsNonRoot: true
         runAsUser: 1001
         fsGroup: 1001
-      
+
       containers:
       - name: worker
         image: veritas/worker:latest
         imagePullPolicy: Always
-        
+
         envFrom:
         - configMapRef:
             name: veritas-config
         - secretRef:
             name: veritas-secrets
-        
+
         resources:
           requests:
             cpu: 1000m
@@ -56,7 +56,7 @@ spec:
           limits:
             cpu: 4000m
             memory: 4Gi
-        
+
         livenessProbe:
           exec:
             command:
@@ -67,20 +67,20 @@ spec:
           periodSeconds: 30
           timeoutSeconds: 10
           failureThreshold: 3
-        
+
         volumeMounts:
         - name: logs
           mountPath: /app/logs
         - name: data
           mountPath: /app/data
-        
+
         securityContext:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: false
           capabilities:
             drop:
             - ALL
-      
+
       volumes:
       - name: logs
         emptyDir: {}
@@ -117,18 +117,18 @@ spec:
         runAsNonRoot: true
         runAsUser: 1001
         fsGroup: 1001
-      
+
       containers:
       - name: worker
         image: veritas/worker:staging
         imagePullPolicy: Always
-        
+
         envFrom:
         - configMapRef:
             name: veritas-config
         - secretRef:
             name: veritas-secrets
-        
+
         resources:
           requests:
             cpu: 500m
@@ -136,13 +136,13 @@ spec:
           limits:
             cpu: 2000m
             memory: 2Gi
-        
+
         volumeMounts:
         - name: logs
           mountPath: /app/logs
         - name: data
           mountPath: /app/data
-      
+
       volumes:
       - name: logs
         emptyDir: {}

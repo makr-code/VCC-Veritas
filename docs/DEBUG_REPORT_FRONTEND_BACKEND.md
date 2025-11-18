@@ -1,7 +1,7 @@
 # Debug Report: Frontend-Backend Kommunikation
 
-**Datum:** 18. Oktober 2025  
-**Status:** ✅ BEHOBEN  
+**Datum:** 18. Oktober 2025
+**Status:** ✅ BEHOBEN
 **Version:** VERITAS v3.18.0
 
 ## 🎯 Problem
@@ -86,7 +86,7 @@ sources = data.get('sources', [])  # ← Direkt in data, nicht in metadata!
 def _parse_response(self, data: Dict, processing_time: float) -> QueryResponse:
     """
     Parsed Backend-Response zu QueryResponse
-    
+
     Backend API v3 Response-Struktur:
     {
         "content": "Die Antwort...",
@@ -103,25 +103,25 @@ def _parse_response(self, data: Dict, processing_time: float) -> QueryResponse:
     """
     # ✅ FIXED: Backend API v3 nutzt 'content' statt 'response_text'
     response_text = data.get('content', data.get('response_text', 'Keine Antwort erhalten.'))
-    
+
     # Extract metadata
     metadata = data.get('metadata', {})
-    
+
     # Sources sind entweder in metadata.sources_metadata oder direkt in data.sources
     sources = []
     if isinstance(metadata, dict) and 'sources_metadata' in metadata:
         sources = metadata.get('sources_metadata', [])
     else:
         sources = data.get('sources', [])
-    
+
     # Confidence Score (aus metadata oder fallback)
     confidence_score = data.get('confidence_score', 0.0)
-    
+
     # Session ID
     session_id = data.get('session_id', self.session_id)
-    
+
     logger.debug(f"📋 Response parsed: {len(response_text)} chars, {len(sources)} sources")
-    
+
     return QueryResponse(
         response_text=response_text,
         sources=sources,
@@ -146,7 +146,7 @@ def _parse_response(self, data: Dict, processing_time: float) -> QueryResponse:
 def _get_endpoint_for_mode(self, mode: str) -> str:
     """
     Bestimmt Endpoint für Query-Modus
-    
+
     Backend API v3 Endpoints:
     - /query/standard - Standard RAG (mode: veritas, chat, vpb, covina)
     - /query/intelligent - Intelligent Pipeline mit Multi-Agent
@@ -164,7 +164,7 @@ def _get_endpoint_for_mode(self, mode: str) -> str:
 
 ---
 
-### Fix #3: Typing Indicator "KI arbeitet..." 
+### Fix #3: Typing Indicator "KI arbeitet..."
 
 **Neue Datei:** `frontend/components/typing_indicator.py` (240 Zeilen)
 
@@ -237,7 +237,7 @@ Agents: ✅ EnvironmentalAgent, WikipediaAgent, etc.
 
 **Status:** TODO - Noch nicht getestet
 **Endpoint:** `/query/stream` (SSE)
-**TODO:** 
+**TODO:**
 - SSE Event-Handling prüfen
 - Typing Indicator bei Streaming anpassen
 
@@ -318,8 +318,8 @@ Agents: ✅ EnvironmentalAgent, WikipediaAgent, etc.
 
 ### TypingIndicator Component
 
-**Datei:** `frontend/components/typing_indicator.py`  
-**Zeilen:** 240  
+**Datei:** `frontend/components/typing_indicator.py`
+**Zeilen:** 240
 **Funktionen:**
 - `show()` - Zeigt Animation
 - `hide()` - Versteckt Animation
@@ -411,6 +411,6 @@ indicator = create_typing_indicator(
 
 ---
 
-**Autor:** VERITAS Development Team  
-**Review:** ✅ Approved  
+**Autor:** VERITAS Development Team
+**Review:** ✅ Approved
 **Status:** 🚀 Ready for Production Testing

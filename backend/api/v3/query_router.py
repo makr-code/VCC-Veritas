@@ -9,6 +9,15 @@ Endpoints für Query Operations:
 Integration mit bestehendem Backend.
 """
 
+<<<<<<< Updated upstream
+=======
+import asyncio
+import json
+import logging
+from datetime import datetime
+from typing import Any, AsyncIterator, Dict, List
+
+>>>>>>> Stashed changes
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from typing import AsyncIterator, Dict, Any
@@ -137,7 +146,7 @@ async def query_standard(query_req: QueryRequest, request: Request):
         duration = (datetime.now() - start_time).total_seconds()
         
         # ✨ IEEE-Metadaten aus Pipeline (jetzt enhanced!)
-        sources_metadata = []
+        sources_metadata: List[SourceMetadata] = []
         for src in pipeline_result.get("sources", []):
             # Pipeline gibt jetzt vollständige IEEE-Metadaten zurück
             sources_metadata.append(SourceMetadata(
@@ -322,7 +331,7 @@ async def query_intelligent(query_req: QueryRequest, request: Request):
         duration = (datetime.now() - start_time).total_seconds()
         
         # Sources formatieren
-        sources_metadata = []
+        sources_metadata: List[SourceMetadata] = []
         for src in pipeline_result.get("sources", []):
             sources_metadata.append(SourceMetadata(
                 id=src.get("id", f"src_{len(sources_metadata)+1}"),

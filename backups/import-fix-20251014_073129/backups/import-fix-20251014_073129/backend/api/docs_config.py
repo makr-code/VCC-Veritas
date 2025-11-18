@@ -16,12 +16,13 @@ Created: 2025-10-08
 Version: 1.0.0
 """
 
+import json
+from typing import Optional
+
 from fastapi import FastAPI
-from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
+from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
-from typing import Optional
-import json
 
 
 def configure_api_docs(
@@ -36,7 +37,7 @@ def configure_api_docs(
 ) -> FastAPI:
     """
     Configure interactive API documentation with custom branding.
-    
+
     Args:
         app: FastAPI application instance
         title: API title
@@ -46,16 +47,16 @@ def configure_api_docs(
         redoc_url: ReDoc endpoint path
         openapi_url: OpenAPI spec JSON endpoint
         enable_oauth: Enable OAuth 2.0 in Swagger UI
-        
+
     Returns:
         Configured FastAPI app
     """
-    
+
     # Update app metadata
     app.title = title
     app.description = description
     app.version = version
-    
+
     # Custom Swagger UI endpoint
     @app.get(docs_url, include_in_schema=False)
     async def custom_swagger_ui():
@@ -70,7 +71,9 @@ def configure_api_docs(
                 "clientId": "veritas-swagger-ui",
                 "appName": "VERITAS API Explorer",
                 "usePkceWithAuthorizationCodeGrant": True,
-            } if enable_oauth else None,
+            }
+            if enable_oauth
+            else None,
             swagger_ui_parameters={
                 "deepLinking": True,
                 "persistAuthorization": True,
@@ -83,13 +86,14 @@ def configure_api_docs(
                 "docExpansion": "list",
                 "operationsSorter": "alpha",
                 "tagsSorter": "alpha",
-            }
+            },
         )
-    
+
     # OAuth 2.0 redirect endpoint for Swagger UI
     @app.get(f"{docs_url}/oauth2-redirect", include_in_schema=False)
     async def swagger_ui_redirect():
-        return HTMLResponse("""
+        return HTMLResponse(
+            """
         <!doctype html>
         <html lang="en-US">
         <head>
@@ -165,8 +169,9 @@ def configure_api_docs(
         </script>
         </body>
         </html>
-        """)
-    
+        """
+        )
+
     # Custom ReDoc endpoint
     @app.get(redoc_url, include_in_schema=False)
     async def custom_redoc():
@@ -177,38 +182,35 @@ def configure_api_docs(
             redoc_favicon_url="/static/favicon.ico",
             with_google_fonts=True,
         )
-    
+
     # OpenAPI JSON endpoint
     @app.get(openapi_url, include_in_schema=False)
     async def get_openapi_json():
         return JSONResponse(app.openapi())
-    
+
     # Download OpenAPI spec
     @app.get(f"{openapi_url}.yaml", include_in_schema=False)
     async def get_openapi_yaml():
         """Download OpenAPI specification as YAML."""
         try:
             import yaml
+
             spec = app.openapi()
             yaml_content = yaml.dump(spec, default_flow_style=False, sort_keys=False)
             return HTMLResponse(
                 content=yaml_content,
                 media_type="application/x-yaml",
-                headers={
-                    "Content-Disposition": f"attachment; filename=openapi.yaml"
-                }
+                headers={"Content-Disposition": f"attachment; filename=openapi.yaml"},
             )
         except ImportError:
-            return JSONResponse(
-                {"error": "PyYAML not installed. Install with: pip install pyyaml"},
-                status_code=500
-            )
-    
+            return JSONResponse({"error": "PyYAML not installed. Install with: pip install pyyaml"}, status_code=500)
+
     # API documentation landing page
     @app.get("/", include_in_schema=False, response_class=HTMLResponse)
     async def api_root():
         """API documentation landing page."""
-        return HTMLResponse(f"""
+        return HTMLResponse(
+            f"""
         <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -335,7 +337,7 @@ def configure_api_docs(
                 <div class="description">
                     {description}
                 </div>
-                
+
                 <div class="buttons">
                     <a href="{docs_url}" class="btn btn-primary">
                         📚 Swagger UI
@@ -350,7 +352,7 @@ def configure_api_docs(
                         ❤️ Health Check
                     </a>
                 </div>
-                
+
                 <div class="features">
                     <div class="feature">
                         <h3>🤖 Agent Orchestration</h3>
@@ -369,11 +371,11 @@ def configure_api_docs(
                         <p>Real-time WebSocket streaming</p>
                     </div>
                 </div>
-                
+
                 <div class="footer">
                     <p>
-                        <a href="https://docs.veritas.example.com">Documentation</a> | 
-                        <a href="https://github.com/veritas/framework">GitHub</a> | 
+                        <a href="https://docs.veritas.example.com">Documentation</a> |
+                        <a href="https://github.com/veritas/framework">GitHub</a> |
                         <a href="mailto:support@veritas.example.com">Support</a>
                     </p>
                     <p>© 2025 VERITAS Framework. All rights reserved.</p>
@@ -381,55 +383,55 @@ def configure_api_docs(
             </div>
         </body>
         </html>
-        """)
-    
+        """
+        )
+
     return app
 
 
 def add_code_samples_to_openapi(app: FastAPI) -> FastAPI:
     """
     Add code samples to OpenAPI spec for multiple languages.
-    
+
     Args:
         app: FastAPI application instance
-        
+
     Returns:
         App with enhanced OpenAPI spec
     """
-    
+
     def custom_openapi():
         if app.openapi_schema:
             return app.openapi_schema
-        
+
         openapi_schema = app.openapi()
-        
+
         # Add code samples to endpoints
         for path, path_item in openapi_schema.get("paths", {}).items():
             for method, operation in path_item.items():
                 if method not in ["get", "post", "put", "patch", "delete"]:
                     continue
-                
+
                 # Add code samples
-                operation["x-codeSamples"] = generate_code_samples(
-                    path, method, operation
-                )
-        
+                operation["x-codeSamples"] = generate_code_samples(path, method, operation)
+
         app.openapi_schema = openapi_schema
         return app.openapi_schema
-    
+
     app.openapi = custom_openapi
     return app
 
 
 def generate_code_samples(path: str, method: str, operation: dict) -> list:
     """Generate code samples for an operation."""
-    
+
     samples = []
-    
+
     # Python sample
-    samples.append({
-        "lang": "Python",
-        "source": f"""
+    samples.append(
+        {
+            "lang": "Python",
+            "source": f"""
 import requests
 
 url = "https://api.veritas.example.com{path}"
@@ -440,13 +442,15 @@ headers = {{
 
 response = requests.{method}(url, headers=headers)
 print(response.json())
-        """.strip()
-    })
-    
+        """.strip(),
+        }
+    )
+
     # JavaScript sample
-    samples.append({
-        "lang": "JavaScript",
-        "source": f"""
+    samples.append(
+        {
+            "lang": "JavaScript",
+            "source": f"""
 const response = await fetch('https://api.veritas.example.com{path}', {{
   method: '{method.upper()}',
   headers: {{
@@ -457,56 +461,59 @@ const response = await fetch('https://api.veritas.example.com{path}', {{
 
 const data = await response.json();
 console.log(data);
-        """.strip()
-    })
-    
+        """.strip(),
+        }
+    )
+
     # cURL sample
-    samples.append({
-        "lang": "cURL",
-        "source": f"""
+    samples.append(
+        {
+            "lang": "cURL",
+            "source": f"""
 curl -X {method.upper()} https://api.veritas.example.com{path} \\
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \\
   -H "Content-Type: application/json"
-        """.strip()
-    })
-    
+        """.strip(),
+        }
+    )
+
     return samples
 
 
 # Example usage
 if __name__ == "__main__":
     from fastapi import FastAPI
-    
+
     app = FastAPI()
-    
+
     # Add some example endpoints
     @app.get("/health", tags=["Monitoring"])
     async def health():
         """Health check endpoint."""
         return {"status": "healthy"}
-    
+
     @app.post("/agents/execute", tags=["Agents"])
     async def execute_agents(plan_id: str):
         """Execute agent orchestration plan."""
         return {"plan_id": plan_id, "status": "pending"}
-    
+
     # Configure documentation
     configure_api_docs(
         app,
         title="VERITAS Framework API",
         description="Comprehensive API for agent orchestration and RAG",
         version="1.0.0",
-        enable_oauth=True
+        enable_oauth=True,
     )
-    
+
     # Add code samples
     add_code_samples_to_openapi(app)
-    
+
     print("✅ Interactive API documentation configured")
     print(f"   Swagger UI: http://localhost:8000/docs")
     print(f"   ReDoc: http://localhost:8000/redoc")
     print(f"   OpenAPI JSON: http://localhost:8000/openapi.json")
     print(f"   OpenAPI YAML: http://localhost:8000/openapi.json.yaml")
-    
+
     # To run:
     # uvicorn docs_config:app --reload

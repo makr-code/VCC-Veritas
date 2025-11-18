@@ -1,7 +1,7 @@
 # UDS3 Search API - Integration Decision Analysis
 
-**Datum:** 11.10.2025  
-**Frage:** Sollte die Search API direkt in UDS3 integriert werden?  
+**Datum:** 11.10.2025
+**Frage:** Sollte die Search API direkt in UDS3 integriert werden?
 **Status:** Architecture Decision Record
 
 ---
@@ -115,10 +115,10 @@ from uds3.search import UDS3SearchAPI  # ← Import im Core
 class UnifiedDatabaseStrategy:
     def __init__(self, ...):
         # ... existing code ...
-        
+
         # Automatisch Search API erstellen
         self._search_api = None
-    
+
     @property
     def search_api(self) -> UDS3SearchAPI:
         """Lazy-loaded Search API"""
@@ -497,7 +497,7 @@ metrics = await strategy.evaluator.evaluate(response, ground_truth)
 
 ---
 
-**Erstellt:** 11.10.2025  
-**Autor:** VERITAS Team  
-**Version:** 1.0.0  
+**Erstellt:** 11.10.2025
+**Autor:** VERITAS Team
+**Version:** 1.0.0
 **Status:** ✅ Proposal Ready

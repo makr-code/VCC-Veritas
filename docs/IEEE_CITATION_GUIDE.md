@@ -24,7 +24,7 @@ natürlicher Sprache [2], [3].
 
 **Quellenverzeichnis:**
 ```
-[1] J. Smith and A. Doe, "Deep Learning Advances," IEEE Trans. 
+[1] J. Smith and A. Doe, "Deep Learning Advances," IEEE Trans.
     Pattern Anal., vol. 42, no. 3, pp. 567-589, Mar. 2020.
 
 [2] "VERITAS Documentation," https://veritas.example.com,
@@ -181,13 +181,13 @@ assistant_layout.render_assistant_message(
 
 **Format:**
 ```
-[N] Author(s), "Article Title," Journal Name, vol. X, no. Y, 
+[N] Author(s), "Article Title," Journal Name, vol. X, no. Y,
     pp. ZZZ-ZZZ, Month Year.
 ```
 
 **Beispiel:**
 ```
-[1] J. Smith and A. Doe, "Deep Learning in NLP," IEEE Trans. 
+[1] J. Smith and A. Doe, "Deep Learning in NLP," IEEE Trans.
     Pattern Anal., vol. 42, no. 3, pp. 567-589, Mar. 2020.
 ```
 
@@ -200,7 +200,7 @@ assistant_layout.render_assistant_message(
 
 **Beispiel:**
 ```
-[2] "VERITAS Documentation," VERITAS Project. 
+[2] "VERITAS Documentation," VERITAS Project.
     https://veritas.example.com (accessed Oct. 17, 2025).
 ```
 
@@ -312,10 +312,10 @@ backend_response = {
     'content': """
 # Deep Learning in NLP
 
-Aktuelle Studien zeigen signifikante Fortschritte {cite:src_1} 
-in der maschinellen Verarbeitung natürlicher Sprache. 
+Aktuelle Studien zeigen signifikante Fortschritte {cite:src_1}
+in der maschinellen Verarbeitung natürlicher Sprache.
 
-Transformer-Architekturen {cite:src_2} haben die Genauigkeit 
+Transformer-Architekturen {cite:src_2} haben die Genauigkeit
 um 15% verbessert.
 
 ## Weitere Forschung
@@ -368,10 +368,10 @@ assistant_layout.render_assistant_message(
 ```
 # Deep Learning in NLP
 
-Aktuelle Studien zeigen signifikante Fortschritte [1] 
-in der maschinellen Verarbeitung natürlicher Sprache. 
+Aktuelle Studien zeigen signifikante Fortschritte [1]
+in der maschinellen Verarbeitung natürlicher Sprache.
 
-Transformer-Architekturen [2] haben die Genauigkeit 
+Transformer-Architekturen [2] haben die Genauigkeit
 um 15% verbessert.
 
 ## Weitere Forschung
@@ -386,9 +386,9 @@ Die VERITAS-Dokumentation [3] bietet weitere Details.
 ▼ Metadata                                      👍👎
   📚 References (IEEE Standard):
      [1] J. Smith, "Deep Learning in NLP," 2020, pp. 15.
-     [2] A. Vaswani et al., "Attention is All You Need," 
+     [2] A. Vaswani et al., "Attention is All You Need,"
          2017, pp. 5998-6008.
-     [3] "VERITAS Documentation," https://veritas.example.com, 
+     [3] "VERITAS Documentation," https://veritas.example.com,
          accessed Oct. 17, 2025.
   ⚙️ Complexity: Medium
   ⏱️ Duration: 2.400s
@@ -518,6 +518,6 @@ Response:
 
 ---
 
-**Version:** 1.0  
-**Datum:** 17. Oktober 2025  
+**Version:** 1.0
+**Datum:** 17. Oktober 2025
 **Status:** 🚀 Ready for Integration

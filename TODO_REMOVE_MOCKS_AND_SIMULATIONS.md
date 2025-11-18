@@ -1,8 +1,8 @@
 # TODO: Mockups und Simulationen Entfernen
 
-**Datum:** 13. Oktober 2025  
-**Status:** 🔴 OPEN - Kritische Code Quality Aufgabe  
-**Priorität:** HIGH  
+**Datum:** 13. Oktober 2025
+**Status:** 🔴 OPEN - Kritische Code Quality Aufgabe
+**Priorität:** HIGH
 **Geschätzte Zeit:** 12-20 Stunden
 
 ---
@@ -63,7 +63,7 @@ Umfassende Analyse und Entfernung von **Mockups, Simulationen, Fallback-Modi und
   - Graceful Degradation auf Graph-Only Search
   - User-Notification bei Vector Search Unavailable
   - Monitoring/Alerting für ChromaDB Connection Errors
-  
+
 - [ ] **Production Monitoring:**
   - ChromaDB Health Checks (heartbeat every 30s)
   - Auto-Restart bei Connection Loss
@@ -107,21 +107,21 @@ TODO_PKI_INTEGRATION.md:80    PKI_MOCK_MODE = os.getenv("PKI_MOCK_MODE", "true")
 ```python
 class CertificateManager:
     """Mock Certificate Manager"""
-    
+
     def __init__(self, mock_mode: bool = True):
         self.mock_mode = mock_mode
         self._mock_certs: Dict[str, Dict[str, Any]] = {}
-    
+
     def create_certificate(self, subject: str, validity_days: int = 365):
         """Erstellt ein neues Zertifikat (Mock)"""
         # TODO: Echte Implementierung mit cryptography library
         pass
-    
+
     def revoke_certificate(self, cert_id: str):
         """Widerruft ein Zertifikat (Mock)"""
         # TODO: CRL Management
         pass
-    
+
     def get_certificate_info(self, cert_id: str):
         """Ruft Zertifikat-Details ab (Mock)"""
         # TODO: X.509 Parsing
@@ -145,15 +145,15 @@ class CertificateManager:
 ```python
 class CAService:
     """Mock Certificate Authority Service"""
-    
+
     def initialize_ca(self):
         """Initialisiert die CA (Mock)"""
         pass
-    
+
     def sign_csr(self, csr_data: str):
         """Signiert einen CSR (Mock)"""
         pass
-    
+
     def get_ca_certificate(self):
         """Ruft CA-Zertifikat ab (Mock)"""
         pass
@@ -236,19 +236,19 @@ VERITAS_AGENT_FRAMEWORK_INTEGRATION_TODO.md:80   **Verdict:** 🔴 **Significant
   - Feature-Matrix erstellen
   - Code-Metriken vergleichen
   - Architecture Diagrams
-  
+
 - [ ] **Integration Strategy (8h):**
   - Agent Registry implementieren (zentrales Register)
   - Message Bus einführen (Agent-to-Agent Communication)
   - Supervisor Pattern (Orchestration Layer)
   - State Machine (Agent Lifecycle Management)
-  
+
 - [ ] **Migration Plan (12h):**
   - Environmental Agent → Mockup-Pattern
   - Financial Agent → Mockup-Pattern
   - Social Agent → Mockup-Pattern
   - Traffic Agent → Mockup-Pattern
-  
+
 - [ ] **Testing (8h):**
   - Integration Tests für Agent Communication
   - Performance Tests (Message Bus Latency)
@@ -286,12 +286,12 @@ tests/test_uds3_search_api.py:116   class MockUnifiedStrategy:
   - Echte PostgreSQL-Tests (mit Test-DB)
   - Echte Neo4j-Tests (mit Test-Graph)
   - Echte ChromaDB-Tests (mit Test-Collection)
-  
+
 - [ ] **Test Data Management (3h):**
   - Database Seeds erstellen (SQL, Cypher, JSON)
   - Test Data Isolation (separate Test-Schemas)
   - Teardown/Cleanup Automation
-  
+
 - [ ] **CI/CD Integration (3h):**
   - Docker Compose für Test-Databases
   - Test Database Initialization Scripts
@@ -341,7 +341,7 @@ def get_temperature_range(model_name: str) -> Tuple[float, float]:
   ```python
   # BEFORE
   return 2.0, 6.0  # Fallback
-  
+
   # AFTER
   return 0.7, 1.0  # Conservative fallback for unknown models
   ```
@@ -350,7 +350,7 @@ def get_temperature_range(model_name: str) -> Tuple[float, float]:
   - Comprehensive Model Database (temperature, top-p, context_length)
   - Model Capabilities Mapping
   - Auto-Detection für neue Models
-  
+
 - [ ] **Tests aktualisieren (2h):**
   - Fallback-Werte validieren
   - Model-Specific Tests
@@ -371,7 +371,7 @@ print("📌 Verwende Fallback-Modelle")
   - Definiere Production-Models (llama3.1:8b, etc.)
   - Environment-basierte Model Selection
   - Health Checks für Model Availability
-  
+
 - [ ] **Test Configuration (2h):**
   - Separate Test-Models Config
   - Mock-LLM für Unit Tests
@@ -403,12 +403,12 @@ test_chat_persistence_ui.py:29  test_data = [...]
   - `seeds/postgresql/01_schema.sql` - Database Schema
   - `seeds/postgresql/02_initial_data.sql` - Initial Production Data
   - `seeds/postgresql/03_test_data.sql` - Test Data (optional)
-  
+
 - [ ] **Neo4j Seeds:**
   - `seeds/neo4j/01_constraints.cypher` - Graph Constraints
   - `seeds/neo4j/02_initial_nodes.cypher` - Initial Graph Data
   - `seeds/neo4j/03_relationships.cypher` - Graph Relationships
-  
+
 - [ ] **ChromaDB Seeds:**
   - `seeds/chromadb/01_collections.json` - Collection Definitions
   - `seeds/chromadb/02_embeddings.json` - Initial Embeddings (optional)
@@ -418,7 +418,7 @@ test_chat_persistence_ui.py:29  test_data = [...]
   ```python
   # scripts/run_seeds.py
   import argparse
-  
+
   def run_seeds(env: str = "development"):
       """Run database seeds for specified environment"""
       if env == "production":
@@ -474,7 +474,7 @@ async def revoke_certificate(cert_id: str):
   - DELETE /pki/certificates/{id} - Revoke Certificate
   - GET /pki/ca/certificate - Get CA Certificate
   - GET /pki/crl - Get Certificate Revocation List
-  
+
 - [ ] **OpenAPI Documentation (2h):**
   - Swagger/OpenAPI Schemas
   - Example Requests/Responses
@@ -490,7 +490,7 @@ TODO_MAP_INTEGRATION.md:379    placeholder="Ort, Betriebsstätte..."
   - GET /maps/geocode - Geocoding Service
   - GET /maps/tiles/{z}/{x}/{y} - Tile Service
   - POST /maps/markers - Add Map Markers
-  
+
 - [ ] **Offline Fallback (4h):**
   - Local Tile Cache
   - Graceful Degradation bei API Failure
@@ -732,10 +732,10 @@ TODO_MAP_INTEGRATION.md:379    placeholder="Ort, Betriebsstätte..."
 
 ---
 
-**Erstellt:** 13. Oktober 2025  
-**Autor:** Code Quality Team  
-**Review:** Pending  
+**Erstellt:** 13. Oktober 2025
+**Autor:** Code Quality Team
+**Review:** Pending
 **Status:** 🔴 OPEN - HIGH PRIORITY
 
-**Total Geschätzte Zeit:** 160-200 Stunden (4-5 Wochen)  
+**Total Geschätzte Zeit:** 160-200 Stunden (4-5 Wochen)
 **Empfehlung:** Staffelung in 3 Phasen (kritisch → wichtig → nice-to-have)

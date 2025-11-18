@@ -75,7 +75,7 @@ services:
       DEBUG: "false"
       HOST: 0.0.0.0
       PORT: 8000
-      
+
       # Database
       DB_TYPE: postgresql
       DB_HOST: postgres
@@ -85,40 +85,40 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:?Database password required}
       DB_POOL_SIZE: 20
       DB_SSL_MODE: prefer
-      
+
       # Redis
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: ${REDIS_PASSWORD:-}
-      
+
       # Security
       SECRET_KEY: ${SECRET_KEY:?Secret key required}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY:?JWT secret key required}
       JWT_ALGORITHM: HS256
       JWT_ACCESS_TOKEN_EXPIRE_MINUTES: 60
-      
+
       # Rate Limiting
       RATE_LIMIT_ENABLED: "true"
       RATE_LIMIT_REQUESTS: 100
       RATE_LIMIT_WINDOW_SECONDS: 60
-      
+
       # Logging
       LOG_LEVEL: INFO
       LOG_FORMAT: json
       LOG_OUTPUT: both
-      
+
       # Monitoring
       METRICS_ENABLED: "true"
       HEALTH_CHECK_ENABLED: "true"
-      
+
       # Ollama
       OLLAMA_ENABLED: ${OLLAMA_ENABLED:-true}
       OLLAMA_API_URL: ${OLLAMA_API_URL:-http://host.docker.internal:11434}
-      
+
       # Backup
       BACKUP_ENABLED: "true"
       BACKUP_PATH: /backups
-      
+
     volumes:
       - ./logs:/app/logs
       - ./backups:/backups

@@ -1,6 +1,6 @@
 # 🏆 Golden Dataset System - Implementierungs-Zusammenfassung
 
-**Datum:** 10. Oktober 2025, 14:15 Uhr  
+**Datum:** 10. Oktober 2025, 14:15 Uhr
 **Status:** ✅ Implementiert und dokumentiert
 
 ---
@@ -122,10 +122,10 @@ print(f"⏱️  Gesamtzeit Modell: {model_total_time:.1f}s")  # ⭐ NEU
    - Setze Zitate in Anführungszeichen: "..."
    - Nach jedem Zitat: IEEE-Referenz [1]
    - Mindestens 2-3 direkte Zitate pro Antwort
-   
+
    BEISPIEL DIREKTE ZITATE:
-   "Nach § 58 Abs. 1 LBO BW gilt: 'Die Baugenehmigung wird auf Antrag erteilt' [1]. 
-   Das Gesetz definiert weiter: 'Der Antrag ist schriftlich bei der zuständigen 
+   "Nach § 58 Abs. 1 LBO BW gilt: 'Die Baugenehmigung wird auf Antrag erteilt' [1].
+   Das Gesetz definiert weiter: 'Der Antrag ist schriftlich bei der zuständigen
    Baugenehmigungsbehörde einzureichen' [1]."
 ```
 
@@ -134,8 +134,8 @@ print(f"⏱️  Gesamtzeit Modell: {model_total_time:.1f}s")  # ⭐ NEU
 # ZITAT-BEISPIELE
 
 EXZELLENT:
-"Gemäß § 59 Abs. 2 LBO BW gilt: 'Die Baugenehmigungsbehörde hat über den 
-Bauantrag innerhalb von drei Monaten zu entscheiden' [1]. Bei vereinfachten 
+"Gemäß § 59 Abs. 2 LBO BW gilt: 'Die Baugenehmigungsbehörde hat über den
+Bauantrag innerhalb von drei Monaten zu entscheiden' [1]. Bei vereinfachten
 Verfahren verkürzt sich die Frist auf 'einen Monat' [2]."
 
 GUT:
@@ -207,18 +207,18 @@ SCHLECHT (vermeide dies):
    # In: backend/api/veritas_api_endpoint.py
    # ÄNDERN:
    from backend.agents.veritas_enhanced_prompts import VerwaltungsrechtPrompts
-   
+
    @app.post("/ask")
    async def ask_question(request: RAGRequest):
        # RAG-Retrieval
        retrieved_docs = await retrieval_system.get_documents(request.question)
-       
+
        # NEUER Prompt mit direkten Zitaten
        prompt = VerwaltungsrechtPrompts.build_prompt(
            question=request.question,
            retrieved_documents=retrieved_docs
        )
-       
+
        response = await llm_client.generate(prompt, model=request.model)
        ...
    ```
@@ -226,7 +226,7 @@ SCHLECHT (vermeide dies):
 2. **Vollständigen Test durchführen**
    ```bash
    python tests/test_rag_quality_v3_19_0.py
-   
+
    # Erwartete Dauer: 10-20 Minuten (4 Modelle × 5 Fragen × ~20s)
    # Output:
    #   - Konsolen-Ausgabe mit Zwischenergebnissen
@@ -238,7 +238,7 @@ SCHLECHT (vermeide dies):
    ```bash
    # Sichere ersten Test als Baseline
    mv golden_dataset_*.json golden_dataset_baseline.json
-   
+
    # Analysiere Baseline
    # - Welches Modell performt am besten?
    # - Wo sind die größten Probleme?
@@ -251,12 +251,12 @@ SCHLECHT (vermeide dies):
    ```
    Iteration 1: Baseline (aktuell)
    ├─ 0% Zitate → Problem identifiziert
-   
+
    Iteration 2: Direkte Zitate erzwungen
    ├─ Prompt: "Verwende ZWINGEND direkte Zitate"
    ├─ Test: python tests/test_rag_quality_v3_19_0.py
    └─ Vergleich: 0% → ??%
-   
+
    Iteration 3: Few-Shot Examples
    ├─ Prompt: Füge 2-3 Beispiel-Zitate hinzu
    ├─ Test: python tests/test_rag_quality_v3_19_0.py
@@ -266,12 +266,12 @@ SCHLECHT (vermeide dies):
 2. **Modell-Auswahl finalisieren**
    ```python
    # Analyse: Welches Modell für was?
-   
+
    Zitationen:        llama3.1:8b (vermutlich)
    Aspekt-Abdeckung:  mistral:latest (vermutlich)
    Performance:       llama3.1:8b (schneller)
    Balance:           llama3.1:latest
-   
+
    → Entscheidung basierend auf Golden Dataset
    ```
 
@@ -340,7 +340,7 @@ python -c "
 import json
 with open('baseline.json') as f:
     data = json.load(f)
-    
+
 # Finde größtes Problem
 for qid, entry in data.items():
     for model, result in entry['model_results'].items():
@@ -417,7 +417,7 @@ Paraphrase: "Die Frist beträgt drei Monate."
 
 **Lösung:** Direkte Zitate + Quelle + Paragraph
 ```
-Direkt: "Nach § 59 Abs. 2 LBO BW: 'Die Baugenehmigungsbehörde hat 
+Direkt: "Nach § 59 Abs. 2 LBO BW: 'Die Baugenehmigungsbehörde hat
         über den Bauantrag innerhalb von drei Monaten zu entscheiden' [1]."
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
         Nachprüfbar, rechtlich belastbar, Rechtsgrundlage klar
@@ -445,6 +445,6 @@ Total:     18.2s
 
 ---
 
-**Zusammengestellt von:** GitHub Copilot  
-**Datum:** 10. Oktober 2025, 14:20 Uhr  
+**Zusammengestellt von:** GitHub Copilot
+**Datum:** 10. Oktober 2025, 14:20 Uhr
 **Status:** ✅ Bereit für Integration und Testing

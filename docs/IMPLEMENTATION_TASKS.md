@@ -1,7 +1,7 @@
 # VERITAS Deep Research System - Detaillierte Task-Liste
 
-**Letzte Aktualisierung:** 11. Oktober 2025  
-**Projekt:** VERITAS/VCC Integration  
+**Letzte Aktualisierung:** 11. Oktober 2025
+**Projekt:** VERITAS/VCC Integration
 **Ziel:** Architektur-Evolution zu Enterprise Deep Research System
 
 **Siehe auch:**
@@ -12,8 +12,8 @@
 
 ## 📊 Übersicht
 
-**Gesamtaufwand:** 10-16 Wochen (2.5-4 Monate)  
-**Team:** 2-3 Entwickler  
+**Gesamtaufwand:** 10-16 Wochen (2.5-4 Monate)
+**Team:** 2-3 Entwickler
 **Prioritäten:** P0 (kritisch) → P1 (hoch) → P2 (mittel) → P3 (optional)
 
 ### Status-Legende
@@ -103,26 +103,26 @@ class ResearchState(TypedDict):
     # Identity
     research_id: str  # UUID
     user_id: Optional[str]
-    
+
     # Input
     initial_query: str
     query_language: str  # "de", "en"
-    
+
     # Status
     status: str  # "IN_PROGRESS", "COMPLETED", "FAILED", "PAUSED"
     current_task: Optional[Dict[str, Any]]
-    
+
     # Execution
     execution_trace: List[ExecutionTraceEntry]
     global_state: GlobalState
-    
+
     # Results
     final_answer: Optional[str]
     results_summary: Optional[Dict[str, Any]]
-    
+
     # Metadata
     timestamps: Dict[str, str]  # created_at, updated_at, completed_at
-    
+
     # Integrity (optional)
     integrity: Optional[IntegrityBlock]
 ```
@@ -157,7 +157,7 @@ CREATE TABLE IF NOT EXISTS research_states (
     status VARCHAR(50) NOT NULL,
     user_id VARCHAR(255),
     initial_query TEXT,
-    
+
     CONSTRAINT valid_status CHECK (
         status IN ('IN_PROGRESS', 'COMPLETED', 'FAILED', 'PAUSED')
     )
@@ -167,7 +167,7 @@ CREATE TABLE IF NOT EXISTS research_states (
 CREATE INDEX idx_research_states_status ON research_states(status);
 CREATE INDEX idx_research_states_updated_at ON research_states(updated_at DESC);
 CREATE INDEX idx_research_states_user_id ON research_states(user_id);
-CREATE INDEX idx_research_states_query_fulltext ON research_states 
+CREATE INDEX idx_research_states_query_fulltext ON research_states
     USING GIN (to_tsvector('german', initial_query));
 
 -- Function to auto-update updated_at
@@ -233,23 +233,23 @@ logger = logging.getLogger(__name__)
 class ResearchStatePersister:
     """
     Manages persistent storage of ResearchState in PostgreSQL
-    
+
     Features:
     - Async connection pooling
     - JSONB storage for flexibility
     - Automatic serialization/deserialization
     - Error handling with retries
     """
-    
+
     def __init__(self, db_config: Dict[str, Any]):
         self.db_config = db_config
         self.pool: Optional[asyncpg.Pool] = None
-    
+
     async def init_pool(self):
         """Initialize connection pool"""
         if self.pool:
             return
-        
+
         try:
             self.pool = await asyncpg.create_pool(
                 host=self.db_config['host'],
@@ -265,31 +265,31 @@ class ResearchStatePersister:
         except Exception as e:
             logger.error(f"❌ Failed to initialize pool: {e}")
             raise
-    
+
     async def close_pool(self):
         """Close connection pool"""
         if self.pool:
             await self.pool.close()
             logger.info("Connection pool closed")
-    
+
     async def save_state(
-        self, 
-        research_id: str, 
+        self,
+        research_id: str,
         state: ResearchState
     ):
         """
         Save or update research state
-        
+
         Args:
             research_id: UUID of research session
             state: Complete ResearchState dict
-        
+
         Raises:
             Exception: If DB operation fails
         """
         if not self.pool:
             await self.init_pool()
-        
+
         try:
             async with self.pool.acquire() as conn:
                 await conn.execute(
@@ -309,33 +309,33 @@ class ResearchStatePersister:
                     state.get('user_id'),
                     state['initial_query']
                 )
-            
+
             logger.debug(f"✅ State saved: {research_id} (status={state['status']})")
-        
+
         except Exception as e:
             logger.error(f"❌ Failed to save state {research_id}: {e}")
             raise
-    
+
     async def load_state(self, research_id: str) -> Optional[ResearchState]:
         """
         Load research state by ID
-        
+
         Args:
             research_id: UUID of research session
-        
+
         Returns:
             ResearchState dict or None if not found
         """
         if not self.pool:
             await self.init_pool()
-        
+
         try:
             async with self.pool.acquire() as conn:
                 row = await conn.fetchrow(
                     "SELECT state_json FROM research_states WHERE id = $1",
                     research_id
                 )
-            
+
             if row:
                 state = json.loads(row['state_json'])
                 logger.debug(f"✅ State loaded: {research_id}")
@@ -343,11 +343,11 @@ class ResearchStatePersister:
             else:
                 logger.warning(f"⚠️ State not found: {research_id}")
                 return None
-        
+
         except Exception as e:
             logger.error(f"❌ Failed to load state {research_id}: {e}")
             raise
-    
+
     async def list_states(
         self,
         user_id: Optional[str] = None,
@@ -356,63 +356,63 @@ class ResearchStatePersister:
     ) -> List[Dict[str, Any]]:
         """
         List research states with filters
-        
+
         Args:
             user_id: Filter by user (optional)
             status_filter: Filter by status (optional)
             limit: Max results (default: 50)
-        
+
         Returns:
             List of state summaries (not full states!)
         """
         if not self.pool:
             await self.init_pool()
-        
+
         query = "SELECT id, status, initial_query, created_at, updated_at FROM research_states"
         conditions = []
         params = []
         param_idx = 1
-        
+
         if user_id:
             conditions.append(f"user_id = ${param_idx}")
             params.append(user_id)
             param_idx += 1
-        
+
         if status_filter:
             conditions.append(f"status = ${param_idx}")
             params.append(status_filter)
             param_idx += 1
-        
+
         if conditions:
             query += " WHERE " + " AND ".join(conditions)
-        
+
         query += f" ORDER BY updated_at DESC LIMIT ${param_idx}"
         params.append(limit)
-        
+
         try:
             async with self.pool.acquire() as conn:
                 rows = await conn.fetch(query, *params)
-            
+
             return [dict(row) for row in rows]
-        
+
         except Exception as e:
             logger.error(f"❌ Failed to list states: {e}")
             raise
-    
+
     async def delete_state(self, research_id: str):
         """Delete research state"""
         if not self.pool:
             await self.init_pool()
-        
+
         try:
             async with self.pool.acquire() as conn:
                 result = await conn.execute(
                     "DELETE FROM research_states WHERE id = $1",
                     research_id
                 )
-            
+
             logger.info(f"✅ State deleted: {research_id}")
-        
+
         except Exception as e:
             logger.error(f"❌ Failed to delete state {research_id}: {e}")
             raise
@@ -451,7 +451,7 @@ from datetime import datetime
 class SupervisorAgent:
     def __init__(self, db_config, ...):
         # ... existing init ...
-        
+
         # NEW: State Persister
         self.persister = ResearchStatePersister(db_config)
         asyncio.create_task(self.persister.init_pool())  # Init pool async
@@ -467,12 +467,12 @@ async def process_query(
 ) -> Dict[str, Any]:
     """
     Process query with persistent state
-    
+
     Args:
         query: User question
         context: Request context
         research_id: UUID to resume research (optional)
-    
+
     Returns:
         {
             "research_id": "uuid-...",
@@ -481,24 +481,24 @@ async def process_query(
             "status": "COMPLETED"
         }
     """
-    
+
     # Load or create state
     if research_id:
         logger.info(f"🔄 Resuming research: {research_id}")
         state = await self.persister.load_state(research_id)
-        
+
         if not state:
             raise ValueError(f"Research {research_id} not found")
     else:
         logger.info(f"🆕 Starting new research")
         state = self._create_initial_state(query)
-    
+
     try:
         # Process while IN_PROGRESS
         while state['status'] == 'IN_PROGRESS':
             # Execute next step
             result = await self._execute_next_step(state)
-            
+
             # Log to execution trace
             trace_entry: ExecutionTraceEntry = {
                 "task_id": len(state['execution_trace']) + 1,
@@ -510,23 +510,23 @@ async def process_query(
                 "evaluation": None,  # Will be filled by Evaluator
                 "error": None
             }
-            
+
             state['execution_trace'].append(trace_entry)
-            
+
             # Update timestamps
             state['timestamps']['updated_at'] = datetime.utcnow().isoformat()
-            
+
             # Persist state
             await self.persister.save_state(state['research_id'], state)
             logger.debug(f"💾 State saved (task {trace_entry['task_id']})")
-        
+
         # Mark as completed
         state['status'] = 'COMPLETED'
         state['timestamps']['completed_at'] = datetime.utcnow().isoformat()
         await self.persister.save_state(state['research_id'], state)
-        
+
         logger.info(f"✅ Research completed: {state['research_id']}")
-        
+
         return {
             "research_id": state['research_id'],
             "response_text": state['final_answer'],
@@ -534,10 +534,10 @@ async def process_query(
             "status": state['status'],
             "execution_trace_length": len(state['execution_trace'])
         }
-    
+
     except Exception as e:
         logger.error(f"❌ Research failed: {e}")
-        
+
         # Mark as failed
         state['status'] = 'FAILED'
         state['execution_trace'].append({
@@ -549,14 +549,14 @@ async def process_query(
             "output": {},
             "error": str(e)
         })
-        
+
         await self.persister.save_state(state['research_id'], state)
         raise
 
 def _create_initial_state(self, query: str) -> ResearchState:
     """Create new research state"""
     research_id = str(uuid.uuid4())
-    
+
     return {
         "research_id": research_id,
         "user_id": None,  # TODO: Get from context
@@ -647,13 +647,13 @@ def sample_state() -> ResearchState:
 async def test_save_and_load_state(persister, sample_state):
     """Test: Save and load state"""
     research_id = sample_state['research_id']
-    
+
     # Save
     await persister.save_state(research_id, sample_state)
-    
+
     # Load
     loaded = await persister.load_state(research_id)
-    
+
     assert loaded is not None
     assert loaded['research_id'] == research_id
     assert loaded['initial_query'] == sample_state['initial_query']
@@ -663,18 +663,18 @@ async def test_save_and_load_state(persister, sample_state):
 async def test_update_existing_state(persister, sample_state):
     """Test: Update existing state"""
     research_id = sample_state['research_id']
-    
+
     # Save initial
     await persister.save_state(research_id, sample_state)
-    
+
     # Update status
     sample_state['status'] = 'COMPLETED'
     sample_state['final_answer'] = "Test answer"
     await persister.save_state(research_id, sample_state)
-    
+
     # Load
     loaded = await persister.load_state(research_id)
-    
+
     assert loaded['status'] == 'COMPLETED'
     assert loaded['final_answer'] == "Test answer"
 
@@ -685,14 +685,14 @@ async def test_list_states_by_status(persister, sample_state):
     state1 = {**sample_state, "research_id": str(uuid.uuid4()), "status": "IN_PROGRESS"}
     state2 = {**sample_state, "research_id": str(uuid.uuid4()), "status": "COMPLETED"}
     state3 = {**sample_state, "research_id": str(uuid.uuid4()), "status": "FAILED"}
-    
+
     await persister.save_state(state1['research_id'], state1)
     await persister.save_state(state2['research_id'], state2)
     await persister.save_state(state3['research_id'], state3)
-    
+
     # List only COMPLETED
     completed = await persister.list_states(status_filter="COMPLETED")
-    
+
     assert len(completed) >= 1
     assert all(s['status'] == 'COMPLETED' for s in completed)
 
@@ -700,13 +700,13 @@ async def test_list_states_by_status(persister, sample_state):
 async def test_delete_state(persister, sample_state):
     """Test: Delete state"""
     research_id = sample_state['research_id']
-    
+
     # Save
     await persister.save_state(research_id, sample_state)
-    
+
     # Delete
     await persister.delete_state(research_id)
-    
+
     # Load should return None
     loaded = await persister.load_state(research_id)
     assert loaded is None
@@ -721,7 +721,7 @@ async def test_load_nonexistent_state(persister):
 async def test_execution_trace_logging(persister, sample_state):
     """Test: Execution trace is correctly stored"""
     research_id = sample_state['research_id']
-    
+
     # Add execution trace entries
     sample_state['execution_trace'] = [
         {
@@ -735,12 +735,12 @@ async def test_execution_trace_logging(persister, sample_state):
             "error": None
         }
     ]
-    
+
     await persister.save_state(research_id, sample_state)
-    
+
     # Load
     loaded = await persister.load_state(research_id)
-    
+
     assert len(loaded['execution_trace']) == 1
     assert loaded['execution_trace'][0]['agent'] == 'EnvironmentalAgent'
 ```

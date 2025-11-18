@@ -18,10 +18,10 @@ Author: VERITAS Security Team
 Date: 22. Oktober 2025
 """
 
-import requests
 import os
 from datetime import datetime
 
+import requests
 
 # ============================================================================
 # Configuration
@@ -30,19 +30,21 @@ from datetime import datetime
 HTTP_URL = "http://localhost:5000"
 HTTPS_URL = "https://localhost:5000"
 
+
 # Colors for terminal output
 class Colors:
-    GREEN = '\033[92m'
-    RED = '\033[91m'
-    YELLOW = '\033[93m'
-    BLUE = '\033[94m'
-    BOLD = '\033[1m'
-    END = '\033[0m'
+    GREEN = "\033[92m"
+    RED = "\033[91m"
+    YELLOW = "\033[93m"
+    BLUE = "\033[94m"
+    BOLD = "\033[1m"
+    END = "\033[0m"
 
 
 # ============================================================================
 # Helper Functions
 # ============================================================================
+
 
 def print_test(name: str):
     """Print test name"""
@@ -75,15 +77,16 @@ def print_info(message: str):
 # Test Functions
 # ============================================================================
 
+
 def test_http_access() -> bool:
     """Test if HTTP access works (for development mode check)"""
     print_test("HTTP Access Test")
-    
+
     try:
         response = requests.get(f"{HTTP_URL}/", allow_redirects=False, timeout=5)
-        
+
         print_info(f"Status Code: {response.status_code}")
-        
+
         if response.status_code == 200:
             print_success("HTTP access allowed (development mode)")
             return True
@@ -95,7 +98,7 @@ def test_http_access() -> bool:
         else:
             print_error(f"Unexpected status code: {response.status_code}")
             return False
-            
+
     except Exception as e:
         print_error(f"Exception: {e}")
         return False
@@ -104,30 +107,31 @@ def test_http_access() -> bool:
 def test_https_redirect() -> bool:
     """Test HTTP → HTTPS redirect"""
     print_test("HTTPS Redirect Test")
-    
+
     # Check if ENFORCE_HTTPS is enabled
     from dotenv import load_dotenv
+
     load_dotenv()
     enforce_https = os.getenv("ENFORCE_HTTPS", "false").lower() == "true"
     reload_mode = os.getenv("VERITAS_API_RELOAD", "false").lower() == "true"
-    
+
     print_info(f"ENFORCE_HTTPS: {enforce_https}")
     print_info(f"Development mode (RELOAD): {reload_mode}")
-    
+
     if reload_mode:
         print_warning("Development mode detected - HTTPS enforcement should be disabled")
-    
+
     try:
         response = requests.get(f"{HTTP_URL}/", allow_redirects=False, timeout=5)
-        
+
         print_info(f"Status Code: {response.status_code}")
-        
+
         if enforce_https and not reload_mode:
             # Production mode - expect redirect
             if response.status_code == 301:
                 redirect_url = response.headers.get("location", "")
                 print_info(f"Redirect URL: {redirect_url}")
-                
+
                 if redirect_url.startswith("https://"):
                     print_success("HTTP correctly redirects to HTTPS (301)")
                     return True
@@ -145,7 +149,7 @@ def test_https_redirect() -> bool:
             else:
                 print_warning(f"Unexpected status code in dev mode: {response.status_code}")
                 return True  # Not a failure in dev mode
-                
+
     except Exception as e:
         print_error(f"Exception: {e}")
         return False
@@ -154,16 +158,17 @@ def test_https_redirect() -> bool:
 def test_hsts_header() -> bool:
     """Test HSTS header presence"""
     print_test("HSTS Header Test")
-    
+
     # Check if ENABLE_HSTS is enabled
     from dotenv import load_dotenv
+
     load_dotenv()
     enable_hsts = os.getenv("ENABLE_HSTS", "false").lower() == "true"
     reload_mode = os.getenv("VERITAS_API_RELOAD", "false").lower() == "true"
-    
+
     print_info(f"ENABLE_HSTS: {enable_hsts}")
     print_info(f"Development mode (RELOAD): {reload_mode}")
-    
+
     try:
         # Try HTTPS first (will fail if no cert)
         try:
@@ -173,24 +178,24 @@ def test_hsts_header() -> bool:
             # Fallback to HTTP with X-Forwarded-Proto header simulation
             response = requests.get(f"{HTTP_URL}/", timeout=5)
             is_https = False
-        
+
         print_info(f"Status Code: {response.status_code}")
         print_info(f"Using HTTPS: {is_https}")
-        
+
         hsts_header = response.headers.get("Strict-Transport-Security")
-        
+
         if enable_hsts and not reload_mode and is_https:
             # Production mode with HTTPS - expect HSTS header
             if hsts_header:
                 print_success(f"HSTS header present: {hsts_header}")
-                
+
                 # Validate header format
                 if "max-age" in hsts_header:
                     print_success("HSTS header includes max-age")
-                
+
                 if "includeSubDomains" in hsts_header:
                     print_info("HSTS includes subdomains")
-                
+
                 return True
             else:
                 print_error("HSTS header missing (expected in production)")
@@ -202,7 +207,7 @@ def test_hsts_header() -> bool:
             else:
                 print_success("HSTS header not present (correct for dev mode/HTTP)")
             return True
-            
+
     except Exception as e:
         print_error(f"Exception: {e}")
         return False
@@ -211,26 +216,26 @@ def test_hsts_header() -> bool:
 def test_tls_config_status() -> bool:
     """Test TLS configuration via backend endpoint"""
     print_test("TLS Configuration Status")
-    
+
     try:
         response = requests.get(f"{HTTP_URL}/", timeout=5)
-        
+
         if response.status_code == 200:
             data = response.json()
-            
+
             # Check if features include TLS info
             features = data.get("features", {})
-            
+
             print_info("Backend Features:")
             for key, value in features.items():
                 print_info(f"  {key}: {value}")
-            
+
             print_success("Backend responding normally")
             return True
         else:
             print_error(f"Unexpected status code: {response.status_code}")
             return False
-            
+
     except Exception as e:
         print_error(f"Exception: {e}")
         return False
@@ -239,6 +244,7 @@ def test_tls_config_status() -> bool:
 # ============================================================================
 # Main Test Suite
 # ============================================================================
+
 
 def run_all_tests():
     """Run all TLS tests"""
@@ -249,41 +255,37 @@ def run_all_tests():
     print(f"HTTP URL: {HTTP_URL}")
     print(f"HTTPS URL: {HTTPS_URL}")
     print(f"{Colors.BOLD}{'=' * 80}{Colors.END}")
-    
-    results = {
-        "passed": 0,
-        "failed": 0,
-        "total": 0
-    }
-    
+
+    results = {"passed": 0, "failed": 0, "total": 0}
+
     # Test 1: HTTP Access
     results["total"] += 1
     if test_http_access():
         results["passed"] += 1
     else:
         results["failed"] += 1
-    
+
     # Test 2: HTTPS Redirect
     results["total"] += 1
     if test_https_redirect():
         results["passed"] += 1
     else:
         results["failed"] += 1
-    
+
     # Test 3: HSTS Header
     results["total"] += 1
     if test_hsts_header():
         results["passed"] += 1
     else:
         results["failed"] += 1
-    
+
     # Test 4: TLS Config Status
     results["total"] += 1
     if test_tls_config_status():
         results["passed"] += 1
     else:
         results["failed"] += 1
-    
+
     # Print summary
     print(f"\n{Colors.BOLD}{'=' * 80}{Colors.END}")
     print(f"{Colors.BOLD}TEST SUMMARY{Colors.END}")
@@ -291,17 +293,17 @@ def run_all_tests():
     print(f"Total Tests: {results['total']}")
     print(f"{Colors.GREEN}Passed: {results['passed']}{Colors.END}")
     print(f"{Colors.RED}Failed: {results['failed']}{Colors.END}")
-    
+
     success_rate = (results["passed"] / results["total"]) * 100 if results["total"] > 0 else 0
     print(f"Success Rate: {success_rate:.1f}%")
-    
+
     if results["failed"] == 0:
         print(f"\n{Colors.GREEN}{Colors.BOLD}🎉 ALL TESTS PASSED!{Colors.END}")
     else:
         print(f"\n{Colors.YELLOW}{Colors.BOLD}⚠️  SOME TESTS FAILED (may be expected in dev mode){Colors.END}")
-    
+
     print(f"{Colors.BOLD}{'=' * 80}{Colors.END}\n")
-    
+
     return results["failed"] == 0
 
 
@@ -311,7 +313,7 @@ def run_all_tests():
 
 if __name__ == "__main__":
     import sys
-    
+
     # Check if backend is running
     try:
         response = requests.get(f"{HTTP_URL}/", timeout=5)
@@ -321,10 +323,9 @@ if __name__ == "__main__":
         print_error(f"Error: {e}")
         print_info("Please start the backend with: python start_backend.py")
         sys.exit(1)
-    
+
     # Run tests
     success = run_all_tests()
-    
+
     # Exit with appropriate code
     sys.exit(0 if success else 1)
-

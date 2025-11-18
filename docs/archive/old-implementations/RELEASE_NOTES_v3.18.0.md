@@ -1,8 +1,8 @@
 # 🧪 VERITAS v3.18.0 Release Notes
 
-**Release Date:** 09.10.2025  
-**Branch:** main  
-**Build Status:** ✅ Production-Ready  
+**Release Date:** 09.10.2025
+**Branch:** main
+**Build Status:** ✅ Production-Ready
 
 ---
 
@@ -58,7 +58,7 @@ tests/
 def test_submit_feedback_with_category(mock_feedback_api):
     """Test: Submit feedback with category"""
     categories = ['accuracy', 'completeness', 'relevance', 'performance']
-    
+
     for category in categories:
         payload = {
             'message_id': 'msg_123',
@@ -91,11 +91,11 @@ python -m pytest tests/backend/test_feedback_api.py -v
 def test_export_large_chat_performance(export_service, large_message_set):
     """Test: Export performance with 100 messages"""
     import time
-    
+
     start = time.time()
     output_path = export_service.export_to_word(large_message_set)
     duration = time.time() - start
-    
+
     assert output_path.exists()
     assert duration < 5.0  # Max 5 seconds
 ```
@@ -126,13 +126,13 @@ def test_detect_duplicate_files(drag_drop_handler, temp_export_dir):
     """Test: Detect duplicate files via SHA256"""
     file1 = temp_export_dir / 'original.txt'
     file1.write_text('same content')
-    
+
     file2 = temp_export_dir / 'duplicate.txt'
     file2.write_text('same content')  # Same content!
-    
+
     valid1, errors1 = drag_drop_handler._validate_files([str(file1)])
     valid2, errors2 = drag_drop_handler._validate_files([str(file2)])
-    
+
     assert len(valid1) == 1  # First is valid
     assert len(valid2) == 0  # Second is duplicate ✅
     assert 'Duplicate' in errors2[0]
@@ -160,7 +160,7 @@ Breakdown:
   Backend API Tests:       44 tests
     - Feedback API:        20 tests (0.19s)
     - Export Service:      24 tests (0.25s)
-  
+
   Frontend UI Tests:       24 tests
     - Drag & Drop:         24 tests (0.21s)
 ```
@@ -370,10 +370,10 @@ start htmlcov/index.html  # Windows
 Backend Tests:
   Feedback API:        0.19s (20 tests)
   Export Service:      0.25s (24 tests)
-  
+
 Frontend Tests:
   Drag & Drop:         0.21s (24 tests)
-  
+
 Total:                 ~0.65s (68 tests)
 ```
 
@@ -457,23 +457,23 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: windows-latest
-    
+
     steps:
       - uses: actions/checkout@v3
-      
+
       - uses: actions/setup-python@v4
         with:
           python-version: '3.13'
-      
+
       - name: Install dependencies
         run: |
           pip install pytest pytest-mock pytest-asyncio pytest-cov
           pip install python-docx openpyxl
-      
+
       - name: Run tests
         run: |
           python -m pytest tests/backend/ tests/frontend/ -v --cov=tests --cov-report=xml
-      
+
       - name: Upload coverage
         uses: codecov/codecov-action@v3
         with:
@@ -538,8 +538,8 @@ Report test failures: https://github.com/veritas/veritas/issues
 
 ---
 
-**Status:** ✅ **Production-Ready Testing**  
-**Build:** ✅ **68/68 Tests Passed**  
-**Coverage:** 🎯 **99-100% (new tests)**  
+**Status:** ✅ **Production-Ready Testing**
+**Build:** ✅ **68/68 Tests Passed**
+**Coverage:** 🎯 **99-100% (new tests)**
 
 🧪 **Happy Testing!** 🧪

@@ -228,9 +228,9 @@ async def lifespan(app: FastAPI):
     # Startup
     app.state.uds3 = UDS3PolyglotManager(backend_config)
     logger.info("✅ UDS3 PolyglotManager initialisiert")
-    
+
     yield
-    
+
     # Shutdown
     if hasattr(app.state.uds3, 'shutdown'):
         app.state.uds3.shutdown()
@@ -313,7 +313,7 @@ except Exception as e:
 class UDS3IntegrationService:
     def __init__(self):
         self.uds3 = UDS3PolyglotManager(...)
-    
+
     def semantic_search(self, query):
         return self.uds3.semantic_search(query)
 

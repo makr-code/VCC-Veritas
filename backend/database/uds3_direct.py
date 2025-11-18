@@ -42,6 +42,54 @@ if str(uds3_path) not in sys.path:
 
 logger = logging.getLogger(__name__)
 
+# Detect CouchDB availability early and set an env flag so integration code can
+# behave accordingly. This is best-effort and won't alter external `uds3`
+# package internals, but helps the VERITAS startup avoid using the file
+# backend when CouchDB is not installed or reachable.
+def _detect_couchdb_available() -> bool:
+    import socket
+
+    # Check if python package is available
+    try:
+        import importlib
+
+        couch_mod = importlib.import_module("couchdb")
+    except Exception:
+        return False
+
+    # Determine host/port from env (prefer COUCHDB_URL)
+    url = os.getenv("COUCHDB_URL")
+    if url:
+        # very small parser for http://host:port
+        try:
+            without_proto = url.split("://", 1)[-1]
+            host_port = without_proto.split("/", 1)[0]
+            host, port = host_port.split(":")
+        except Exception:
+            return False
+    else:
+        host = os.getenv("COUCHDB_HOST", "192.168.178.94")
+        port = os.getenv("COUCHDB_PORT", "32769")
+
+    try:
+        socket.create_connection((host, int(port)), timeout=1)
+        return True
+    except Exception:
+        return False
+
+
+# Set environment flag for other components (UDS3 may or may not honor it).
+try:
+    available = _detect_couchdb_available()
+    os.environ.setdefault("UDS3_DISABLE_FILE_BACKEND", "0" if available else "1")
+    if not available:
+        logger.info("ℹ️ CouchDB not available — UDS3 file backend will be disabled where supported")
+    else:
+        logger.info("ℹ️ CouchDB appears reachable; file backend may be enabled")
+except Exception:
+    # Non-fatal: detection should not crash startup
+    logger.debug("ℹ️ CouchDB availability detection failed (non-fatal)")
+
 # Singleton instances
 _chromadb_instance = None
 _neo4j_instance = None
@@ -181,6 +229,7 @@ def get_couchdb(config: Optional[Dict[str, Any]] = None):
     global _couchdb_instance
     
     if _couchdb_instance is None:
+<<<<<<< Updated upstream
         from uds3.database.database_api_couchdb import CouchDBBackend
         
         if config is None:
@@ -196,6 +245,47 @@ def get_couchdb(config: Optional[Dict[str, Any]] = None):
         _couchdb_instance.connect()
         logger.info(f"✅ CouchDB connected: {config['url']}")
     
+=======
+        try:
+            # Import the UDS3 CouchDB backend implementation only when requested.
+            # Guard the import so systems without the optional `couchdb` driver
+            # don't raise at import-time.
+            from uds3.database.database_api_couchdb import CouchDBBackend
+        except ImportError:
+            logger.info("ℹ️ CouchDB driver or UDS3 CouchDB backend not available - file backend disabled")
+            raise
+
+        if config is None:
+            # Prefer an explicit COUCHDB_URL if provided, otherwise fall back to host/port
+            couchdb_url = os.getenv("COUCHDB_URL")
+            if couchdb_url:
+                config = {
+                    "url": couchdb_url,
+                    "database": os.getenv("COUCHDB_DATABASE", "veritas_documents"),
+                    "user": os.getenv("COUCHDB_USER", "admin"),
+                    "password": os.getenv("COUCHDB_PASSWORD", "admin"),
+                }
+            else:
+                couchdb_port = os.getenv("COUCHDB_PORT", "32769")  # Default to custom port
+                config = {
+                    "url": f"http://{os.getenv('COUCHDB_HOST', '192.168.178.94')}:{couchdb_port}",
+                    "database": os.getenv("COUCHDB_DATABASE", "veritas_documents"),
+                    "user": os.getenv("COUCHDB_USER", "admin"),
+                    "password": os.getenv("COUCHDB_PASSWORD", "admin"),
+                }
+
+        _couchdb_instance = CouchDBBackend(config)
+        try:
+            _couchdb_instance.connect()
+            logger.info(f"✅ CouchDB connected: {config['url']}")
+        except Exception as e:
+            # Common failure: connection refused when CouchDB not running or wrong host/port.
+            # Treat file/document backend as optional: log informationally and skip it.
+            logger.info("ℹ️ CouchDB connection failed — skipping file/document backend: %s", e)
+            _couchdb_instance = None
+            return None
+
+>>>>>>> Stashed changes
     return _couchdb_instance
 
 
@@ -218,8 +308,13 @@ def get_all_databases(config: Optional[Dict[str, Any]] = None) -> Dict[str, Any]
         vector_results = dbs['vector'].query_vectors(...)
         graph_results = dbs['graph'].execute_cypher(...)
     """
+<<<<<<< Updated upstream
     databases = {}
     
+=======
+    databases: Dict[str, Any] = {}
+
+>>>>>>> Stashed changes
     # Try to connect to each database
     try:
         databases['vector'] = get_chromadb(config.get('chromadb') if config else None)
@@ -240,7 +335,15 @@ def get_all_databases(config: Optional[Dict[str, Any]] = None) -> Dict[str, Any]
         databases['relational'] = None
     
     try:
+<<<<<<< Updated upstream
         databases['document'] = get_couchdb(config.get('couchdb') if config else None)
+=======
+        databases["document"] = get_couchdb(config.get("couchdb") if config else None)
+    except ImportError:
+        # Optional driver not installed - treat as disabled rather than an error.
+        logger.info("ℹ️ CouchDB driver not installed - skipping file/document backend")
+        databases["document"] = None
+>>>>>>> Stashed changes
     except Exception as e:
         logger.error(f"❌ CouchDB connection failed: {e}")
         databases['document'] = None

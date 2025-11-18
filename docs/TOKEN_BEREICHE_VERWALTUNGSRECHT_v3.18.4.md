@@ -1,8 +1,8 @@
 # ⚖️ Token-Bereiche für Verwaltungsrecht - Anpassungen v3.18.4
 
-**Version:** v3.18.4  
-**Datum:** 10.10.2025  
-**Anpassung:** Token-Bereiche für Verwaltungsrechtliche KI  
+**Version:** v3.18.4
+**Datum:** 10.10.2025
+**Anpassung:** Token-Bereiche für Verwaltungsrechtliche KI
 **Status:** ✅ IMPLEMENTED
 
 ---
@@ -167,7 +167,7 @@ Beispiel-Antwort (~750 Wörter):
 
 ### Standard-Wert
 
-**Vorher:** 500 Tokens → 💬 ~375 Wörter (Grau)  
+**Vorher:** 500 Tokens → 💬 ~375 Wörter (Grau)
 **Nachher:** **1200 Tokens → 📘 ~900 Wörter (Blau)** ✅
 
 ---
@@ -390,7 +390,7 @@ python start_frontend.py
 
 ---
 
-**Version:** v3.18.4  
-**Erstellt:** 10.10.2025  
-**Status:** ✅ READY FOR PRODUCTION  
+**Version:** v3.18.4
+**Erstellt:** 10.10.2025
+**Status:** ✅ READY FOR PRODUCTION
 **Hauptverbesserung:** +140% mehr Tokens für realistische Verwaltungsantworten

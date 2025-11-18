@@ -78,6 +78,18 @@ try:
 except Exception:
     _ollama_available = False
 
+# Optional multi-database API (may be provided by the deployment)
+# Predefine symbol so mypy doesn't complain about redefinition during conditional import
+MultiDatabaseAPI: Any = None
+try:
+    import importlib as _importlib
+
+    _db_mod = _importlib.import_module("database.database_api")
+    MultiDatabaseAPI = getattr(_db_mod, "MultiDatabaseAPI", None)
+    _database_api_available = MultiDatabaseAPI is not None
+except Exception:
+    _database_api_available = False
+
 logger = logging.getLogger(__name__)
 
 # Sanitize all log messages to ASCII (analog zu Worker Registry)
@@ -87,7 +99,7 @@ class _AsciiLogFilter(logging.Filter):
             if isinstance(record.msg, str):
                 record.msg = record.msg.encode('ascii', 'replace').decode('ascii')
             if record.args:
-                new_args = []
+                new_args: List[Any] = []
                 for a in record.args:
                     if isinstance(a, str):
                         new_args.append(a.encode('ascii', 'replace').decode('ascii'))
@@ -211,8 +223,8 @@ class AgentInstance:
     agent_object: Any
     status: AgentStatus
     current_query_id: Optional[str] = None
-    created_at: str = field(default_factory=lambda: time.time())
-    last_activity: str = field(default_factory=lambda: time.time())
+    created_at: float = field(default_factory=time.time)
+    last_activity: float = field(default_factory=time.time)
     processing_statistics: Dict[str, Any] = field(default_factory=dict)
 
 # ========================================
@@ -224,6 +236,7 @@ class SharedResourcePool:
     
     def __init__(self):
         self._lock = threading.RLock()
+<<<<<<< Updated upstream
         self._database_api = None
         self._uds3_strategy = None
         self._ollama_llm = None
@@ -237,6 +250,21 @@ class SharedResourcePool:
             'external_api_calls': 0,
             'cache_hits': 0,
             'cache_misses': 0
+=======
+        self._database_api: Optional[Any] = None
+        self._uds3_strategy: Optional[Any] = None
+        self._ollama_llm: Optional[Any] = None
+        self._ollama_embeddings: Optional[Any] = None
+        self._external_api_cache: Dict[str, Any] = {}
+
+        # Resource Usage Statistics
+        self.resource_usage_stats: Dict[str, int] = {
+            "database_connections": 0,
+            "ollama_requests": 0,
+            "external_api_calls": 0,
+            "cache_hits": 0,
+            "cache_misses": 0,
+>>>>>>> Stashed changes
         }
         
         logger.info("🔧 Shared Resource Pool initialisiert")

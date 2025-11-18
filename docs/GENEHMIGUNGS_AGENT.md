@@ -1,7 +1,7 @@
 # GenehmigungsAgent
 
-**Typ:** LEGAL Agent  
-**Version:** v1.0  
+**Typ:** LEGAL Agent
+**Version:** v1.0
 **Date:** 2025-10-16
 
 ---

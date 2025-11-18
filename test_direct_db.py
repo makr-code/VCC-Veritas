@@ -8,7 +8,7 @@ cursor = conn.cursor()
 # Teste ob die Tabellen existieren
 tables = cursor.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name").fetchall()
 print("📊 Verfügbare Tabellen:")
-for table_name, in tables:
+for (table_name,) in tables:
     count = cursor.execute(f"SELECT COUNT(*) FROM {table_name}").fetchone()[0]
     print(f"   {table_name}: {count} Datensätze")
 

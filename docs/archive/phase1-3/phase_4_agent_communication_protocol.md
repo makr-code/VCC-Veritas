@@ -1,8 +1,8 @@
 # Phase 4: Agent-Kommunikationsprotokoll - Design-Dokument
 
-**Version:** 1.0  
-**Datum:** 6. Oktober 2025  
-**Status:** 🔄 In Entwicklung  
+**Version:** 1.0
+**Datum:** 6. Oktober 2025
+**Status:** 🔄 In Entwicklung
 **Autor:** VERITAS Development Team
 
 ---
@@ -148,10 +148,10 @@ class AgentIdentity:
     agent_type: str            # Typ (environmental, construction, etc.)
     agent_name: str            # Menschenlesbarer Name
     capabilities: List[str] = field(default_factory=list)
-    
+
     def __hash__(self):
         return hash(self.agent_id)
-    
+
     def __eq__(self, other):
         return isinstance(other, AgentIdentity) and self.agent_id == other.agent_id
 
@@ -170,7 +170,7 @@ class MessageMetadata:
 class AgentMessage:
     """
     Standardisiertes Nachrichtenformat für Inter-Agent-Kommunikation
-    
+
     Beispiel:
         message = AgentMessage(
             message_id="msg-123",
@@ -187,7 +187,7 @@ class AgentMessage:
     message_type: MessageType
     payload: Dict[str, Any]
     metadata: MessageMetadata = field(default_factory=MessageMetadata)
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Serialisierung für JSON-Transport"""
         return {
@@ -219,7 +219,7 @@ class AgentMessage:
                 "headers": self.metadata.headers
             }
         }
-    
+
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'AgentMessage':
         """Deserialisierung aus JSON"""
@@ -230,7 +230,7 @@ class AgentMessage:
             agent_name=sender_data["agent_name"],
             capabilities=sender_data.get("capabilities", [])
         )
-        
+
         recipients = [
             AgentIdentity(
                 agent_id=r["agent_id"],
@@ -240,7 +240,7 @@ class AgentMessage:
             )
             for r in data["recipients"]
         ]
-        
+
         metadata_data = data["metadata"]
         metadata = MessageMetadata(
             timestamp=datetime.fromisoformat(metadata_data["timestamp"]),
@@ -251,7 +251,7 @@ class AgentMessage:
             retry_count=metadata_data.get("retry_count", 0),
             headers=metadata_data.get("headers", {})
         )
-        
+
         return cls(
             message_id=data["message_id"],
             sender=sender,
@@ -279,7 +279,7 @@ logger = logging.getLogger(__name__)
 class AgentMessageBroker:
     """
     Zentraler Message-Broker für Agent-zu-Agent-Kommunikation
-    
+
     Features:
     - Message-Routing (Point-to-Point, Broadcast, Pub/Sub)
     - Topic-basiertes Subscription-System
@@ -288,26 +288,26 @@ class AgentMessageBroker:
     - Delivery-Guarantees (Best-Effort)
     - Dead-Letter-Queue für fehlgeschlagene Deliveries
     """
-    
+
     def __init__(self):
         # Agent-Registry: agent_id -> AgentIdentity
         self._agents: Dict[str, AgentIdentity] = {}
-        
+
         # Message-Handler-Registry: agent_id -> callback
         self._handlers: Dict[str, Callable[[AgentMessage], Any]] = {}
-        
+
         # Topic-Subscriptions: topic -> Set[agent_id]
         self._subscriptions: Dict[str, Set[str]] = defaultdict(set)
-        
+
         # Message-Queue (Priority-Queue mit asyncio)
         self._message_queue: asyncio.PriorityQueue = asyncio.PriorityQueue()
-        
+
         # Pending Requests: correlation_id -> asyncio.Future
         self._pending_requests: Dict[str, asyncio.Future] = {}
-        
+
         # Dead-Letter-Queue für fehlgeschlagene Messages
         self._dead_letter_queue: List[AgentMessage] = []
-        
+
         # Statistics
         self._stats = {
             "messages_sent": 0,
@@ -316,21 +316,21 @@ class AgentMessageBroker:
             "subscriptions_active": 0,
             "agents_registered": 0
         }
-        
+
         # Background-Worker für Message-Processing
         self._worker_task: Optional[asyncio.Task] = None
         self._running = False
-    
+
     async def start(self):
         """Startet den Message-Broker Background-Worker"""
         if self._running:
             logger.warning("⚠️ Message-Broker läuft bereits")
             return
-        
+
         self._running = True
         self._worker_task = asyncio.create_task(self._message_worker())
         logger.info("✅ Message-Broker gestartet")
-    
+
     async def stop(self):
         """Stoppt den Message-Broker"""
         self._running = False
@@ -341,11 +341,11 @@ class AgentMessageBroker:
             except asyncio.CancelledError:
                 pass
         logger.info("🛑 Message-Broker gestoppt")
-    
+
     def register_agent(self, identity: AgentIdentity, handler: Callable[[AgentMessage], Any]):
         """
         Registriert einen Agenten mit Message-Handler
-        
+
         Args:
             identity: Agent-Identität
             handler: Callback-Funktion für eingehende Messages
@@ -354,48 +354,48 @@ class AgentMessageBroker:
         self._handlers[identity.agent_id] = handler
         self._stats["agents_registered"] = len(self._agents)
         logger.info(f"📝 Agent registriert: {identity.agent_name} ({identity.agent_id})")
-    
+
     def unregister_agent(self, agent_id: str):
         """Entfernt einen Agenten aus dem Broker"""
         if agent_id in self._agents:
             del self._agents[agent_id]
             del self._handlers[agent_id]
-            
+
             # Remove from all subscriptions
             for topic in self._subscriptions:
                 self._subscriptions[topic].discard(agent_id)
-            
+
             self._stats["agents_registered"] = len(self._agents)
             logger.info(f"🗑️ Agent deregistriert: {agent_id}")
-    
+
     def subscribe(self, agent_id: str, topic: str):
         """
         Abonniert ein Topic für einen Agenten
-        
+
         Args:
             agent_id: Agent-ID
             topic: Topic-Name (z.B. "rag_context_updates", "agent_status_changes")
         """
         if agent_id not in self._agents:
             raise ValueError(f"Agent {agent_id} nicht registriert")
-        
+
         self._subscriptions[topic].add(agent_id)
         self._stats["subscriptions_active"] = sum(len(subs) for subs in self._subscriptions.values())
         logger.info(f"📬 Agent {agent_id} abonniert Topic: {topic}")
-    
+
     def unsubscribe(self, agent_id: str, topic: str):
         """Beendet Subscription für ein Topic"""
         self._subscriptions[topic].discard(agent_id)
         self._stats["subscriptions_active"] = sum(len(subs) for subs in self._subscriptions.values())
         logger.info(f"📭 Agent {agent_id} deabonniert Topic: {topic}")
-    
+
     async def send_message(self, message: AgentMessage) -> bool:
         """
         Sendet eine Message (Point-to-Point oder Broadcast)
-        
+
         Args:
             message: AgentMessage-Objekt
-            
+
         Returns:
             True wenn Message in Queue eingereiht wurde
         """
@@ -403,31 +403,31 @@ class AgentMessageBroker:
         priority = -message.metadata.priority.value  # Negative für Max-Heap
         await self._message_queue.put((priority, message))
         self._stats["messages_sent"] += 1
-        
+
         logger.debug(f"📤 Message gesendet: {message.message_id} ({message.message_type.value})")
         return True
-    
+
     async def send_request(self, message: AgentMessage, timeout: float = 30.0) -> Optional[AgentMessage]:
         """
         Sendet eine REQUEST-Message und wartet auf RESPONSE
-        
+
         Args:
             message: Request-Message
             timeout: Timeout in Sekunden
-            
+
         Returns:
             Response-Message oder None bei Timeout
         """
         if message.message_type != MessageType.REQUEST:
             raise ValueError("send_request() erfordert MessageType.REQUEST")
-        
+
         # Future für Response erstellen
         future = asyncio.Future()
         self._pending_requests[message.metadata.correlation_id] = future
-        
+
         # Request senden
         await self.send_message(message)
-        
+
         try:
             # Auf Response warten (mit Timeout)
             response = await asyncio.wait_for(future, timeout=timeout)
@@ -436,11 +436,11 @@ class AgentMessageBroker:
             logger.warning(f"⏱️ Request-Timeout: {message.message_id}")
             del self._pending_requests[message.metadata.correlation_id]
             return None
-    
+
     async def publish_event(self, topic: str, sender: AgentIdentity, payload: Dict[str, Any]):
         """
         Publiziert ein Event an alle Subscribers eines Topics
-        
+
         Args:
             topic: Topic-Name
             sender: Sender-Identität
@@ -448,14 +448,14 @@ class AgentMessageBroker:
         """
         # Subscribers für Topic ermitteln
         subscribers = self._subscriptions.get(topic, set())
-        
+
         if not subscribers:
             logger.debug(f"📢 Kein Subscriber für Topic: {topic}")
             return
-        
+
         # Event-Message erstellen
         recipients = [self._agents[agent_id] for agent_id in subscribers if agent_id in self._agents]
-        
+
         message = AgentMessage(
             sender=sender,
             recipients=recipients,
@@ -463,14 +463,14 @@ class AgentMessageBroker:
             payload={"topic": topic, "data": payload},
             metadata=MessageMetadata(priority=MessagePriority.NORMAL)
         )
-        
+
         await self.send_message(message)
         logger.info(f"📢 Event publiziert: {topic} → {len(recipients)} Subscribers")
-    
+
     async def _message_worker(self):
         """Background-Worker für Message-Delivery"""
         logger.info("🔄 Message-Worker gestartet")
-        
+
         while self._running:
             try:
                 # Message aus Queue holen (mit Timeout)
@@ -478,16 +478,16 @@ class AgentMessageBroker:
                     self._message_queue.get(),
                     timeout=1.0
                 )
-                
+
                 # Message verarbeiten
                 await self._deliver_message(message)
-                
+
             except asyncio.TimeoutError:
                 # Keine Messages in Queue, weiter warten
                 continue
             except Exception as e:
                 logger.error(f"❌ Fehler im Message-Worker: {e}", exc_info=True)
-    
+
     async def _deliver_message(self, message: AgentMessage):
         """Liefert eine Message an Empfänger"""
         try:
@@ -497,7 +497,7 @@ class AgentMessageBroker:
                 recipients = list(self._agents.values())
             else:
                 recipients = message.recipients
-            
+
             # TTL prüfen
             elapsed = (datetime.now() - message.metadata.timestamp).total_seconds()
             if elapsed > message.metadata.ttl_seconds:
@@ -505,14 +505,14 @@ class AgentMessageBroker:
                 self._dead_letter_queue.append(message)
                 self._stats["messages_failed"] += 1
                 return
-            
+
             # An jeden Empfänger ausliefern
             delivery_count = 0
             for recipient in recipients:
                 if recipient.agent_id not in self._handlers:
                     logger.warning(f"⚠️ Handler für Agent {recipient.agent_id} nicht gefunden")
                     continue
-                
+
                 try:
                     # Handler aufrufen (async oder sync)
                     handler = self._handlers[recipient.agent_id]
@@ -520,7 +520,7 @@ class AgentMessageBroker:
                         response = await handler(message)
                     else:
                         response = handler(message)
-                    
+
                     # Für REQUEST: Response verarbeiten
                     if message.message_type == MessageType.REQUEST and response:
                         # Response-Message erstellen
@@ -536,27 +536,27 @@ class AgentMessageBroker:
                                 )
                             )
                             await self.send_message(response_msg)
-                    
+
                     # Für RESPONSE: Pending-Request auflösen
                     if message.message_type == MessageType.RESPONSE:
                         correlation_id = message.metadata.correlation_id
                         if correlation_id in self._pending_requests:
                             self._pending_requests[correlation_id].set_result(message)
                             del self._pending_requests[correlation_id]
-                    
+
                     delivery_count += 1
-                    
+
                 except Exception as e:
                     logger.error(f"❌ Fehler bei Message-Delivery an {recipient.agent_id}: {e}", exc_info=True)
-            
+
             self._stats["messages_delivered"] += delivery_count
             logger.debug(f"✅ Message zugestellt: {message.message_id} → {delivery_count} Empfänger")
-            
+
         except Exception as e:
             logger.error(f"❌ Fehler bei Message-Delivery: {e}", exc_info=True)
             self._dead_letter_queue.append(message)
             self._stats["messages_failed"] += 1
-    
+
     def get_stats(self) -> Dict[str, Any]:
         """Liefert Broker-Statistiken"""
         return {
@@ -580,7 +580,7 @@ import asyncio
 class AgentCommunicationMixin:
     """
     Mixin für Agent-Klassen zur Aktivierung von Message-basierter Kommunikation
-    
+
     Usage:
         class EnvironmentalAgent(AgentCommunicationMixin):
             def __init__(self, broker: AgentMessageBroker):
@@ -592,28 +592,28 @@ class AgentCommunicationMixin:
                 )
                 super().__init__(broker, self.identity)
     """
-    
+
     def __init__(self, broker: AgentMessageBroker, identity: AgentIdentity):
         self.broker = broker
         self.identity = identity
         self._message_handlers: Dict[MessageType, Callable] = {}
-        
+
         # Bei Broker registrieren
         self.broker.register_agent(self.identity, self._on_message)
-        
+
         # Standard-Handler registrieren
         self.register_message_handler(MessageType.REQUEST, self._handle_request)
         self.register_message_handler(MessageType.EVENT, self._handle_event)
         self.register_message_handler(MessageType.CONTEXT_SHARE, self._handle_context_share)
-    
+
     def register_message_handler(self, message_type: MessageType, handler: Callable):
         """Registriert einen Handler für einen Message-Typ"""
         self._message_handlers[message_type] = handler
-    
+
     async def _on_message(self, message: AgentMessage) -> Optional[Dict[str, Any]]:
         """Callback für eingehende Messages"""
         handler = self._message_handlers.get(message.message_type)
-        
+
         if handler:
             if asyncio.iscoroutinefunction(handler):
                 return await handler(message)
@@ -622,8 +622,8 @@ class AgentCommunicationMixin:
         else:
             logger.warning(f"⚠️ Kein Handler für Message-Typ {message.message_type.value}")
             return None
-    
-    async def send_message(self, recipients: List[AgentIdentity], message_type: MessageType, 
+
+    async def send_message(self, recipients: List[AgentIdentity], message_type: MessageType,
                           payload: Dict[str, Any], priority: MessagePriority = MessagePriority.NORMAL) -> bool:
         """Sendet eine Message an andere Agenten"""
         message = AgentMessage(
@@ -634,8 +634,8 @@ class AgentCommunicationMixin:
             metadata=MessageMetadata(priority=priority)
         )
         return await self.broker.send_message(message)
-    
-    async def send_request(self, recipient: AgentIdentity, payload: Dict[str, Any], 
+
+    async def send_request(self, recipient: AgentIdentity, payload: Dict[str, Any],
                           timeout: float = 30.0) -> Optional[Dict[str, Any]]:
         """Sendet eine Request-Message und wartet auf Response"""
         message = AgentMessage(
@@ -647,26 +647,26 @@ class AgentCommunicationMixin:
         )
         response = await self.broker.send_request(message, timeout=timeout)
         return response.payload if response else None
-    
+
     async def publish_event(self, topic: str, payload: Dict[str, Any]):
         """Publiziert ein Event an Topic-Subscribers"""
         await self.broker.publish_event(topic, self.identity, payload)
-    
+
     def subscribe(self, topic: str):
         """Abonniert ein Topic"""
         self.broker.subscribe(self.identity.agent_id, topic)
-    
+
     # Standard-Handler (können überschrieben werden)
-    
+
     async def _handle_request(self, message: AgentMessage) -> Dict[str, Any]:
         """Standard-Handler für REQUEST-Messages"""
         logger.info(f"📨 Request erhalten: {message.payload}")
         return {"status": "acknowledged", "message_id": message.message_id}
-    
+
     async def _handle_event(self, message: AgentMessage) -> None:
         """Standard-Handler für EVENT-Messages"""
         logger.info(f"📢 Event erhalten: {message.payload}")
-    
+
     async def _handle_context_share(self, message: AgentMessage) -> None:
         """Standard-Handler für CONTEXT_SHARE-Messages"""
         logger.info(f"🔄 Context-Share erhalten: {message.payload}")
@@ -771,7 +771,7 @@ class SupervisorAgent(AgentCommunicationMixin):
     """
     SupervisorAgent mit Message-basierter Agent-Koordination
     """
-    
+
     def __init__(self, broker: AgentMessageBroker, query_decomposer, agent_selector, result_synthesizer):
         identity = AgentIdentity(
             agent_id="supervisor-agent-1",
@@ -780,15 +780,15 @@ class SupervisorAgent(AgentCommunicationMixin):
             capabilities=["query_decomposition", "agent_coordination", "result_synthesis"]
         )
         super().__init__(broker, identity)
-        
+
         self.query_decomposer = query_decomposer
         self.agent_selector = agent_selector
         self.result_synthesizer = result_synthesizer
-    
+
     async def process_query_with_messages(self, query: str, user_context: Dict[str, Any]) -> Dict[str, Any]:
         """
         Verarbeitet Query mit Message-basierter Agent-Koordination
-        
+
         Workflow:
         1. Query dekomponieren
         2. Agenten für SubQueries auswählen
@@ -797,21 +797,21 @@ class SupervisorAgent(AgentCommunicationMixin):
         5. Ergebnisse synthetisieren
         """
         logger.info(f"🎯 Supervisor verarbeitet Query mit Message-Protokoll: {query[:100]}")
-        
+
         # Step 1: Query dekomponieren
         subqueries = await self.query_decomposer.decompose_query(query, user_context)
         logger.info(f"📋 {len(subqueries)} SubQueries erstellt")
-        
+
         # Step 2: Agenten auswählen
         agent_plan = await self.agent_selector.create_agent_plan(subqueries, user_context)
         logger.info(f"🤖 Agent-Plan erstellt: {len(agent_plan.assignments)} Assignments")
-        
+
         # Step 3: SubQueries via Messages verteilen
         tasks = []
         for assignment in agent_plan.assignments:
             # Agent-Identity aus Registry holen
             agent_identity = self._get_agent_identity(assignment.agent_type)
-            
+
             if agent_identity:
                 # Request-Message erstellen und senden
                 task = self.send_request(
@@ -825,7 +825,7 @@ class SupervisorAgent(AgentCommunicationMixin):
                     timeout=60.0
                 )
                 tasks.append((assignment.agent_type, task))
-        
+
         # Step 4: Parallel auf Responses warten
         results = []
         for agent_type, task in tasks:
@@ -846,7 +846,7 @@ class SupervisorAgent(AgentCommunicationMixin):
                     "status": "failed",
                     "confidence_score": 0.0
                 })
-        
+
         # Step 5: Ergebnisse synthetisieren
         agent_results = [
             AgentResult(
@@ -857,15 +857,15 @@ class SupervisorAgent(AgentCommunicationMixin):
             )
             for r in results
         ]
-        
+
         synthesized = await self.result_synthesizer.synthesize_results(
             query=query,
             agent_results=agent_results,
             user_context=user_context
         )
-        
+
         logger.info(f"✅ Query erfolgreich verarbeitet (Message-Protokoll)")
-        
+
         return {
             "final_answer": synthesized.final_answer,
             "confidence_score": synthesized.confidence_score,
@@ -876,7 +876,7 @@ class SupervisorAgent(AgentCommunicationMixin):
                 "protocol": "message_based"
             }
         }
-    
+
     def _get_agent_identity(self, agent_type: str) -> Optional[AgentIdentity]:
         """Holt Agent-Identity aus Broker-Registry"""
         for agent_id, identity in self.broker._agents.items():
@@ -1087,18 +1087,18 @@ class EnvironmentalAgent(AgentCommunicationMixin):
 class EnvironmentalAgent(AgentCommunicationMixin):
     def __init__(self, broker: AgentMessageBroker):
         # ... (wie oben)
-        
+
         # Custom-Handler registrieren
         self.register_message_handler(MessageType.REQUEST, self._handle_analysis_request)
-    
+
     async def _handle_analysis_request(self, message: AgentMessage) -> Dict[str, Any]:
         """Handler für Environmental-Analysis-Requests"""
         query = message.payload.get("query")
         project_id = message.payload.get("project_id")
-        
+
         # Analyse durchführen
         result = await self.analyze_environment(query, project_id)
-        
+
         # Response zurückgeben
         return {
             "result": result,
@@ -1211,17 +1211,17 @@ supervisor = SupervisorAgent(
 ### Technische Entscheidungen
 1. **Message-Persistence:** In-Memory (asyncio.Queue) vs. Persistent (Redis)?
    - **Entscheidung:** Phase 4.1 mit In-Memory starten, Redis als Phase 4.8 Extension
-   
+
 2. **Serialization-Format:** JSON vs. Protocol-Buffers vs. MessagePack?
    - **Entscheidung:** JSON für Phase 4 (readable, debuggable), Protobuf als Optimization später
-   
+
 3. **Error-Handling:** Best-Effort vs. At-Least-Once vs. Exactly-Once Delivery?
    - **Entscheidung:** Best-Effort für Phase 4, At-Least-Once als Extension
 
 ### Architektur-Entscheidungen
 1. **Broker-Architektur:** Single-Broker vs. Multi-Broker (per Agent-Type)?
    - **Entscheidung:** Single-Broker für Simplicity, Multi-Broker als Scaling-Option
-   
+
 2. **Message-Ordering:** FIFO vs. Priority-based vs. No-Guarantee?
    - **Entscheidung:** Priority-based (balanciert Performance und Fairness)
 
@@ -1254,4 +1254,3 @@ supervisor = SupervisorAgent(
 **Status:** 🎯 **DESIGN ABGESCHLOSSEN - BEREIT FÜR IMPLEMENTATION**
 
 **Nächster Schritt:** Phase 4.1 - Core Protocol Implementation starten
-

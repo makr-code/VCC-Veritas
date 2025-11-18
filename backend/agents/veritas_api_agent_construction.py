@@ -4,7 +4,13 @@ VERITAS Construction & Urban Planning Workers
 Spezialisierte Worker für Bau- und Stadtplanungsanfragen
 """
 import logging
+<<<<<<< Updated upstream
 import asyncio
+=======
+from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional, cast
+
+>>>>>>> Stashed changes
 import aiohttp
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
@@ -27,7 +33,13 @@ class BuildingPermitWorker(ExternalAPIWorker):
     
     def __init__(self):
         from covina_core import WorkerType
+<<<<<<< Updated upstream
         super().__init__(WorkerType.BUILDING_PERMIT, "https://api.bauamt.de/", cache_ttl=3600)  # 1 Stunde Cache
+=======
+
+        # BaseAgent expects (agent_id, db_path, config=...), so pass a conservative config dict
+        super().__init__(agent_id=str(WorkerType.BUILDING_PERMIT), db_path=None, config={"api_base": "https://api.bauamt.de/", "cache_ttl": 3600})
+>>>>>>> Stashed changes
         self.permit_databases = {
             "municipal": "https://api.municipality.de/building_permits/",
             "state": "https://api.state.de/construction/",
@@ -137,12 +149,23 @@ class BuildingPermitWorker(ExternalAPIWorker):
         
         # Besondere Anforderungen
         if "denkmal" in query:
-            project["special_requirements"].append("heritage_protection")
+            reqs = list(cast(List[str], project.get("special_requirements") or []))
+            reqs.append("heritage_protection")
+            project["special_requirements"] = reqs
         if "energie" in query or "sanierung" in query:
-            project["special_requirements"].append("energy_efficiency")
+            reqs = list(cast(List[str], project.get("special_requirements") or []))
+            reqs.append("energy_efficiency")
+            project["special_requirements"] = reqs
         if "barriere" in query:
+<<<<<<< Updated upstream
             project["special_requirements"].append("accessibility")
         
+=======
+            reqs = list(cast(List[str], project.get("special_requirements") or []))
+            reqs.append("accessibility")
+            project["special_requirements"] = reqs
+
+>>>>>>> Stashed changes
         return project
     
     async def _get_nearby_permits(self, location: Dict, project: Dict) -> List[Dict]:
@@ -361,8 +384,14 @@ class UrbanPlanningWorker(BaseWorker):
     
     def __init__(self):
         from covina_core import WorkerType
+<<<<<<< Updated upstream
         super().__init__(WorkerType.URBAN_PLANNING, cache_ttl=7200)  # 2 Stunden Cache
     
+=======
+
+        super().__init__(agent_id=str(WorkerType.URBAN_PLANNING), db_path=None, config={"cache_ttl": 7200})
+
+>>>>>>> Stashed changes
     def _extract_location(self, query: str) -> Dict[str, Any]:
         """Extrahiert Standortinformationen aus der Anfrage"""
         location = {
@@ -432,16 +461,31 @@ class UrbanPlanningWorker(BaseWorker):
         
         # Anliegen-Kategorien
         if any(word in query.lower() for word in ["verkehr", "straße", "parkplatz"]):
-            concerns["focus"].append("traffic")
+            f = list(concerns.get("focus") or [])
+            f.append("traffic")
+            concerns["focus"] = f
         if any(word in query.lower() for word in ["grün", "park", "spielplatz"]):
-            concerns["focus"].append("green_space")
+            f = list(concerns.get("focus") or [])
+            f.append("green_space")
+            concerns["focus"] = f
         if any(word in query.lower() for word in ["wohnen", "miete", "immobilien"]):
-            concerns["focus"].append("housing")
+            f = list(concerns.get("focus") or [])
+            f.append("housing")
+            concerns["focus"] = f
         if any(word in query.lower() for word in ["gewerbe", "industrie", "arbeitsplatz"]):
-            concerns["focus"].append("commercial")
+            f = list(concerns.get("focus") or [])
+            f.append("commercial")
+            concerns["focus"] = f
         if any(word in query.lower() for word in ["lärmschutz", "umwelt"]):
+<<<<<<< Updated upstream
             concerns["focus"].append("environmental")
         
+=======
+            f = list(concerns.get("focus") or [])
+            f.append("environmental")
+            concerns["focus"] = f
+
+>>>>>>> Stashed changes
         # Zeitbezug
         if any(word in query.lower() for word in ["zukunft", "geplant", "soll"]):
             concerns["timeline"] = "future"
@@ -542,36 +586,60 @@ class UrbanPlanningWorker(BaseWorker):
             change_type = change.get("type", "")
             
             if change_type == "residential_development":
-                impact["detailed_impacts"]["housing"] = {
+                dd = dict(cast(Dict[str, Any], impact.get("detailed_impacts") or {}))
+                dd["housing"] = {
                     "impact": "positive",
                     "description": "Mehr Wohnraum verfügbar",
                     "magnitude": "high"
                 }
-                impact["detailed_impacts"]["traffic"] = {
+                dd["traffic"] = {
                     "impact": "negative",
                     "description": "Erhöhtes Verkehrsaufkommen",
                     "magnitude": "medium"
                 }
+<<<<<<< Updated upstream
                 impact["concerns"].append("Verkehrszunahme um ca. 30%")
                 impact["benefits"].append("200 neue Wohnungen für ca. 400 Bewohner")
             
+=======
+                impact["detailed_impacts"] = dd
+
+                concerns_list = list(impact.get("concerns") or [])
+                concerns_list.append("Verkehrszunahme um ca. 30%")
+                impact["concerns"] = concerns_list
+
+                benefits_list = list(impact.get("benefits") or [])
+                benefits_list.append("200 neue Wohnungen für ca. 400 Bewohner")
+                impact["benefits"] = benefits_list
+
+>>>>>>> Stashed changes
             elif change_type == "traffic_modification":
-                impact["detailed_impacts"]["traffic"] = {
+                dd = dict(cast(Dict[str, Any], impact.get("detailed_impacts") or {}))
+                dd["traffic"] = {
                     "impact": "positive",
                     "description": "Verkehrsberuhigung und Sicherheit",
                     "magnitude": "medium"
                 }
-                impact["detailed_impacts"]["environment"] = {
+                dd["environment"] = {
                     "impact": "positive",
                     "description": "Weniger Lärm und Abgase",
                     "magnitude": "low"
                 }
+<<<<<<< Updated upstream
                 impact["benefits"].extend([
                     "Erhöhte Verkehrssicherheit",
                     "Bessere Luftqualität",
                     "Mehr Platz für Fußgänger und Radfahrer"
                 ])
         
+=======
+                impact["detailed_impacts"] = dd
+
+                benefits_list = list(impact.get("benefits") or [])
+                benefits_list.extend(["Erhöhte Verkehrssicherheit", "Bessere Luftqualität", "Mehr Platz für Fußgänger und Radfahrer"])
+                impact["benefits"] = benefits_list
+
+>>>>>>> Stashed changes
         return impact
     
     def _identify_participation_options(self, changes: List) -> List[Dict]:
@@ -615,8 +683,14 @@ class HeritageProtectionWorker(BaseWorker):
     
     def __init__(self):
         from covina_core import WorkerType
+<<<<<<< Updated upstream
         super().__init__(WorkerType.HERITAGE_PROTECTION, cache_ttl=7200)  # 2 Stunden Cache
     
+=======
+
+        super().__init__(agent_id=str(WorkerType.HERITAGE_PROTECTION), db_path=None, config={"cache_ttl": 7200})
+
+>>>>>>> Stashed changes
     def _extract_location(self, query: str) -> Dict[str, Any]:
         """Extrahiert Standortinformationen aus der Anfrage"""
         location = {
@@ -676,6 +750,7 @@ class HeritageProtectionWorker(BaseWorker):
     
     def _extract_building_info(self, query: str) -> Dict[str, Any]:
         """Extrahiert Gebäudeinformationen aus Query"""
+<<<<<<< Updated upstream
         
         building = {
             "construction_year": None,
@@ -683,6 +758,11 @@ class HeritageProtectionWorker(BaseWorker):
             "planned_work": "renovation"
         }
         
+=======
+
+        building: Dict[str, Any] = {"construction_year": None, "building_type": "unknown", "planned_work": "renovation"}
+
+>>>>>>> Stashed changes
         # Jahr extrahieren
         import re
         years = re.findall(r'\b(18\d{2}|19\d{2}|20\d{2})\b', query)
@@ -779,12 +859,26 @@ class HeritageProtectionWorker(BaseWorker):
             })
             
             if planned_work == "energy_retrofit":
+<<<<<<< Updated upstream
                 requirements["special_requirements"].extend([
                     "Energetische Maßnahmen nur mit Sondergenehmigung",
                     "Innendämmung bevorzugt",
                     "Historische Fenster möglichst erhalten"
                 ])
         
+=======
+                # Sicherstellen, dass wir mit einer echten Liste arbeiten (mypy-sicher)
+                special_reqs = list(cast(List[str], requirements.get("special_requirements") or []))
+                special_reqs.extend(
+                    [
+                        "Energetische Maßnahmen nur mit Sondergenehmigung",
+                        "Innendämmung bevorzugt",
+                        "Historische Fenster möglichst erhalten",
+                    ]
+                )
+                requirements["special_requirements"] = special_reqs
+
+>>>>>>> Stashed changes
         elif protection_level == "architectural_interest":
             requirements.update({
                 "permit_required": True,

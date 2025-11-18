@@ -1,7 +1,7 @@
 # VERITAS WebSocket Protocol
 
-**Version:** 1.0.0  
-**Last Updated:** 2025-10-08  
+**Version:** 1.0.0
+**Last Updated:** 2025-10-08
 **WebSocket Endpoint:** `wss://api.veritas.example.com/api/v1/streaming/ws/{client_id}`
 
 ---
@@ -29,10 +29,10 @@ The VERITAS WebSocket API provides real-time streaming for agent execution progr
 - Interactive dashboards
 - Progressive UI updates
 
-**Protocol:** WebSocket (RFC 6455)  
-**Format:** JSON  
-**Encoding:** UTF-8  
-**Max Message Size:** 1MB  
+**Protocol:** WebSocket (RFC 6455)
+**Format:** JSON
+**Encoding:** UTF-8
+**Max Message Size:** 1MB
 
 ---
 
@@ -450,7 +450,7 @@ function useAgentStream(planId: string) {
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data) as StreamEvent;
       setEvents(prev => [...prev, data]);
-      
+
       // Handle specific event types
       switch(data.event_type) {
         case 'PLAN_COMPLETED':
@@ -514,16 +514,16 @@ import websockets
 async def stream_agent_execution(plan_id: str):
     client_id = f"client_{uuid.uuid4().hex[:8]}"
     uri = f"wss://api.veritas.example.com/api/v1/streaming/ws/{client_id}?plan_id={plan_id}"
-    
+
     async with websockets.connect(uri) as websocket:
         print(f"Connected to agent stream for plan: {plan_id}")
-        
+
         async for message in websocket:
             data = json.loads(message)
             event_type = data['event_type']
-            
+
             print(f"[{event_type}] {data.get('message', '')}")
-            
+
             # Handle specific events
             if event_type == 'PLAN_COMPLETED':
                 print(f"Plan completed! Quality score: {data['data']['quality_score']}")
@@ -565,11 +565,11 @@ class AgentStreamClient:
         self.on_event = on_event
         self.max_reconnects = max_reconnects
         self.reconnect_count = 0
-        
+
     @property
     def uri(self) -> str:
         return f"wss://api.veritas.example.com/api/v1/streaming/ws/{self.client_id}?plan_id={self.plan_id}"
-    
+
     async def connect(self):
         """Connect to WebSocket with automatic reconnection."""
         while self.reconnect_count < self.max_reconnects:
@@ -577,28 +577,28 @@ class AgentStreamClient:
                 async with websockets.connect(self.uri) as websocket:
                     logger.info(f"Connected to plan: {self.plan_id}")
                     self.reconnect_count = 0  # Reset on successful connection
-                    
+
                     async for message in websocket:
                         data = json.loads(message)
-                        
+
                         # Call event handler
                         if self.on_event:
                             await self.on_event(data)
-                        
+
                         # Exit on completion
                         if data['event_type'] in ('PLAN_COMPLETED', 'PLAN_FAILED'):
                             logger.info(f"Plan finished: {data['event_type']}")
                             return
-                            
+
             except websockets.exceptions.ConnectionClosed:
                 self.reconnect_count += 1
                 logger.warning(f"Connection closed. Reconnecting... ({self.reconnect_count}/{self.max_reconnects})")
                 await asyncio.sleep(2 ** self.reconnect_count)  # Exponential backoff
-                
+
             except Exception as e:
                 logger.error(f"Error: {e}")
                 break
-        
+
         logger.error("Max reconnection attempts reached")
 
 # Usage
@@ -791,6 +791,6 @@ For WebSocket issues:
 
 ---
 
-**Last Updated:** 2025-10-08  
-**Version:** 1.0.0  
+**Last Updated:** 2025-10-08
+**Version:** 1.0.0
 **License:** MIT

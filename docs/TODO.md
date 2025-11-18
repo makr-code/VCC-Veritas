@@ -1,7 +1,7 @@
 # VERITAS Entwicklungs-ToDo Liste 🚀
 
-**Datum:** 28. September 2025  
-**Status:** Nach Projekt-Reorganisation  
+**Datum:** 28. September 2025
+**Status:** Nach Projekt-Reorganisation
 **Ziel:** Funktionale Wiederherstellung und Weiterentwicklung
 
 ---
@@ -110,7 +110,7 @@
 ```
 uds3/ (26 Module)
 ├── uds3_core.py                    # ✅ Kern-Funktionalität
-├── uds3_security.py               # ✅ Sicherheits-Management  
+├── uds3_security.py               # ✅ Sicherheits-Management
 ├── uds3_quality.py                # ✅ Qualitäts-Management
 ├── uds3_api_backend.py            # ✅ UDS3-API
 └── ...weitere 22 Module
@@ -129,7 +129,7 @@ database/ (21 APIs + Manager)
 └── adapter_governance.py          # ✅ Governance
 ```
 **Maßnahmen:**
-- [ ] Import-Pfade für Database NICHT ändern  
+- [ ] Import-Pfade für Database NICHT ändern
 - [ ] Bestehende `from database_*` Imports beibehalten
 - [ ] Database als externe Bibliothek behandeln
 
@@ -260,7 +260,7 @@ Okay
 ### **Hoch (Diese Woche)** 🟠
 1. **Multi-Agent-Pipeline mit Ollama LLM** (Phase 4)
    - Ollama Client Integration
-   - RAG-Agent-Pipeline-Orchestrierung  
+   - RAG-Agent-Pipeline-Orchestrierung
    - Threading & Queue-Management
 2. Agent-System funktionsfähig machen
 3. Streaming-Funktionalität testen
@@ -348,5 +348,5 @@ curl http://localhost:5000/health
 
 ---
 
-*Erstellt am: 28. September 2025*  
+*Erstellt am: 28. September 2025*
 *VERITAS ToDo v1.0 - Post-Reorganisation*

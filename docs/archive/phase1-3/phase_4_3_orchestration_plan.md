@@ -42,7 +42,7 @@
          "documents": [{"id": str, "title": str, "snippet": str, "relevance": float, "domain_tags": [str]}],
          "vector": {"matches": [...], "statistics": {...}},
          "graph": {"related_entities": [...], "confidence": float},
-         "relational": {"metadata_hits": int, "filters": [...]} 
+         "relational": {"metadata_hits": int, "filters": [...]}
        }
        ```
      - Fallback-Generator mit reproduzierbaren Dummy-Daten, falls `RAG_INTEGRATION_AVAILABLE` `False` meldet oder die externe Anfrage fehlschlägt.

@@ -1,7 +1,7 @@
 # 🎯 QUERY EXPANSION - FINAL DECISION REPORT
 
-**Date:** 7. Oktober 2025  
-**Status:** ❌ NOT RECOMMENDED for Production (Phase 1)  
+**Date:** 7. Oktober 2025
+**Status:** ❌ NOT RECOMMENDED for Production (Phase 1)
 **Reason:** Latency >1000ms unacceptable
 
 ---
@@ -9,7 +9,7 @@
 ## 📊 Benchmark Results Summary
 
 ### Ollama Models Tested: 10
-**Working Models:** 6  
+**Working Models:** 6
 **Failed Models:** 4 (all-minilm, gpt-oss, nomic-embed-text, mixtral)
 
 ### Performance Rankings:
@@ -29,8 +29,8 @@
 
 ### Real-World Test with Best Model (phi3:latest):
 
-**Query:** "BGB Taschengeldparagraph"  
-**Expected Latency:** ~1654ms (from benchmark)  
+**Query:** "BGB Taschengeldparagraph"
+**Expected Latency:** ~1654ms (from benchmark)
 **Actual Latency:** **4012ms** ❌
 
 **Results:**
@@ -149,7 +149,7 @@ model: str = "phi3:latest"  # Best model identified, ready when needed
 | **Cost** | Free ✅ | GPU/API costs 💰 |
 | **Complexity** | Low ✅ | High ⚠️ |
 
-**Recommendation:** 
+**Recommendation:**
 - ✅ **Deploy BM25-Hybrid NOW** (Week 1)
 - ✅ **Add Full Hybrid** (Week 2-3) - NO Query Expansion
 - 🟡 **Re-evaluate Query Expansion** (Week 3-4) - IF performance improves
@@ -189,11 +189,11 @@ model: str = "phi3:latest"  # Best model identified, ready when needed
 
 ---
 
-**STATUS:** ✅ DECISION MADE - Query Expansion DISABLED  
-**NEXT STEP:** Continue with Backend Integration (Step 2)  
+**STATUS:** ✅ DECISION MADE - Query Expansion DISABLED
+**NEXT STEP:** Continue with Backend Integration (Step 2)
 **CONFIDENCE:** HIGH - Evidence-based decision
 
 ---
 
-**Last Updated:** 7. Oktober 2025 20:25  
+**Last Updated:** 7. Oktober 2025 20:25
 **Decision:** APPROVED for Production Deployment (Query Expansion OFF)

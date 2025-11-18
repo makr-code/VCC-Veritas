@@ -63,10 +63,10 @@ class WorkflowStep:
     duration_seconds: float
     result: Any
     error: Optional[str]
-    
+
     @property
     def is_completed(self) -> bool
-    
+
     @property
     def has_error(self) -> bool
 
@@ -85,13 +85,13 @@ class WorkflowResult:
     started_at: str
     completed_at: Optional[str]
     total_duration_seconds: float
-    
+
     @property
     def is_completed(self) -> bool
-    
+
     @property
     def has_critical_findings(self) -> bool
-    
+
     @property
     def success_rate(self) -> float
 ```
@@ -412,11 +412,11 @@ orchestrator = get_orchestrator()
 try:
     # Workflow ausführen
     result = await orchestrator.comprehensive_analysis("10686360000", "4001")
-    
+
     # Ergebnisse verarbeiten
     if result.prioritaet in [PriorityLevel.HIGH, PriorityLevel.CRITICAL]:
         print("⚠️ ACHTUNG: Hohe Priorität!")
-    
+
     for empfehlung in result.handlungsempfehlungen:
         print(f"💡 {empfehlung}")
 
@@ -430,42 +430,42 @@ finally:
 async def full_analysis(bst_nr: str, anl_nr: str):
     """Führt alle verfügbaren Workflows durch"""
     orchestrator = get_orchestrator()
-    
+
     try:
         # 1. Comprehensive Analysis
         print("🔍 Comprehensive Analysis...")
         comprehensive = await orchestrator.comprehensive_analysis(bst_nr, anl_nr)
-        
+
         # 2. Compliance Check
         print("📋 Compliance Check...")
         compliance = await orchestrator.compliance_workflow(bst_nr, anl_nr)
-        
+
         # 3. Maintenance Planning
         print("🔧 Maintenance Planning...")
         maintenance = await orchestrator.maintenance_planning(bst_nr, anl_nr, 90)
-        
+
         # 4. Emission Monitoring
         print("🌫️ Emission Monitoring...")
         monitoring = await orchestrator.emission_monitoring(bst_nr, anl_nr)
-        
+
         # Zusammenfassung
         print("\n" + "=" * 80)
         print("📊 ZUSAMMENFASSUNG")
         print("=" * 80)
-        
+
         print(f"\n✅ Alle Workflows abgeschlossen")
         print(f"   • Compliance: {compliance['compliance_score']:.0%}")
         print(f"   • Wartungen geplant: {maintenance['wartungen_geplant']}")
         print(f"   • Überschreitungen: {monitoring['ueberschreitungen']}")
         print(f"   • Priorität: {comprehensive.prioritaet.value}")
-        
+
         # Active Workflows
         active = orchestrator.list_active_workflows()
         print(f"\n📈 {len(active)} Workflows durchgeführt")
-        
+
         for wf in active:
             print(f"   • {wf.workflow_type.value}: {wf.success_rate:.0f}% success")
-    
+
     finally:
         await orchestrator.close()
 
@@ -583,7 +583,7 @@ for anlage in anlagen_liste:
         anlage.bst_nr,
         anlage.anl_nr
     )
-    
+
     if result['compliance_score'] < 0.8:
         send_alert(anlage, result)
 ```
@@ -597,7 +597,7 @@ for anlage in anlagen_liste:
         anlage.anl_nr,
         planungszeitraum_tage=90
     )
-    
+
     if plan['kritische_wartungen'] > 0:
         schedule_urgent_maintenance(anlage, plan)
 ```
@@ -610,9 +610,9 @@ for anlage in anlagen_liste:
         anlage.bst_nr,
         anlage.anl_nr
     )
-    
+
     generate_pdf_report(anlage, report)
-    
+
     if report['ueberschreitungen'] > 5:
         notify_authorities(anlage, report)
 ```
@@ -648,7 +648,7 @@ for anlage in anlagen_liste:
 
 ---
 
-**Status**: ✅ Production-Ready  
-**Version**: 1.0  
-**Autor**: VERITAS Team  
+**Status**: ✅ Production-Ready
+**Version**: 1.0
+**Autor**: VERITAS Team
 **Datum**: 18. Oktober 2025

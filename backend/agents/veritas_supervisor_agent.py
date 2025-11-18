@@ -506,6 +506,7 @@ class AgentSelector:
     
     def __init__(self):
         self.agent_capability_map = AGENT_CAPABILITY_MAP
+<<<<<<< Updated upstream
         self.stats = {
             'selections_performed': 0,
             'avg_confidence_score': 0.0,
@@ -515,6 +516,14 @@ class AgentSelector:
     async def select_agents(self, 
                            subquery: SubQuery, 
                            rag_context: Optional[Dict[str, Any]] = None) -> AgentSelection:
+=======
+        # conservative typing to avoid mypy inferring 'object' for values like defaultdict
+        from typing import Any
+
+        self.stats: Dict[str, Any] = {"selections_performed": 0, "avg_confidence_score": 0.0, "agent_usage_counts": defaultdict(int)}
+
+    async def select_agents(self, subquery: SubQuery, rag_context: Optional[Dict[str, Any]] = None) -> AgentSelection:
+>>>>>>> Stashed changes
         """
         Wählt optimale Agents für Subquery
         
@@ -705,9 +714,18 @@ Antworte NUR mit der finalen Antwort, kein zusätzlicher Text!"""
             # Bereite RAG Context auf (aus Agent-Ergebnissen)
             rag_context_parts = []
             for i, agent_result in enumerate(deduplicated, 1):
+<<<<<<< Updated upstream
                 rag_context_parts.append(
                     f"[{i}] {agent_result.agent_type}: {agent_result.response_text}"
                 )
+=======
+                # `AgentResult` may store textual output in `result_data['response_text']`.
+                text = getattr(agent_result, "response_text", None)
+                if text is None:
+                    rd = getattr(agent_result, "result_data", {})
+                    text = rd.get("response_text") if isinstance(rd, dict) else str(rd)
+                rag_context_parts.append(f"[{i}] {agent_result.agent_type}: {text}")
+>>>>>>> Stashed changes
             rag_context = "\n\n".join(rag_context_parts)
             
             # Bereite Source-List für Zitationen
@@ -717,11 +735,29 @@ Antworte NUR mit der finalen Antwort, kein zusätzlicher Text!"""
             ])
             
             # Agent-Results als strukturierter Text
+<<<<<<< Updated upstream
             agent_results_text = "\n\n".join([
                 f"**{agent_result.agent_type}** (Confidence: {agent_result.confidence_score:.2f}):\n{agent_result.response_text}"
                 for agent_result in deduplicated
             ])
             
+=======
+            agent_results_text = "\n\n".join(
+                [
+                    "**{}** (Confidence: {:.2f}):\n{}".format(
+                        agent_result.agent_type,
+                        agent_result.confidence_score,
+                        (
+                            getattr(agent_result, "response_text", None)
+                            if getattr(agent_result, "response_text", None) is not None
+                            else (agent_result.result_data.get("response_text") if isinstance(agent_result.result_data, dict) else str(agent_result.result_data))
+                        ),
+                    )
+                    for agent_result in deduplicated
+                ]
+            )
+
+>>>>>>> Stashed changes
             # 4. ✨ Build JSON Prompt (LLM gibt JSON zurück, wir formatieren zu IEEE)
             # Enable Rich Media for complex queries (maps, charts, tables)
             enable_rich_media = len(deduplicated) >= 3  # Rich media nur bei umfangreichen Antworten

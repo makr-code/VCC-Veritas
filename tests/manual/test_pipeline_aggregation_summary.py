@@ -9,9 +9,7 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
 
-from backend.agents.veritas_intelligent_pipeline import (  # noqa: E402
-    IntelligentMultiAgentPipeline,
-)
+from backend.agents.veritas_intelligent_pipeline import IntelligentMultiAgentPipeline  # noqa: E402
 
 
 async def run_aggregation_demo() -> None:

@@ -11,7 +11,7 @@ IMPLEMENTIERUNGS-ÜBERSICHT
 --------------------------------------------------------------------------------
 
 ✅ IMPLEMENTIERT (9/12 Features = 75%)
-   
+
    [CORE-SYSTEM - 100%]
    ✅ Query-Komplexitäts-Analyzer        (504 LOC)
    ✅ Chunk-basiertes Token-Budget       (integrated)
@@ -22,9 +22,9 @@ IMPLEMENTIERUNGS-ÜBERSICHT
    ✅ Context-Window Management          (399 LOC, 15+ models)
    ✅ Token-Overflow-Strategien          (459 LOC, 4 strategies)
    ✅ Domain Weighting                   (Verwaltungsrecht: +1.5x)
-   
+
 ⏳ OPTIONAL (3/12 Features)
-   
+
    ⏳ Confidence-gesteuerte Anpassung    (framework ready)
    ⏳ Lernbasierte Budget-Optimierung    (not started)
    ⏳ Token-Budget Analytics             (not started)
@@ -99,7 +99,7 @@ KEY ACHIEVEMENTS
    STAGE 0: Intent + Complexity
    STAGE 2: +RAG Chunks + Sources
    STAGE 3: +Agent Count
-   
+
 ✅ Intelligent Overflow-Handling
    Strategy 1: Rerank Chunks (95% quality, -20% tokens)
    Strategy 2: Summarize Context (80% quality, -50% tokens)

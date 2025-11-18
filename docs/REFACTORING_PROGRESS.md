@@ -1,6 +1,6 @@
 # VERITAS Refactoring Progress Report
-**Datum:** 18. Oktober 2025  
-**Version:** v3.17.0  
+**Datum:** 18. Oktober 2025
+**Version:** v3.17.0
 **Status:** 🟢 In Arbeit
 
 ## 📊 Übersicht
@@ -116,17 +116,17 @@ class QueryResponse:
 
 class BackendAPIClient:
     """HTTP-Client für VERITAS Backend API v3"""
-    
+
     # Session Management
     def create_session(self, user_id: Optional[str] = None) -> bool
     def get_session_id(self) -> Optional[str]
     def ensure_session(self) -> bool
-    
+
     # Capability Discovery
     def get_capabilities(self) -> Optional[Dict]
     def get_available_models(self) -> List[str]
     def get_question_modes(self) -> List[Dict]
-    
+
     # Query Methods
     def send_query(...) -> QueryResponse  # Synchron
     def start_streaming_query(...)  # Asynchron
@@ -166,7 +166,7 @@ def _send_to_backend_via_client(self, message: str):
         max_tokens=max_tokens,
         conversation_history=conversation_history
     )
-    
+
     if response.success:
         # Handle successful response
         self.queue.put(response_msg)
@@ -210,16 +210,16 @@ def _send_to_backend_via_client(self, message: str):
 ```python
 class BackendAPIClient:
     def __init__(self, base_url: str, session_id: Optional[str] = None)
-    
+
     # Query Methods
     def send_query(self, message: str, mode: str, context: List[Dict]) -> Dict
     async def stream_query(self, message: str, mode: str, on_chunk: Callable)
-    
+
     # Metadata Methods
     def get_capabilities(self) -> Dict
     def get_question_modes(self) -> List[str]
     def get_available_models(self) -> List[str]
-    
+
     # Session Management
     def create_session(self) -> bool
     def close_session(self)
@@ -370,7 +370,7 @@ def test_theme_toggle():
 def test_observer_pattern():
     mgr = ThemeManager.get_instance()
     called = False
-    def callback(colors): 
+    def callback(colors):
         nonlocal called
         called = True
     mgr.register_listener(callback)
@@ -449,6 +449,6 @@ def test_observer_pattern():
 
 ## 📞 Kontakt & Review
 
-**Entwickler:** GitHub Copilot  
-**Review-Status:** ✅ Phase 1 abgeschlossen  
+**Entwickler:** GitHub Copilot
+**Review-Status:** ✅ Phase 1 abgeschlossen
 **Nächstes Review:** Nach BackendAPIClient-Extraktion

@@ -1,5 +1,5 @@
 # VERITAS Backend - Architektur-Analyse & Optimierungsvorschläge
-**Datum:** 16. Oktober 2025  
+**Datum:** 16. Oktober 2025
 **Analyse:** Backend-Design, Resource-Management, Pipeline-Orchestrierung
 
 ---
@@ -38,20 +38,20 @@ Das VERITAS Backend implementiert eine **hybride Architektur** mit:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """App Lifespan Management"""
-    
+
     # STARTUP
     streaming_initialized = initialize_streaming_system()
     uds3_initialized = initialize_uds3_system()  # ✅ Singleton
-    
+
     # ⚠️ GLOBALE PIPELINE-INSTANZ (wird EINMAL erstellt)
     pipeline_initialized = await initialize_intelligent_pipeline()
-    
+
     # Ollama-Check
     if not ollama_client:  # ✅ Singleton
         raise RuntimeError("Ollama Client nicht verfügbar!")
-    
+
     yield  # Server läuft
-    
+
     # SHUTDOWN
     logger.info("Backend wird heruntergefahren...")
 ```
@@ -65,7 +65,7 @@ async def lifespan(app: FastAPI):
 
 async def initialize_intelligent_pipeline():
     global intelligent_pipeline, ollama_client  # ⚠️ GLOBAL
-    
+
     if INTELLIGENT_PIPELINE_AVAILABLE:
         intelligent_pipeline = await get_intelligent_pipeline()  # Singleton!
         ollama_client = await get_ollama_client()  # Singleton!
@@ -83,15 +83,15 @@ _intelligent_pipeline: Optional[IntelligentMultiAgentPipeline] = None
 async def get_intelligent_pipeline() -> IntelligentMultiAgentPipeline:
     """
     Get or create intelligent pipeline singleton.
-    
+
     ⚠️ SINGLETON PATTERN - NICHT REQUEST-SCOPED!
     """
     global _intelligent_pipeline
-    
+
     if _intelligent_pipeline is None:
         _intelligent_pipeline = IntelligentMultiAgentPipeline(max_workers=5)
         await _intelligent_pipeline.initialize()
-    
+
     return _intelligent_pipeline
 ```
 
@@ -107,20 +107,20 @@ async def get_intelligent_pipeline() -> IntelligentMultiAgentPipeline:
 @app.post("/v2/intelligent/query")
 async def veritas_intelligent_query(request: VeritasStreamingQueryRequest):
     """Intelligent Multi-Agent Pipeline Endpoint"""
-    
+
     if not intelligent_pipeline:  # ⚠️ Nutzt GLOBALE Instanz
         raise HTTPException(status_code=503, detail="Pipeline nicht verfügbar")
-    
+
     # Pipeline Request erstellen
     pipeline_request = IntelligentPipelineRequest(...)
-    
+
     # ⚠️ GLOBALE PIPELINE wird genutzt (NICHT request-scoped)
     pipeline_response = await intelligent_pipeline.process_intelligent_query(pipeline_request)
-    
+
     return response
 ```
 
-**Problem:**  
+**Problem:**
 - **Keine** Pipeline-Instanz wird pro Request erstellt
 - **Keine** Cleanup nach Request
 - **Concurrent Requests** konkurrieren um dieselbe Pipeline-Instanz
@@ -133,16 +133,16 @@ async def veritas_intelligent_query(request: VeritasStreamingQueryRequest):
 class IntelligentMultiAgentPipeline:
     def __init__(self, max_workers: int = 5):
         self.max_workers = max_workers
-        
+
         # ⚠️ SHARED Components (bleiben zwischen Requests erhalten)
         self.ollama_client: Optional[VeritasOllamaClient] = None
         self.agent_orchestrator: Optional[AgentOrchestrator] = None
         self.agent_registry: Optional[AgentRegistry] = None
         self.uds3_strategy: Optional[UnifiedDatabaseStrategy] = None
-        
+
         # ✅ ThreadPool für parallele Agent-Execution
         self.executor = ThreadPoolExecutor(max_workers=max_workers)
-        
+
         # ⚠️ SHARED State (potenzielle Race Conditions)
         self.active_pipelines: Dict[str, IntelligentPipelineRequest] = {}
         self.pipeline_steps: Dict[str, List[PipelineStep]] = {}
@@ -237,7 +237,7 @@ class IntelligentMultiAgentPipeline:
 ```python
 class PipelineFactory:
     """Factory für Request-scoped Pipeline-Instanzen"""
-    
+
     def __init__(
         self,
         ollama_client: VeritasOllamaClient,
@@ -246,7 +246,7 @@ class PipelineFactory:
     ):
         """
         Initialisiert Factory mit SHARED Ressourcen
-        
+
         Args:
             ollama_client: Globaler Ollama LLM Client
             uds3_strategy: Globale UDS3 Database Strategy
@@ -255,24 +255,24 @@ class PipelineFactory:
         self.ollama_client = ollama_client
         self.uds3_strategy = uds3_strategy
         self.agent_registry = agent_registry
-    
+
     async def create_pipeline(self, max_workers: int = 5) -> IntelligentMultiAgentPipeline:
         """
         Erstellt neue Pipeline-Instanz für einen Request
-        
+
         Returns:
             Frische Pipeline-Instanz mit injizierten Shared Resources
         """
         pipeline = IntelligentMultiAgentPipeline(max_workers=max_workers)
-        
+
         # Injiziere Shared Resources
         pipeline.ollama_client = self.ollama_client
         pipeline.uds3_strategy = self.uds3_strategy
         pipeline.agent_registry = self.agent_registry
-        
+
         # Initialisiere Pipeline-spezifische Ressourcen
         await pipeline._initialize_request_scoped_resources()
-        
+
         return pipeline
 ```
 
@@ -283,33 +283,33 @@ class PipelineFactory:
 ```python
 class IntelligentMultiAgentPipeline:
     """Request-scoped Pipeline mit Auto-Cleanup"""
-    
+
     def __init__(self, max_workers: int = 5):
         self.max_workers = max_workers
-        
+
         # ✅ REQUEST-SCOPED State
         self.active_pipelines: Dict[str, IntelligentPipelineRequest] = {}
         self.pipeline_steps: Dict[str, List[PipelineStep]] = {}
         self.stats = {...}  # Pro-Request Stats
-        
+
         # ✅ REQUEST-SCOPED ThreadPool
         self.executor: Optional[ThreadPoolExecutor] = None
-        
+
         # ⚠️ INJECTED Shared Resources (werden von Factory gesetzt)
         self.ollama_client = None
         self.uds3_strategy = None
         self.agent_registry = None
-    
+
     async def _initialize_request_scoped_resources(self):
         """Initialisiert Request-spezifische Ressourcen"""
         # ThreadPool für diesen Request
         self.executor = ThreadPoolExecutor(max_workers=self.max_workers)
-        
+
         # Weitere Agent-Komponenten (falls benötigt)
         if self.agent_registry:
             # Nutze bereits initialisierte Agents aus Registry
             pass
-    
+
     async def process_intelligent_query(self, request: IntelligentPipelineRequest):
         """Verarbeitet Query und führt Cleanup durch"""
         try:
@@ -319,18 +319,18 @@ class IntelligentMultiAgentPipeline:
         finally:
             # ✅ CLEANUP nach Query (egal ob Erfolg oder Fehler)
             await self.cleanup()
-    
+
     async def cleanup(self):
         """Räumt Pipeline-Ressourcen auf"""
         # ThreadPool beenden
         if self.executor:
             self.executor.shutdown(wait=False)
             self.executor = None
-        
+
         # State clearen
         self.active_pipelines.clear()
         self.pipeline_steps.clear()
-        
+
         logger.info("✅ Pipeline-Ressourcen bereinigt")
 ```
 
@@ -346,28 +346,28 @@ pipeline_factory: Optional[PipelineFactory] = None
 async def initialize_intelligent_pipeline():
     """Initialisiert Pipeline Factory mit Shared Resources"""
     global pipeline_factory, ollama_client
-    
+
     if INTELLIGENT_PIPELINE_AVAILABLE:
         # Ollama Client (Singleton)
         ollama_client = await get_ollama_client()
-        
+
         # UDS3 Strategy (Singleton)
         uds3 = get_optimized_unified_strategy()
-        
+
         # Agent Registry (Singleton)
         from backend.agents.agent_registry import get_agent_registry
         registry = get_agent_registry()
-        
+
         # ✅ Factory erstellen (NICHT Pipeline-Instanz!)
         pipeline_factory = PipelineFactory(
             ollama_client=ollama_client,
             uds3_strategy=uds3,
             agent_registry=registry
         )
-        
+
         logger.info("✅ Pipeline Factory initialisiert")
         return True
-    
+
     return False
 
 
@@ -376,26 +376,26 @@ async def initialize_intelligent_pipeline():
 @app.post("/v2/intelligent/query")
 async def veritas_intelligent_query(request: VeritasStreamingQueryRequest):
     """Intelligent Query mit Request-scoped Pipeline"""
-    
+
     if not pipeline_factory:
         raise HTTPException(status_code=503, detail="Pipeline Factory nicht verfügbar")
-    
+
     # ✅ NEUE Pipeline-Instanz für diesen Request
     pipeline = await pipeline_factory.create_pipeline(max_workers=5)
-    
+
     try:
         # Pipeline Request erstellen
         pipeline_request = IntelligentPipelineRequest(...)
-        
+
         # Query verarbeiten (Cleanup erfolgt automatisch in process_intelligent_query)
         pipeline_response = await pipeline.process_intelligent_query(pipeline_request)
-        
+
         return {
             "query_id": pipeline_request.query_id,
             "answer": pipeline_response.response_text,
             ...
         }
-    
+
     except Exception as e:
         logger.error(f"Pipeline Error: {e}")
         # Cleanup auch bei Fehler
@@ -412,12 +412,12 @@ async def veritas_intelligent_query(request: VeritasStreamingQueryRequest):
 ```python
 class LazyNLPModels:
     """Lazy-loading NLP Models Pool"""
-    
+
     def __init__(self):
         self._spacy_model = None
         self._sentiment_model = None
         self._ner_model = None
-    
+
     @property
     def spacy(self):
         """Lädt spaCy nur bei Bedarf"""
@@ -425,7 +425,7 @@ class LazyNLPModels:
             import spacy
             self._spacy_model = spacy.load("de_core_news_sm")
         return self._spacy_model
-    
+
     @property
     def sentiment(self):
         """Lädt Sentiment-Model nur bei Bedarf"""
@@ -440,15 +440,15 @@ class LazyNLPModels:
 ```python
 class OllamaConnectionPool:
     """Connection Pool für Ollama API"""
-    
+
     def __init__(self, pool_size: int = 10):
         self.pool = asyncio.Queue(maxsize=pool_size)
         self.pool_size = pool_size
-    
+
     async def get_connection(self):
         """Holt Connection aus Pool"""
         return await self.pool.get()
-    
+
     async def release_connection(self, conn):
         """Gibt Connection zurück an Pool"""
         await self.pool.put(conn)
@@ -461,15 +461,15 @@ Statt ThreadPoolExecutor:
 ```python
 async def _execute_agents_async(self, agents: List[str], query: str):
     """Führt Agents parallel mit asyncio aus"""
-    
+
     tasks = [
         self._execute_single_agent(agent, query)
         for agent in agents
     ]
-    
+
     # ✅ Echte async Parallelität (kein Threading)
     results = await asyncio.gather(*tasks, return_exceptions=True)
-    
+
     return dict(zip(agents, results))
 ```
 
@@ -485,11 +485,11 @@ async def _execute_agents_async(self, agents: List[str], query: str):
 @app.post("/v2/chat/simple")
 async def simple_chatbot_query(request: SimpleChatRequest):
     """Einfacher 1-dim Chatbot (KEIN Multi-Agent)"""
-    
+
     # ✅ DIREKT Ollama nutzen (kein Pipeline-Overhead)
     if not ollama_client:
         raise HTTPException(status_code=503, detail="Ollama nicht verfügbar")
-    
+
     # Optional: RAG-Context holen
     context_docs = []
     if request.use_rag and uds3_strategy:
@@ -497,14 +497,14 @@ async def simple_chatbot_query(request: SimpleChatRequest):
             vector_params={"query_text": request.query, "top_k": 3}
         )
         context_docs = rag_result.get("documents", [])
-    
+
     # LLM-Antwort generieren
     response = await ollama_client.generate_response(
         query=request.query,
         context_documents=context_docs,
         chat_history=request.chat_history
     )
-    
+
     return {
         "answer": response.text,
         "sources": response.sources,
@@ -587,5 +587,5 @@ async def simple_chatbot_query(request: SimpleChatRequest):
 
 ---
 
-**Fazit:**  
+**Fazit:**
 Das aktuelle Backend nutzt Singleton-Pattern für die Pipeline, was **nicht** der gewünschten Request-scoped Architektur entspricht. Mit Factory Pattern und Cleanup-Mechanismus kann das Backend ressourceneffizienter und skalierender werden.

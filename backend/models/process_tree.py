@@ -12,8 +12,12 @@ Version: 1.0
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Any
 from datetime import datetime
+<<<<<<< Updated upstream
 import sys
 import os
+=======
+from typing import Any, Dict, List, Optional, cast
+>>>>>>> Stashed changes
 
 # Add project root to path
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -151,8 +155,14 @@ class ProcessTree:
         def get_level(step_id: str) -> int:
             """Get the execution level of a step."""
             if step_id in visited:
+<<<<<<< Updated upstream
                 return levels.get(step_id, 0)
             
+=======
+                # Already visited — return 0 as a safe default for recursion
+                return 0
+
+>>>>>>> Stashed changes
             step = self.steps[step_id]
             visited.add(step_id)
             
@@ -184,12 +194,17 @@ class ProcessTree:
         Returns:
             Dictionary with statistics
         """
-        status_counts = {}
+        status_counts: Dict[str, int] = {}
         for status in StepStatus:
             count = sum(1 for step in self.steps.values() if step.status == status)
             status_counts[status.value] = count
+<<<<<<< Updated upstream
         
         type_counts = {}
+=======
+
+        type_counts: Dict[str, int] = {}
+>>>>>>> Stashed changes
         for step_type in StepType:
             count = sum(1 for step in self.steps.values() if step.step_type == step_type)
             type_counts[step_type.value] = count
@@ -319,8 +334,13 @@ if __name__ == "__main__":
             name=name,
             description=name,
             step_type=step_type,
+<<<<<<< Updated upstream
             parameters=params,
             dependencies=deps
+=======
+            parameters=cast(Dict[str, Any], params),
+            dependencies=cast(List[str], deps),
+>>>>>>> Stashed changes
         )
         complex_tree.add_step(step)
     

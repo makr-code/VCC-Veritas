@@ -100,7 +100,7 @@ async def orchestrate_saga(
         saga_status = SAGAStatus(
             saga_id=saga_id,
             saga_name=orchestration_req.saga_name,
-            status=StatusEnum.RUNNING,
+            status=StatusEnum.IN_PROGRESS,
             current_step=1,
             total_steps=len(orchestration_req.steps),
             steps_completed=[],

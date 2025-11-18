@@ -1,9 +1,9 @@
 # MCP & SSE Standard Vergleich - VERITAS & UDS3 Streaming-Architektur
 
-**Datum:** 31. Oktober 2025  
-**Autor:** VERITAS System Architecture Team  
-**Version:** 1.0.0  
-**Status:** 🔍 Technical Evaluation  
+**Datum:** 31. Oktober 2025
+**Autor:** VERITAS System Architecture Team
+**Version:** 1.0.0
+**Status:** 🔍 Technical Evaluation
 
 ---
 
@@ -34,15 +34,15 @@ Dieser Bericht vergleicht die aktuelle VERITAS/UDS3 Streaming-Architektur mit de
 @app.websocket("/ws/process/{session_id}")
 async def websocket_endpoint(websocket: WebSocket, session_id: str):
     await websocket.accept()
-    
+
     # Register client
     bridge = WebSocketProgressBridge(streaming_manager, session_id)
     callback = ProgressCallback()
     callback.add_handler(bridge.on_progress_event)
-    
+
     # Execute with streaming
     executor.execute_process(tree, progress_callback=callback)
-    
+
     # Stream events
     while True:
         event = await receive_event()
@@ -92,7 +92,7 @@ class ChunkedUploadManager:
     ) -> str:
         """
         Memory-efficient upload with resume support.
-        
+
         Features:
         - Chunked upload (never load full file)
         - Resume support (continue after interruption)
@@ -101,17 +101,17 @@ class ChunkedUploadManager:
         """
         operation_id = str(uuid4())
         total_bytes = file_path.stat().st_size
-        
+
         with open(file_path, 'rb') as f:
             for chunk_index in range(total_chunks):
                 chunk = f.read(chunk_size)
-                
+
                 # Upload chunk via HTTP POST
                 response = requests.post(
                     f"/api/upload/{operation_id}/chunk/{chunk_index}",
                     files={'chunk': chunk}
                 )
-                
+
                 # Progress callback
                 if progress_callback:
                     progress_callback(StreamingProgress(
@@ -199,7 +199,7 @@ async def stream_progress(session_id: str):
                 "id": event.id,
                 "retry": 5000  # Auto-reconnect after 5s
             }
-    
+
     return EventSourceResponse(event_generator())
 ```
 
@@ -258,8 +258,8 @@ StreamingManager (WebSocket)  →  SSE Endpoint (EventSourceResponse)
 
 **Spezifikation:** [Anthropic MCP](https://modelcontextprotocol.io/)
 
-**Zweck:** 
-Standardisiertes Protokoll für **Desktop-Anwendungen, IDEs und Office-Software** zur Integration von AI-Services und Datenquellen. 
+**Zweck:**
+Standardisiertes Protokoll für **Desktop-Anwendungen, IDEs und Office-Software** zur Integration von AI-Services und Datenquellen.
 
 **Primäre Use Cases:**
 - 🖥️ **Desktop Apps:** VS Code, Cursor, Zed, IDX
@@ -344,39 +344,39 @@ import { MCPClient } from '@modelcontextprotocol/sdk';
 
 class VeritasWordAddin {
     private mcp: MCPClient;
-    
+
     async initialize() {
         // Connect to VERITAS MCP Server
         this.mcp = new MCPClient({
             serverUrl: 'http://localhost:5000/mcp',
             transport: 'http'
         });
-        
+
         await this.mcp.connect();
     }
-    
+
     async insertLegalResearch() {
         // 1. List available prompts
         const prompts = await this.mcp.listPrompts();
         // → ["legal-research", "baurecht-query", ...]
-        
+
         // 2. Get prompt template
         const prompt = await this.mcp.getPrompt('legal-research', {
             topic: 'Bauantrag',
             jurisdiction: 'Stuttgart'
         });
-        
+
         // 3. Execute hybrid search tool
         const results = await this.mcp.callTool('hybrid_search', {
             query: 'Bauantrag Stuttgart Genehmigungspflicht',
             top_k: 5
         });
-        
+
         // 4. Insert results into Word document
         await Word.run(async (context) => {
             const body = context.document.body;
             body.insertParagraph('Recherche-Ergebnisse:', 'End');
-            
+
             results.results.forEach(doc => {
                 body.insertParagraph(
                     `${doc.title} - ${doc.content_preview}`,
@@ -516,15 +516,15 @@ async def stream_agent_progress(session_id: str):
 @app.websocket("/ws/agent/{session_id}")
 async def agent_control_websocket(websocket: WebSocket, session_id: str):
     await websocket.accept()
-    
+
     while True:
         # Client commands: pause, resume, cancel, adjust_parameters
         command = await websocket.receive_json()
-        
+
         if command["action"] == "pause":
             await agent_system.pause(session_id)
             await websocket.send_json({"status": "paused"})
-        
+
         elif command["action"] == "adjust_quality_threshold":
             await agent_system.set_threshold(session_id, command["value"])
             await websocket.send_json({"status": "threshold_updated"})
@@ -629,10 +629,10 @@ class BackendMessaging:
     def __init__(self):
         self.redis = redis.from_url("redis://localhost:6379")
         self.pubsub = self.redis.pubsub()
-    
+
     async def publish_event(self, channel: str, event: dict):
         await self.redis.publish(channel, json.dumps(event))
-    
+
     async def subscribe_events(self, pattern: str):
         await self.pubsub.psubscribe(pattern)
         async for message in self.pubsub.listen():
@@ -665,7 +665,7 @@ class BackendMessaging:
 async def upload_chunked_with_sse_progress(file_id: str, chunk: bytes):
     # HTTP Chunked Upload (Binary)
     await storage.write_chunk(file_id, chunk)
-    
+
     # SSE Progress Update (Separate Stream)
     await sse_manager.emit(file_id, {
         "type": "upload_progress",
@@ -710,7 +710,7 @@ for (let chunk of fileChunks) {
    ```python
    # backend/api/sse_endpoints.py
    from sse_starlette.sse import EventSourceResponse
-   
+
    @app.get("/api/stream/progress/{session_id}")
    async def stream_progress(session_id: str):
        return EventSourceResponse(
@@ -723,7 +723,7 @@ for (let chunk of fileChunks) {
    # backend/agents/framework/sse_adapter.py
    class SSEStreamAdapter:
        """Convert StreamEvent to SSE format"""
-       
+
        async def event_generator(self, session_id: str):
            async for event in streaming_manager.get_events(session_id):
                yield {
@@ -742,7 +742,7 @@ for (let chunk of fileChunks) {
            this.source = new EventSource(
                `/api/stream/progress/${sessionId}`
            );
-           
+
            this.source.addEventListener('step_progress', (e) => {
                const event = JSON.parse(e.data);
                this.handleProgress(event);
@@ -775,7 +775,7 @@ for (let chunk of fileChunks) {
    class RedisEventBus:
        async def publish(self, channel: str, event: dict):
            await self.redis.publish(channel, json.dumps(event))
-       
+
        async def subscribe(self, pattern: str):
            await self.pubsub.psubscribe(pattern)
            async for msg in self.pubsub.listen():
@@ -817,9 +817,9 @@ for (let chunk of fileChunks) {
    ```python
    # backend/mcp/veritas_mcp_server.py
    from mcp.server import MCPServer
-   
+
    server = MCPServer("veritas-legal-research")
-   
+
    # Prompts für Template-basierte Queries
    @server.prompt("legal-research")
    async def legal_research_prompt(topic: str, jurisdiction: str):
@@ -831,7 +831,7 @@ for (let chunk of fileChunks) {
                "content": f"Analysiere die Rechtslage zu {topic}"
            }]
        }
-   
+
    # Resources für Dokument-Zugriff
    @server.resource("veritas://documents/{doc_id}")
    async def get_document_resource(doc_id: str):
@@ -841,13 +841,13 @@ for (let chunk of fileChunks) {
            "mimeType": "application/json",
            "text": json.dumps(doc.to_dict())
        }
-   
+
    # Tools für VERITAS Functions
    @server.tool("hybrid_search")
    async def hybrid_search_tool(query: str, top_k: int = 10):
        results = await uds3.hybrid_search(query, top_k)
        return [doc.to_dict() for doc in results]
-   
+
    @server.tool("execute_agent")
    async def execute_agent_tool(agent_name: str, query: str):
        result = await agent_system.execute(agent_name, query)
@@ -858,10 +858,10 @@ for (let chunk of fileChunks) {
    ```typescript
    // Word Add-In (TypeScript)
    import { MCPClient } from '@modelcontextprotocol/sdk';
-   
+
    class VeritasWordAddin {
        private mcp: MCPClient;
-       
+
        async initialize() {
            this.mcp = new MCPClient({
                serverUrl: 'http://localhost:5000/mcp',
@@ -869,14 +869,14 @@ for (let chunk of fileChunks) {
            });
            await this.mcp.connect();
        }
-       
+
        async insertLegalResearch(topic: string) {
            // Execute hybrid search
            const results = await this.mcp.callTool('hybrid_search', {
                query: topic,
                top_k: 5
            });
-           
+
            // Insert into Word document
            await Word.run(async (context) => {
                const body = context.document.body;
@@ -954,7 +954,7 @@ Total ROI: €266,000/Woche → Break-Even: <1 Tag!
 async def stream_progress(session_id: str, token: str = Query(...)):
     if not verify_jwt(token):
         raise HTTPException(401, "Unauthorized")
-    
+
     return EventSourceResponse(event_generator(session_id))
 ```
 
@@ -980,7 +980,7 @@ async def agent_websocket(
     if not verify_jwt(token):
         await websocket.close(code=1008)  # Policy Violation
         return
-    
+
     await websocket.accept()
 ```
 
@@ -1065,7 +1065,7 @@ UDS3 Streaming:
 3. **Phase 3:** MCP Server für Desktop-Integration (2-3 Wochen) → €3,500
 
 **Total Investment:** €3,500 - €7,000
-**ROI:** 
+**ROI:**
 - **Phase 1+2 (Streaming):** 6-12 Monate (reduzierte Reconnect-Issues)
 - **Phase 3 (MCP Desktop):** <1 Tag! (€266k/Woche Einsparung bei Office Integration)
 
@@ -1089,9 +1089,9 @@ UDS3 Streaming:
 
 ---
 
-**Status:** 🔍 **AWAITING DECISION**  
-**Next Steps:** Diskussion mit Team, Priorisierung Phase 1 vs Phase 2  
-**Contact:** VERITAS Architecture Team  
+**Status:** 🔍 **AWAITING DECISION**
+**Next Steps:** Diskussion mit Team, Priorisierung Phase 1 vs Phase 2
+**Contact:** VERITAS Architecture Team
 
 ---
 

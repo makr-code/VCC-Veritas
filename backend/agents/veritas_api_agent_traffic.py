@@ -4,7 +4,13 @@ VERITAS Traffic & Transport Workers
 Spezialisierte Worker für Verkehrs- und Transportanfragen
 """
 import logging
+<<<<<<< Updated upstream
 import asyncio
+=======
+from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional, cast
+
+>>>>>>> Stashed changes
 import aiohttp
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
@@ -26,7 +32,12 @@ class TrafficManagementWorker(ExternalAPIWorker):
     
     def __init__(self):
         from covina_core import WorkerType
+<<<<<<< Updated upstream
         super().__init__(WorkerType.TRAFFIC_MANAGEMENT, "https://api.verkehr.de/", cache_ttl=900)  # 15 Minuten Cache
+=======
+
+        super().__init__(agent_id=str(WorkerType.TRAFFIC_MANAGEMENT), db_path=None, config={"api_base": "https://api.verkehr.de/", "cache_ttl": 900})
+>>>>>>> Stashed changes
         self.traffic_apis = {
             "municipal_traffic": "https://api.municipality.de/traffic/",
             "state_traffic": "https://api.state.de/verkehr/",
@@ -101,6 +112,7 @@ class TrafficManagementWorker(ExternalAPIWorker):
     
     def _extract_traffic_concern(self, query: str) -> Dict[str, Any]:
         """Extrahiert Verkehrsanliegen aus Query"""
+<<<<<<< Updated upstream
         
         concern = {
             "type": "general",
@@ -108,20 +120,33 @@ class TrafficManagementWorker(ExternalAPIWorker):
             "proposed_solution": None
         }
         
+=======
+
+        concern: Dict[str, Any] = {"type": "general", "specific_issues": [], "proposed_solution": None}
+
+        # Collect specific issues in a mutable list (mypy-safe)
+        specific_issues: List[str] = list(cast(List[str], concern.get("specific_issues") or []))
+
+>>>>>>> Stashed changes
         # Verkehrsprobleme identifizieren
         if any(word in query.lower() for word in ["raser", "schnell", "geschwindigkeit"]):
-            concern["specific_issues"].append("speeding")
+            specific_issues.append("speeding")
         if any(word in query.lower() for word in ["laut", "lärm", "ruhig"]):
-            concern["specific_issues"].append("noise")
+            specific_issues.append("noise")
         if any(word in query.lower() for word in ["gefährlich", "unfall", "sicherheit"]):
-            concern["specific_issues"].append("safety")
+            specific_issues.append("safety")
         if any(word in query.lower() for word in ["parkplatz", "parken", "stau"]):
-            concern["specific_issues"].append("parking")
+            specific_issues.append("parking")
         if any(word in query.lower() for word in ["fahrrad", "radweg"]):
-            concern["specific_issues"].append("cycling_infrastructure")
+            specific_issues.append("cycling_infrastructure")
         if any(word in query.lower() for word in ["fußgänger", "gehweg", "zebrastreifen"]):
+<<<<<<< Updated upstream
             concern["specific_issues"].append("pedestrian_safety")
         
+=======
+            specific_issues.append("pedestrian_safety")
+
+>>>>>>> Stashed changes
         # Lösungsvorschläge
         if any(word in query.lower() for word in ["tempo 30", "tempo-30"]):
             concern["proposed_solution"] = "speed_limit_30"
@@ -131,7 +156,14 @@ class TrafficManagementWorker(ExternalAPIWorker):
             concern["proposed_solution"] = "pedestrian_crossing"
         elif any(word in query.lower() for word in ["verkehrsberuhigung", "beruhigt"]):
             concern["proposed_solution"] = "traffic_calming"
+<<<<<<< Updated upstream
         
+=======
+
+        # Reassign the possibly-modified list back to the concern dict
+        concern["specific_issues"] = specific_issues
+
+>>>>>>> Stashed changes
         return concern
     
     async def _analyze_current_traffic(self, location: Dict) -> Dict[str, Any]:
@@ -364,7 +396,11 @@ class PublicTransportWorker(ExternalAPIWorker):
     
     def __init__(self):
         from covina_core import WorkerType
+<<<<<<< Updated upstream
         super().__init__(WorkerType.PUBLIC_TRANSPORT, "https://api.verkehr.de/", cache_ttl=600)  # 10 Minuten Cache
+=======
+        super().__init__(agent_id=str(WorkerType.PUBLIC_TRANSPORT), db_path=None, config={"api_base": "https://api.verkehr.de/", "cache_ttl": 600})
+>>>>>>> Stashed changes
         self.transport_apis = {
             "local_transport": "https://api.local-transport.de/",
             "regional_transport": "https://api.regional.de/",
@@ -430,6 +466,7 @@ class PublicTransportWorker(ExternalAPIWorker):
     
     def _extract_transport_need(self, query: str) -> Dict[str, Any]:
         """Extrahiert ÖPNV-Bedarf aus Query"""
+<<<<<<< Updated upstream
         
         need = {
             "type": "general_improvement",
@@ -438,14 +475,23 @@ class PublicTransportWorker(ExternalAPIWorker):
             "time_constraints": []
         }
         
+=======
+
+        need: Dict[str, Any] = {"type": "general_improvement", "specific_requests": [], "target_destinations": [], "time_constraints": []}
+
+        specific_requests: List[str] = list(cast(List[str], need.get("specific_requests") or []))
+        target_destinations: List[str] = list(cast(List[str], need.get("target_destinations") or []))
+
+>>>>>>> Stashed changes
         # Spezifische Anfragen
         if any(word in query.lower() for word in ["häufiger", "öfter", "takt"]):
-            need["specific_requests"].append("increased_frequency")
+            specific_requests.append("increased_frequency")
         if any(word in query.lower() for word in ["abends", "nacht", "spät"]):
-            need["specific_requests"].append("extended_hours")
+            specific_requests.append("extended_hours")
         if any(word in query.lower() for word in ["direktverbindung", "umsteigen"]):
-            need["specific_requests"].append("direct_connection")
+            specific_requests.append("direct_connection")
         if any(word in query.lower() for word in ["barrierefrei", "rollstuhl"]):
+<<<<<<< Updated upstream
             need["specific_requests"].append("accessibility")
         
         # Ziele
@@ -456,6 +502,21 @@ class PublicTransportWorker(ExternalAPIWorker):
         if any(word in query.lower() for word in ["arbeitsplatz", "arbeit"]):
             need["target_destinations"].append("workplace")
         
+=======
+            specific_requests.append("accessibility")
+
+        # Ziele
+        if any(word in query.lower() for word in ["innenstadt", "zentrum"]):
+            target_destinations.append("city_center")
+        if any(word in query.lower() for word in ["bahnho", "hauptbahnhof"]):
+            target_destinations.append("main_station")
+        if any(word in query.lower() for word in ["arbeitsplatz", "arbeit"]):
+            target_destinations.append("workplace")
+
+        need["specific_requests"] = specific_requests
+        need["target_destinations"] = target_destinations
+
+>>>>>>> Stashed changes
         return need
     
     async def _analyze_current_transport_service(self, location: Dict) -> Dict[str, Any]:
@@ -557,8 +618,13 @@ class PublicTransportWorker(ExternalAPIWorker):
     async def _evaluate_alternative_mobility(self, location: Dict, need: Dict) -> List[Dict]:
         """Bewertet alternative Mobilitätsoptionen"""
         await asyncio.sleep(0.3)
+<<<<<<< Updated upstream
         
         alternatives = [
+=======
+
+        alternatives: List[Dict[str, Any]] = [
+>>>>>>> Stashed changes
             {
                 "option": "Bike-Sharing",
                 "availability": "verfügbar",
@@ -640,8 +706,14 @@ class ParkingManagementWorker(BaseWorker):
     
     def __init__(self):
         from covina_core import WorkerType
+<<<<<<< Updated upstream
         super().__init__(WorkerType.PARKING_MANAGEMENT, cache_ttl=1800)  # 30 Minuten Cache
     
+=======
+
+        super().__init__(agent_id=str(WorkerType.PARKING_MANAGEMENT), db_path=None, config={"cache_ttl": 1800})
+
+>>>>>>> Stashed changes
     def _extract_location(self, query: str) -> Dict[str, Any]:
         """Extrahiert Standortinformationen aus der Anfrage"""
         location = {
@@ -701,6 +773,7 @@ class ParkingManagementWorker(BaseWorker):
     
     def _extract_parking_need(self, query: str) -> Dict[str, Any]:
         """Extrahiert Parkraum-Bedarf aus Query"""
+<<<<<<< Updated upstream
         
         need = {
             "duration": "short_term",
@@ -709,6 +782,13 @@ class ParkingManagementWorker(BaseWorker):
             "special_requirements": []
         }
         
+=======
+
+        need: Dict[str, Any] = {"duration": "short_term", "vehicle_type": "car", "price_sensitivity": "medium", "special_requirements": []}
+
+        special_requirements: List[str] = list(cast(List[str], need.get("special_requirements") or []))
+
+>>>>>>> Stashed changes
         # Parkdauer
         if any(word in query.lower() for word in ["dauerhaft", "monat", "jahr"]):
             need["duration"] = "long_term"
@@ -727,12 +807,19 @@ class ParkingManagementWorker(BaseWorker):
         
         # Besondere Anforderungen
         if any(word in query.lower() for word in ["behinderung", "rollstuhl"]):
-            need["special_requirements"].append("disabled_access")
+            special_requirements.append("disabled_access")
         if any(word in query.lower() for word in ["elektro", "ladesäule"]):
-            need["special_requirements"].append("ev_charging")
+            special_requirements.append("ev_charging")
         if any(word in query.lower() for word in ["überdacht", "garage"]):
+<<<<<<< Updated upstream
             need["special_requirements"].append("covered")
         
+=======
+            special_requirements.append("covered")
+
+        need["special_requirements"] = special_requirements
+
+>>>>>>> Stashed changes
         return need
     
     async def _analyze_parking_situation(self, location: Dict) -> Dict[str, Any]:
@@ -915,8 +1002,13 @@ class ParkingManagementWorker(BaseWorker):
     async def _check_parking_developments(self, location: Dict) -> List[Dict]:
         """Prüft zukünftige Parkraum-Entwicklungen"""
         await asyncio.sleep(0.2)
+<<<<<<< Updated upstream
         
         developments = [
+=======
+
+        developments: List[Dict[str, Any]] = [
+>>>>>>> Stashed changes
             {
                 "development": "Ausweitung Bewohnerparkzonen",
                 "timeline": "2025-2026",

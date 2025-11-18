@@ -7,6 +7,10 @@ import logging
 import asyncio
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
+<<<<<<< Updated upstream
+=======
+from typing import Any, Dict, List, Optional, cast
+>>>>>>> Stashed changes
 
 # Import base classes from framework
 try:
@@ -25,15 +29,25 @@ class SocialBenefitsWorker(ExternalAPIWorker):
     
     def __init__(self):
         from covina_core import WorkerType
+<<<<<<< Updated upstream
         super().__init__(WorkerType.SOCIAL_BENEFITS, "https://api.sozialamt.de/", cache_ttl=3600)  # 1 Stunde Cache
+=======
+
+        super().__init__(WorkerType.SOCIAL_BENEFITS)
+>>>>>>> Stashed changes
         self.social_apis = {
             "federal_social": "https://api.arbeitsagentur.de/",
             "pension_insurance": "https://api.deutsche-rentenversicherung.de/",
             "health_insurance": "https://api.gkv-spitzenverband.de/",
             "family_benefits": "https://api.familienkasse.de/"
         }
+<<<<<<< Updated upstream
     
     async def _process_internal(self, metadata, user_profile: Dict = None) -> Dict[str, Any]:
+=======
+
+    async def _process_internal(self, metadata: Any, user_profile: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+>>>>>>> Stashed changes
         """Analysiert Sozialleistungsansprüche"""
         
         benefit_inquiry = self._extract_benefit_inquiry(metadata.normalized_query)
@@ -144,12 +158,23 @@ class SocialBenefitsWorker(ExternalAPIWorker):
             situation["children_count"] = 1
         
         return situation
+<<<<<<< Updated upstream
     
     async def _identify_eligible_benefits(self, inquiry: Dict, situation: Dict) -> List[Dict]:
         """Identifiziert anspruchsberechtigte Leistungen"""
         await asyncio.sleep(0.5)
         
         benefits = []
+=======
+
+    async def _identify_eligible_benefits(self, inquiry: Dict[str, Any], situation: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """Identifiziert anspruchsberechtigte Leistungen"""
+        await asyncio.sleep(0.5)
+
+        from typing import List as _List, Dict as _Dict, Any as _Any
+
+        benefits: _List[_Dict[str, _Any]] = []
+>>>>>>> Stashed changes
         benefit_type = inquiry.get("benefit_type", "general")
         employment = situation.get("employment_status", "unknown")
         
@@ -274,6 +299,7 @@ class SocialBenefitsWorker(ExternalAPIWorker):
             })
         
         return benefits
+<<<<<<< Updated upstream
     
     async def _analyze_application_processes(self, benefits: List) -> Dict[str, Any]:
         """Analysiert Antragsverfahren"""
@@ -286,6 +312,15 @@ class SocialBenefitsWorker(ExternalAPIWorker):
             "tips": []
         }
         
+=======
+
+    async def _analyze_application_processes(self, benefits: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Analysiert Antragsverfahren"""
+        await asyncio.sleep(0.3)
+
+        processes: Dict[str, Any] = {"priority_order": [], "timeline": {}, "common_documents": [], "tips": []}
+
+>>>>>>> Stashed changes
         # Prioritätsreihenfolge bestimmen
         priority_mapping = {
             "Arbeitslosengeld I": 1,  # Zeitkritisch
@@ -342,8 +377,13 @@ class SocialBenefitsWorker(ExternalAPIWorker):
         ]
         
         return processes
+<<<<<<< Updated upstream
     
     async def _calculate_benefit_amounts(self, benefits: List, situation: Dict) -> Dict[str, Any]:
+=======
+
+    async def _calculate_benefit_amounts(self, benefits: List[Dict[str, Any]], situation: Dict[str, Any]) -> Dict[str, Any]:
+>>>>>>> Stashed changes
         """Berechnet voraussichtliche Leistungshöhen"""
         await asyncio.sleep(0.4)
         
@@ -405,6 +445,7 @@ class SocialBenefitsWorker(ExternalAPIWorker):
                 }
         
         return calculations
+<<<<<<< Updated upstream
     
     async def _check_benefit_combinations(self, benefits: List) -> Dict[str, Any]:
         """Prüft Kombinationsmöglichkeiten von Leistungen"""
@@ -416,6 +457,15 @@ class SocialBenefitsWorker(ExternalAPIWorker):
             "optimization_tips": []
         }
         
+=======
+
+    async def _check_benefit_combinations(self, benefits: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Prüft Kombinationsmöglichkeiten von Leistungen"""
+        await asyncio.sleep(0.2)
+
+        combinations: Dict[str, Any] = {"allowed_combinations": [], "exclusions": [], "optimization_tips": []}
+
+>>>>>>> Stashed changes
         benefit_names = [b["name"] for b in benefits]
         
         # Erlaubte Kombinationen
@@ -466,8 +516,14 @@ class CitizenServicesWorker(BaseWorker):
     
     def __init__(self):
         from covina_core import WorkerType
+<<<<<<< Updated upstream
         super().__init__(WorkerType.CITIZEN_SERVICES, cache_ttl=3600)  # 1 Stunde Cache
     
+=======
+
+        super().__init__(WorkerType.CITIZEN_SERVICES)
+
+>>>>>>> Stashed changes
     def _extract_location(self, query: str) -> Dict[str, Any]:
         """Extrahiert Standortinformationen aus der Anfrage"""
         location = {
@@ -486,6 +542,7 @@ class CitizenServicesWorker(BaseWorker):
             location.update({"name": "München", "state": "Bayern", "coordinates": {"lat": 48.1351, "lon": 11.5820}})
         
         return location
+<<<<<<< Updated upstream
     
     async def _process_internal(self, metadata, user_profile: Dict = None) -> Dict[str, Any]:
         """Bearbeitet Bürgerdienst-Anfragen"""
@@ -497,6 +554,20 @@ class CitizenServicesWorker(BaseWorker):
             # Zuständige Behörde identifizieren
             responsible_authority = await self._identify_responsible_authority(service_request, location)
             
+=======
+
+    async def _process_internal(self, metadata: Any, user_profile: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Bearbeitet Bürgerdienst-Anfragen"""
+
+        # `metadata` is runtime object with attribute `normalized_query`
+        service_request: Dict[str, Any] = self._extract_service_request(metadata.normalized_query)
+        location: Dict[str, Any] = self._extract_location(metadata.normalized_query)
+
+        try:
+            # Zuständige Behörde identifizieren
+            responsible_authority: Dict[str, Any] = await self._identify_responsible_authority(service_request, location)
+
+>>>>>>> Stashed changes
             # Verfahrensschritte analysieren
             process_steps = await self._analyze_process_steps(service_request)
             
@@ -659,11 +730,18 @@ class CitizenServicesWorker(BaseWorker):
         })
         
         return authority
+<<<<<<< Updated upstream
     
     async def _analyze_process_steps(self, request: Dict) -> List[Dict]:
         """Analysiert Verfahrensschritte"""
         await asyncio.sleep(0.4)
         
+=======
+
+    async def _analyze_process_steps(self, request: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """Analysiert Verfahrensschritte"""
+        await asyncio.sleep(0.4)
+>>>>>>> Stashed changes
         service_type = request.get("service_type", "general_inquiry")
         
         process_mappings = {
@@ -827,6 +905,7 @@ class CitizenServicesWorker(BaseWorker):
                 ]
             }
         }
+<<<<<<< Updated upstream
         
         requirements = document_requirements.get(service_type, {
             "mandatory": ["Personalausweis"],
@@ -835,6 +914,16 @@ class CitizenServicesWorker(BaseWorker):
         
         return requirements
     
+=======
+
+        requirements = document_requirements.get(
+            service_type, {"mandatory": ["Personalausweis"], "note": "Genaue Anforderungen bei zuständiger Behörde erfragen"}
+        )
+
+        from typing import cast
+        return cast(Dict[str, Any], requirements)
+
+>>>>>>> Stashed changes
     async def _calculate_costs_and_fees(self, request: Dict, location: Dict) -> Dict[str, Any]:
         """Berechnet Kosten und Gebühren"""
         await asyncio.sleep(0.2)
@@ -892,9 +981,15 @@ class CitizenServicesWorker(BaseWorker):
                 }
             }
         }
+<<<<<<< Updated upstream
         
         base_costs = fee_structure.get(service_type, {"standard_fee": 0.0})
         
+=======
+
+        base_costs = cast(Dict[str, Any], fee_structure.get(service_type, {"standard_fee": 0.0}))
+
+>>>>>>> Stashed changes
         # Gesamtkosten berechnen
         total_cost = base_costs.get("standard_fee", 0.0)
         
@@ -928,19 +1023,37 @@ class HealthInsuranceWorker(ExternalAPIWorker):
     
     def __init__(self):
         from covina_core import WorkerType
+<<<<<<< Updated upstream
         super().__init__(WorkerType.HEALTH_INSURANCE, "https://api.sozialamt.de/", cache_ttl=3600)  # 1 Stunde Cache
+=======
+        super().__init__(WorkerType.HEALTH_INSURANCE)
+>>>>>>> Stashed changes
         self.health_apis = {
             "gkv_central": "https://api.gkv-spitzenverband.de/",
             "insurance_finder": "https://api.krankenkassen.de/",
             "service_portal": "https://api.gesundheit.gv.at/"
         }
+<<<<<<< Updated upstream
     
     async def _process_internal(self, metadata, user_profile: Dict = None) -> Dict[str, Any]:
+=======
+
+    async def _process_internal(self, metadata: Any, user_profile: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+>>>>>>> Stashed changes
         """Bearbeitet Krankenversicherungsanfragen"""
         
         health_inquiry = self._extract_health_inquiry(metadata.normalized_query)
+<<<<<<< Updated upstream
         personal_situation = self._extract_personal_situation(metadata.normalized_query)
         
+=======
+        # Health worker may reuse personal situation extractor; provide fallback
+        if hasattr(self, "_extract_personal_situation"):
+            personal_situation = self._extract_personal_situation(metadata.normalized_query)
+        else:
+            personal_situation = {"employment_status": "unknown", "family_status": "unknown", "children_count": 0}
+
+>>>>>>> Stashed changes
         try:
             # Passende Krankenversicherung finden
             suitable_insurances = await self._find_suitable_insurances(health_inquiry, personal_situation)
@@ -1110,6 +1223,7 @@ class HealthInsuranceWorker(ExternalAPIWorker):
                 insurances.extend(pkv_options)
         
         return insurances
+<<<<<<< Updated upstream
     
     async def _compare_benefits(self, insurances: List, inquiry: Dict) -> Dict[str, Any]:
         """Vergleicht Leistungen der Krankenversicherungen"""
@@ -1122,6 +1236,17 @@ class HealthInsuranceWorker(ExternalAPIWorker):
             "recommendation_matrix": {}
         }
         
+=======
+
+    async def _compare_benefits(self, insurances: List[Dict[str, Any]], inquiry: Dict[str, Any]) -> Dict[str, Any]:
+        """Vergleicht Leistungen der Krankenversicherungen"""
+        await asyncio.sleep(0.4)
+
+        from typing import Dict as _Dict, Any as _Any
+
+        comparison: _Dict[str, _Any] = {"basic_benefits": {}, "additional_benefits": {}, "cost_comparison": {}, "recommendation_matrix": {}}
+
+>>>>>>> Stashed changes
         # Grundleistungen (bei GKV standardisiert)
         comparison["basic_benefits"] = {
             "doctor_visits": "100% bei Kassenärzten",
@@ -1180,6 +1305,7 @@ class HealthInsuranceWorker(ExternalAPIWorker):
     async def _analyze_switching_options(self, situation: Dict) -> Dict[str, Any]:
         """Analysiert Wechselmöglichkeiten"""
         await asyncio.sleep(0.3)
+<<<<<<< Updated upstream
         
         options = {
             "possible_switches": [],
@@ -1188,6 +1314,13 @@ class HealthInsuranceWorker(ExternalAPIWorker):
             "process_steps": []
         }
         
+=======
+
+        from typing import Dict as _Dict, Any as _Any
+
+        options: _Dict[str, _Any] = {"possible_switches": [], "restrictions": [], "optimal_timing": {}, "process_steps": []}
+
+>>>>>>> Stashed changes
         employment = situation.get("employment_status", "employed")
         
         # GKV zu GKV Wechsel
@@ -1243,6 +1376,7 @@ class HealthInsuranceWorker(ExternalAPIWorker):
     async def _perform_cost_analysis(self, insurances: List, situation: Dict) -> Dict[str, Any]:
         """Führt detaillierte Kostenanalyse durch"""
         await asyncio.sleep(0.3)
+<<<<<<< Updated upstream
         
         analysis = {
             "monthly_costs": {},
@@ -1251,6 +1385,13 @@ class HealthInsuranceWorker(ExternalAPIWorker):
             "cost_factors": {}
         }
         
+=======
+
+        from typing import Dict as _Dict, Any as _Any
+
+        analysis: _Dict[str, _Any] = {"monthly_costs": {}, "annual_comparison": {}, "lifetime_projection": {}, "cost_factors": {}}
+
+>>>>>>> Stashed changes
         # Beispiel-Einkommen für Berechnung
         example_income = 4000  # Euro brutto
         

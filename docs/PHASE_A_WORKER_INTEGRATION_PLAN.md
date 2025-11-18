@@ -1,15 +1,15 @@
 # 🔧 PHASE A: WORKER-INTEGRATION - Detaillierter Plan
 
-**Projekt**: VERITAS Worker-Integration  
-**Zeitrahmen**: 2 Wochen (10 Arbeitstage)  
-**Budget**: €6,400 (80 Stunden × €80/h)  
+**Projekt**: VERITAS Worker-Integration
+**Zeitrahmen**: 2 Wochen (10 Arbeitstage)
+**Budget**: €6,400 (80 Stunden × €80/h)
 **Ziel**: 15+ vorhandene spezialisierte Workers in Intelligent Pipeline integrieren
 
 ---
 
 ## 🎯 MISSION
 
-**Problem**: 
+**Problem**:
 - 15+ spezialisierte Worker-Klassen sind implementiert
 - Intelligent Pipeline nutzt generische Agent-Typen
 - Agent Registry System existiert, wird nicht genutzt
@@ -19,7 +19,7 @@
 - Worker-Mapping in Pipeline integrieren
 - Agent Registry für Dynamic Discovery aktivieren
 
-**Impact**: 
+**Impact**:
 - Von 8 generischen zu 15+ spezialisierten Workers
 - Bessere Query-Antworten durch Spezialisierung
 - Basis für weitere Worker-Erweiterungen
@@ -175,24 +175,24 @@ class WorkerInfo:
 class WorkerRegistry:
     """
     Central registry for all specialized workers
-    
+
     Usage:
         registry = WorkerRegistry()
         worker = registry.get_worker("BuildingPermitWorker")
         result = await worker.execute(query, context)
     """
-    
+
     def __init__(self, db_pool=None, api_config=None):
         self.db_pool = db_pool
         self.api_config = api_config
         self.workers: Dict[str, WorkerInfo] = {}
         self.initialized_workers: Dict[str, Any] = {}
-        
+
         self._register_all_workers()
-    
+
     def _register_all_workers(self):
         """Register all available workers"""
-        
+
         # Construction Workers
         try:
             from backend.agents.veritas_api_agent_construction import (
@@ -200,8 +200,8 @@ class WorkerRegistry:
                 UrbanPlanningWorker,
                 HeritageProtectionWorker
             )
-            self._register_worker("BuildingPermitWorker", WorkerDomain.CONSTRUCTION, 
-                                 ["building_permit", "construction", "legal"], 
+            self._register_worker("BuildingPermitWorker", WorkerDomain.CONSTRUCTION,
+                                 ["building_permit", "construction", "legal"],
                                  BuildingPermitWorker, requires_db=True)
             self._register_worker("UrbanPlanningWorker", WorkerDomain.CONSTRUCTION,
                                  ["urban_planning", "zoning", "construction"],
@@ -212,7 +212,7 @@ class WorkerRegistry:
             logger.info("✅ Construction Workers registered")
         except ImportError as e:
             logger.warning(f"⚠️ Construction Workers nicht verfügbar: {e}")
-        
+
         # Environmental Worker
         try:
             from backend.agents.veritas_api_agent_environmental import EnvironmentalAgent
@@ -222,7 +222,7 @@ class WorkerRegistry:
             logger.info("✅ Environmental Worker registered")
         except ImportError as e:
             logger.warning(f"⚠️ Environmental Worker nicht verfügbar: {e}")
-        
+
         # Traffic Workers
         try:
             from backend.agents.veritas_api_agent_traffic import (
@@ -242,7 +242,7 @@ class WorkerRegistry:
             logger.info("✅ Traffic Workers registered")
         except ImportError as e:
             logger.warning(f"⚠️ Traffic Workers nicht verfügbar: {e}")
-        
+
         # Social Workers
         try:
             from backend.agents.veritas_api_agent_social import (
@@ -262,7 +262,7 @@ class WorkerRegistry:
             logger.info("✅ Social Workers registered")
         except ImportError as e:
             logger.warning(f"⚠️ Social Workers nicht verfügbar: {e}")
-        
+
         # Financial Workers
         try:
             from backend.agents.veritas_api_agent_financial import (
@@ -282,7 +282,7 @@ class WorkerRegistry:
             logger.info("✅ Financial Workers registered")
         except ImportError as e:
             logger.warning(f"⚠️ Financial Workers nicht verfügbar: {e}")
-        
+
         # Specialized Agents
         try:
             from backend.agents.veritas_api_agent_chemical_data import ChemicalDataAgent
@@ -292,7 +292,7 @@ class WorkerRegistry:
             logger.info("✅ Chemical Data Agent registered")
         except ImportError as e:
             logger.warning(f"⚠️ Chemical Data Agent nicht verfügbar: {e}")
-        
+
         try:
             from backend.agents.veritas_api_agent_dwd_weather import DwdWeatherAgent
             self._register_worker("DwdWeatherAgent", WorkerDomain.SPECIALIZED,
@@ -301,7 +301,7 @@ class WorkerRegistry:
             logger.info("✅ DWD Weather Agent registered")
         except ImportError as e:
             logger.warning(f"⚠️ DWD Weather Agent nicht verfügbar: {e}")
-        
+
         try:
             from backend.agents.veritas_api_agent_technical_standards import TechnicalStandardsAgent
             self._register_worker("TechnicalStandardsAgent", WorkerDomain.SPECIALIZED,
@@ -310,7 +310,7 @@ class WorkerRegistry:
             logger.info("✅ Technical Standards Agent registered")
         except ImportError as e:
             logger.warning(f"⚠️ Technical Standards Agent nicht verfügbar: {e}")
-        
+
         try:
             from backend.agents.veritas_api_agent_wikipedia import WikipediaAgent
             self._register_worker("WikipediaAgent", WorkerDomain.SPECIALIZED,
@@ -319,7 +319,7 @@ class WorkerRegistry:
             logger.info("✅ Wikipedia Agent registered")
         except ImportError as e:
             logger.warning(f"⚠️ Wikipedia Agent nicht verfügbar: {e}")
-        
+
         try:
             from backend.agents.veritas_api_agent_atmospheric_flow import AtmosphericFlowAgent
             self._register_worker("AtmosphericFlowAgent", WorkerDomain.SPECIALIZED,
@@ -328,7 +328,7 @@ class WorkerRegistry:
             logger.info("✅ Atmospheric Flow Agent registered")
         except ImportError as e:
             logger.warning(f"⚠️ Atmospheric Flow Agent nicht verfügbar: {e}")
-        
+
         try:
             from backend.agents.veritas_api_agent_database import DatabaseAgent
             self._register_worker("DatabaseAgent", WorkerDomain.CORE,
@@ -337,10 +337,10 @@ class WorkerRegistry:
             logger.info("✅ Database Agent registered")
         except ImportError as e:
             logger.warning(f"⚠️ Database Agent nicht verfügbar: {e}")
-        
+
         logger.info(f"📊 Worker Registry: {len(self.workers)} workers registered")
-    
-    def _register_worker(self, worker_id: str, domain: WorkerDomain, 
+
+    def _register_worker(self, worker_id: str, domain: WorkerDomain,
                          capabilities: List[str], class_ref: Type,
                          requires_db: bool = False, requires_api: bool = False):
         """Register a worker"""
@@ -352,57 +352,57 @@ class WorkerRegistry:
             requires_db=requires_db,
             requires_api=requires_api
         )
-    
+
     def get_worker(self, worker_id: str) -> Optional[Any]:
         """Get initialized worker instance"""
         if worker_id in self.initialized_workers:
             return self.initialized_workers[worker_id]
-        
+
         if worker_id not in self.workers:
             logger.warning(f"⚠️ Worker '{worker_id}' nicht registriert")
             return None
-        
+
         worker_info = self.workers[worker_id]
-        
+
         try:
             # Initialize worker with available resources
             if worker_info.requires_db and not self.db_pool:
                 logger.warning(f"⚠️ Worker '{worker_id}' benötigt DB, aber keine verfügbar")
                 return None
-            
+
             if worker_info.requires_api and not self.api_config:
                 logger.warning(f"⚠️ Worker '{worker_id}' benötigt API Config, aber keine verfügbar")
                 # Nicht kritisch, Worker kann Mock-Daten nutzen
-            
+
             # Instantiate worker
             worker_instance = worker_info.class_reference(
                 db_pool=self.db_pool if worker_info.requires_db else None
             )
-            
+
             self.initialized_workers[worker_id] = worker_instance
             worker_info.initialized = True
-            
+
             logger.info(f"✅ Worker '{worker_id}' initialisiert")
             return worker_instance
-            
+
         except Exception as e:
             logger.error(f"❌ Worker '{worker_id}' Initialisierung fehlgeschlagen: {e}")
             return None
-    
+
     def get_workers_by_capability(self, capability: str) -> List[str]:
         """Get worker IDs that have a specific capability"""
         return [
             worker_id for worker_id, info in self.workers.items()
             if capability.lower() in [c.lower() for c in info.capabilities]
         ]
-    
+
     def get_workers_by_domain(self, domain: WorkerDomain) -> List[str]:
         """Get all worker IDs in a domain"""
         return [
             worker_id for worker_id, info in self.workers.items()
             if info.domain == domain
         ]
-    
+
     def list_available_workers(self) -> Dict[str, Any]:
         """List all registered workers with status"""
         return {
@@ -443,7 +443,7 @@ self.worker_registry = get_worker_registry(db_pool=db_pool)
 # Update _step_agent_selection() (Zeile 600-700):
 def _enhanced_agent_mapping(self, domain: str, query: str) -> List[str]:
     """Map domain to specialized workers instead of generic agents"""
-    
+
     domain_worker_mapping = {
         "building": [
             "BuildingPermitWorker",
@@ -469,9 +469,9 @@ def _enhanced_agent_mapping(self, domain: str, query: str) -> List[str]:
             "BusinessTaxOptimizationWorker"
         ],
     }
-    
+
     workers = domain_worker_mapping.get(domain, [])
-    
+
     # Add specialized agents based on query keywords
     if "wetter" in query.lower() or "weather" in query.lower():
         workers.append("DwdWeatherAgent")
@@ -479,7 +479,7 @@ def _enhanced_agent_mapping(self, domain: str, query: str) -> List[str]:
         workers.append("TechnicalStandardsAgent")
     if "chemisch" in query.lower() or "gefahrstoff" in query.lower():
         workers.append("ChemicalDataAgent")
-    
+
     return workers
 ```
 
@@ -502,10 +502,10 @@ logger.info(f"✅ Worker Registry: {len(worker_registry.workers)} workers verfü
 # Update _select_agents_for_query() (Zeile 1129-1150):
 def _select_agents_for_query(query: str, complexity: str, domain: str) -> List[str]:
     """Wählt spezialisierte Workers basierend auf Query aus"""
-    
+
     # Use WorkerRegistry for domain-based selection
     registry = get_worker_registry()
-    
+
     domain_mapping = {
         'building': WorkerDomain.CONSTRUCTION,
         'environmental': WorkerDomain.ENVIRONMENTAL,
@@ -513,21 +513,21 @@ def _select_agents_for_query(query: str, complexity: str, domain: str) -> List[s
         'business': WorkerDomain.FINANCIAL,
         'social': WorkerDomain.SOCIAL
     }
-    
+
     selected_workers = []
-    
+
     # Get workers for domain
     if domain in domain_mapping:
         selected_workers = registry.get_workers_by_domain(domain_mapping[domain])
-    
+
     # Add core workers
     selected_workers.extend(['geo_context', 'legal_framework', 'document_retrieval'])
-    
+
     # Complexity-based extension
     if complexity == 'advanced':
         # Add more specialized workers for complex queries
         selected_workers.append('DatabaseAgent')
-    
+
     return list(set(selected_workers))  # Remove duplicates
 ```
 
@@ -562,7 +562,7 @@ from backend.agents.worker_registry import (
 def test_worker_registry_initialization():
     """Test registry initialization"""
     registry = WorkerRegistry()
-    
+
     assert len(registry.workers) > 0
     assert len(registry.workers) >= 15  # At least 15 workers
     print(f"✅ {len(registry.workers)} workers registered")
@@ -570,12 +570,12 @@ def test_worker_registry_initialization():
 def test_get_workers_by_domain():
     """Test domain-based worker retrieval"""
     registry = WorkerRegistry()
-    
+
     construction_workers = registry.get_workers_by_domain(WorkerDomain.CONSTRUCTION)
     assert len(construction_workers) >= 3
     assert "BuildingPermitWorker" in construction_workers
     print(f"✅ Construction workers: {construction_workers}")
-    
+
     traffic_workers = registry.get_workers_by_domain(WorkerDomain.TRAFFIC)
     assert len(traffic_workers) >= 3
     print(f"✅ Traffic workers: {traffic_workers}")
@@ -583,11 +583,11 @@ def test_get_workers_by_domain():
 def test_get_workers_by_capability():
     """Test capability-based worker retrieval"""
     registry = WorkerRegistry()
-    
+
     building_capable = registry.get_workers_by_capability("building_permit")
     assert len(building_capable) >= 1
     print(f"✅ Building permit capable: {building_capable}")
-    
+
     traffic_capable = registry.get_workers_by_capability("traffic")
     assert len(traffic_capable) >= 1
     print(f"✅ Traffic capable: {traffic_capable}")
@@ -595,10 +595,10 @@ def test_get_workers_by_capability():
 def test_worker_initialization():
     """Test worker instantiation"""
     registry = WorkerRegistry()
-    
+
     # Try to initialize a worker
     worker = registry.get_worker("BuildingPermitWorker")
-    
+
     if worker is None:
         print("⚠️ Worker needs DB, testing without DB")
     else:
@@ -608,28 +608,28 @@ def test_worker_initialization():
 def test_list_available_workers():
     """Test worker listing"""
     registry = WorkerRegistry()
-    
+
     workers_list = registry.list_available_workers()
     assert len(workers_list) >= 15
-    
+
     for worker_id, info in workers_list.items():
         assert "domain" in info
         assert "capabilities" in info
         assert "initialized" in info
         print(f"  {worker_id}: {info['domain']} - {len(info['capabilities'])} capabilities")
-    
+
     print(f"✅ {len(workers_list)} workers listed")
 
 if __name__ == "__main__":
     print("WORKER REGISTRY TESTS")
     print("=" * 80)
-    
+
     test_worker_registry_initialization()
     test_get_workers_by_domain()
     test_get_workers_by_capability()
     test_worker_initialization()
     test_list_available_workers()
-    
+
     print("\n✅ All tests passed!")
 ```
 
@@ -657,58 +657,58 @@ from backend.agents.veritas_intelligent_pipeline import (
 @pytest.mark.asyncio
 async def test_building_query_with_specialized_workers():
     """Test building-related query with specialized workers"""
-    
+
     pipeline = IntelligentMultiAgentPipeline()
-    
+
     request = IntelligentPipelineRequest(
         query_text="Wie beantrage ich eine Baugenehmigung in München?",
         query_id="test-building-001",
         user_context={"location": "Munich"}
     )
-    
+
     result = await pipeline.process_query(request)
-    
+
     assert result is not None
     assert "confidence" in result
     assert result["confidence"] > 0.5
-    
+
     # Check if specialized workers were used
     agent_results = result.get("agent_results", {})
     worker_types = [r.get("worker_type") for r in agent_results.values()]
-    
+
     # Should contain at least one Construction worker
     construction_workers = [
-        w for w in worker_types 
+        w for w in worker_types
         if "BuildingPermit" in w or "UrbanPlanning" in w or "HeritageProtection" in w
     ]
-    
+
     assert len(construction_workers) > 0, "No specialized construction workers used!"
     print(f"✅ Specialized workers used: {construction_workers}")
 
 @pytest.mark.asyncio
 async def test_traffic_query_with_specialized_workers():
     """Test traffic-related query with specialized workers"""
-    
+
     pipeline = IntelligentMultiAgentPipeline()
-    
+
     request = IntelligentPipelineRequest(
         query_text="Wie ist die aktuelle Verkehrslage auf der A9?",
         query_id="test-traffic-001"
     )
-    
+
     result = await pipeline.process_query(request)
-    
+
     assert result is not None
-    
+
     # Check for traffic workers
     agent_results = result.get("agent_results", {})
     worker_types = [r.get("worker_type") for r in agent_results.values()]
-    
+
     traffic_workers = [
         w for w in worker_types
         if "Traffic" in w or "PublicTransport" in w or "Parking" in w
     ]
-    
+
     assert len(traffic_workers) > 0, "No specialized traffic workers used!"
     print(f"✅ Traffic workers used: {traffic_workers}")
 
@@ -745,25 +745,25 @@ async def benchmark_query(query: str, iterations: int = 5) -> dict:
         IntelligentMultiAgentPipeline,
         IntelligentPipelineRequest
     )
-    
+
     pipeline = IntelligentMultiAgentPipeline()
     times: List[float] = []
-    
+
     for i in range(iterations):
         start = time.time()
-        
+
         request = IntelligentPipelineRequest(
             query_text=query,
             query_id=f"perf-{i}"
         )
-        
+
         result = await pipeline.process_query(request)
-        
+
         elapsed = time.time() - start
         times.append(elapsed)
-        
+
         print(f"  Iteration {i+1}: {elapsed:.2f}s")
-    
+
     return {
         "query": query,
         "mean": statistics.mean(times),
@@ -776,7 +776,7 @@ async def benchmark_query(query: str, iterations: int = 5) -> dict:
 async def main():
     print("WORKER PERFORMANCE BENCHMARKS")
     print("=" * 80)
-    
+
     queries = [
         "Baugenehmigung für Einfamilienhaus in München",
         "Aktuelle Verkehrslage auf der A9",
@@ -784,21 +784,21 @@ async def main():
         "Steueroptimierung für GmbH",
         "Umweltauflagen für Industriebetrieb"
     ]
-    
+
     results = []
     for query in queries:
         print(f"\nBenchmarking: {query}")
         result = await benchmark_query(query, iterations=3)
         results.append(result)
-    
+
     print("\n\nSUMMARY")
     print("=" * 80)
     for r in results:
         print(f"{r['query'][:50]:50s} | {r['mean']:6.2f}s ± {r['stdev']:5.2f}s")
-    
+
     overall_mean = statistics.mean([r['mean'] for r in results])
     print(f"\nOverall Mean: {overall_mean:.2f}s")
-    
+
     if overall_mean < 30:
         print("✅ Performance: EXCELLENT (<30s)")
     elif overall_mean < 45:

@@ -1,6 +1,6 @@
 # VERITAS Agent System - Umfassende Analyse
-**Datum**: 16. Oktober 2025  
-**Scope**: `backend/agents/` Verzeichnis  
+**Datum**: 16. Oktober 2025
+**Scope**: `backend/agents/` Verzeichnis
 **Ziel**: Prüfung des Agentensystems und Integration mit Backend API
 
 ---
@@ -84,7 +84,7 @@ DEFAULT_AGENT_CAPS = {
 
 **Klassen**:
 - `BaseEnvironmentalAgent` (ABC)
-- `EnvironmentalAgent` 
+- `EnvironmentalAgent`
 - `EnvironmentalAgentConfig`
 
 **Features**:
@@ -261,7 +261,7 @@ from backend.agents.veritas_supervisor_agent import SupervisorAgent
 ```python
 # Zeile 78-82: NUR Intelligent Pipeline wird importiert
 from backend.agents.veritas_intelligent_pipeline import (
-    IntelligentMultiAgentPipeline, 
+    IntelligentMultiAgentPipeline,
     IntelligentPipelineRequest,
     IntelligentPipelineResponse
 )
@@ -357,7 +357,7 @@ def _generate_agent_result(agent_type: str, query: str, complexity: str):
 
 ### Hypothesen:
 
-1. **Entwicklungs-Phase**: 
+1. **Entwicklungs-Phase**:
    - Real Agents wurden entwickelt
    - Mock-System für Quick-Prototyping erstellt
    - Migration nie abgeschlossen
@@ -427,7 +427,7 @@ agent_registry.register_agent('environmental', EnvironmentalAgent)
 ```python
 def _generate_agent_result(agent_type: str, query: str, complexity: str):
     # ALT: Hardcoded Dictionary
-    
+
     # NEU: Echter Agent-Call
     agent = agent_registry.get_agent(agent_type)
     if agent:

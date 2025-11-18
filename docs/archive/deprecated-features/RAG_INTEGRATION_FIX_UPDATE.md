@@ -1,6 +1,6 @@
 # RAG Integration Fix - Update
 
-**Datum:** 05.10.2025, 20:42 Uhr  
+**Datum:** 05.10.2025, 20:42 Uhr
 **Status:** ✅ Fix aktualisiert
 
 ## Problem-Update
@@ -33,14 +33,14 @@ logging.info("✅ RAG Integration (UDS3) verfügbar")
 except ImportError as e:
     RAG_INTEGRATION_AVAILABLE = False
     logging.warning(f"⚠️ RAG Integration läuft im Mock-Modus: {e}")
-    
+
     # Mock-Klassen für Fallback
     class UnifiedDatabaseStrategy:
         def __init__(self):
             pass
         def unified_query(self, query_text, strategy_weights):
             return None
-    
+
     def get_optimized_unified_strategy():
         return None
 ```
@@ -243,6 +243,6 @@ curl http://localhost:5000/capabilities | jq '.features'
 
 ---
 
-**Status:** ✅ Fix korrigiert und vereinfacht  
-**Backend-Neustart:** Erforderlich  
+**Status:** ✅ Fix korrigiert und vereinfacht
+**Backend-Neustart:** Erforderlich
 **Erwartete Logs:** "✅ RAG Integration (UDS3) verfügbar" + "✅ UDS3 Strategy initialisiert"

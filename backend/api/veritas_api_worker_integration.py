@@ -110,9 +110,9 @@ class VeritasWorkerRegistry:
     """Registry für alle verfügbaren Worker"""
     
     def __init__(self):
-        self.workers = {}
-        self.worker_status = {}
-        self.worker_metrics = {}
+        self.workers: Dict[str, Any] = {}
+        self.worker_status: Dict[str, Any] = {}
+        self.worker_metrics: Dict[str, Any] = {}
         self.agent_engine = None
         
         if AGENT_CORE_AVAILABLE:

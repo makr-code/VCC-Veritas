@@ -107,12 +107,17 @@ class UDS3VectorSearchAdapter:
         
         try:
             # Call UDS3 query_across_databases
+            vector_params: Dict[str, Any] = {"query_text": query, "top_k": top_k, "threshold": threshold}
             result = self.uds3.query_across_databases(
+<<<<<<< Updated upstream
                 vector_params={
                     "query_text": query,
                     "top_k": top_k,
                     "threshold": threshold
                 },
+=======
+                vector_params=vector_params,
+>>>>>>> Stashed changes
                 graph_params=None,
                 relational_params=None,
                 join_strategy="union",
@@ -163,8 +168,13 @@ class UDS3VectorSearchAdapter:
         Returns:
             Liste von Dokumenten
         """
+<<<<<<< Updated upstream
         documents = []
         
+=======
+        documents: List[Dict[str, Any]] = []
+
+>>>>>>> Stashed changes
         try:
             # Check if successful
             if not polyglot_result or not hasattr(polyglot_result, 'success'):

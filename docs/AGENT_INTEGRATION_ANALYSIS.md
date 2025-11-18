@@ -1,7 +1,7 @@
 # Agent System Integration Analysis - v7.0
 
-**Date:** 13. Oktober 2025, 03:00 Uhr  
-**Status:** 🔍 **INTEGRATION ANALYSIS**  
+**Date:** 13. Oktober 2025, 03:00 Uhr
+**Status:** 🔍 **INTEGRATION ANALYSIS**
 **Goal:** Agent-System ↔ UnifiedOrchestratorV7 Integration
 
 ---
@@ -126,7 +126,7 @@ Query
   ├─ Agent Selection                 ├─ Scientific Phases
   ├─ Parallel Execution              └─ Final Answer
   └─ Result Aggregation
-  
+
 ❌ No communication!
 ```
 
@@ -163,11 +163,11 @@ UnifiedOrchestratorV7 (Coordinator)
 class PhaseExecutionContext:
     user_query: str
     rag_results: Dict[str, Any]  # ✅ From UDS3
-    
+
     # Previous phase results
     hypothesis: Optional[Dict[str, Any]] = None
     # ...
-    
+
     # ❌ MISSING: agent_results: Dict[str, Any]
 ```
 
@@ -178,7 +178,7 @@ class PhaseExecutionContext:
     user_query: str
     rag_results: Dict[str, Any]  # From UDS3
     agent_results: Dict[str, Any]  # ← NEW! From specialized agents
-    
+
     # Previous phase results
     hypothesis: Optional[Dict[str, Any]] = None
     # ...
@@ -197,16 +197,16 @@ Agent Results (should be added):
   - Environmental Agent: Photovoltaik als privilegierte Nutzung
   - Weather Agent: Solar radiation data (München 1,200 kWh/m²/a)
   - Financial Agent: Kosten 5,000-15,000 EUR, ROI 8-12 Jahre
-  
+
 Scientific Phases (need BOTH RAG + Agent data):
   Phase 1: Hypothesis
     Input: RAG + Agent Results
     Output: "Carport <30m² verfahrensfrei, PV-Anlage privilegiert"
-  
+
   Phase 2: Synthesis
     Input: RAG + Agent Results + Phase 1
     Output: Evidence clusters (legal + environmental + financial)
-  
+
   # ...
 ```
 
@@ -351,7 +351,7 @@ def __init__(
     enable_streaming: bool = True
 ):
     # ...
-    
+
     # Initialize Agent Orchestrator
     if agent_orchestrator is None:
         try:
@@ -376,18 +376,18 @@ async def _coordinate_agents(
 ) -> Dict[str, Any]:
     """
     Coordinate specialized agents based on scientific phase results
-    
+
     Strategy:
     - Phase 1 (Hypothesis) identifies missing_information
     - Map missing_information → Agent Capabilities
     - Spawn relevant agents
     - Collect results
-    
+
     Args:
         user_query: Original query
         phase_results: Results from Phase 1-6
         rag_results: RAG search results
-        
+
     Returns:
         {
             'construction': {...},      # If building query
@@ -399,25 +399,25 @@ async def _coordinate_agents(
     if not self.agent_orchestrator:
         logger.warning("⚠️ Agent Orchestrator not available - skipping")
         return {}
-    
+
     start_time = time.time()
-    
+
     # Extract missing_information from Phase 1 (Hypothesis)
     hypothesis_result = phase_results.get('phase1_hypothesis')
     if not hypothesis_result:
         return {}
-    
+
     missing_info = hypothesis_result.output.get('missing_information', [])
-    
+
     # Map missing_information → Agent Types
     agent_requirements = self._map_missing_info_to_agents(missing_info)
-    
+
     if not agent_requirements:
         logger.info("ℹ️ No agents required (all info in RAG)")
         return {}
-    
+
     logger.info(f"🤖 Spawning agents: {list(agent_requirements.keys())}")
-    
+
     # Execute agents via AgentOrchestrator
     agent_results = {}
     for agent_type, capability in agent_requirements.items():
@@ -432,12 +432,12 @@ async def _coordinate_agents(
         except Exception as e:
             logger.error(f"❌ Agent {agent_type} failed: {e}")
             agent_results[agent_type] = {'error': str(e), 'status': 'failed'}
-    
+
     execution_time = (time.time() - start_time) * 1000
     agent_results['execution_time_ms'] = execution_time
-    
+
     logger.info(f"✅ Agents completed: {len(agent_results)} results, {execution_time:.0f}ms")
-    
+
     return agent_results
 
 
@@ -447,14 +447,14 @@ def _map_missing_info_to_agents(
 ) -> Dict[str, str]:
     """
     Map missing_information from Phase 1 → Agent Types
-    
+
     Example missing_info:
     [
         {"type": "user_input", "description": "Grundfläche Carport", "impact": "critical"},
         {"type": "data", "description": "Solarstrahlung München", "impact": "high"},
         {"type": "expertise", "description": "Kostenabschätzung PV-Anlage", "impact": "medium"}
     ]
-    
+
     Returns:
     {
         'construction': 'BUILDING_PERMIT_PROCESSING',
@@ -463,27 +463,27 @@ def _map_missing_info_to_agents(
     }
     """
     agent_requirements = {}
-    
+
     # Keyword-based mapping (simple heuristic)
     for item in missing_info:
         desc = item.get('description', '').lower()
-        
+
         # Building/Construction
         if any(kw in desc for kw in ['baugenehmigung', 'grundfläche', 'grenzabstand', 'carport', 'garage']):
             agent_requirements['construction'] = 'BUILDING_PERMIT_PROCESSING'
-        
+
         # Weather/Environmental
         if any(kw in desc for kw in ['solarstrahlung', 'wetter', 'wind', 'temperatur', 'luftqualität']):
             agent_requirements['weather'] = 'REAL_TIME_DATA_ACCESS'
-        
+
         # Financial
         if any(kw in desc for kw in ['kosten', 'preis', 'finanzierung', 'förderung', 'rentabilität']):
             agent_requirements['financial'] = 'FINANCIAL_IMPACT_ANALYSIS'
-        
+
         # Transport
         if any(kw in desc for kw in ['öpnv', 'verkehr', 'bus', 'bahn', 'fahrplan']):
             agent_requirements['transport'] = 'TRANSPORT_DATA_PROCESSING'
-    
+
     return agent_requirements
 
 
@@ -496,11 +496,11 @@ async def _execute_single_agent(
 ) -> Dict[str, Any]:
     """
     Execute single specialized agent
-    
+
     Delegates to AgentOrchestrator.preprocess_query()
     """
     from backend.agents.veritas_shared_enums import QueryDomain, QueryComplexity
-    
+
     # Map agent_type → QueryDomain
     domain_mapping = {
         'construction': QueryDomain.BUILDING,
@@ -509,17 +509,17 @@ async def _execute_single_agent(
         'financial': QueryDomain.BUSINESS,
         'transport': QueryDomain.TRANSPORT
     }
-    
+
     query_data = {
         'query': query,
         'user_context': context,
         'complexity': QueryComplexity.STANDARD,
         'domain': domain_mapping.get(agent_type, QueryDomain.ENVIRONMENTAL)
     }
-    
+
     # Call AgentOrchestrator
     result = self.agent_orchestrator.preprocess_query(query_data)
-    
+
     return result
 ```
 
@@ -531,29 +531,29 @@ async def process_query(self, query: str) -> OrchestratorResult:
     Process Query (updated with Agent Coordination)
     """
     start_time = time.time()
-    
+
     # 1. RAG Search
     rag_results = await self._collect_rag_results(query)
-    
+
     # 2. Scientific Phases (6x Ollama)
     phase_results = await self._execute_scientific_phases(
         query=query,
         rag_results=rag_results
     )
-    
+
     # 3. Agent Coordination (NEW!)
     agent_results = await self._coordinate_agents(
         user_query=query,
         phase_results=phase_results,
         rag_results=rag_results
     )
-    
+
     # 4. Final Synthesis (combine Phase 6 + Agent Results)
     final_answer = self._synthesize_final_answer(
         phase_results=phase_results,
         agent_results=agent_results
     )
-    
+
     # ...
 ```
 
@@ -569,7 +569,7 @@ class PhaseExecutionContext:
     user_query: str
     rag_results: Dict[str, Any]
     agent_results: Dict[str, Any] = field(default_factory=dict)  # NEW!
-    
+
     # Previous phase results
     hypothesis: Optional[Dict[str, Any]] = None
     # ...
@@ -582,11 +582,11 @@ class PhaseExecutionContext:
 
 def _construct_prompt(...):
     # ...
-    
+
     # 6. Template Variables
     if template_vars.get('agent_results'):
         prompt_parts.append(f"\n## Agent Results (External Data)\n```json\n{json.dumps(template_vars['agent_results'], indent=2)}\n```\n")
-    
+
     # ...
 ```
 
@@ -706,9 +706,9 @@ BEFORE:
 "Nach § 50 LBO BW ist ein Carport bis 30m² verfahrensfrei."
 
 AFTER (with Agent data):
-"Nach § 50 LBO BW ist ein Carport bis 30m² verfahrensfrei. 
-Für München (1,200 kWh/m²/a Solarstrahlung) ist eine 
-Photovoltaikanlage sinnvoll mit Kosten von 5,000-15,000 EUR 
+"Nach § 50 LBO BW ist ein Carport bis 30m² verfahrensfrei.
+Für München (1,200 kWh/m²/a Solarstrahlung) ist eine
+Photovoltaikanlage sinnvoll mit Kosten von 5,000-15,000 EUR
 und ROI von 8-12 Jahren (800 EUR/Jahr Ersparnis)."
 ```
 
@@ -804,6 +804,6 @@ und ROI von 8-12 Jahren (800 EUR/Jahr Ersparnis)."
 
 ---
 
-**Author:** VERITAS v7.0 Integration Analysis  
-**Date:** 13. Oktober 2025, 03:00 Uhr  
+**Author:** VERITAS v7.0 Integration Analysis
+**Date:** 13. Oktober 2025, 03:00 Uhr
 **Status:** Analysis Complete, Awaiting Decision

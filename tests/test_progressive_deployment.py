@@ -9,17 +9,17 @@ Expected Behavior:
 - Execution time: 44-62s
 - Mock agent selection/execution
 """
-import sys
-import os
 import json
+import os
+import sys
 import time
 from pathlib import Path
 
 # Setup paths
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
-sys.path.insert(0, str(project_root / 'backend'))
-sys.path.insert(0, str(project_root / 'backend' / 'orchestration'))
+sys.path.insert(0, str(project_root / "backend"))
+sys.path.insert(0, str(project_root / "backend" / "orchestration"))
 
 print("=" * 80)
 print("PROGRESSIVE DEPLOYMENT TEST - Phase 2")
@@ -28,21 +28,22 @@ print("=" * 80)
 # Test 1: Verify Configuration
 print("\n[Test 1/5] Verifying Configuration...")
 config_path = project_root / "config" / "scientific_methods" / "default_method.json"
-with open(config_path, 'r', encoding='utf-8') as f:
+with open(config_path, "r", encoding="utf-8") as f:
     config = json.load(f)
 
 print(f"  ✅ Config Version: {config.get('version')}")
 print(f"  ✅ Supervisor Enabled: {config.get('supervisor_enabled')}")
 print(f"  ✅ Total Phases in Config: {len(config.get('phases', []))}")
 
-assert config.get('version') == '2.0.0', "Config version should be 2.0.0"
-assert config.get('supervisor_enabled') == True, "Supervisor should be ENABLED for progressive deployment"
+assert config.get("version") == "2.0.0", "Config version should be 2.0.0"
+assert config.get("supervisor_enabled") == True, "Supervisor should be ENABLED for progressive deployment"
 print("  ✅ Configuration correct for Progressive Mode")
 
 # Test 2: Import Orchestrator
 print("\n[Test 2/5] Importing Orchestrator...")
 try:
     from unified_orchestrator_v7 import UnifiedOrchestratorV7
+
     print("  ✅ UnifiedOrchestratorV7 imported successfully")
 except ImportError as e:
     print(f"  ❌ Import failed: {e}")
@@ -56,24 +57,25 @@ try:
         method_id="default_method",
         uds3_strategy=None,  # Will use mock
         ollama_client=None,  # Will use mock
-        agent_orchestrator=None  # Mock agents (Phase 2)
+        agent_orchestrator=None,  # Mock agents (Phase 2)
     )
     print("  ✅ Orchestrator initialized")
-    
+
     # Check supervisor status
     supervisor_enabled = orchestrator._is_supervisor_enabled()
     print(f"  ✅ Supervisor Enabled (Runtime): {supervisor_enabled}")
     assert supervisor_enabled == True, "Supervisor should be enabled at runtime"
-    
+
     # Check if supervisor was initialized
-    if hasattr(orchestrator, 'supervisor_agent'):
+    if hasattr(orchestrator, "supervisor_agent"):
         print("  ✅ SupervisorAgent initialized")
     else:
         print("  ⚠️  SupervisorAgent not yet initialized (lazy loading)")
-    
+
 except Exception as e:
     print(f"  ❌ Initialization failed: {e}")
     import traceback
+
     traceback.print_exc()
     sys.exit(1)
 
@@ -81,16 +83,16 @@ except Exception as e:
 print("\n[Test 4/5] Phase Execution Flow (Dry Run)...")
 print("  Checking which phases would execute...")
 
-phases = config.get('phases', [])
+phases = config.get("phases", [])
 expected_phases = []
 supervisor_phases = []
 
 for phase in phases:
-    phase_num = phase.get('phase_number')
-    phase_id = phase.get('phase_id')
-    executor = phase.get('execution', {}).get('executor', 'llm')
-    
-    if executor in ['supervisor', 'agent_coordinator']:
+    phase_num = phase.get("phase_number")
+    phase_id = phase.get("phase_id")
+    executor = phase.get("execution", {}).get("executor", "llm")
+
+    if executor in ["supervisor", "agent_coordinator"]:
         supervisor_phases.append(phase_num)
         print(f"    ✅ Phase {phase_num} ({phase_id}): Will execute (SUPERVISOR)")
     else:
@@ -107,12 +109,12 @@ assert len(supervisor_phases) == 3, f"Expected 3 supervisor phases, got {len(sup
 # Test 5: Verify Supervisor Methods
 print("\n[Test 5/5] Verifying Supervisor Methods...")
 method_checks = [
-    '_is_supervisor_enabled',
-    '_ensure_supervisor_initialized',
-    '_map_inputs',
-    '_infer_complexity',
-    '_execute_supervisor_phase',
-    '_execute_agent_coordination_phase'
+    "_is_supervisor_enabled",
+    "_ensure_supervisor_initialized",
+    "_map_inputs",
+    "_infer_complexity",
+    "_execute_supervisor_phase",
+    "_execute_agent_coordination_phase",
 ]
 
 missing_methods = []

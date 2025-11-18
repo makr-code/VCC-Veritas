@@ -38,7 +38,7 @@ Welche Unterlagen benötige ich dafür?
 ```
 
 **Erwartung**:
-- ✅ Streaming-Antwort wird angezeigt  
+- ✅ Streaming-Antwort wird angezeigt
 - ✅ 4 Stage Reflections (falls aktiviert)
 - ✅ **Gesprächskontext** Abschnitt sollte erscheinen:
 

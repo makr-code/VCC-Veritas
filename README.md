@@ -25,7 +25,7 @@ python start_frontend.py
 curl http://localhost:5000/api/feedback/health
 ```
 
-**📖 Vollständige Anleitung:** [`QUICK_START.md`](QUICK_START.md)  
+**📖 Vollständige Anleitung:** [`QUICK_START.md`](QUICK_START.md)
 **📋 Production Checklist:** [`PRODUCTION_CHECKLIST.md`](PRODUCTION_CHECKLIST.md)
 
 ---
@@ -321,6 +321,6 @@ Für Fragen und Support:
 
 ---
 
-**Version**: 3.5.0  
-**Letztes Update**: 5. Oktober 2025  
+**Version**: 3.5.0
+**Letztes Update**: 5. Oktober 2025
 **Status**: Produktionsreif ✅

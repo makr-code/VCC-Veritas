@@ -108,7 +108,7 @@ echo "YOUR_BASE64_STRING" | base64 -d
 
 **Configuration**: Same as `KUBECONFIG_STAGING` but for production cluster
 
-**⚠️ Important**: 
+**⚠️ Important**:
 - Use a separate kubeconfig for production
 - Limit permissions to specific namespace (e.g., `veritas-production`)
 - Consider using a service account token instead of admin credentials
@@ -202,7 +202,7 @@ gh secret set STAGING_USER --body "deploy"
 gh secret set PRODUCTION_USER --body "deploy"
 ```
 
-**Best Practice**: 
+**Best Practice**:
 - Create a dedicated deployment user (e.g., `deploy`, `github-deployer`)
 - Grant only necessary permissions
 - Use `sudo` for privileged operations with NOPASSWD for specific commands
@@ -258,7 +258,7 @@ gh secret set PRODUCTION_HOST --body "192.168.1.100"
 gh secret set PYPI_API_TOKEN --body "pypi-AgE..."
 ```
 
-**⚠️ Important**: 
+**⚠️ Important**:
 - Token is shown only once - save it securely
 - Rotate token every 90 days
 - Use scoped tokens when possible
@@ -519,5 +519,5 @@ chmod +x setup_github_secrets.sh
 
 ---
 
-**Last Updated**: 2025-10-08  
+**Last Updated**: 2025-10-08
 **Version**: 1.0.0

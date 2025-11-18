@@ -1,18 +1,18 @@
 # TODO: Remote Database Agent (SQLite/SQL)
 
-**Status:** ✅ **PHASE 1 COMPLETED** (10. Oktober 2025)  
-**Datum:** 10. Oktober 2025  
-**Priorität:** MEDIUM  
-**Typ:** New Feature - Agent Development  
+**Status:** ✅ **PHASE 1 COMPLETED** (10. Oktober 2025)
+**Datum:** 10. Oktober 2025
+**Priorität:** MEDIUM
+**Typ:** New Feature - Agent Development
 **Verantwortlich:** VERITAS Agent System
 
 ---
 
 ## ✅ Phase 1: COMPLETED
 
-**Target Time:** 4-6 hours  
-**Actual Time:** ~2 hours (50% faster)  
-**Test Results:** 23/23 passed (100%)  
+**Target Time:** 4-6 hours
+**Actual Time:** ~2 hours (50% faster)
+**Test Results:** 23/23 passed (100%)
 **Production Ready:** YES ✅
 
 See: `docs/DATABASE_AGENT_IMPLEMENTATION_REPORT.md`
@@ -23,7 +23,7 @@ See: `docs/DATABASE_AGENT_IMPLEMENTATION_REPORT.md`
 
 Entwicklung eines **Remote Database Agent** für VERITAS, der Daten aus externen Datenbanken per SQL abrufen kann.
 
-**Phase 1:** SQLite-Support (lokale/remote SQLite-Dateien)  
+**Phase 1:** SQLite-Support (lokale/remote SQLite-Dateien)
 **Phase 2:** PostgreSQL/MySQL/MSSQL-Support (erweitert)
 
 ---
@@ -141,26 +141,26 @@ class DatabaseQueryResponse:
 class DatabaseAgent:
     """
     VERITAS Database Agent
-    
+
     Read-Only SQL-Zugriff auf externe Datenbanken
     """
-    
+
     def __init__(self, config: DatabaseConfig = None):
         self.config = config or DatabaseConfig()
-        
+
         # SQL-Sicherheit
         self.sql_validator = SQLValidator()
-        
+
         # Connection Pool (Read-Only)
         self.connection_pool: Dict[str, Any] = {}
-        
+
     async def execute_query(
-        self, 
+        self,
         request: DatabaseQueryRequest
     ) -> DatabaseQueryResponse:
         """
         Führt SQL-Query aus (Read-Only)
-        
+
         1. Validiere SQL (nur SELECT/EXPLAIN/PRAGMA erlaubt)
         2. Parametrisiere Query (SQL-Injection Prevention)
         3. Öffne Read-Only Connection
@@ -168,7 +168,7 @@ class DatabaseAgent:
         5. Parse Results
         6. Schließe Connection
         """
-        
+
         # 1. SQL Validation
         operation = self.sql_validator.detect_operation(request.sql_query)
         if operation == SQLOperation.BLOCKED:
@@ -177,27 +177,27 @@ class DatabaseAgent:
                 success=False,
                 error_message="⚠️ Write operations are not allowed (Read-Only Mode)"
             )
-        
+
         # 2. Execute Query (Read-Only)
         try:
             conn = self._get_readonly_connection(request.database_path)
             cursor = conn.cursor()
-            
+
             # Timeout setzen
             cursor.execute("PRAGMA query_timeout = ?", (request.timeout_seconds * 1000,))
-            
+
             # Query ausführen
             start_time = time.time()
             cursor.execute(request.sql_query)
             results = cursor.fetchall()
             query_time_ms = int((time.time() - start_time) * 1000)
-            
+
             # Columns extrahieren
             columns = [desc[0] for desc in cursor.description] if cursor.description else []
-            
+
             # Results als Dicts
             result_dicts = [dict(zip(columns, row)) for row in results]
-            
+
             return DatabaseQueryResponse(
                 query_id=request.query_id,
                 success=True,
@@ -206,14 +206,14 @@ class DatabaseAgent:
                 row_count=len(result_dicts),
                 query_time_ms=query_time_ms
             )
-            
+
         except Exception as e:
             return DatabaseQueryResponse(
                 query_id=request.query_id,
                 success=False,
                 error_message=f"Query execution failed: {str(e)}"
             )
-    
+
     def _get_readonly_connection(self, db_path: str):
         """Öffnet Read-Only SQLite Connection"""
         # SQLite Read-Only Mode: file:path?mode=ro
@@ -231,14 +231,14 @@ class DatabaseAgent:
 ```python
 class SQLValidator:
     """Validiert SQL-Queries auf Sicherheit"""
-    
+
     # Blockierte Keywords
     BLOCKED_KEYWORDS = [
         "INSERT", "UPDATE", "DELETE", "DROP", "CREATE", "ALTER",
         "TRUNCATE", "REPLACE", "MERGE", "GRANT", "REVOKE",
         "BEGIN", "COMMIT", "ROLLBACK", "EXEC", "EXECUTE"
     ]
-    
+
     # Erlaubte Keywords
     ALLOWED_KEYWORDS = [
         "SELECT", "FROM", "WHERE", "JOIN", "LEFT JOIN", "RIGHT JOIN",
@@ -247,17 +247,17 @@ class SQLValidator:
         "UNION", "INTERSECT", "EXCEPT", "WITH",
         "EXPLAIN", "PRAGMA"
     ]
-    
+
     def detect_operation(self, sql_query: str) -> SQLOperation:
         """Erkennt SQL-Operation"""
         query_upper = sql_query.strip().upper()
-        
+
         # Check für blockierte Keywords
         for keyword in self.BLOCKED_KEYWORDS:
             if re.search(rf'\b{keyword}\b', query_upper):
                 logger.warning(f"🚫 Blocked SQL operation detected: {keyword}")
                 return SQLOperation.BLOCKED
-        
+
         # Check für erlaubte Operations
         if query_upper.startswith("SELECT"):
             return SQLOperation.SELECT
@@ -268,16 +268,16 @@ class SQLValidator:
         else:
             logger.warning(f"🚫 Unknown SQL operation: {query_upper[:50]}")
             return SQLOperation.BLOCKED
-    
+
     def sanitize_query(self, sql_query: str) -> str:
         """Sanitiert SQL-Query (entfernt gefährliche Patterns)"""
         # Entferne Kommentare (-- und /* */)
         query = re.sub(r'--.*$', '', sql_query, flags=re.MULTILINE)
         query = re.sub(r'/\*.*?\*/', '', query, flags=re.DOTALL)
-        
+
         # Entferne mehrfache Leerzeichen
         query = re.sub(r'\s+', ' ', query).strip()
-        
+
         return query
 ```
 
@@ -338,10 +338,10 @@ response = agent.execute_query(request)
 request = DatabaseQueryRequest(
     query_id="data_001",
     sql_query="""
-        SELECT username, email, created_at 
-        FROM users 
-        WHERE status = 'active' 
-        ORDER BY created_at DESC 
+        SELECT username, email, created_at
+        FROM users
+        WHERE status = 'active'
+        ORDER BY created_at DESC
         LIMIT 100
     """,
     database_path="/data/app.db",
@@ -356,7 +356,7 @@ response = agent.execute_query(request)
 request = DatabaseQueryRequest(
     query_id="stats_001",
     sql_query="""
-        SELECT 
+        SELECT
             status,
             COUNT(*) as count,
             AVG(age) as avg_age
@@ -372,7 +372,7 @@ request = DatabaseQueryRequest(
 request = DatabaseQueryRequest(
     query_id="join_001",
     sql_query="""
-        SELECT 
+        SELECT
             u.username,
             o.order_id,
             o.total_amount,
@@ -407,7 +407,7 @@ def test_db(tmp_path):
     db_path = tmp_path / "test.db"
     conn = sqlite3.connect(str(db_path))
     cursor = conn.cursor()
-    
+
     # Test-Tabelle erstellen
     cursor.execute("""
         CREATE TABLE users (
@@ -417,7 +417,7 @@ def test_db(tmp_path):
             status TEXT
         )
     """)
-    
+
     # Test-Daten einfügen
     cursor.executemany(
         "INSERT INTO users (username, email, status) VALUES (?, ?, ?)",
@@ -429,114 +429,114 @@ def test_db(tmp_path):
     )
     conn.commit()
     conn.close()
-    
+
     return str(db_path)
 
 class TestDatabaseAgent:
-    
+
     def test_select_query_allowed(self, test_db):
         """Test: SELECT Query ist erlaubt"""
         agent = DatabaseAgent()
-        
+
         request = DatabaseQueryRequest(
             query_id="test_001",
             sql_query="SELECT * FROM users",
             database_path=test_db
         )
-        
+
         response = agent.execute_query(request)
-        
+
         assert response.success == True
         assert response.row_count == 3
         assert "username" in response.columns
-    
+
     def test_insert_query_blocked(self, test_db):
         """Test: INSERT Query wird blockiert"""
         agent = DatabaseAgent()
-        
+
         request = DatabaseQueryRequest(
             query_id="test_002",
             sql_query="INSERT INTO users (username) VALUES ('hacker')",
             database_path=test_db
         )
-        
+
         response = agent.execute_query(request)
-        
+
         assert response.success == False
         assert "not allowed" in response.error_message.lower()
-    
+
     def test_update_query_blocked(self, test_db):
         """Test: UPDATE Query wird blockiert"""
         agent = DatabaseAgent()
-        
+
         request = DatabaseQueryRequest(
             query_id="test_003",
             sql_query="UPDATE users SET status = 'admin'",
             database_path=test_db
         )
-        
+
         response = agent.execute_query(request)
-        
+
         assert response.success == False
-    
+
     def test_delete_query_blocked(self, test_db):
         """Test: DELETE Query wird blockiert"""
         agent = DatabaseAgent()
-        
+
         request = DatabaseQueryRequest(
             query_id="test_004",
             sql_query="DELETE FROM users WHERE id = 1",
             database_path=test_db
         )
-        
+
         response = agent.execute_query(request)
-        
+
         assert response.success == False
-    
+
     def test_sql_injection_prevention(self, test_db):
         """Test: SQL-Injection wird verhindert"""
         agent = DatabaseAgent()
-        
+
         # Versuch: SQL-Injection mit UNION
         request = DatabaseQueryRequest(
             query_id="test_005",
             sql_query="SELECT * FROM users WHERE id = 1; DROP TABLE users;",
             database_path=test_db
         )
-        
+
         response = agent.execute_query(request)
-        
+
         # Query sollte blockiert werden (enthält DROP)
         assert response.success == False
-    
+
     def test_pragma_query_allowed(self, test_db):
         """Test: PRAGMA Query ist erlaubt"""
         agent = DatabaseAgent()
-        
+
         request = DatabaseQueryRequest(
             query_id="test_006",
             sql_query="PRAGMA table_info(users)",
             database_path=test_db
         )
-        
+
         response = agent.execute_query(request)
-        
+
         assert response.success == True
         assert len(response.results) > 0  # Schema-Info
-    
+
     def test_max_results_limit(self, test_db):
         """Test: max_results wird respektiert"""
         agent = DatabaseAgent()
-        
+
         request = DatabaseQueryRequest(
             query_id="test_007",
             sql_query="SELECT * FROM users",
             database_path=test_db,
             max_results=2
         )
-        
+
         response = agent.execute_query(request)
-        
+
         assert response.success == True
         assert len(response.results) == 2  # Limit funktioniert
         assert response.row_count == 3     # Aber row_count ist total
@@ -645,7 +645,7 @@ docs/
 
 AGENT_REGISTRY = {
     # ... existing agents ...
-    
+
     "database": {
         "name": "Database Agent",
         "description": "Read-Only SQL Access to External Databases",
@@ -677,7 +677,7 @@ AGENT_REGISTRY = {
 
 DYNAMIC_AGENT_TASK_BLUEPRINTS = {
     # ... existing blueprints ...
-    
+
     "database_query": {
         "stage": "data_retrieval",
         "capability": "sql_query_execution",
@@ -724,22 +724,22 @@ DYNAMIC_AGENT_TASK_BLUEPRINTS = {
 @dataclass
 class DatabaseAgentMetrics:
     """Database Agent Performance-Metriken"""
-    
+
     # Query-Statistiken
     total_queries: int = 0
     successful_queries: int = 0
     blocked_queries: int = 0
     failed_queries: int = 0
-    
+
     # Performance
     avg_query_time_ms: float = 0.0
     max_query_time_ms: int = 0
     slow_queries_count: int = 0  # > 1000ms
-    
+
     # Security
     sql_injection_attempts: int = 0
     blocked_write_attempts: int = 0
-    
+
     # Connection Pool
     active_connections: int = 0
     max_connections_reached: int = 0
@@ -789,6 +789,6 @@ class DatabaseAgentMetrics:
 
 ---
 
-**Erstellt:** 10. Oktober 2025, 16:30 Uhr  
-**Nächste Schritte:** Phase 1 Implementierung starten (SQLite Read-Only)  
+**Erstellt:** 10. Oktober 2025, 16:30 Uhr
+**Nächste Schritte:** Phase 1 Implementierung starten (SQLite Read-Only)
 **Estimated Effort:** 4-6 Stunden (Phase 1), 18-24 Stunden (komplett)

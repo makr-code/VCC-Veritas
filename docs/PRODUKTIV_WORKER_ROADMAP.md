@@ -1,7 +1,7 @@
 # 🎯 PRODUKTIV-FOKUS: Verwaltung, Recht & Immissionsschutz
 
-**Datum**: 16. Oktober 2025  
-**Strategische Neuausrichtung**: Beispiel-Workers → Produktiv-Workers  
+**Datum**: 16. Oktober 2025
+**Strategische Neuausrichtung**: Beispiel-Workers → Produktiv-Workers
 **Ziel**: Workers für echte Verwaltungs-Use-Cases
 
 ---
@@ -51,14 +51,14 @@
 class VerwaltungsrechtWorker(BaseAgent):
     """
     Spezialist für Verwaltungsrecht und Baurecht
-    
+
     Features:
     - Baurecht-Recherche (BauGB, BauO)
     - Baugenehmigungsverfahren
     - Bebauungsplan-Analyse
     - Zuständigkeiten
     """
-    
+
     def __init__(self, db_pool=None):
         super().__init__(agent_id="verwaltungsrecht_worker")
         self.rag_service = RAGContextService(
@@ -66,22 +66,22 @@ class VerwaltungsrechtWorker(BaseAgent):
         )
         self.uds3_adapter = UDS3Adapter(db_pool)
         self.ollama_client = VeritasOllamaClient()
-    
+
     def execute_step(self, step, context):
         """Execute verwaltungsrecht-specific analysis"""
         query = step['parameters']['query']
-        
+
         # 1. RAG: Baurecht-Dokumente
         baurecht_docs = self.rag_service.retrieve(
             query,
             categories=["BauGB", "BauO", "DIN-Normen", "VwVfG"]
         )
-        
+
         # 2. UDS3: Ähnliche Genehmigungen
         similar_permits = self.uds3_adapter.search_building_permits(
             query, limit=10
         )
-        
+
         # 3. Ollama: Rechtliche Analyse
         analysis = self.ollama_client.generate(
             prompt=self._build_legal_analysis_prompt(
@@ -89,7 +89,7 @@ class VerwaltungsrechtWorker(BaseAgent):
             ),
             model="llama3.1:8b"
         )
-        
+
         return {
             "status": "success",
             "data": {
@@ -101,10 +101,10 @@ class VerwaltungsrechtWorker(BaseAgent):
             "confidence": self._calculate_confidence(baurecht_docs, similar_permits),
             "sources": self._extract_sources(baurecht_docs)
         }
-    
+
     def get_agent_type(self):
         return "verwaltungsrecht"
-    
+
     def get_capabilities(self):
         return [
             "baurecht",
@@ -148,14 +148,14 @@ class VerwaltungsrechtWorker(BaseAgent):
 class RechtsrecherchWorker(BaseAgent):
     """
     Spezialist für Rechtsrecherche und Gesetzesanalyse
-    
+
     Features:
     - Gesetzes-Suche & Analyse
     - Rechtsprechungs-Recherche
     - Normen-Suche (DIN/VDI/ISO)
     - Kommentierung
     """
-    
+
     def __init__(self, db_pool=None):
         super().__init__(agent_id="rechtsrecherch_worker")
         self.rag_service = RAGContextService(
@@ -163,29 +163,29 @@ class RechtsrecherchWorker(BaseAgent):
         )
         self.technical_standards_agent = TechnicalStandardsAgent()
         self.ollama_client = VeritasOllamaClient()
-        
+
         # External APIs
         self.gesetze_api = GesetzeImInternetAPI()  # To be implemented
         self.rechtsprechung_api = RechtsprechungAPI()  # To be implemented
-    
+
     def execute_step(self, step, context):
         """Execute rechtsrecherch-specific analysis"""
         query = step['parameters']['query']
-        
+
         # 1. Gesetze im Internet API
         gesetze = self.gesetze_api.search(query)
-        
+
         # 2. Rechtsprechung API
         urteile = self.rechtsprechung_api.search(query)
-        
+
         # 3. RAG: Lokale Gesetzes-DB
         rag_gesetze = self.rag_service.retrieve(
             query, categories=["BGB", "BauGB", "VwVfG", "VwGO"]
         )
-        
+
         # 4. Normen (DIN/VDI/ISO)
         normen = self.technical_standards_agent.query(query)
-        
+
         # 5. Ollama: Rechtliche Interpretation
         interpretation = self.ollama_client.generate(
             prompt=self._build_interpretation_prompt(
@@ -193,7 +193,7 @@ class RechtsrecherchWorker(BaseAgent):
             ),
             model="llama3.1:8b"
         )
-        
+
         return {
             "status": "success",
             "data": {
@@ -206,10 +206,10 @@ class RechtsrecherchWorker(BaseAgent):
             "confidence": self._calculate_confidence(gesetze, urteile, rag_gesetze),
             "sources": self._extract_all_sources(gesetze, urteile, normen)
         }
-    
+
     def get_agent_type(self):
         return "rechtsrecherch"
-    
+
     def get_capabilities(self):
         return [
             "gesetze",
@@ -253,14 +253,14 @@ class RechtsrecherchWorker(BaseAgent):
 class ImmissionsschutzWorker(BaseAgent):
     """
     Spezialist für Immissionsschutz und Umweltauflagen
-    
+
     Features:
     - Luftqualitäts-Analyse
     - Lärmschutz-Berechnung
     - Emissions-Prüfung
     - Umweltauflagen
     """
-    
+
     def __init__(self, db_pool=None):
         super().__init__(agent_id="immissionsschutz_worker")
         self.rag_service = RAGContextService(
@@ -269,38 +269,38 @@ class ImmissionsschutzWorker(BaseAgent):
         self.environmental_agent = EnvironmentalAgent()
         self.chemical_agent = ChemicalDataAgent()
         self.ollama_client = VeritasOllamaClient()
-        
+
         # External APIs
         self.uba_api = UmweltbundesamtAPI()  # To be implemented
-    
+
     def execute_step(self, step, context):
         """Execute immissionsschutz-specific analysis"""
         query = step['parameters']['query']
         location = self._extract_location(query)
-        
+
         # 1. Umweltbundesamt: Aktuelle Luftqualität
         luftqualitaet = self.uba_api.get_air_quality(location)
-        
+
         # 2. EnvironmentalAgent: Umwelt-Basisdaten
         umwelt_basis = self.environmental_agent.query(query)
-        
+
         # 3. ChemicalDataAgent: Gefahrstoff-Daten
         gefahrstoffe = self.chemical_agent.query(query)
-        
+
         # 4. RAG: Immissionsschutz-Recht
         immissionsschutz_recht = self.rag_service.retrieve(
             query, categories=["BImSchG", "TA_Laerm", "TA_Luft", "BImSchV"]
         )
-        
+
         # 5. Ollama: Umweltrechtliche Bewertung
         bewertung = self.ollama_client.generate(
             prompt=self._build_environmental_assessment_prompt(
-                query, luftqualitaet, umwelt_basis, 
+                query, luftqualitaet, umwelt_basis,
                 gefahrstoffe, immissionsschutz_recht
             ),
             model="llama3.1:8b"
         )
-        
+
         return {
             "status": "success",
             "data": {
@@ -315,10 +315,10 @@ class ImmissionsschutzWorker(BaseAgent):
             ),
             "sources": self._extract_sources(immissionsschutz_recht, luftqualitaet)
         }
-    
+
     def get_agent_type(self):
         return "immissionsschutz"
-    
+
     def get_capabilities(self):
         return [
             "luftqualitaet",
@@ -362,14 +362,14 @@ class ImmissionsschutzWorker(BaseAgent):
 class BauantragsverfahrenWorker(BaseAgent):
     """
     Spezialist für Bauantragsverfahren
-    
+
     Features:
     - Verfahrens-Workflows
     - Unterlagen-Checklisten
     - Fristen-Management
     - Zuständigkeiten
     """
-    
+
     def __init__(self, db_pool=None):
         super().__init__(agent_id="bauantragsverfahren_worker")
         self.verwaltungsrecht_worker = VerwaltungsrechtWorker(db_pool)
@@ -378,34 +378,34 @@ class BauantragsverfahrenWorker(BaseAgent):
             categories=["bauantrag", "verfahren"]
         )
         self.ollama_client = VeritasOllamaClient()
-    
+
     def execute_step(self, step, context):
         """Execute bauantragsverfahren-specific analysis"""
         query = step['parameters']['query']
         location = self._extract_location(query)
         bauvorhaben = self._extract_bauvorhaben(query)
-        
+
         # 1. Rechtliche Grundlagen
         rechtliche_basis = self.verwaltungsrecht_worker.execute_step(
             {"parameters": {"query": f"Baurecht {location}"}}, context
         )
-        
+
         # 2. Verfahrens-Schritte generieren
         verfahrensschritte = self._generate_verfahrensschritte(
             bauvorhaben, location
         )
-        
+
         # 3. Unterlagen-Checkliste
         unterlagen = self._generate_unterlagen_checkliste(
             bauvorhaben, location
         )
-        
+
         # 4. Fristen berechnen
         fristen = self._calculate_fristen(bauvorhaben, location)
-        
+
         # 5. Zuständigkeiten ermitteln
         zustaendigkeiten = self._identify_zustaendigkeiten(location)
-        
+
         # 6. Ollama: Prozess-Beschreibung
         prozess_beschreibung = self.ollama_client.generate(
             prompt=self._build_prozess_prompt(
@@ -413,7 +413,7 @@ class BauantragsverfahrenWorker(BaseAgent):
             ),
             model="llama3.1:8b"
         )
-        
+
         return {
             "status": "success",
             "data": {
@@ -427,10 +427,10 @@ class BauantragsverfahrenWorker(BaseAgent):
             "confidence": 0.9,  # High confidence for process knowledge
             "sources": self._extract_sources(rechtliche_basis)
         }
-    
+
     def get_agent_type(self):
         return "bauantragsverfahren"
-    
+
     def get_capabilities(self):
         return [
             "bauantrag",
@@ -465,7 +465,7 @@ class BauantragsverfahrenWorker(BaseAgent):
 **Tag 12-15**: BauantragsverfahrenWorker (24-32h)
 
 ### **Woche 5: API-Integrationen**
-**Tag 16-20**: 
+**Tag 16-20**:
 - Umweltbundesamt API (Luftqualität)
 - Gesetze im Internet API
 - Rechtsprechung im Internet

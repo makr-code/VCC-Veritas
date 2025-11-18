@@ -1,7 +1,7 @@
 # TODO: SQLite-Datenbanken als FastAPI Test-Instanz für Agenten
 
-**Datum**: 18. Oktober 2025  
-**Priorität**: ⭐⭐⭐ HOCH  
+**Datum**: 18. Oktober 2025
+**Priorität**: ⭐⭐⭐ HOCH
 **Ziel**: BImSchG und WKA SQLite-Datenbanken als Test-Datenquellen für Agenten über FastAPI bereitstellen
 
 ---
@@ -63,12 +63,12 @@ def analyze_database(db_path: Path):
     """Analysiert SQLite-Datenbank und gibt Schema aus"""
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-    
+
     # Tabellen auflisten
     tables = cursor.execute(
         "SELECT name FROM sqlite_master WHERE type='table'"
     ).fetchall()
-    
+
     for table in tables:
         print(f"Table: {table[0]}")
         # Spalten auflisten
@@ -187,21 +187,21 @@ class DatabaseAgent:
     def __init__(self):
         self.bimschg_db = "data/bimschg/BImSchG.sqlite"
         self.wka_db = "data/wka/wka.sqlite"
-    
+
     async def query_bimschg(self, query_text: str) -> Dict[str, Any]:
         """Fragt BImSchG-Datenbank ab"""
         # NLP → SQL-Query konvertieren
         sql = self._convert_to_sql(query_text, "bimschg")
-        
+
         # Query ausführen
         results = self._execute_query(self.bimschg_db, sql)
-        
+
         return {
             "source": "BImSchG Database",
             "results": results,
             "sql_query": sql
         }
-    
+
     async def query_wka(self, location: str = None) -> Dict[str, Any]:
         """Fragt WKA-Datenbank ab"""
         # ...
@@ -363,7 +363,7 @@ class DatabaseConfig:
     DEFAULT_PAGE_SIZE = 50
     QUERY_TIMEOUT = 30  # Sekunden
     CACHE_TTL = 300  # 5 Minuten
-    
+
     ALLOWED_OPERATIONS = ["SELECT"]  # Nur Lese-Zugriff
 ```
 
@@ -518,7 +518,7 @@ Invoke-RestMethod -Method POST `
 
 ---
 
-**Erstellt**: 18. Oktober 2025  
-**Status**: ⏳ TODO  
-**Priorität**: ⭐⭐⭐ HOCH  
+**Erstellt**: 18. Oktober 2025
+**Status**: ⏳ TODO
+**Priorität**: ⭐⭐⭐ HOCH
 **Nächster Schritt**: Phase 1 - Datenbank-Analyse starten

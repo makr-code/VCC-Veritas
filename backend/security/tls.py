@@ -25,7 +25,7 @@ import logging
 import os
 import ssl
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Dict, Any
 
 from fastapi import FastAPI, Request, status
 from fastapi.responses import RedirectResponse
@@ -241,9 +241,15 @@ def get_uvicorn_ssl_config(config: Optional[TLSConfig] = None) -> dict:
     """Get SSL configuration for uvicorn.run()."""
     if config is None:
         config = TLSConfig.from_env()
+<<<<<<< Updated upstream
     
     ssl_config = {}
     
+=======
+
+    ssl_config: Dict[str, Any] = {}
+
+>>>>>>> Stashed changes
     if config.cert_file and config.key_file:
         ssl_config["ssl_certfile"] = config.cert_file
         ssl_config["ssl_keyfile"] = config.key_file

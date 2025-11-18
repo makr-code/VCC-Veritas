@@ -1,6 +1,6 @@
 # Secrets Management Guide for VERITAS
-**Version:** 1.0  
-**Date:** 22. Oktober 2025  
+**Version:** 1.0
+**Date:** 22. Oktober 2025
 **Author:** VERITAS Security Team
 
 ---
@@ -51,11 +51,11 @@ VCC_CA_PASSWORD=VCC-SecurePassword-2024
 
 ### Key Benefits
 
-✅ **At-Rest Encryption:** Secrets encrypted with Windows DPAPI (machine + user-specific)  
-✅ **Access Control:** Only the user account that encrypted secrets can decrypt them  
-✅ **Audit Trail:** All secret access logged for security monitoring  
-✅ **Cloud Ready:** Azure Key Vault support for cloud deployments  
-✅ **Zero Code Changes:** Transparent encryption via `SecretsManager` API  
+✅ **At-Rest Encryption:** Secrets encrypted with Windows DPAPI (machine + user-specific)
+✅ **Access Control:** Only the user account that encrypted secrets can decrypt them
+✅ **Audit Trail:** All secret access logged for security monitoring
+✅ **Cloud Ready:** Azure Key Vault support for cloud deployments
+✅ **Zero Code Changes:** Transparent encryption via `SecretsManager` API
 ✅ **Dev Flexibility:** ENV fallback for development (optional)
 
 ---
@@ -708,6 +708,6 @@ spec:
 
 ---
 
-**Status:** ✅ PRODUCTION READY  
-**Rating:** 4.2/5 (DPAPI) | 4.5/5 (Key Vault)  
+**Status:** ✅ PRODUCTION READY
+**Rating:** 4.2/5 (DPAPI) | 4.5/5 (Key Vault)
 **Next Steps:** Implement automatic secret rotation (Phase 2)

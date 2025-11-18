@@ -9,22 +9,21 @@ from .config import CovinaConfig
 
 # Import hybrid search configuration
 from .hybrid_search_config import (
+    DEFAULT_CONFIG,
     HybridSearchConfig,
-    SearchWeights,
-    SearchFilters,
-    RRFConfig,
-    ReRankingConfig,
     RankingStrategy,
+    ReRankingConfig,
+    RRFConfig,
     ScoringMode,
-    load_config_from_env,
+    SearchFilters,
+    SearchWeights,
     get_preset_config,
-    DEFAULT_CONFIG
+    load_config_from_env,
 )
 
 __all__ = [
     # Main config
     "CovinaConfig",
-    
     # Hybrid search config
     "HybridSearchConfig",
     "SearchWeights",
@@ -35,5 +34,5 @@ __all__ = [
     "ScoringMode",
     "load_config_from_env",
     "get_preset_config",
-    "DEFAULT_CONFIG"
+    "DEFAULT_CONFIG",
 ]

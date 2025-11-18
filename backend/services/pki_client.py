@@ -16,9 +16,14 @@ Date: 2025-10-14
 import sys
 import logging
 from pathlib import Path
+<<<<<<< Updated upstream
 from typing import Dict, Optional, List
 import ssl
 import json
+=======
+from typing import Any, Dict, List, Optional
+
+>>>>>>> Stashed changes
 import requests
 from datetime import datetime
 
@@ -81,21 +86,45 @@ class VeritasPKIClient:
         service_certs = pki_root / 'service_certificates'
         
         if not cert_path:
+<<<<<<< Updated upstream
             cert_path = service_certs / 'veritas_client.pem'
             if not cert_path.exists():
                 logger.warning(f"Client certificate not found: {cert_path}")
+=======
+            candidate = service_certs / "veritas_client.pem"
+            if candidate.exists():
+                cert_path = str(candidate)
+            else:
+                logger.warning(f"Client certificate not found: {candidate}")
+>>>>>>> Stashed changes
                 cert_path = None
         
         if not key_path and cert_path:
+<<<<<<< Updated upstream
             key_path = service_certs / 'veritas_client_key.pem'
             if not key_path.exists():
                 logger.warning(f"Client key not found: {key_path}")
+=======
+            candidate_key = service_certs / "veritas_client_key.pem"
+            if candidate_key.exists():
+                key_path = str(candidate_key)
+            else:
+                logger.warning(f"Client key not found: {candidate_key}")
+>>>>>>> Stashed changes
                 key_path = None
         
         if not ca_cert_path:
+<<<<<<< Updated upstream
             ca_cert_path = pki_root / 'ca_storage' / 'ca_certificates' / 'root_ca.pem'
             if not ca_cert_path.exists():
                 logger.warning(f"CA certificate not found: {ca_cert_path}")
+=======
+            candidate_ca = pki_root / "ca_storage" / "ca_certificates" / "root_ca.pem"
+            if candidate_ca.exists():
+                ca_cert_path = str(candidate_ca)
+            else:
+                logger.warning(f"CA certificate not found: {candidate_ca}")
+>>>>>>> Stashed changes
                 ca_cert_path = None
         
         self.cert_path = str(cert_path) if cert_path else None
@@ -120,6 +149,7 @@ class VeritasPKIClient:
         logger.info(f"PKI Client initialized: {self.base_url}")
         logger.debug(f"  Client cert: {self.cert_path}")
         logger.debug(f"  CA cert: {self.ca_cert_path}")
+<<<<<<< Updated upstream
     
     def _request(
         self,
@@ -128,6 +158,10 @@ class VeritasPKIClient:
         data: Optional[Dict] = None,
         params: Optional[Dict] = None
     ) -> Dict:
+=======
+
+    def _request(self, method: str, endpoint: str, data: Optional[Dict] = None, params: Optional[Dict] = None) -> Any:
+>>>>>>> Stashed changes
         """
         Make HTTP request to PKI service.
         
@@ -178,8 +212,13 @@ class VeritasPKIClient:
         except Exception as e:
             logger.error(f"Unexpected PKI error: {e}")
             raise PKIServiceError(f"Unexpected error: {e}")
+<<<<<<< Updated upstream
     
     def health_check(self) -> Dict:
+=======
+
+    def health_check(self) -> Any:
+>>>>>>> Stashed changes
         """
         Check PKI service health.
         
@@ -199,12 +238,17 @@ class VeritasPKIClient:
             return {'status': 'unhealthy', 'error': str(e)}
     
     def request_certificate(
+<<<<<<< Updated upstream
         self,
         subject: Dict[str, str],
         key_size: int = 2048,
         valid_days: int = 365,
         cert_type: str = 'server'
     ) -> Dict:
+=======
+        self, subject: Dict[str, str], key_size: int = 2048, valid_days: int = 365, cert_type: str = "server"
+    ) -> Any:
+>>>>>>> Stashed changes
         """
         Request certificate from PKI service.
         
@@ -245,12 +289,17 @@ class VeritasPKIClient:
         except Exception as e:
             logger.error(f"Certificate request failed: {e}")
             raise PKICertificateError(f"Certificate request failed: {e}")
+<<<<<<< Updated upstream
     
     def verify_certificate(
         self,
         cert_pem: str,
         check_revocation: bool = True
     ) -> Dict:
+=======
+
+    def verify_certificate(self, cert_pem: str, check_revocation: bool = True) -> Any:
+>>>>>>> Stashed changes
         """
         Verify certificate signature and validity.
         
@@ -280,6 +329,7 @@ class VeritasPKIClient:
             return result
         except Exception as e:
             logger.error(f"Certificate verification failed: {e}")
+<<<<<<< Updated upstream
             return {
                 'valid': False,
                 'reason': f'Verification error: {e}',
@@ -291,6 +341,11 @@ class VeritasPKIClient:
         serial_number: str,
         reason: str = 'unspecified'
     ) -> Dict:
+=======
+            return {"valid": False, "reason": f"Verification error: {e}", "details": {}}
+
+    def revoke_certificate(self, serial_number: str, reason: str = "unspecified") -> Any:
+>>>>>>> Stashed changes
         """
         Revoke certificate.
         
@@ -319,8 +374,13 @@ class VeritasPKIClient:
         except Exception as e:
             logger.error(f"Certificate revocation failed: {e}")
             raise PKICertificateError(f"Certificate revocation failed: {e}")
+<<<<<<< Updated upstream
     
     def get_ca_certificate(self) -> str:
+=======
+
+    def get_ca_certificate(self) -> Any:
+>>>>>>> Stashed changes
         """
         Get Root CA certificate (PEM format).
         
@@ -338,12 +398,17 @@ class VeritasPKIClient:
         except Exception as e:
             logger.error(f"Failed to get CA certificate: {e}")
             raise PKICertificateError(f"Failed to get CA certificate: {e}")
+<<<<<<< Updated upstream
     
     def list_certificates(
         self,
         status: Optional[str] = None,
         limit: int = 100
     ) -> List[Dict]:
+=======
+
+    def list_certificates(self, status: Optional[str] = None, limit: int = 100) -> Any:
+>>>>>>> Stashed changes
         """
         List certificates issued by PKI service.
         
@@ -359,7 +424,11 @@ class VeritasPKIClient:
             >>> for cert in certs:
             ...     print(cert['subject']['CN'])
         """
+<<<<<<< Updated upstream
         params = {'limit': limit}
+=======
+        params: Dict[str, Any] = {"limit": limit}
+>>>>>>> Stashed changes
         if status:
             params['status'] = status
         

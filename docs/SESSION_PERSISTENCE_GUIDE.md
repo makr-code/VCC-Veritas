@@ -236,6 +236,6 @@ Session laden?
 
 ---
 
-**Version**: 1.0  
-**Datum**: 18. Oktober 2025  
+**Version**: 1.0
+**Datum**: 18. Oktober 2025
 **Status**: ✅ Implementiert und Getestet

@@ -43,10 +43,10 @@ def _create_scroll_to_top_button(self, parent):
         cursor='hand2',
         command=self._scroll_to_top
     )
-    
+
     # Positionierung (rechts unten)
     self.scroll_top_btn.place(relx=0.95, rely=0.9, anchor='se')
-    
+
     # Initial versteckt
     self.scroll_top_btn.place_forget()
 ```
@@ -56,7 +56,7 @@ def _create_scroll_to_top_button(self, parent):
 def _on_chat_scroll(self, event=None):
     """Callback für Scroll-Events"""
     scroll_pos = self.chat_text.yview()
-    
+
     # Zeige Button wenn nicht ganz unten
     if scroll_pos[1] < 0.95:
         self.scroll_top_btn.place(relx=0.95, rely=0.9, anchor='se')
@@ -78,13 +78,13 @@ def _scroll_to_top(self):
 def _create_chat_display(self, parent, height=20):
     # Chat-Container für Overlay
     chat_container = tk.Frame(parent)
-    
+
     # Chat-Widget
     self.chat_text = scrolledtext.ScrolledText(chat_container, ...)
-    
+
     # Scroll-to-Top Button
     self._create_scroll_to_top_button(chat_container)
-    
+
     # Event-Bindings
     self.chat_text.bind('<Configure>', self._on_chat_scroll)
     self.chat_text.bind('<MouseWheel>', self._on_chat_scroll)
@@ -115,9 +115,9 @@ Properties = {
 
 ### Hover-Effekte
 ```python
-self.scroll_top_btn.bind('<Enter>', 
+self.scroll_top_btn.bind('<Enter>',
     lambda e: self.scroll_top_btn.config(bg='#005a9e'))
-self.scroll_top_btn.bind('<Leave>', 
+self.scroll_top_btn.bind('<Leave>',
     lambda e: self.scroll_top_btn.config(bg='#0078d4'))
 ```
 
@@ -225,10 +225,10 @@ scrollbar.bind('<ButtonRelease-1>', self._on_chat_scroll)
 try:
     if not hasattr(self, 'scroll_top_btn'):
         return  # Button existiert nicht
-    
+
     scroll_pos = self.chat_text.yview()
     # ... Button-Logik
-    
+
 except Exception as e:
     logger.debug(f"Fehler beim Scroll-Event: {e}")
     # Graceful Degradation: Feature deaktiviert
@@ -237,19 +237,19 @@ except Exception as e:
 ## 🎯 Anwendungsfälle
 
 ### 1. Lange Konversationen
-**Problem:** 100+ Messages, User scrollt zu neuen Nachrichten, will zurück zum Anfang  
+**Problem:** 100+ Messages, User scrollt zu neuen Nachrichten, will zurück zum Anfang
 **Lösung:** Button erscheint → Ein Klick → Am Anfang
 
 ### 2. Message-Suche
-**Problem:** User sucht nach früher Message, will schnell zurück  
+**Problem:** User sucht nach früher Message, will schnell zurück
 **Lösung:** Scroll-to-Top Button statt manuelles Scrollen
 
 ### 3. Session-Reload
-**Problem:** Alte Session geladen, User ist ganz unten  
+**Problem:** Alte Session geladen, User ist ganz unten
 **Lösung:** Button verfügbar für Navigation zum Start
 
 ### 4. Desktop vs. Mobile
-**Problem:** Mausrad-Scroll mühsam bei langen Chats  
+**Problem:** Mausrad-Scroll mühsam bei langen Chats
 **Lösung:** Button als schnelle Alternative
 
 ## 🚀 Best Practices
@@ -329,6 +329,6 @@ activebackground='#0078d4'
 
 ---
 
-**Version**: 1.0  
-**Datum**: 18. Oktober 2025  
+**Version**: 1.0
+**Datum**: 18. Oktober 2025
 **Status**: ✅ Implementiert und Getestet

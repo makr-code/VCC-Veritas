@@ -91,7 +91,7 @@ Replace `pytest.skip()` with actual test logic:
 async def test_query_processing(self, agent_instance, sample_query):
     """Test query processing."""
     result = await agent_instance.process_query(sample_query)
-    
+
     assert result is not None
     assert "data" in result
     assert len(result["data"]) > 0
@@ -104,7 +104,7 @@ async def test_query_processing(self, agent_instance, sample_query):
 async def test_financial_query(self, agent_instance):
     """Test financial domain query."""
     result = await agent_instance.query_financial_data("cost of construction")
-    
+
     assert "cost" in result or "price" in result
     assert result["currency"] == "EUR"
 ```
@@ -117,9 +117,9 @@ async def test_api_integration(self, agent_instance):
     """Test external API."""
     with patch("requests.get") as mock_get:
         mock_get.return_value.json.return_value = {"data": "test"}
-        
+
         result = await agent_instance.fetch_external_data()
-        
+
         assert result["data"] == "test"
         mock_get.assert_called_once()
 ```

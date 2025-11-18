@@ -107,8 +107,21 @@ logger = setup_logging()
 # Import Required Dependencies (NO FALLBACK!)
 # ============================================================================
 
-# UDS3 v2.0.0 - ZWINGEND ERFORDERLICH!
-from uds3.core import UDS3PolyglotManager
+# Ensure CouchDB availability is detected before importing UDS3 so the
+# `UDS3_DISABLE_FILE_BACKEND` environment flag is available to UDS3 init.
+try:
+    import backend.database.uds3_direct  # module-level detection sets env flag
+except Exception:
+    logger.debug("Early CouchDB availability detection failed (non-fatal)")
+
+# UDS3 v2.0.0 - Direct import may cause circular imports in some setups.
+try:
+    from uds3.core import UDS3PolyglotManager
+    UDS3_AVAILABLE = True
+except Exception as e:  # pragma: no cover - defensive fallback
+    UDS3_AVAILABLE = False
+    UDS3PolyglotManager = None
+    logger.warning(f"⚠️ UDS3 import failed or caused circular import: {e}")
 
 # Intelligent Pipeline - ZWINGEND ERFORDERLICH!
 from backend.agents.veritas_intelligent_pipeline import (
@@ -157,7 +170,7 @@ except ImportError:
 # Feature Flags
 # ============================================================================
 
-UDS3_AVAILABLE = True  # Direct integration - always available
+# `UDS3_AVAILABLE` is set by the defensive import above; keep that value.
 INTELLIGENT_PIPELINE_AVAILABLE = True  # Required dependency
 STREAMING_AVAILABLE = True  # Required dependency
 
@@ -234,21 +247,33 @@ async def lifespan(app: FastAPI):
         app.state.pki_enabled = False
     
     logger.info("=" * 80)
+<<<<<<< Updated upstream
     
     # Initialize UDS3 PolyglotManager - DIRECT INTEGRATION!
     # NO WRAPPERS, NO STUBS, NO FALLBACKS - PRODUCTION READY!
     logger.info("🔄 Initialisiere UDS3 PolyglotManager (DIRECT)...")
     
+=======
+
+    # Initialize UDS3 Remote Client - Simplified minimal initialization
+    logger.info("🔄 Initialisiere UDS3 Remote Client (minimal rumpf)...")
+
+>>>>>>> Stashed changes
     # ============================================================================
-    # DIRECT UDS3 INTEGRATION:
+    # UDS3 REMOTE INTEGRATION (NEW):
     # ============================================================================
-    # UDS3PolyglotManager (Legacy stable) - DIREKT eingebunden
-    # - Alle 4 Backends: Vector, Graph, Relational, File
-    # - Echte DB-Credentials aus uds3/config_local.py
-    # - KEINE Fallbacks, KEINE Stubs!
+    # Request minimal backend "rumpf" with only required databases:
+    # - Vector (ChromaDB) for semantic search
+    # - Graph (Neo4j) for knowledge relationships
+    # - Relational (PostgreSQL) for structured data
+    # - File (CouchDB) only if driver available
+    #
+    # Old approach requested full UDS3PolyglotManager with local config.
+    # New approach: Request lightweight remote stub from UDS3 service.
     # ============================================================================
     
     try:
+<<<<<<< Updated upstream
         # DIRECT: UDS3PolyglotManager (Legacy stable version)
         # Minimal Config - DatabaseManager lädt echte Credentials aus uds3/config.py
         backend_config = {
@@ -265,6 +290,40 @@ async def lifespan(app: FastAPI):
         
         logger.info("✅ UDS3 PolyglotManager initialisiert (Direct Integration)")
         
+=======
+        # Determine which backends to request from remote UDS3
+        requested_backends = ["vector", "graph", "relational"]
+        
+        # Only request file backend if CouchDB driver is available
+        try:
+            import importlib
+            if importlib.util.find_spec("couchdb") is not None:
+                uds3_disable_flag = os.getenv("UDS3_DISABLE_FILE_BACKEND", "0")
+                if uds3_disable_flag != "1":
+                    requested_backends.append("file")
+                    logger.info("ℹ️  CouchDB driver available - requesting file backend")
+                else:
+                    logger.info("ℹ️  UDS3_DISABLE_FILE_BACKEND=1 - skipping file backend")
+            else:
+                logger.info("ℹ️  CouchDB driver not installed - skipping file backend")
+        except Exception:
+            logger.info("ℹ️  Error checking CouchDB availability - skipping file backend")
+
+        logger.info(f"📋 Requesting UDS3 backends: {', '.join(requested_backends)}")
+
+        # Request minimal UDS3 rumpf with only the databases we need
+        backend_config = {backend: {"enabled": True} for backend in requested_backends}
+
+        app.state.uds3 = UDS3PolyglotManager(backend_config=backend_config, enable_rag=True)
+
+        logger.info("✅ UDS3 Remote Client initialisiert (minimal rumpf)")
+
+        # Log requested backends
+        logger.info(f"📊 Requested backends: {len(requested_backends)}")
+        for backend in requested_backends:
+            logger.info(f"   ✓ {backend}")
+
+>>>>>>> Stashed changes
         # Check database backends (optional logging)
         if hasattr(app.state.uds3, 'db_manager'):
             try:
@@ -306,35 +365,34 @@ async def lifespan(app: FastAPI):
         
     except Exception as e:
         logger.error("=" * 80)
-        logger.error("❌ KRITISCHER FEHLER: UDS3 Initialisierung fehlgeschlagen!")
+        logger.error("❌ KRITISCHER FEHLER: UDS3 Remote Client Initialisierung fehlgeschlagen!")
         logger.error("=" * 80)
         logger.error(f"Fehler: {e}")
         logger.error("")
-        logger.error("🔧 DIRECT UDS3 INTEGRATION:")
-        logger.error("   • Keine Fallbacks!")
-        logger.error("   • Keine Stubs!")
-        logger.error("   • UDS3 config_local.py muss existieren!")
+        logger.error("🔧 UDS3 REMOTE INTEGRATION:")
+        logger.error("   • Verbindung zu UDS3 Remote Service fehlgeschlagen")
+        logger.error("   • Backend 'rumpf' konnte nicht angefordert werden")
         logger.error("")
         logger.error("💡 Prüfe:")
-        logger.error("   1. uds3/config_local.py existiert")
-        logger.error("   2. DB-Credentials korrekt")
-        logger.error("   3. Alle 4 Backends konfiguriert:")
-        logger.error("   • ChromaDB (Vector Store)")
-        logger.error("   • PostgreSQL (Relational DB)")
-        logger.error("   • CouchDB (Document Store)")
-        logger.error("   • Neo4j (Graph DB)")
+        logger.error("   1. UDS3 Remote Service läuft und ist erreichbar")
+        logger.error("   2. Netzwerkverbindung zu Remote-Datenbanken")
+        logger.error("   3. Umgebungsvariablen für DB-Endpoints gesetzt:")
+        logger.error("      - CHROMA_HOST, CHROMA_PORT (Vector)")
+        logger.error("      - NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD (Graph)")
+        logger.error("      - POSTGRES_HOST, POSTGRES_PORT, POSTGRES_DB (Relational)")
+        logger.error("      - COUCHDB_URL (File, optional)")
         logger.error("")
         logger.error("✅ LÖSUNG:")
-        logger.error("   1. Starten Sie zuerst UDS3 Microservice")
-        logger.error("   2. Warten Sie, bis UDS3 vollständig bereit ist")
-        logger.error("   3. Starten Sie dann VERITAS Backend")
+        logger.error("   1. Starte UDS3 Remote Service")
+        logger.error("   2. Prüfe Erreichbarkeit der Remote-DBs")
+        logger.error("   3. Starte dann VERITAS Backend")
         logger.error("")
-        logger.error("❌ KEIN FALLBACK - KEIN MOCK - KEINE SIMULATION!")
-        logger.error("   VERITAS kann ohne UDS3 nicht funktionieren.")
+        logger.error("❌ KEIN FALLBACK - Minimal-Rumpf erforderlich!")
+        logger.error("   VERITAS benötigt mindestens Vector + Graph + Relational.")
         logger.error("=" * 80)
         raise RuntimeError(
-            "VERITAS Backend kann ohne UDS3 Microservice nicht starten! "
-            "UDS3 muss verfügbar sein und alle Datenbankverbindungen bereitstellen."
+            "VERITAS Backend kann ohne UDS3 Remote Service nicht starten! "
+            "Mindestens Vector, Graph und Relational DBs müssen verfügbar sein."
         )
     
     # Initialize Intelligent Multi-Agent Pipeline - REQUIRED!
@@ -373,7 +431,31 @@ async def lifespan(app: FastAPI):
         logger.error(f"❌ KRITISCHER FEHLER: Query Service konnte nicht initialisiert werden!")
         logger.error(f"   Fehler: {e}")
         raise RuntimeError("Query Service initialization failed - cannot start VERITAS") from e
+<<<<<<< Updated upstream
     
+=======
+
+    # Initialize / register a shared Ollama client on app.state for reuse
+    try:
+        from backend.agents.veritas_ollama_client import VeritasOllamaClient
+
+        try:
+            app.state.ollama_client = VeritasOllamaClient()
+            # initialize (health + model list) but do not fail hard if unavailable
+            try:
+                await app.state.ollama_client.initialize()
+                logger.info("✅ Shared Ollama client initialized and stored in app.state")
+            except Exception as e:
+                logger.warning(f"⚠️ Shared Ollama client initialization failed (continuing): {e}")
+                # keep the instance (may be offline_mode=True)
+                app.state.ollama_client.offline_mode = True
+        except Exception as e:
+            logger.warning(f"⚠️ Could not create VeritasOllamaClient: {e}")
+            app.state.ollama_client = None
+    except ImportError:
+        logger.info("ℹ️ VeritasOllamaClient not available in environment - skipping shared client setup")
+
+>>>>>>> Stashed changes
     # Startup Summary
     logger.info("=" * 80)
     logger.info("✅ VERITAS Backend Ready!")
@@ -450,7 +532,22 @@ async def lifespan(app: FastAPI):
             logger.info("✅ UDS3 closed")
         except Exception as e:
             logger.error(f"❌ UDS3 cleanup error: {e}")
+<<<<<<< Updated upstream
     
+=======
+
+    # Close shared Ollama client if present
+    if hasattr(app.state, "ollama_client") and app.state.ollama_client:
+        try:
+            try:
+                await app.state.ollama_client.close()
+                logger.info("✅ Shared Ollama client closed")
+            except Exception as e:
+                logger.warning(f"⚠️ Error closing shared Ollama client: {e}")
+        except Exception:
+            pass
+
+>>>>>>> Stashed changes
     logger.info("✅ Shutdown complete")
     logger.info("=" * 80)
 
@@ -673,6 +770,7 @@ if __name__ == "__main__":
                 ca_password = get_vcc_ca_password() or "your-secure-ca-password"
             except Exception:
                 ca_password = os.getenv("VCC_CA_PASSWORD", "your-secure-ca-password")
+<<<<<<< Updated upstream
             
             temp_pki = PKIClient(
                 pki_server_url=pki_server_url,
@@ -681,6 +779,20 @@ if __name__ == "__main__":
             )
             
             cert_paths = temp_pki.get_certificate_paths()
+=======
+
+            temp_pki = PKIClient(pki_server_url=pki_server_url, service_id=service_id, ca_password=ca_password)
+
+            # Some PKI client implementations (older/newer) may not provide
+            # `get_certificate_paths`. Guard against AttributeError and
+            # fall back to HTTP if certificate paths cannot be obtained.
+            try:
+                cert_paths = temp_pki.get_certificate_paths()
+            except AttributeError:
+                logger.warning("⚠️ PKI client does not expose 'get_certificate_paths' - using HTTP")
+                cert_paths = None
+
+>>>>>>> Stashed changes
             if cert_paths:
                 ssl_keyfile = cert_paths.get("key")
                 ssl_certfile = cert_paths.get("cert")

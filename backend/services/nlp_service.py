@@ -158,7 +158,7 @@ class NLPService:
         logger.info(f"🔍 Analyzing query: {query}")
         
         # Extract components
-        entities = self.extract_entities(query)
+        entities: List[Entity] = self.extract_entities(query)
         intent = self.detect_intent(query, entities)
         parameters = self.extract_parameters(query, entities)
         question_type = self.classify_question_type(query)
@@ -187,7 +187,7 @@ class NLPService:
         Returns:
             List of extracted entities
         """
-        entities = []
+        entities: List[Entity] = []
         query_lower = query.lower()
         
         for entity_type, patterns in self.entity_patterns.items():
@@ -209,7 +209,7 @@ class NLPService:
                     entities.append(entity)
         
         # Remove duplicates (keep highest confidence)
-        unique_entities = {}
+        unique_entities: Dict[Tuple[str, Any], Entity] = {}
         for entity in entities:
             key = (entity.text.lower(), entity.entity_type)
             if key not in unique_entities or entity.confidence > unique_entities[key].confidence:
@@ -233,7 +233,7 @@ class NLPService:
         
         # Score each intent type
         for intent_type, patterns in self.intent_patterns.items():
-            matched_keywords = []
+            matched_keywords: List[str] = []
             score = 0.0
             
             for pattern in patterns:
@@ -275,9 +275,15 @@ class NLPService:
         """
         if entities is None:
             entities = self.extract_entities(query)
+<<<<<<< Updated upstream
         
         params = QueryParameters()
         
+=======
+
+        params: QueryParameters = QueryParameters()
+
+>>>>>>> Stashed changes
         # Extract by entity type
         for entity in entities:
             if entity.entity_type == EntityType.LOCATION and not params.location:

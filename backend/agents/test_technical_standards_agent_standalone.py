@@ -21,6 +21,7 @@ import logging
 import sys
 import time
 from pathlib import Path
+from typing import Dict
 
 # Projekt-Root für Paketimporte sicherstellen
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -616,8 +617,13 @@ class TechnicalStandardsTestSuite:
         # Check diversity of organizations
         organizations = set(std.identifier.organization for std in response.standards)
         print(f"   Organizations represented: {len(organizations)}")
+<<<<<<< Updated upstream
         
         org_counts = {}
+=======
+
+        org_counts: Dict[str, int] = {}
+>>>>>>> Stashed changes
         for std in response.standards:
             org = std.identifier.organization.value.upper()
             org_counts[org] = org_counts.get(org, 0) + 1

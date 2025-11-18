@@ -25,17 +25,17 @@ Author: VERITAS Development Team
 Created: 2025-10-13
 """
 
-import sys
 import os
+import sys
 from pathlib import Path
 
 # Add project root to path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
-sys.path.insert(0, str(project_root / 'backend'))
+sys.path.insert(0, str(project_root / "backend"))
 
 from backend.pki.ca_service import CAService
-from backend.pki.crypto_utils import generate_keypair, generate_csr
+from backend.pki.crypto_utils import generate_csr, generate_keypair
 
 
 def setup_mtls_certificates():
@@ -45,34 +45,34 @@ def setup_mtls_certificates():
     2. Server Certificate (for FastAPI backend)
     3. Client Certificate (for testing)
     """
-    
+
     print("╔════════════════════════════════════════════════════════════════════╗")
     print("║         mTLS Certificate Setup for VERITAS Framework              ║")
     print("╚════════════════════════════════════════════════════════════════════╝")
     print()
-    
+
     # Initialize CA Service
     ca_storage_path = project_root / "ca_storage"
     ca_storage_path.mkdir(exist_ok=True)
-    
+
     print(f"📁 CA Storage: {ca_storage_path}")
     print()
-    
+
     ca_service = CAService(ca_storage_path=str(ca_storage_path))
-    
+
     # ========================================================================
     # Step 1: Initialize Root CA (if not exists)
     # ========================================================================
-    
+
     print("🔐 Step 1: Root CA Initialization")
     print("─" * 70)
-    
+
     try:
         if ca_service.is_initialized():
             print("✅ Root CA already initialized")
             ca_config = ca_service._load_ca_config()
-            if 'root_ca_info' in ca_config:
-                ca_info = ca_config['root_ca_info']
+            if "root_ca_info" in ca_config:
+                ca_info = ca_config["root_ca_info"]
                 print(f"   Common Name: {ca_info.get('common_name', 'VERITAS Root CA')}")
                 print(f"   Valid Until: {ca_info.get('not_valid_after', 'N/A')}")
             print()
@@ -85,31 +85,31 @@ def setup_mtls_certificates():
                 country="DE",
                 state="NRW",
                 locality="Köln",
-                validity_days=3650  # 10 years
+                validity_days=3650,  # 10 years
             )
-            
+
             print("✅ Root CA created successfully!")
             print(f"   Common Name: {root_ca.get('common_name', 'VERITAS Root CA')}")
             print(f"   Valid Until: {root_ca['not_valid_after']}")
             print(f"   Key Size: {root_ca['key_size']} bit")
             print(f"   Serial Number: {root_ca['serial_number']}")
             print()
-    
+
     except Exception as e:
         print(f"❌ Error initializing Root CA: {e}")
         return False
-    
+
     # ========================================================================
     # Step 2: Generate Server Certificate
     # ========================================================================
-    
+
     print("🖥️  Step 2: Server Certificate Generation")
     print("─" * 70)
-    
+
     try:
         server_cert_path = ca_storage_path / "server_cert.pem"
         server_key_path = ca_storage_path / "server_key.pem"
-        
+
         if server_cert_path.exists() and server_key_path.exists():
             print("✅ Server certificate already exists")
             print(f"   Certificate: {server_cert_path}")
@@ -118,7 +118,7 @@ def setup_mtls_certificates():
         else:
             print("🔨 Generating server key pair...")
             server_key_pem, server_public_key_pem = generate_keypair(2048)
-            
+
             print("🔨 Creating server CSR...")
             server_csr = generate_csr(
                 private_key_pem=server_key_pem,
@@ -128,29 +128,25 @@ def setup_mtls_certificates():
                 country="DE",
                 state="NRW",
                 locality="Köln",
-                email="admin@veritas.local"
+                email="admin@veritas.local",
             )
-            
+
             print("🔨 Signing server certificate...")
-            server_cert_info = ca_service.sign_csr(
-                csr_pem=server_csr,
-                validity_days=365,  # 1 year
-                is_ca=False
-            )
-            
+            server_cert_info = ca_service.sign_csr(csr_pem=server_csr, validity_days=365, is_ca=False)  # 1 year
+
             # Save server certificate and key
-            with open(server_cert_path, 'w') as f:
-                f.write(server_cert_info['certificate_pem'])
-            
-            with open(server_key_path, 'wb') as f:
+            with open(server_cert_path, "w") as f:
+                f.write(server_cert_info["certificate_pem"])
+
+            with open(server_key_path, "wb") as f:
                 f.write(server_key_pem)
-            
+
             # Set restrictive permissions on private key (Unix-like systems)
             try:
                 os.chmod(server_key_path, 0o600)
             except:
                 pass  # Windows doesn't support chmod
-            
+
             print("✅ Server certificate created successfully!")
             print(f"   Certificate: {server_cert_path}")
             print(f"   Key: {server_key_path}")
@@ -158,24 +154,25 @@ def setup_mtls_certificates():
             print(f"   Valid Until: {server_cert_info['not_valid_after']}")
             print(f"   Serial Number: {server_cert_info['serial_number']}")
             print()
-    
+
     except Exception as e:
         print(f"❌ Error generating server certificate: {e}")
         import traceback
+
         traceback.print_exc()
         return False
-    
+
     # ========================================================================
     # Step 3: Generate Client Certificate (for testing)
     # ========================================================================
-    
+
     print("👤 Step 3: Client Certificate Generation (Test)")
     print("─" * 70)
-    
+
     try:
         client_cert_path = ca_storage_path / "client_cert.pem"
         client_key_path = ca_storage_path / "client_key.pem"
-        
+
         if client_cert_path.exists() and client_key_path.exists():
             print("✅ Client certificate already exists")
             print(f"   Certificate: {client_cert_path}")
@@ -184,7 +181,7 @@ def setup_mtls_certificates():
         else:
             print("🔨 Generating client key pair...")
             client_key_pem, client_public_key_pem = generate_keypair(2048)
-            
+
             print("🔨 Creating client CSR...")
             client_csr = generate_csr(
                 private_key_pem=client_key_pem,
@@ -192,29 +189,25 @@ def setup_mtls_certificates():
                 organization="VERITAS Framework",
                 organizational_unit="Test Client",
                 country="DE",
-                email="client@veritas.local"
+                email="client@veritas.local",
             )
-            
+
             print("🔨 Signing client certificate...")
-            client_cert_info = ca_service.sign_csr(
-                csr_pem=client_csr,
-                validity_days=365,  # 1 year
-                is_ca=False
-            )
-            
+            client_cert_info = ca_service.sign_csr(csr_pem=client_csr, validity_days=365, is_ca=False)  # 1 year
+
             # Save client certificate and key
-            with open(client_cert_path, 'w') as f:
-                f.write(client_cert_info['certificate_pem'])
-            
-            with open(client_key_path, 'wb') as f:
+            with open(client_cert_path, "w") as f:
+                f.write(client_cert_info["certificate_pem"])
+
+            with open(client_key_path, "wb") as f:
                 f.write(client_key_pem)
-            
+
             # Set restrictive permissions on private key
             try:
                 os.chmod(client_key_path, 0o600)
             except:
                 pass  # Windows doesn't support chmod
-            
+
             print("✅ Client certificate created successfully!")
             print(f"   Certificate: {client_cert_path}")
             print(f"   Key: {client_key_path}")
@@ -222,17 +215,18 @@ def setup_mtls_certificates():
             print(f"   Valid Until: {client_cert_info['not_valid_after']}")
             print(f"   Serial Number: {client_cert_info['serial_number']}")
             print()
-    
+
     except Exception as e:
         print(f"❌ Error generating client certificate: {e}")
         import traceback
+
         traceback.print_exc()
         return False
-    
+
     # ========================================================================
     # Summary
     # ========================================================================
-    
+
     print("╔════════════════════════════════════════════════════════════════════╗")
     print("║                     ✅ mTLS Setup Complete!                        ║")
     print("╚════════════════════════════════════════════════════════════════════╝")
@@ -257,7 +251,7 @@ def setup_mtls_certificates():
     print("   3. Configure FastAPI with mTLS")
     print("   4. Test with: curl --cert client_cert.pem --key client_key.pem https://localhost:5000/health")
     print()
-    
+
     return True
 
 
@@ -271,5 +265,6 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n❌ Fatal error: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)

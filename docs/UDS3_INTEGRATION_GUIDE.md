@@ -1,7 +1,7 @@
 # VERITAS + UDS3 Integration Guide
 
-**Datum:** 11. Oktober 2025  
-**Version:** 1.0  
+**Datum:** 11. Oktober 2025
+**Version:** 1.0
 **Status:** Architektur-Dokumentation
 
 ---
@@ -130,7 +130,7 @@ if store.has_graph_backend:
         """,
         params={"doc_id": "doc-123"}
     )
-    
+
     # Findet alle Dokumente, die von doc-123 referenziert werden
 ```
 
@@ -150,10 +150,10 @@ class UDS3HybridSearchAgent:
     """
     Kombiniert Vector, Keyword und Graph Search für beste Ergebnisse
     """
-    
+
     def __init__(self, store: DocumentStore):
         self.store = store
-    
+
     async def hybrid_search(
         self,
         query: str,
@@ -162,31 +162,31 @@ class UDS3HybridSearchAgent:
     ):
         """
         Hybrid Search mit Re-Ranking
-        
+
         Args:
             query: User query
             top_k: Results per method
             weights: {"vector": 0.5, "keyword": 0.3, "graph": 0.2}
-        
+
         Returns:
             Merged & re-ranked results
         """
-        
+
         weights = weights or {"vector": 0.5, "keyword": 0.3, "graph": 0.2}
-        
+
         # 1. Vector Search (Semantic)
         vector_results = await self.store.vector_search(
             query=query,
             top_k=top_k
         )
-        
+
         # 2. Keyword Search (Exact)
         keyword_results = await self.store.keyword_search(
             query=query,
             top_k=top_k,
             search_mode="and"
         )
-        
+
         # 3. Graph Search (Relationships, optional)
         graph_results = []
         if self.store.has_graph_backend:
@@ -200,7 +200,7 @@ class UDS3HybridSearchAgent:
                 """,
                 params={"doc_ids": doc_ids}
             )
-        
+
         # 4. Merge & Re-rank
         merged = self._merge_results(
             vector_results=vector_results,
@@ -208,44 +208,44 @@ class UDS3HybridSearchAgent:
             graph_results=graph_results,
             weights=weights
         )
-        
+
         return merged[:top_k]
-    
+
     def _merge_results(self, vector_results, keyword_results, graph_results, weights):
         """
         Merges results with weighted scoring
-        
+
         Scoring:
         - Vector: similarity_score (0-1)
         - Keyword: match_score (0-1)
         - Graph: relationship_score (0-1)
-        
+
         Final Score = w_v * vector + w_k * keyword + w_g * graph
         """
-        
+
         score_map = {}  # doc_id -> score
         doc_map = {}    # doc_id -> Document
-        
+
         # Vector results
         for doc in vector_results:
             score_map[doc.id] = score_map.get(doc.id, 0) + doc.similarity_score * weights["vector"]
             doc_map[doc.id] = doc
-        
+
         # Keyword results
         for doc in keyword_results:
             score_map[doc.id] = score_map.get(doc.id, 0) + doc.match_score * weights["keyword"]
             if doc.id not in doc_map:
                 doc_map[doc.id] = doc
-        
+
         # Graph results
         for doc in graph_results:
             score_map[doc.id] = score_map.get(doc.id, 0) + doc.relationship_score * weights["graph"]
             if doc.id not in doc_map:
                 doc_map[doc.id] = doc
-        
+
         # Sort by final score
         ranked_doc_ids = sorted(score_map.items(), key=lambda x: x[1], reverse=True)
-        
+
         # Return Documents with final scores
         return [
             {
@@ -279,7 +279,7 @@ class SupervisorAgent:
     def __init__(self, ...):
         # Aktuell: Einzelne Agenten rufen UDS3 direkt
         pass
-    
+
     async def _execute_agents(self, selected_agents, query):
         # Jeder Agent macht eigene UDS3 Calls
         results = []
@@ -307,41 +307,41 @@ class SupervisorAgent:
         # NEW: Zentraler UDS3 Zugriff
         self.uds3_store = uds3_store
         self.uds3_agent = UDS3HybridSearchAgent(uds3_store)
-        
+
         # Existing agents
         self.agents = {
             'environmental': EnvironmentalAgent(),
             'financial': FinancialAgent(),
             # ... weitere Agenten
         }
-    
+
     async def process_query(self, query: str, research_id: Optional[str] = None):
         """
         Process query with centralized UDS3 access
         """
-        
+
         # 1. UDS3 Hybrid Search (EINMAL für alle Agenten!)
         uds3_results = await self.uds3_agent.hybrid_search(
             query=query,
             top_k=20,  # Mehr Ergebnisse für verschiedene Agenten
             weights={"vector": 0.5, "keyword": 0.3, "graph": 0.2}
         )
-        
+
         # 2. Agent Selection (basierend auf UDS3 Ergebnissen)
         selected_agents = await self._select_agents(query, uds3_results)
-        
+
         # 3. Agent Execution (mit UDS3 Context!)
         agent_results = await self._execute_agents_with_context(
             selected_agents=selected_agents,
             query=query,
             uds3_context=uds3_results  # Pass UDS3 results to agents!
         )
-        
+
         # 4. Synthesis
         synthesized = await self.synthesize_results(agent_results, query)
-        
+
         return synthesized
-    
+
     async def _execute_agents_with_context(
         self,
         selected_agents: List[str],
@@ -350,30 +350,30 @@ class SupervisorAgent:
     ):
         """
         Execute agents with shared UDS3 context
-        
+
         Vorteil: Agenten müssen UDS3 nicht selbst abfragen!
         """
-        
+
         results = []
         for agent_name in selected_agents:
             agent = self.agents[agent_name]
-            
+
             # Filter UDS3 results relevant for this agent
             agent_context = self._filter_context_for_agent(
                 agent_name=agent_name,
                 context=uds3_context
             )
-            
+
             # Agent processes with pre-fetched context
             result = await agent.process_with_context(
                 query=query,
                 context=agent_context  # Pre-fetched from UDS3!
             )
-            
+
             results.append(result)
-        
+
         return results
-    
+
     def _filter_context_for_agent(
         self,
         agent_name: str,
@@ -381,12 +381,12 @@ class SupervisorAgent:
     ) -> List[Dict]:
         """
         Filter UDS3 results relevant for specific agent
-        
+
         Example:
         - EnvironmentalAgent → Documents with tags=['environment', 'pollution']
         - FinancialAgent → Documents with tags=['finance', 'budget']
         """
-        
+
         agent_filters = {
             'environmental': ['environment', 'pollution', 'climate', 'emissions'],
             'financial': ['finance', 'budget', 'costs', 'funding'],
@@ -394,15 +394,15 @@ class SupervisorAgent:
             'social': ['social', 'welfare', 'community'],
             'traffic': ['traffic', 'transport', 'mobility']
         }
-        
+
         relevant_tags = agent_filters.get(agent_name, [])
-        
+
         # Filter by document tags
         filtered = [
             doc for doc in context
             if any(tag in doc['document'].metadata.get('tags', []) for tag in relevant_tags)
         ]
-        
+
         return filtered[:10]  # Top 10 for each agent
 ```
 
@@ -427,22 +427,22 @@ import hashlib
 class UDS3Cache:
     """
     Cache für UDS3 Queries
-    
+
     Cache-Strategie:
     - Vector Search: 1 Stunde TTL
     - Keyword Search: 5 Minuten TTL
     - Graph Search: 10 Minuten TTL
     """
-    
+
     def __init__(self, ttl_seconds: int = 3600):
         self.cache = {}
         self.ttl = ttl_seconds
-    
+
     def _hash_query(self, method: str, query: str, filters: dict) -> str:
         """Create cache key"""
         key_str = f"{method}:{query}:{json.dumps(filters, sort_keys=True)}"
         return hashlib.sha256(key_str.encode()).hexdigest()
-    
+
     async def get_or_fetch(
         self,
         method: str,
@@ -454,17 +454,17 @@ class UDS3Cache:
         Get from cache or fetch from UDS3
         """
         cache_key = self._hash_query(method, query, filters)
-        
+
         # Check cache
         if cache_key in self.cache:
             result, timestamp = self.cache[cache_key]
             if time.time() - timestamp < self.ttl:
                 return result  # Cache hit!
-        
+
         # Cache miss → Fetch
         result = await fetch_fn()
         self.cache[cache_key] = (result, time.time())
-        
+
         return result
 ```
 
@@ -570,16 +570,16 @@ class EnvironmentalAgent:
     ):
         """
         Process query with pre-fetched context
-        
+
         Vorteil: Kein UDS3 Call mehr nötig!
         """
-        
+
         # Extract relevant info from context
         relevant_docs = [doc['document'] for doc in context]
-        
+
         # Synthesize answer
         answer = await self._synthesize(query, relevant_docs)
-        
+
         return answer
 ```
 
@@ -665,18 +665,18 @@ from uds3 import DocumentStore
 async def main():
     store = DocumentStore()
     agent = UDS3HybridSearchAgent(store)
-    
+
     results = await agent.hybrid_search(
         query="Was regelt § 58 LBO BW?",
         top_k=10
     )
-    
+
     print(f"Found {len(results)} results:")
     for i, result in enumerate(results, 1):
         doc = result['document']
         score = result['final_score']
         breakdown = result['breakdown']
-        
+
         print(f"\n{i}. Score: {score:.3f}")
         print(f"   Title: {doc.metadata['title']}")
         print(f"   Breakdown: V={breakdown['vector']:.2f}, K={breakdown['keyword']:.2f}, G={breakdown['graph']:.2f}")

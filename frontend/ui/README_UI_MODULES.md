@@ -309,7 +309,7 @@ tooltip = SourceTooltip(
 **API**:
 ```python
 formatter = ChatDisplayFormatter(
-    text_widget, 
+    text_widget,
     parent_window,
     markdown_renderer=md_renderer,
     source_link_handler=link_handler
@@ -403,10 +403,10 @@ from frontend.ui.veritas_ui_dialogs import DialogManager
 ```python
 def create_gui(self):
     # ... bestehender Code ...
-    
+
     # Chat-Display erstellen
     self._create_chat_display(main_frame, height=25)
-    
+
     # UI-Module initialisieren
     self.markdown_renderer = MarkdownRenderer(self.chat_text)
     self.source_link_handler = SourceLinkHandler(self.window, self.status_var)
@@ -422,10 +422,10 @@ def create_gui(self):
         status_var=self.status_var,
         update_chat_callback=lambda: self.chat_formatter.update_chat_display(self.chat_messages)
     )
-    
+
     # Link-Callback setzen
     self.markdown_renderer.set_link_callback(self.source_link_handler.open_source_link)
-    
+
     # Tags konfigurieren
     setup_markdown_tags(self.chat_text)
     setup_chat_tags(self.chat_text)
@@ -438,11 +438,11 @@ def create_gui(self):
 def update_chat_display(self):
     # 200+ Zeilen Code
     ...
-    
+
 def _insert_formatted_content(self, content, tag):
     # 150+ Zeilen Code
     ...
-    
+
 def _render_markdown(self, text, base_tag):
     # 100+ Zeilen Code
     ...
@@ -525,23 +525,23 @@ class MainChatWindow(ChatWindowBase):
         super().__init__("MainChat", thread_manager, parent=veritas_app)
         self.is_main_window = True
         self.veritas_app = veritas_app
-        
+
         # UI-Module initialisieren (NACH create_gui!)
         self._init_ui_modules()
-        
+
         self.create_gui()
         self.setup_bindings()
         self.start_message_loop()
-    
+
     def _init_ui_modules(self):
         """Initialisiert UI-Module nach GUI-Erstellung"""
         # Warte bis self.chat_text existiert
         pass
-    
+
     def create_gui(self):
         # ... GUI erstellen ...
         self._create_chat_display(main_frame, height=25)
-        
+
         # NACH Chat-Text-Erstellung: UI-Module initialisieren
         self.markdown_renderer = MarkdownRenderer(self.chat_text)
         self.source_link_handler = SourceLinkHandler(self.window, self.status_var)
@@ -557,27 +557,27 @@ class MainChatWindow(ChatWindowBase):
             status_var=self.status_var,
             update_chat_callback=self.update_chat_display
         )
-        
+
         # Link-Callback
         self.markdown_renderer.set_link_callback(self.source_link_handler.open_source_link)
-        
+
         # Tags konfigurieren
         setup_markdown_tags(self.chat_text)
         setup_chat_tags(self.chat_text)
-    
+
     # Wrapper-Methoden (optional für Kompatibilität)
     def update_chat_display(self):
         self.chat_formatter.update_chat_display(self.chat_messages)
-    
+
     def _save_chat(self):
         self.dialog_manager.save_chat()
-    
+
     def _load_chat(self):
         loaded = self.dialog_manager.load_chat()
         if loaded:
             self.chat_messages = loaded
             self.update_chat_display()
-    
+
     # ... weitere Wrapper ...
 ```
 
@@ -732,7 +732,7 @@ copy_btn = tk.Label(
 **Testing**:
 ```python
 # Test 1: Kurzer Code
-text = "`x = 1`"  
+text = "`x = 1`"
 # → Copy-Button erscheint
 
 # Test 2: Sehr kurzer Code
@@ -753,7 +753,7 @@ text = "`def hello(): return 'world'`"
 
 ## ✨ Rich-Text Enhancement #3: Syntax-Highlighting
 
-**Feature**: #3 aus Rich-Text Enhancements TODO  
+**Feature**: #3 aus Rich-Text Enhancements TODO
 **Status**: ✅ Implementiert (2025-10-09)
 
 **Beschreibung**: Code-Blöcke werden mit Syntax-Highlighting farblich hervorgehoben (Python, JavaScript, SQL, JSON, u.v.m.).
@@ -864,7 +864,7 @@ python frontend/ui/veritas_ui_syntax.py
 
 ## 🎉 MILESTONE: Feature #2 - Markdown-Tabellen (v3.15.0)
 
-**Entwicklungszeit:** ~30 Minuten  
+**Entwicklungszeit:** ~30 Minuten
 **Status:** ✅ **FINAL FEATURE - 100% COMPLETE!** 🏆
 
 ### Übersicht
@@ -1168,7 +1168,7 @@ self.window.bind('<Control-s>', lambda e: self._save_chat())
 # Shortcuts-Hilfe anzeigen
 def _show_shortcuts_help(self):
     shortcuts_text = """⌨️ Keyboard Shortcuts
-    
+
 Chat-Steuerung:
   Strg+N      ➕ Neuer Chat
   Strg+S      💾 Chat speichern
@@ -1222,14 +1222,14 @@ def _render_list(self, line: str, base_tag: str) -> bool:
     # Auto-Indentation berechnen
     indent_level = (len(line) - len(line.lstrip(' '))) // 2
     indent_spaces = "  " * indent_level
-    
+
     # Bullet Lists
     if stripped.startswith(('- ', '* ', '• ')):
         content = stripped[2:].strip()
         self.text_widget.insert(tk.END, f"{indent_spaces}{bullet_icon} ", "md_list_item")
         self.render_inline_markdown(content, base_tag)
         return True
-    
+
     # Nummerierte Listen (Regex: ^\d+\.\s)
     match = re.match(r'^(\d+)\.\s(.+)', stripped)
     if match:
@@ -1237,7 +1237,7 @@ def _render_list(self, line: str, base_tag: str) -> bool:
         self.text_widget.insert(tk.END, f"{indent_spaces}{num}. ", "md_list_item")
         self.render_inline_markdown(content, base_tag)
         return True
-    
+
     # ... weitere Listen-Typen (a., A., i., I.)
 ```
 
@@ -1253,7 +1253,7 @@ bullet_icon = VeritasIcons.get('special', 'bullet') if ICONS_AVAILABLE else '•
 
 Nach Integration testen:
 
-1. **Markdown-Rendering**: 
+1. **Markdown-Rendering**:
    - Sende Nachricht mit Markdown-Syntax
    - Prüfe Headings, Lists, Bold, Italic, Code, Links
    - ✨ **NEU**: Teste nested Lists mit verschiedenen Typen (1., a., i., -)

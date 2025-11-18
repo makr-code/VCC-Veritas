@@ -1,7 +1,7 @@
 # VERITAS Deep Research System - Vereinfachte Implementierungs-Roadmap
 
-**Datum:** 11. Oktober 2025  
-**Version:** 2.0 (OHNE LangGraph/Prefect)  
+**Datum:** 11. Oktober 2025
+**Version:** 2.0 (OHNE LangGraph/Prefect)
 **Philosophie:** Evolutionär statt revolutionär - Bestehende Architektur erweitern
 
 ---
@@ -43,12 +43,12 @@ VERITAS nutzt bereits **UDS3 (Universal Document System 3)** - ein polyglot RAG-
 1. **Research State Schema** (1 Tag)
    - `backend/agents/veritas_research_state.py`
    - TypedDicts für ResearchState, ExecutionTraceEntry
-   
+
 2. **PostgreSQL Persistence** (2-3 Tage)
    - `backend/agents/veritas_state_persister.py`
    - Migration: `CREATE TABLE research_states`
    - CRUD Operations (save, load, list, delete)
-   
+
 3. **SupervisorAgent Integration** (3-4 Tage)
    - Erweitere `process_query()` um `research_id` Parameter
    - State Loading/Saving
@@ -61,7 +61,7 @@ VERITAS nutzt bereits **UDS3 (Universal Document System 3)** - ein polyglot RAG-
 class SupervisorAgent:
     def __init__(self, db_config, ...):
         self.persister = ResearchStatePersister(db_config)
-    
+
     async def process_query(
         self,
         query: str,
@@ -72,11 +72,11 @@ class SupervisorAgent:
             state = await self.persister.load_state(research_id)
         else:
             state = self._create_initial_state(query)
-        
+
         # Process with state tracking
         while state['status'] == 'IN_PROGRESS':
             result = await self._execute_next_step(state)
-            
+
             # Log execution
             state['execution_trace'].append({
                 "task_id": len(state['execution_trace']) + 1,
@@ -84,10 +84,10 @@ class SupervisorAgent:
                 "action": "EXECUTE",
                 "output": result.dict()
             })
-            
+
             # Persist
             await self.persister.save_state(state['research_id'], state)
-        
+
         return state
 ```
 
@@ -118,7 +118,7 @@ class SupervisorAgent:
     async def _execute_workflow_with_refinement(self, state: ResearchState):
         """
         Custom State Machine mit Reflexions-Loop
-        
+
         Flow:
         PLANNING → EXECUTING → EVALUATING
                         ↑           ↓
@@ -126,18 +126,18 @@ class SupervisorAgent:
                                 ↓
                             COMPLETED
         """
-        
+
         max_refinements = 3
         refinement_count = 0
         current_state = WorkflowState.PLANNING
-        
+
         while current_state != WorkflowState.COMPLETED:
             if current_state == WorkflowState.PLANNING:
                 # Step 1: Agent Selection
                 selected_agents = await self._select_agents(state['query'])
                 state['selected_agents'] = selected_agents
                 current_state = WorkflowState.EXECUTING
-            
+
             elif current_state == WorkflowState.EXECUTING:
                 # Step 2: Execute Agents
                 results = await self._execute_agents(
@@ -146,7 +146,7 @@ class SupervisorAgent:
                 )
                 state['agent_results'] = results
                 current_state = WorkflowState.EVALUATING
-            
+
             elif current_state == WorkflowState.EVALUATING:
                 # Step 3: Evaluate Quality (NEW!)
                 evaluator = EvaluatorAgent(self.ollama)
@@ -155,16 +155,16 @@ class SupervisorAgent:
                     context=self._format_context(results),
                     answer=results[-1].response_text
                 )
-                
+
                 state['evaluation'] = evaluation
-                
+
                 # Decision: Good enough or refine?
                 avg_score = (
                     evaluation['context_relevance'] +
                     evaluation['groundedness'] +
                     evaluation['answer_relevance']
                 ) / 3
-                
+
                 if avg_score >= 0.75:
                     # Good enough!
                     current_state = WorkflowState.COMPLETED
@@ -176,17 +176,17 @@ class SupervisorAgent:
                     # Refine!
                     logger.info(f"Quality too low ({avg_score:.2f}), refining...")
                     current_state = WorkflowState.REFINING
-            
+
             elif current_state == WorkflowState.REFINING:
                 # Step 4: Reformulate Query
                 refinement_count += 1
-                
+
                 # Use evaluator feedback to improve query
                 refined_query = await self._reformulate_query(
                     original_query=state['query'],
                     feedback=state['evaluation']['feedback']
                 )
-                
+
                 state['query'] = refined_query
                 state['refinement_history'].append({
                     "iteration": refinement_count,
@@ -194,13 +194,13 @@ class SupervisorAgent:
                     "refined_query": refined_query,
                     "reason": state['evaluation']['feedback']
                 })
-                
+
                 # Go back to planning
                 current_state = WorkflowState.PLANNING
-            
+
             # Persist state after each step
             await self.persister.save_state(state['research_id'], state)
-        
+
         return state
 ```
 
@@ -209,12 +209,12 @@ class SupervisorAgent:
    - `backend/agents/veritas_evaluator_agent.py`
    - RAG-Triade: Context Relevance, Groundedness, Answer Relevance
    - LLM-as-a-Judge mit Few-Shot Prompts
-   
+
 2. **State Machine in SupervisorAgent** (2-3 Tage)
    - `WorkflowState` Enum
    - `_execute_workflow_with_refinement()` Methode
    - Decision Logic (Score-basiert)
-   
+
 3. **Query Reformulation** (1-2 Tage)
    - `_reformulate_query()` Methode
    - Uses Evaluator Feedback
@@ -246,18 +246,18 @@ class SupervisorAgent:
    - ChromaDB Status prüfen
    - Neo4j Status prüfen (falls vorhanden)
    - Dokumenten-Statistiken
-   
+
 2. **UDS3 Query-Optimierung** (2-3 Tage)
    ```python
    # Nutze UDS3's bestehende APIs besser
    from uds3 import DocumentStore
-   
+
    class UDS3EnhancedAgent:
        """Nutzt UDS3 RAG-System optimal"""
-       
+
        def __init__(self, uds3_store: DocumentStore):
            self.store = uds3_store
-       
+
        async def hybrid_search(self, query: str, top_k: int = 10):
            """
            Hybrid Search: Vector + Keyword + Graph (falls Neo4j aktiv)
@@ -268,13 +268,13 @@ class SupervisorAgent:
                top_k=top_k,
                filters={"status": "active"}
            )
-           
+
            # 2. Keyword Search (PostgreSQL via UDS3)
            keyword_results = await self.store.keyword_search(
                query=query,
                top_k=top_k
            )
-           
+
            # 3. Graph Search (Neo4j via UDS3, falls vorhanden)
            if self.store.has_graph_backend:
                graph_results = await self.store.graph_query(
@@ -283,12 +283,12 @@ class SupervisorAgent:
                )
            else:
                graph_results = []
-           
+
            # 4. Merge & Re-rank
            merged = self._merge_results(vector_results, keyword_results, graph_results)
            return merged
    ```
-   
+
 3. **Integration in SupervisorAgent** (2-3 Tage)
    - Nutze UDS3 statt separate ChromaDB/Neo4j Calls
    - Hybrid Search aktivieren
@@ -309,12 +309,12 @@ class SupervisorAgent:
 1. **SearxNG Docker Setup** (1 Tag)
    - `docker-compose.yml` mit SearxNG
    - Privacy-Config (keine Logs)
-   
+
 2. **SearxNG Agent Implementation** (4-5 Tage)
    - `backend/agents/veritas_searxng_agent.py`
    - Web Search mit Deduplication
    - Integration in SupervisorAgent
-   
+
 3. **Testing** (2-3 Tage)
    - Unit Tests
    - Integration Tests
@@ -336,11 +336,11 @@ class SupervisorAgent:
    - `backend/agents/veritas_integrity_manager.py`
    - SHA-256 Hash Chain
    - RSA Digital Signatures
-   
+
 2. **Integration in State Persister** (2-3 Tage)
    - `save_state()` berechnet Hash + Signatur
    - `load_state()` verifiziert Integrität
-   
+
 3. **Testing** (2-3 Tage)
    - Manipulation Detection Tests
    - Performance Tests
@@ -354,7 +354,7 @@ class IntegrityManager:
         """SHA-256 Hash über execution_trace"""
         trace_json = json.dumps(execution_trace, sort_keys=True)
         return hashlib.sha256(trace_json.encode()).hexdigest()
-    
+
     def sign_state(self, state_hash: str) -> str:
         """RSA-PSS Signatur"""
         signature = self.private_key.sign(
@@ -363,7 +363,7 @@ class IntegrityManager:
             hashes.SHA256()
         )
         return signature.hex()
-    
+
     def verify_integrity(self, state: ResearchState) -> bool:
         """Verifiziert Hash-Kette + Signatur"""
         # Check hash chain
@@ -373,7 +373,7 @@ class IntegrityManager:
             )
             if state['integrity_chain'][i-1] != prev_hash:
                 return False  # Manipulation!
-        
+
         # Verify signature
         current_hash = self.compute_state_hash(state['execution_trace'])
         return self._verify_signature(current_hash, state['signature'])

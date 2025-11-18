@@ -1,5 +1,5 @@
 # ThemisDB & Adapter Endpoints - Quick Reference
-**Erstellt:** 7. November 2025  
+**Erstellt:** 7. November 2025
 **Status:** ✅ Produktionsbereit
 
 ---
@@ -476,7 +476,7 @@ async function searchWithThemis(query: string, topK: number = 5) {
       collection: 'documents'
     })
   });
-  
+
   const data = await response.json();
   return data.results;
 }
@@ -485,11 +485,11 @@ async function searchWithThemis(query: string, topK: number = 5) {
 async function checkAdapterStatus() {
   const response = await fetch('/api/v3/adapters/status');
   const data = await response.json();
-  
+
   console.log(`Current adapter: ${data.current_adapter}`);
   console.log(`ThemisDB available: ${data.themis_available}`);
   console.log(`Fallback enabled: ${data.failover_enabled}`);
-  
+
   return data;
 }
 
@@ -497,7 +497,7 @@ async function checkAdapterStatus() {
 async function getAdapterCapabilities() {
   const response = await fetch('/api/v3/adapters/capabilities');
   const capabilities = await response.json();
-  
+
   capabilities.forEach(cap => {
     console.log(`\n${cap.adapter.toUpperCase()}:`);
     console.log(`  Data Models: ${cap.data_models.join(', ')}`);
@@ -506,7 +506,7 @@ async function getAdapterCapabilities() {
       .filter(f => f.supported)
       .forEach(f => console.log(`    - ${f.name}: ${f.description}`));
   });
-  
+
   return capabilities;
 }
 
@@ -514,9 +514,9 @@ async function getAdapterCapabilities() {
 async function hasFeature(adapter: string, featureName: string): Promise<boolean> {
   const capabilities = await fetch('/api/v3/adapters/capabilities').then(r => r.json());
   const adapterCap = capabilities.find(c => c.adapter === adapter);
-  
+
   if (!adapterCap) return false;
-  
+
   const feature = adapterCap.features.find(f => f.name === featureName);
   return feature?.supported || false;
 }
@@ -525,12 +525,12 @@ async function hasFeature(adapter: string, featureName: string): Promise<boolean
 async function initSearchUI() {
   const hasGraphTraversal = await hasFeature('themis', 'graph_traversal');
   const hasFullTextSearch = await hasFeature('themis', 'full_text_search');
-  
+
   if (hasGraphTraversal) {
     // Enable "Show Related Documents" button
     document.getElementById('btn-related')?.removeAttribute('disabled');
   }
-  
+
   if (!hasFullTextSearch) {
     // Show fallback message
     console.warn('Full-text search not available, using vector search');
@@ -541,7 +541,7 @@ async function initSearchUI() {
 async function compareAdapters() {
   const response = await fetch('/api/v3/adapters/metrics');
   const metrics = await response.json();
-  
+
   metrics.forEach(m => {
     console.log(`${m.adapter}: ${m.success_rate * 100}% success, ${m.avg_latency_ms}ms avg`);
   });
@@ -557,24 +557,24 @@ import React, { useState, useEffect } from 'react';
 
 function AdapterStatus() {
   const [status, setStatus] = useState(null);
-  
+
   useEffect(() => {
     fetch('/api/v3/adapters/status')
       .then(res => res.json())
       .then(data => setStatus(data));
   }, []);
-  
+
   if (!status) return <div>Loading...</div>;
-  
+
   return (
     <div className="adapter-status">
       <h3>Database Adapter Status</h3>
       <div className={`adapter ${status.current_adapter === 'themis' ? 'active' : ''}`}>
-        <strong>ThemisDB:</strong> 
+        <strong>ThemisDB:</strong>
         {status.themis_available ? '✅ Available' : '❌ Unavailable'}
       </div>
       <div className={`adapter ${status.current_adapter === 'uds3' ? 'active' : ''}`}>
-        <strong>UDS3:</strong> 
+        <strong>UDS3:</strong>
         {status.uds3_available ? '✅ Available' : '❌ Unavailable'}
       </div>
       <div className="failover">
@@ -863,6 +863,6 @@ curl "http://localhost:8000/api/v3/ws/connections"
 
 ---
 
-**Status:** ✅ Produktionsbereit  
-**Dokumentation:** Vollständig  
+**Status:** ✅ Produktionsbereit
+**Dokumentation:** Vollständig
 **Nächste Schritte:** Backend starten und Endpoints testen

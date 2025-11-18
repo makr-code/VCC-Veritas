@@ -1,7 +1,7 @@
 # 📋 VERITAS v3.20.0 - Deployment Log
 
-**Version:** v3.20.0 (Chat Persistence)  
-**Created:** 12. Oktober 2025, 17:00 Uhr  
+**Version:** v3.20.0 (Chat Persistence)
+**Created:** 12. Oktober 2025, 17:00 Uhr
 **Status:** 🟢 PRE-DEPLOYMENT READY
 
 ---
@@ -10,7 +10,7 @@
 
 ### Pre-Deployment Phase ✅
 
-**Date:** 12. Oktober 2025, 17:00 Uhr  
+**Date:** 12. Oktober 2025, 17:00 Uhr
 **Status:** ✅ COMPLETE
 
 **Tasks Completed:**

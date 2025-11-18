@@ -1,9 +1,9 @@
 # Syntax-Highlighting Implementation - Feature #3
 
-**Feature**: #3 aus Rich-Text Enhancements TODO  
-**Status**: ✅ Implementiert (2025-10-09)  
-**Version**: v3.9.0  
-**Author**: Copilot  
+**Feature**: #3 aus Rich-Text Enhancements TODO
+**Status**: ✅ Implementiert (2025-10-09)
+**Version**: v3.9.0
+**Author**: Copilot
 
 ---
 
@@ -73,21 +73,21 @@ Code-Blöcke in VERITAS-Chat-Antworten werden jetzt mit professionellem Syntax-H
 
 3. Markdown-Rendering:
    render_markdown(response_text)
-   
+
 4. Code-Fence-Erkennung:
    Regex: ```(\w+)?\n(.*?)```
    → language="python", code="def decorator..."
 
 5. Syntax-Highlighting:
    highlighter.highlight_code(code, language="python")
-   
+
 6. Pygments Tokenization:
    lex(code, PythonLexer())
    → [(Token.Keyword, 'def'), (Token.Name, 'decorator'), ...]
 
 7. Token-to-Tag Mapping:
    Token.Keyword → "syntax_keyword"
-   
+
 8. Tkinter Text Widget:
    text_widget.insert("def", tag="syntax_keyword")
    # → Blauer Text (#569cd6)
@@ -123,14 +123,14 @@ except ImportError:
 class SyntaxHighlighter:
     """
     Syntax-Highlighting für Code-Blöcke mit Pygments
-    
+
     Features:
     - Automatische Sprach-Erkennung
     - Token → Tkinter Tag Mapping
     - VS Code Dark+ Farbschema
     - 15+ Programmiersprachen
     """
-    
+
     # Farbschema (VS Code Dark+ Theme)
     COLOR_SCHEME = {
         Token.Keyword: '#569cd6',           # Blau
@@ -141,37 +141,37 @@ class SyntaxHighlighter:
         Token.Name.Builtin: '#4ec9b0',      # Türkis
         # ... weitere Tokens
     }
-    
+
     def __init__(self, text_widget: tk.Text):
         self.text_widget = text_widget
         if PYGMENTS_AVAILABLE:
             self._configure_syntax_tags()
-    
+
     def highlight_code(
-        self, 
-        code: str, 
+        self,
+        code: str,
         language: Optional[str] = None,
         insert_position: str = tk.END
     ) -> List[Tuple[str, str]]:
         """
         Highlightet Code-Text mit Pygments
-        
+
         Args:
             code: Code-Text
             language: Programmiersprache (optional)
             insert_position: Position im Text-Widget
-        
+
         Returns:
             Liste von (text, tag) Tuples
         """
         detected_language = self.detect_language(code, hint=language)
         lexer = get_lexer_by_name(detected_language)
         tokens = list(lex(code, lexer))
-        
+
         for token_type, token_text in tokens:
             tag_name = self._token_to_tag(token_type)
             self.text_widget.insert(insert_position, token_text, tag_name)
-        
+
         return [(t, self._token_to_tag(tt)) for tt, t in tokens]
 ```
 
@@ -183,7 +183,7 @@ class SyntaxHighlighter:
    if hint:
        language = LANGUAGE_ALIASES.get(hint, hint)
        return language
-   
+
    # Priorität 2: Guess aus Code-Inhalt
    lexer = guess_lexer(code)
    return lexer.name.lower()
@@ -229,7 +229,7 @@ def __init__(self, text_widget: tk.Text):
     self.text_widget = text_widget
     self.link_handlers = {}
     self.copy_buttons = []
-    
+
     # ✨ NEU: Syntax-Highlighter initialisieren
     self.syntax_highlighter = None
     if SYNTAX_AVAILABLE:
@@ -249,24 +249,24 @@ def render_markdown(self, text: str, base_tag: str = "assistant") -> None:
     """
     # Code-Block-Pattern: ```language\ncode\n```
     code_block_pattern = r'```(\w+)?\n(.*?)```'
-    
+
     # Splitte Text bei Code-Blöcken
     parts = re.split(code_block_pattern, text, flags=re.DOTALL)
-    
+
     i = 0
     while i < len(parts):
         part = parts[i]
-        
+
         # Prüfe auf Code-Block (nach Split: language, code)
         if i + 2 < len(parts) and parts[i + 1]:
             language = parts[i + 1].strip()
             code_content = parts[i + 2]
-            
+
             # Render Code-Block mit Syntax-Highlighting
             self.render_code_block(code_content, language=language)
             i += 3
             continue
-        
+
         # Normaler Text - zeilenweise verarbeiten
         # ... (bestehende Logik)
         i += 1
@@ -278,7 +278,7 @@ def render_markdown(self, text: str, base_tag: str = "assistant") -> None:
 def render_code_block(self, code: str, language: Optional[str] = None, add_copy_button: bool = True) -> None:
     """
     ✨ NEU: Rendert mehrzeiligen Code-Block mit Syntax-Highlighting
-    
+
     Unterstützt Code-Fences:
     ```python
     def hello():
@@ -287,9 +287,9 @@ def render_code_block(self, code: str, language: Optional[str] = None, add_copy_
     """
     if not code:
         return
-    
+
     start_pos = self.text_widget.index(tk.END)
-    
+
     # Syntax-Highlighting anwenden
     if self.syntax_highlighter:
         self.syntax_highlighter.highlight_multiline_block(
@@ -301,11 +301,11 @@ def render_code_block(self, code: str, language: Optional[str] = None, add_copy_
     else:
         # Fallback: Einfaches Code-Rendering
         self.text_widget.insert(tk.END, code, "md_code")
-    
+
     # Copy-Button hinzufügen
     if add_copy_button:
         self._add_copy_button(code, start_pos)
-    
+
     self.text_widget.insert(tk.END, '\n')
 ```
 
@@ -317,21 +317,21 @@ def _render_code(self, part: str, add_copy_button: bool = True, language: Option
     ✨ ERWEITERT: Syntax-Highlighting für inline code
     """
     code_match = re.match(r'`([^`]+)`', part)
-    
+
     if code_match:
         code_text = code_match.group(1)
         code_start = self.text_widget.index(tk.END)
-        
+
         # ✨ Syntax-Highlighting für inline code
         if self.syntax_highlighter and language:
             self.syntax_highlighter.highlight_code(code_text, language=language)
         else:
             self.text_widget.insert(tk.END, code_text, "md_code")
-        
+
         # Copy-Button
         if add_copy_button and len(code_text.strip()) > 3:
             self._add_copy_button(code_text, code_start)
-        
+
         return True
     return False
 ```
@@ -818,7 +818,7 @@ Wenn Pygments **nicht** installiert ist:
 
 ---
 
-**Feature #3 Status**: ✅ **Abgeschlossen**  
-**Version**: v3.9.0  
-**Datum**: 2025-10-09  
+**Feature #3 Status**: ✅ **Abgeschlossen**
+**Version**: v3.9.0
+**Datum**: 2025-10-09
 **Nächstes Feature**: TBD (User entscheidet)

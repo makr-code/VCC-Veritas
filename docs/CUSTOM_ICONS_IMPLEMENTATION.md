@@ -1,9 +1,9 @@
 # Custom Icons System - Technische Dokumentation
 
-**Feature**: Rich-Text Enhancement #10  
-**Version**: v3.11.0  
-**Datum**: 2025-10-09  
-**Modul**: `frontend/ui/veritas_ui_icons.py`  
+**Feature**: Rich-Text Enhancement #10
+**Version**: v3.11.0
+**Datum**: 2025-10-09
+**Modul**: `frontend/ui/veritas_ui_icons.py`
 **Status**: ✅ Produktionsreif
 
 ---
@@ -58,7 +58,7 @@ class VeritasIcons:
     # Basis-Methode
     @classmethod
     def get(cls, category: str, name: str, fallback: str = '•') -> str
-    
+
     # Shortcut-Methoden
     @classmethod
     def chat(cls, name: str, fallback: str = '💬') -> str
@@ -67,12 +67,12 @@ class VeritasIcons:
     def agent(cls, name: str, fallback: str = '🤖') -> str
     def action(cls, name: str, fallback: str = '⚙️') -> str
     def status(cls, name: str, fallback: str = '⚪') -> str
-    
+
     # Kontext-basierte Methoden
     @classmethod
     def file(cls, extension: str, fallback: str = '📄') -> str
     def confidence(cls, score: float) -> str
-    
+
     # Utility-Methoden
     @classmethod
     def get_all_icons(cls) -> Dict[str, Dict[str, str]]
@@ -161,7 +161,7 @@ icon = VeritasIcons.get('unknown_category', 'test')
 def _insert_sources(self, sources: List[str]) -> None:
     self.text_widget.insert(tk.END, "\n📚 ", "header")
     self.text_widget.insert(tk.END, "Verwendete Quellen:\n", "header")
-    
+
     for i, source in enumerate(sources, 1):
         self.text_widget.insert(tk.END, f"  {i}. ", "source")
         # ...
@@ -176,7 +176,7 @@ def _insert_sources(self, sources: List[str]) -> None:
     sources_icon = VeritasIcons.source('sources') if ICONS_AVAILABLE else '📚'
     self.text_widget.insert(tk.END, f"\n{sources_icon} ", "header")
     self.text_widget.insert(tk.END, "Verwendete Quellen:\n", "header")
-    
+
     for i, source in enumerate(sources, 1):
         # Dynamisches Source-Icon basierend auf Typ
         source_icon = get_source_icon(source) if ICONS_AVAILABLE else '📄'
@@ -208,7 +208,7 @@ from frontend.ui.veritas_ui_icons import VeritasIcons, ICONS_AVAILABLE
 def _render_list(self, line: str, base_tag: str) -> bool:
     # Dynamisches Bullet-Icon
     bullet_icon = VeritasIcons.get('special', 'bullet') if ICONS_AVAILABLE else '•'
-    
+
     if line.strip().startswith(('- ', '* ', '• ')):
         content = line.strip()[2:].strip()
         self.text_widget.insert(tk.END, f"  {bullet_icon} ", "md_list_item")
@@ -434,32 +434,32 @@ import unittest
 from frontend.ui.veritas_ui_icons import VeritasIcons, get_source_icon, get_file_icon
 
 class TestVeritasIcons(unittest.TestCase):
-    
+
     def test_get_basic(self):
         """Test basic get() method"""
         self.assertEqual(VeritasIcons.get('chat', 'user'), '👤')
         self.assertEqual(VeritasIcons.get('sources', 'pdf'), '📕')
-    
+
     def test_shortcuts(self):
         """Test shortcut methods"""
         self.assertEqual(VeritasIcons.chat('assistant'), '🤖')
         self.assertEqual(VeritasIcons.source('web'), '🌐')
-    
+
     def test_fallback(self):
         """Test fallback icons"""
         self.assertEqual(VeritasIcons.get('nonexistent', 'test', '❓'), '❓')
-    
+
     def test_confidence_scoring(self):
         """Test confidence score mapping"""
         self.assertEqual(VeritasIcons.confidence(0.95), '🟢')
         self.assertEqual(VeritasIcons.confidence(0.65), '🟡')
         self.assertEqual(VeritasIcons.confidence(0.35), '🔴')
-    
+
     def test_file_icons(self):
         """Test file extension mapping"""
         self.assertEqual(VeritasIcons.file('.pdf'), '📕')
         self.assertEqual(VeritasIcons.file('docx'), '📘')
-    
+
     def test_source_detection(self):
         """Test automatic source icon detection"""
         self.assertEqual(get_source_icon('https://example.com'), '🌐')

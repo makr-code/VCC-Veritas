@@ -1,7 +1,7 @@
 # Token Overflow Strategies - Complete Implementation
 
-**Status**: ✅ **IMPLEMENTED**  
-**Date**: 2025-10-17  
+**Status**: ✅ **IMPLEMENTED**
+**Date**: 2025-10-17
 **File**: `backend/services/token_overflow_handler.py`
 
 ---
@@ -172,7 +172,7 @@ User Message: "📄 Antwort Teil 1/3 (aufgrund der Komplexität aufgeteilt)"
 # Check for potential overflow
 if context_window_manager and available_tokens < requested_tokens:
     overflow_handler = TokenOverflowHandler()
-    
+
     result = overflow_handler.handle_overflow(
         available_tokens=available_tokens,
         required_tokens=requested_tokens,
@@ -181,21 +181,21 @@ if context_window_manager and available_tokens < requested_tokens:
         query=request.query_text,
         agent_count=len(agent_results)
     )
-    
+
     # Apply strategy
     if result.strategy_used == OverflowStrategy.RERANK_CHUNKS:
         rag_result['documents'] = result.metadata['filtered_chunks']
         logger.info(f"✂️ {result.tokens_saved} tokens gespart durch Chunk-Reranking")
-    
+
     elif result.strategy_used == OverflowStrategy.SUMMARIZE_CONTEXT:
         rag_result = summarizer.compress(rag_result)
         logger.info(f"📝 {result.tokens_saved} tokens gespart durch Summarization")
-    
+
     elif result.strategy_used == OverflowStrategy.CHUNKED_RESPONSE:
         response.metadata['chunked'] = True
         response.metadata['chunk_plan'] = result.metadata['chunk_plan']
         logger.info("📄 Response wird in {len(result.metadata['chunk_plan'])} Teile aufgeteilt")
-    
+
     # Add user message to response
     if result.user_message:
         response.user_notice = result.user_message
@@ -337,6 +337,6 @@ python backend/services/token_overflow_handler.py
 
 ---
 
-**Author**: VERITAS System  
-**Date**: 2025-10-17  
+**Author**: VERITAS System
+**Date**: 2025-10-17
 **Status**: ✅ Production-Ready

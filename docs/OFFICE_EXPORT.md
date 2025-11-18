@@ -136,13 +136,13 @@ def handle_export(config):
     print(f"Format: {config['format']}")
     print(f"Period: {config['period']}")
     print(f"Metadata: {config['include_metadata']}")
-    
+
     # Filter messages
     if config['period'] == '7days':
         filtered = service.filter_messages_by_date(messages, days=7)
     else:
         filtered = messages
-    
+
     # Export
     if config['format'] == '.docx':
         service.export_to_word(
@@ -358,7 +358,7 @@ from frontend.ui.veritas_ui_export_dialog import show_export_dialog
 class VeritasApp:
     def __init__(self):
         # ... existing code ...
-        
+
         # Export Service
         self.export_service = OfficeExportService(
             output_dir=Path("./exports")
@@ -370,13 +370,13 @@ class VeritasApp:
 ```python
 def _create_menu(self):
     menubar = tk.Menu(self.root)
-    
+
     # File Menu
     file_menu = tk.Menu(menubar, tearoff=0)
     file_menu.add_command(label="📤 Chat exportieren...", command=self._show_export_dialog)
     file_menu.add_separator()
     file_menu.add_command(label="Beenden", command=self.root.quit)
-    
+
     menubar.add_cascade(label="Datei", menu=file_menu)
     self.root.config(menu=menubar)
 ```
@@ -392,13 +392,13 @@ def _handle_export(self, config: Dict):
     """Handles export"""
     # Get messages from chat
     messages = self.chat_formatter.get_all_messages()
-    
+
     # Filter by period
     if config['period'] != 'all':
         days_map = {'today': 1, '7days': 7, '30days': 30, '90days': 90}
         days = days_map.get(config['period'], 7)
         messages = self.export_service.filter_messages_by_date(messages, days)
-    
+
     # Export
     try:
         if config['format'] == '.docx':
@@ -416,17 +416,17 @@ def _handle_export(self, config: Dict):
                 feedback_stats=stats,
                 filename=config['filename']
             )
-        
+
         # Success message
         messagebox.showinfo(
             "Export erfolgreich",
             f"Chat exportiert nach:\n{path}"
         )
-        
+
         # Open folder
         import subprocess
         subprocess.run(['explorer', '/select,', str(path)])
-    
+
     except Exception as e:
         messagebox.showerror("Export-Fehler", str(e))
 ```
@@ -523,7 +523,7 @@ wb.close()  # ← Add this
 ```python
 class OfficeExportService:
     def __init__(output_dir: Optional[Path] = None)
-    
+
     def export_to_word(
         chat_messages: List[Dict],
         filename: Optional[str] = None,
@@ -531,18 +531,18 @@ class OfficeExportService:
         include_metadata: bool = True,
         include_sources: bool = True
     ) -> Path
-    
+
     def export_to_excel(
         chat_messages: List[Dict],
         feedback_stats: Optional[Dict] = None,
         filename: Optional[str] = None
     ) -> Path
-    
+
     def filter_messages_by_date(
         messages: List[Dict],
         days: int = 7
     ) -> List[Dict]
-    
+
     def get_supported_formats() -> List[str]
 ```
 
@@ -555,7 +555,7 @@ class ExportDialog:
         on_export: Callable[[Dict], None],
         supported_formats: List[str] = ['.docx', '.xlsx']
     )
-    
+
     def show() -> None
 
 # Convenience function
@@ -581,6 +581,6 @@ def show_export_dialog(
 
 ---
 
-**Status:** ✅ **Production-Ready**  
-**License:** MIT  
+**Status:** ✅ **Production-Ready**
+**License:** MIT
 **Author:** VERITAS Team

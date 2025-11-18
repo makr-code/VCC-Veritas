@@ -1,8 +1,8 @@
 # VERITAS Backend Refactoring
 ## Von Multiple Backends → Unified Backend
 
-**Datum:** 19. Oktober 2025  
-**Version:** 4.0.0  
+**Datum:** 19. Oktober 2025
+**Version:** 4.0.0
 **Status:** ✅ Phase 1 Complete
 
 ---
@@ -52,7 +52,7 @@ class UnifiedResponse(BaseModel):
     metadata: UnifiedResponseMetadata         # Processing Details
     session_id: str
     timestamp: datetime
-    
+
     # Optional Advanced Features
     agent_results: Optional[List[Dict]]
     external_data: Optional[List[Dict]]
@@ -85,7 +85,7 @@ class QueryService:
         self,
         request: UnifiedQueryRequest
     ) -> UnifiedResponse:
-        
+
         # Route based on mode
         if mode == "rag":
             result = await self._process_rag(request)
@@ -97,7 +97,7 @@ class QueryService:
             result = await self._process_agent(request)
         else:
             result = await self._process_ask(request)
-        
+
         # Return unified response
         return UnifiedResponse(...)
 ```

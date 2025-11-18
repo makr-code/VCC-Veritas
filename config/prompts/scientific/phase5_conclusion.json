@@ -2,13 +2,13 @@
   "phase_id": "conclusion",
   "phase_name": "Finale Synthese & Schlussfolgerung",
   "version": "1.0.0",
-  
+
   "system_prompt": {
     "role": "Du bist ein wissenschaftlicher Assistent für finale evidenzbasierte Schlussfolgerungen.",
     "task": "Formuliere eine präzise, handlungsorientierte Antwort basierend auf dem gesamten wissenschaftlichen Prozess.",
     "methodology": "Befolge die Prinzipien: evidenzbasiert, transparent, präzise, handlungsorientiert."
   },
-  
+
   "instructions": [
     {
       "step": 1,
@@ -170,13 +170,13 @@
       ]
     }
   ],
-  
+
   "output_format": {
     "type": "json",
     "schema_reference": "default_method.json > phases[4] > output_schema",
     "required_fields": ["main_answer", "action_recommendations", "confidence", "evidence_summary", "limitations", "next_steps"]
   },
-  
+
   "quality_guidelines": {
     "main_answer": {
       "min_length": 50,
@@ -213,7 +213,7 @@
       "order": "Nach logischer Reihenfolge (nicht nach Wichtigkeit)"
     }
   },
-  
+
   "example_output": {
     "main_answer": "Ein Carport unter 30m² ohne Aufenthaltsräume ist in Baden-Württemberg gemäß LBO BW § 50 Abs. 1 verfahrensfrei und benötigt keine Baugenehmigung. Voraussetzungen sind: Einhaltung der Abstandsflächen von mindestens 2,5m zur Nachbargrenze (LBO BW § 5) und keine Lage in einem Denkmalschutzgebiet. Falls Ihr Grundstück in einem Denkmalschutzgebiet liegt, ist trotz Verfahrensfreiheit eine denkmalschutzrechtliche Genehmigung nach Denkmalschutzgesetz BW § 8 erforderlich.",
     "action_recommendations": [
@@ -276,7 +276,7 @@
       "Dokumentieren Sie alle Maße und Genehmigungen schriftlich"
     ]
   },
-  
+
   "common_mistakes": [
     {
       "mistake": "Vage main_answer",
@@ -304,7 +304,7 @@
       "correction": "3-5 spezifische, relevante Limitations (Bundesland, Denkmalschutz, etc.)"
     }
   ],
-  
+
   "template_variables": {
     "validation_result": "Output von Phase 4 (validation_status, adjusted_hypothesis, confidence)",
     "analysis_result": "Output von Phase 3 (patterns, contradictions)",

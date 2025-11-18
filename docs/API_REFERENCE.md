@@ -1,7 +1,7 @@
 # VERITAS API Reference
 
-**Version:** 1.0.0  
-**Last Updated:** 2025-10-08  
+**Version:** 1.0.0
+**Last Updated:** 2025-10-08
 **Base URL:** `https://api.veritas.example.com`
 
 ---
@@ -1032,6 +1032,6 @@ X-RateLimit-Reset: 1728396000
 
 ---
 
-**Last Updated:** 2025-10-08  
-**Version:** 1.0.0  
+**Last Updated:** 2025-10-08
+**Version:** 1.0.0
 **License:** MIT

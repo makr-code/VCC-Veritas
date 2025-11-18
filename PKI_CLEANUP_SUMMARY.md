@@ -1,7 +1,7 @@
 # PKI Cleanup - Summary
 
-**Datum:** 14. Oktober 2025  
-**Status:** ✅ **ERFOLGREICH ABGESCHLOSSEN**  
+**Datum:** 14. Oktober 2025
+**Status:** ✅ **ERFOLGREICH ABGESCHLOSSEN**
 **Dauer:** ~10 Minuten
 
 ---
@@ -79,9 +79,9 @@
 
 ## 🎯 Externer PKI-Service
 
-**Location:** `C:\VCC\PKI`  
-**URL:** `https://localhost:8443`  
-**API:** `/api/v1/`  
+**Location:** `C:\VCC\PKI`
+**URL:** `https://localhost:8443`
+**API:** `/api/v1/`
 **Auth:** mTLS (Client Certificates)
 
 ### Service-Zertifikate
@@ -232,6 +232,6 @@ Get-Content C:\VCC\PKI\logs\pki-service.log -Tail 50
 
 ---
 
-**Version:** 1.0.0  
-**Erstellt:** 14. Oktober 2025, 06:51 Uhr  
+**Version:** 1.0.0
+**Erstellt:** 14. Oktober 2025, 06:51 Uhr
 **Autor:** VCC Development Team

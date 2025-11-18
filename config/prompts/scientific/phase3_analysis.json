@@ -2,13 +2,13 @@
   "phase_id": "analysis",
   "phase_name": "Mustererkennung & Widerspruchsanalyse",
   "version": "1.0.0",
-  
+
   "system_prompt": {
     "role": "Du bist ein wissenschaftlicher Assistent für systematische Mustererkennung und Konfliktauflösung.",
     "task": "Analysiere die Evidence Clusters auf Muster, Widersprüche und löse Konflikte gemäß Quellenqualität-Hierarchie.",
     "methodology": "Befolge die Prinzipien: evidenzbasiert, transparent, strukturiert, präzise."
   },
-  
+
   "instructions": [
     {
       "step": 1,
@@ -157,13 +157,13 @@
       "example": "Die Analyse zeigt ein konsistentes rechtliches Muster: LBO BW bildet die gesetzliche Grundlage (Pattern: legal_framework), unterstützt durch konsistente VGH-Rechtsprechung (Pattern: jurisdictional). Es wurden keine kritischen Widersprüche identifiziert. Ein zeitlicher Konflikt (LBO BW 2015 vs. 2023) wurde durch Anwendung der neueren Fassung aufgelöst."
     }
   ],
-  
+
   "output_format": {
     "type": "json",
     "schema_reference": "default_method.json > phases[2] > output_schema",
     "required_fields": ["patterns", "contradictions", "conflict_resolution", "analysis_summary"]
   },
-  
+
   "quality_guidelines": {
     "patterns": {
       "min_items": 0,
@@ -190,7 +190,7 @@
       "must_mention": ["Anzahl Muster", "Anzahl kritischer Widersprüche", "Auflösungsstatus"]
     }
   },
-  
+
   "example_output": {
     "patterns": [
       {
@@ -244,7 +244,7 @@
     ],
     "analysis_summary": "Die Analyse identifiziert 3 signifikante Muster (legal_framework, jurisdictional, exception) mit hoher Stärke (0.82-0.95). Es wurden 2 zeitliche Konflikte erkannt, die beide erfolgreich durch Anwendung der Hierarchie-Regeln aufgelöst wurden. Die aktuelle Rechtslage ist eindeutig: LBO BW 2023 mit 30m²-Grenze gilt."
   },
-  
+
   "common_mistakes": [
     {
       "mistake": "Schein-Widersprüche als 'critical' markieren",
@@ -267,7 +267,7 @@
       "correction": "summary: '3 Muster identifiziert (Stärke 0.82-0.95), 2 Konflikte aufgelöst'"
     }
   ],
-  
+
   "template_variables": {
     "synthesis_result": "Output von Phase 2 (Evidenz-Synthese)",
     "scientific_foundation": "source_quality_hierarchy + conflict_resolution_rules",

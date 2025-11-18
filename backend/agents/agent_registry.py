@@ -651,7 +651,7 @@ def get_agent(agent_id: str) -> Optional[Any]:
 
 def list_agents() -> Dict[str, Any]:
     """Convenience function to list all agents"""
-    return get_agent_registry().list_available_workers()
+    return get_agent_registry().list_available_agents()
 
 def search_agents(query: str) -> List[str]:
     """Convenience function to search agents"""
@@ -670,7 +670,7 @@ if __name__ == "__main__":
     # List all agents
     print("\n📋 AVAILABLE WORKERS:")
     print("-" * 80)
-    for agent_id, info in registry.list_available_workers().items():
+    for agent_id, info in registry.list_available_agents().items():
         print(f"\n{agent_id}:")
         print(f"  Domain: {info['domain']}")
         print(f"  Capabilities: {', '.join(info['capabilities'][:5])}...")
@@ -686,8 +686,13 @@ if __name__ == "__main__":
     print("\n\n🌍 ENVIRONMENTAL DOMAIN WORKERS:")
     print("-" * 80)
     env_agents = registry.get_agents_by_domain(AgentDomain.ENVIRONMENTAL)
+<<<<<<< Updated upstream
     print(f"Found {len(env_workers)} agents: {env_workers}")
     
+=======
+    print(f"Found {len(env_agents)} agents: {env_agents}")
+
+>>>>>>> Stashed changes
     print("\n" + "=" * 80)
     print("✅ Agent Registry Demo Complete!")
     print("=" * 80)

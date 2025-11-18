@@ -1,7 +1,7 @@
 # NÄCHSTER TODO-PUNKT - Empfehlung 🎯
 
-**Datum:** 14. Oktober 2025, 09:05 Uhr  
-**Basis:** IMPLEMENTATION_GAP_ANALYSIS_TODO.md  
+**Datum:** 14. Oktober 2025, 09:05 Uhr
+**Basis:** IMPLEMENTATION_GAP_ANALYSIS_TODO.md
 **Aktueller Status:** Phase 2 Complete (Streaming funktioniert!)
 
 ---
@@ -70,10 +70,10 @@ class NLPService:
 ```python
 class ProcessBuilder:
     def __init__(self, nlp_service: NLPService)
-    
+
     def build_process_tree(self, query: str) -> ProcessTree:
         """Converts user query → ProcessTree with steps + dependencies"""
-        
+
     def _infer_steps(self, intent: Intent, entities: List[Entity]) -> List[ProcessStep]
     def _infer_dependencies(self, steps: List[ProcessStep]) -> Dict[str, List[str]]
 ```
@@ -91,11 +91,11 @@ ProcessTree:
     - id: "search_regulations"
       name: "Suche Bauvorschriften Stuttgart"
       dependencies: []
-      
+
     - id: "search_forms"
       name: "Suche Antragsformulare"
       dependencies: []
-      
+
     - id: "compile_checklist"
       name: "Erstelle Unterlagen-Checkliste"
       dependencies: ["search_regulations", "search_forms"]
@@ -113,10 +113,10 @@ ProcessTree:
 ```python
 class ProcessExecutor:
     def __init__(self, dependency_resolver: DependencyResolver)
-    
+
     def execute_process(self, process: ProcessTree) -> ProcessResult:
         """Executes process with parallel execution where possible"""
-        
+
     def _execute_parallel_group(self, step_ids: List[str]) -> Dict[str, StepResult]
     def _aggregate_results(self, results: Dict[str, StepResult]) -> ProcessResult
 ```
@@ -160,7 +160,7 @@ class ProcessTree:
 class Entity:
     text: str
     type: str  # location, organization, person, etc.
-    
+
 @dataclass
 class Intent:
     type: str  # fact_retrieval, procedure_query, etc.
@@ -401,13 +401,13 @@ cat docs\SERVER_SIDE_PROCESSING_ARCHITECTURE.md
 
 ---
 
-**Status:** ✅ READY TO START!  
-**Nächster Schritt:** Create `backend/services/nlp_service.py`  
+**Status:** ✅ READY TO START!
+**Nächster Schritt:** Create `backend/services/nlp_service.py`
 **Estimated Time:** 2-3 Tage bis Phase 1 Complete
 
 ---
 
-**Version:** 1.0  
-**Erstellt:** 14. Oktober 2025, 09:10 Uhr  
-**Basis:** IMPLEMENTATION_GAP_ANALYSIS_TODO.md  
+**Version:** 1.0
+**Erstellt:** 14. Oktober 2025, 09:10 Uhr
+**Basis:** IMPLEMENTATION_GAP_ANALYSIS_TODO.md
 **Recommendation:** Phase 1 Foundation ✅

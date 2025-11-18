@@ -38,14 +38,14 @@ def send_chat_message(self, content: str):
     try:
         # API-Call
         api_response = requests.post(...)
-        
+
     except requests.exceptions.Timeout:
         self._display_error_with_retry(
             "⏱️ Timeout: Server antwortet nicht (30s)",
             content,
             "timeout"
         )
-    
+
     except requests.exceptions.ConnectionError:
         self._display_error_with_retry(
             "🔌 Verbindungsfehler: Server nicht erreichbar",
@@ -66,7 +66,7 @@ def _display_error_with_retry(self, error_message, original_query, error_type):
         'error_type': error_type,
         'retryable': True
     }
-    
+
     self.chat_messages.append(error_msg)
     self.window.after(0, lambda: self._render_error_message(error_msg))
 ```
@@ -83,27 +83,27 @@ def _render_error_message(self, error_data):
         borderwidth=2,
         padx=15, pady=10
     )
-    
+
     # Icon
     error_icon = tk.Label(error_frame, text="❌", font=('Segoe UI', 16))
-    
+
     # Message
     error_text = tk.Label(error_frame, text=error_data['content'])
-    
+
     # Retry-Button
     retry_btn = tk.Button(
         error_frame,
         text="🔄 Erneut versuchen",
         command=lambda: self._retry_failed_query(error_data)
     )
-    
+
     # Dismiss-Button
     dismiss_btn = tk.Button(
         error_frame,
         text="✕ Schließen",
         command=lambda: self._dismiss_error(error_frame)
     )
-    
+
     # In Chat einfügen
     self.chat_text.window_create(tk.END, window=error_frame)
 ```
@@ -304,19 +304,19 @@ ErrorMessage = {
 ## 🎯 Anwendungsfälle
 
 ### 1. Backend-Downtime
-**Problem:** Backend-Server nicht verfügbar  
+**Problem:** Backend-Server nicht verfügbar
 **Lösung:** ConnectionError → Retry-Button → User kann später erneut versuchen
 
 ### 2. Timeout bei langen Queries
-**Problem:** Komplexe RAG-Query dauert >30s  
+**Problem:** Komplexe RAG-Query dauert >30s
 **Lösung:** Timeout-Error → Retry → Zweiter Versuch erfolgreich
 
 ### 3. Netzwerk-Probleme
-**Problem:** User's Internet-Verbindung instabil  
+**Problem:** User's Internet-Verbindung instabil
 **Lösung:** Request-Error → Retry nach Verbindungs-Fix
 
 ### 4. Rate-Limiting
-**Problem:** API-Rate-Limit erreicht (429)  
+**Problem:** API-Rate-Limit erreicht (429)
 **Lösung:** HTTP-Error → Retry nach Wartezeit
 
 ## 🚀 Best Practices
@@ -386,6 +386,6 @@ ErrorMessage = {
 
 ---
 
-**Version**: 1.0  
-**Datum**: 18. Oktober 2025  
+**Version**: 1.0
+**Datum**: 18. Oktober 2025
 **Status**: ✅ Implementiert und Getestet

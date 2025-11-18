@@ -1,7 +1,7 @@
 # VERITAS API Reference - Hybrid Search Endpoints
 
-**Version:** 4.0.1  
-**Last Updated:** 2025-10-20  
+**Version:** 4.0.1
+**Last Updated:** 2025-10-20
 **Base URL:** `http://localhost:8000/api`
 
 Comprehensive API documentation for VERITAS Hybrid Search endpoints.
@@ -266,7 +266,7 @@ class HybridSearchRequest(BaseModel):
     bm25_weight: float = Field(0.5, deprecated=True)  # Legacy
     dense_weight: float = Field(0.5, deprecated=True)  # Legacy
     session_id: Optional[str] = Field(None, description="Session identifier")
-    
+
     class Config:
         json_schema_extra = {
             "example": {
@@ -318,7 +318,7 @@ class UnifiedResponse(BaseModel):
     answer: str = Field(..., description="Generated answer")
     sources: List[UnifiedSource] = Field(default_factory=list)
     metadata: Dict[str, Any] = Field(default_factory=dict)
-    
+
     class Config:
         json_schema_extra = {
             "example": {
@@ -351,47 +351,47 @@ class UnifiedSourceMetadata(BaseModel):
     source_type: str  # legal, scientific, administrative, etc.
     file_path: str
     page_number: Optional[int]
-    
+
     # Search Metadata (Hybrid-specific)
     search_method: str  # "hybrid", "rag", "vector", etc.
     ranking_strategy: Optional[str]  # "reciprocal_rank_fusion", "weighted", "borda"
-    
+
     # Scoring (Hybrid Search)
     original_score: float  # Pre-reranking score (0.0-1.0)
     rerank_score: Optional[float]  # Post-reranking score
     score_delta: Optional[float]  # Improvement from reranking
     rerank_confidence: Optional[float]  # Confidence in reranked score
-    
+
     # Ranking Details
     vector_rank: Optional[int]  # Rank in vector search results
     graph_rank: Optional[int]  # Rank in graph search results
     relational_rank: Optional[int]  # Rank in relational search results
     final_rank: int  # Final rank after fusion
-    
+
     # RRF-specific
     rrf_score: Optional[float]  # RRF fusion score
-    
+
     # Performance
     execution_time_ms: Optional[float]
     retrieval_time_ms: Optional[float]
     reranking_time_ms: Optional[float]
-    
+
     # IEEE Citations
     ieee_citation: str  # "[1] Title, Author, Year, p. X"
     apa_citation: Optional[str]
     bibtex: Optional[str]
-    
+
     # Content Metadata
     authors: Optional[List[str]]
     publication_date: Optional[str]
     doi: Optional[str]
     url: Optional[str]
-    
+
     # Legal-specific
     law_reference: Optional[str]  # "§ 35 BauGB"
     legal_area: Optional[str]  # "Baurecht", "Umweltrecht"
     relevance_category: Optional[str]  # "high", "medium", "low"
-    
+
     # Additional
     custom_fields: Dict[str, Any] = Field(default_factory=dict)
 ```
@@ -609,6 +609,6 @@ curl -O https://veritas.example.com/postman/VERITAS_Hybrid_Search.postman_collec
 
 ---
 
-**Version:** 4.0.1  
-**Last Updated:** 2025-10-20  
+**Version:** 4.0.1
+**Last Updated:** 2025-10-20
 **Maintainer:** VERITAS Development Team

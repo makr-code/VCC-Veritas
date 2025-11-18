@@ -1,6 +1,6 @@
 # UDS3 API Layer Architecture
 
-**Date:** 11. Oktober 2025  
+**Date:** 11. Oktober 2025
 **Purpose:** Architecture-Entscheidung für Backend-Kommunikation
 
 ---
@@ -58,12 +58,12 @@ class UnifiedDatabaseStrategy:
         self.graph_backend: Neo4jGraphBackend      # Layer 1
         self.vector_backend: ChromaRemoteVectorBackend
         self.relational_backend: PostgreSQLRelationalBackend
-    
+
     # High-level APIs (missing search methods!)
     def create_document(doc_data)  # ✅ Exists
     def update_document(doc_id)    # ✅ Exists
     def delete_document(doc_id)    # ✅ Exists
-    
+
     def search_documents(query)    # ❌ MISSING!
     def hybrid_search(query)       # ❌ MISSING!
     def vector_search(embedding)   # ❌ MISSING!
@@ -101,7 +101,7 @@ class SearchResult:
     metadata: Dict[str, Any]
     score: float
     source: str  # "vector", "graph", "relational"
-    
+
 @dataclass
 class SearchQuery:
     """Search query configuration"""
@@ -114,30 +114,30 @@ class SearchQuery:
 
 class UDS3SearchAPI:
     """High-Level Search API für UnifiedDatabaseStrategy"""
-    
+
     def __init__(self, strategy: UnifiedDatabaseStrategy):
         self.strategy = strategy
-    
+
     async def vector_search(
-        self, 
-        query_embedding: List[float], 
+        self,
+        query_embedding: List[float],
         top_k: int = 10,
         collection: Optional[str] = None
     ) -> List[SearchResult]:
         """
         Semantic vector search using ChromaDB
-        
+
         Uses: strategy.vector_backend.search_similar()
         """
         backend = self.strategy.vector_backend
-        
+
         # Delegate to Database API Layer
         raw_results = backend.search_similar(
             query_vector=query_embedding,
             n_results=top_k,
             collection=collection
         )
-        
+
         # Normalize to SearchResult
         results = []
         for raw in raw_results:
@@ -148,9 +148,9 @@ class UDS3SearchAPI:
                 score=1.0 - raw.get('distance', 0.5),  # Convert distance to similarity
                 source='vector'
             ))
-        
+
         return results
-    
+
     async def graph_search(
         self,
         query_text: str,
@@ -158,11 +158,11 @@ class UDS3SearchAPI:
     ) -> List[SearchResult]:
         """
         Graph-based search using Neo4j
-        
+
         Uses: strategy.graph_backend.execute_query()
         """
         backend = self.strategy.graph_backend
-        
+
         # Cypher query for text search
         cypher = """
         MATCH (d:Document)
@@ -172,19 +172,19 @@ class UDS3SearchAPI:
         RETURN d, collect(related) AS related_docs
         LIMIT $top_k
         """
-        
+
         # Delegate to Database API Layer (with retry logic!)
         raw_results = backend.execute_query(
-            cypher, 
+            cypher,
             params={'query': query_text, 'top_k': top_k}
         )
-        
+
         # Normalize to SearchResult
         results = []
         for record in raw_results:
             doc_node = record.get('d')
             props = doc_node._properties if hasattr(doc_node, '_properties') else {}
-            
+
             results.append(SearchResult(
                 document_id=props.get('document_id', 'unknown'),
                 content=props.get('content', ''),
@@ -192,9 +192,9 @@ class UDS3SearchAPI:
                 score=1.0,  # Default score (can be improved)
                 source='graph'
             ))
-        
+
         return results
-    
+
     async def keyword_search(
         self,
         query_text: str,
@@ -203,29 +203,29 @@ class UDS3SearchAPI:
     ) -> List[SearchResult]:
         """
         Keyword search using PostgreSQL full-text search
-        
+
         Uses: strategy.relational_backend.execute_sql() (if available)
         """
         backend = self.strategy.relational_backend
-        
+
         # Check if SQL query API exists
         if not hasattr(backend, 'execute_sql'):
             logger.warning("PostgreSQL backend has no execute_sql() - skipping keyword search")
             return []
-        
+
         # SQL full-text search (PostgreSQL)
         sql = """
-        SELECT document_id, content, metadata, 
+        SELECT document_id, content, metadata,
                ts_rank(to_tsvector('german', content), plainto_tsquery('german', %s)) AS score
         FROM documents
         WHERE to_tsvector('german', content) @@ plainto_tsquery('german', %s)
         ORDER BY score DESC
         LIMIT %s
         """
-        
+
         # Delegate to Database API Layer
         raw_results = backend.execute_sql(sql, params=(query_text, query_text, top_k))
-        
+
         # Normalize to SearchResult
         results = []
         for row in raw_results:
@@ -236,16 +236,16 @@ class UDS3SearchAPI:
                 score=row['score'],
                 source='keyword'
             ))
-        
+
         return results
-    
+
     async def hybrid_search(
         self,
         search_query: SearchQuery
     ) -> List[SearchResult]:
         """
         Hybrid search combining Vector + Graph + Keyword
-        
+
         Weights:
         - vector: 0.5 (default)
         - graph: 0.3 (default)
@@ -256,39 +256,39 @@ class UDS3SearchAPI:
             "graph": 0.3,
             "keyword": 0.2
         }
-        
+
         all_results = []
-        
+
         # 1. Vector Search (if enabled)
         if "vector" in search_query.search_types and weights.get("vector", 0) > 0:
             # Generate embedding from query_text (needs sentence-transformers)
             from sentence_transformers import SentenceTransformer
             model = SentenceTransformer('all-MiniLM-L6-v2')
             embedding = model.encode(search_query.query_text).tolist()
-            
+
             vector_results = await self.vector_search(embedding, search_query.top_k * 2)
             for result in vector_results:
                 result.score *= weights["vector"]
             all_results.extend(vector_results)
-        
+
         # 2. Graph Search (if enabled)
         if "graph" in search_query.search_types and weights.get("graph", 0) > 0:
             graph_results = await self.graph_search(search_query.query_text, search_query.top_k * 2)
             for result in graph_results:
                 result.score *= weights["graph"]
             all_results.extend(graph_results)
-        
+
         # 3. Keyword Search (if enabled)
         if "keyword" in search_query.search_types and weights.get("keyword", 0) > 0:
             keyword_results = await self.keyword_search(
-                search_query.query_text, 
+                search_query.query_text,
                 search_query.top_k * 2,
                 search_query.filters
             )
             for result in keyword_results:
                 result.score *= weights["keyword"]
             all_results.extend(keyword_results)
-        
+
         # 4. Merge and Re-Rank
         merged = {}
         for result in all_results:
@@ -298,10 +298,10 @@ class UDS3SearchAPI:
                 merged[doc_id].score += result.score
             else:
                 merged[doc_id] = result
-        
+
         # Sort by final score
         final_results = sorted(merged.values(), key=lambda r: r.score, reverse=True)
-        
+
         return final_results[:search_query.top_k]
 ```
 
@@ -332,7 +332,7 @@ class UDS3HybridSearchAgent:
     def __init__(self, strategy):
         self.strategy = strategy
         self.search_api = UDS3SearchAPI(strategy)  # ✅ Use UDS3 Search API
-    
+
     async def hybrid_search(self, query, top_k=10, weights=None):
         search_query = SearchQuery(
             query_text=query,
@@ -340,10 +340,10 @@ class UDS3HybridSearchAgent:
             search_types=["vector", "graph", "keyword"],
             weights=weights or {"vector": 0.5, "graph": 0.3, "keyword": 0.2}
         )
-        
+
         # Delegate to UDS3 Search API ✅
         results = await self.search_api.hybrid_search(search_query)
-        
+
         return results
 ```
 
@@ -413,5 +413,5 @@ class UDS3HybridSearchAgent:
 
 ---
 
-**Status:** 📝 Architecture Decision Documented  
+**Status:** 📝 Architecture Decision Documented
 **Next:** Implement `uds3/uds3_search_api.py`

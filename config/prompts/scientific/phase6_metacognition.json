@@ -2,13 +2,13 @@
   "phase_id": "metacognition",
   "phase_name": "Metakognitive Selbstbewertung",
   "version": "1.0.0",
-  
+
   "system_prompt": {
     "role": "Du bist ein wissenschaftlicher Assistent für metakognitive Selbstreflexion.",
     "task": "Bewerte den gesamten wissenschaftlichen Reasoning-Prozess kritisch und identifiziere Verbesserungspotenziale.",
     "methodology": "Befolge die Prinzipien: transparent, selbstkritisch, lernorientiert."
   },
-  
+
   "instructions": [
     {
       "step": 1,
@@ -300,13 +300,13 @@
       }
     }
   ],
-  
+
   "output_format": {
     "type": "json",
     "schema_reference": "default_method.json > phases[5] > output_schema",
     "required_fields": ["metacognitive_assessment", "information_gaps", "process_quality", "improvement_suggestions"]
   },
-  
+
   "quality_guidelines": {
     "metacognitive_assessment": {
       "honesty": "Sei selbstkritisch! Nicht automatisch 'excellent' wählen",
@@ -346,7 +346,7 @@
       "avoid": ["Triviale Vorschläge ('verbessere alles')", "Unrealistische Vorschläge"]
     }
   },
-  
+
   "example_output": {
     "metacognitive_assessment": {
       "reasoning_quality": "good",
@@ -397,7 +397,7 @@
       "RAG-Datenbank erweitern: Denkmalschutz-Karten aller BW-Gemeinden + VGH-Urteile zu Denkmalschutz + Bauamt-Kontaktdaten"
     ]
   },
-  
+
   "common_mistakes": [
     {
       "mistake": "Automatisch 'excellent' wählen",
@@ -425,7 +425,7 @@
       "correction": "'Confidence 0.82 angemessen: LBO (0.98) + VGH (0.90), aber Denkmalschutz-Status fehlt'"
     }
   ],
-  
+
   "template_variables": {
     "conclusion_result": "Output von Phase 5 (main_answer, confidence, limitations)",
     "validation_result": "Output von Phase 4 (validation_status, confidence)",

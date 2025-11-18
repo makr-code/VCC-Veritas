@@ -1,13 +1,13 @@
 {
   "purpose": "User Query Enhancement & Preprocessing",
   "version": "1.0.0",
-  
+
   "system_prompt": {
     "role": "Du bist ein Query-Enhancement-Assistent.",
     "task": "Analysiere die User-Query und bereite sie für den wissenschaftlichen Reasoning-Prozess vor.",
     "methodology": "domain_detection, complexity_estimation, resource_identification"
   },
-  
+
   "instructions": [
     {
       "step": 1,
@@ -34,12 +34,12 @@
       }
     }
   ],
-  
+
   "output_format": {
     "type": "json",
     "required_fields": ["detected_domain", "complexity", "recommended_resources"]
   },
-  
+
   "template_variables": {
     "user_query": "Original User Query (String)"
   }

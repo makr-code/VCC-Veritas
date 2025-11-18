@@ -20,6 +20,10 @@ import sys
 import os
 from typing import Dict, Any, Optional, List
 from datetime import datetime
+<<<<<<< Updated upstream
+=======
+from typing import Any, Dict, List, Optional, cast
+>>>>>>> Stashed changes
 
 # Add project root to path
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -31,8 +35,14 @@ from backend.models.process_step import ProcessStep, StepType, StepResult
 
 # Try to import RAG service for document retrieval
 try:
+<<<<<<< Updated upstream
     from backend.services.rag_service import RAGService
     from backend.models.document_source import DocumentSource, SourceCitation
+=======
+    from backend.models.document_source import DocumentSource, SourceCitation
+    from backend.services.rag_service import RAGService, SearchFilters
+
+>>>>>>> Stashed changes
     RAG_SERVICE_AVAILABLE = True
 except ImportError:
     RAG_SERVICE_AVAILABLE = False
@@ -135,24 +145,37 @@ class AgentExecutor:
             query = f"{step.name}: {step.description}"
             
             # Retrieve documents
+<<<<<<< Updated upstream
             search_result = self.rag_service.hybrid_search(
                 query=query,
                 filters={'max_results': top_k}
             )
             
+=======
+            # Use typed SearchFilters instead of passing a raw dict to satisfy static typing
+            search_result = self.rag_service.hybrid_search(query=query, filters=SearchFilters(max_results=top_k))
+
+>>>>>>> Stashed changes
             if not search_result or not search_result.results:
                 return [], []
             
             # Extract citations
-            citations = []
+            citations: List["SourceCitation"] = []
             for doc in search_result.results:
                 citation = doc.to_citation() if hasattr(doc, 'to_citation') else None
                 if citation:
                     citations.append(citation)
             
             logger.info(f"📚 Retrieved {len(search_result.results)} documents for agent execution")
+<<<<<<< Updated upstream
             return search_result.results, citations
             
+=======
+            # mypy: RAGService.search_result.results may be typed as a generic SearchResult list.
+            # Cast to the expected runtime type `List[DocumentSource]` for downstream consumers.
+            return cast(List["DocumentSource"], search_result.results), citations
+
+>>>>>>> Stashed changes
         except Exception as e:
             logger.warning(f"⚠️ Document retrieval failed: {e}")
             return [], []
@@ -270,6 +293,7 @@ class AgentExecutor:
             # Execute through orchestrator
             # Note: This is a simplified integration - full implementation
             # would need to adapt to orchestrator's specific API
+<<<<<<< Updated upstream
             result_data = {
                 'step_id': step.id,
                 'step_type': step.step_type.value,
@@ -279,10 +303,22 @@ class AgentExecutor:
                 'agent_mode': 'real',
                 'documents_retrieved': len(documents),
                 'note': 'Agent execution with RAG integration'
+=======
+            result_data: Dict[str, Any] = {
+                "step_id": step.id,
+                "step_type": step.step_type.value,
+                "capabilities_used": [str(c) for c in capabilities],
+                "query": query_text,
+                "parameters": step.parameters,
+                "agent_mode": "real",
+                "documents_retrieved": len(documents),
+                "note": "Agent execution with RAG integration",
+>>>>>>> Stashed changes
             }
             
             # Add document metadata if available
             if documents:
+<<<<<<< Updated upstream
                 result_data['document_sources'] = [
                     {
                         'document_id': doc.document_id if hasattr(doc, 'document_id') else f'doc_{i}',
@@ -292,6 +328,21 @@ class AgentExecutor:
                     for i, doc in enumerate(documents)
                 ]
             
+=======
+                # Build a serializable list of document metadata. Cast to satisfy mypy expectations.
+                result_data["document_sources"] = cast(
+                    List[Dict[str, Any]],
+                    [
+                        {
+                            "document_id": doc.document_id if hasattr(doc, "document_id") else f"doc_{i}",
+                            "title": doc.title if hasattr(doc, "title") else "Unknown",
+                            "relevance": doc.relevance_score if hasattr(doc, "relevance_score") else 0.0,
+                        }
+                        for i, doc in enumerate(documents)
+                    ],
+                )
+
+>>>>>>> Stashed changes
             # For now, return structured result
             # TODO: Replace with actual orchestrator.execute_query(query_text)
             logger.info(f"✅ Agent execution complete: {step.name} (with {len(citations)} citations)")
@@ -335,6 +386,7 @@ class AgentExecutor:
         documents, citations = self._retrieve_documents_for_agent(step, top_k=2)
         
         # Generate mock data
+<<<<<<< Updated upstream
         data = self._generate_mock_data(step)
         
         # Add document info to mock data
@@ -348,6 +400,24 @@ class AgentExecutor:
                 for i, doc in enumerate(documents)
             ]
         
+=======
+        data: Dict[str, Any] = self._generate_mock_data(step)
+
+        # Add document info to mock data
+        if documents:
+            data["documents_retrieved"] = len(documents)
+            data["document_sources"] = cast(
+                List[Dict[str, Any]],
+                [
+                    {
+                        "document_id": doc.document_id if hasattr(doc, "document_id") else f"doc_{i}",
+                        "title": doc.title if hasattr(doc, "title") else f"Mock Document {i + 1}",
+                    }
+                    for i, doc in enumerate(documents)
+                ],
+            )
+
+>>>>>>> Stashed changes
         return StepResult(
             success=True,
             data=data,
@@ -374,8 +444,13 @@ class AgentExecutor:
         """
         # Extract key information from step
         name = step.name
+<<<<<<< Updated upstream
         params = step.parameters
         
+=======
+        params: Dict[str, Any] = step.parameters
+
+>>>>>>> Stashed changes
         # Build query based on step type and parameters
         query_parts = [name]
         
@@ -404,8 +479,13 @@ class AgentExecutor:
             Mock data dictionary
         """
         step_type = step.step_type
+<<<<<<< Updated upstream
         params = step.parameters
         
+=======
+        params: Dict[str, Any] = step.parameters
+
+>>>>>>> Stashed changes
         # Generate mock data based on step type
         if step_type == StepType.SEARCH:
             return {

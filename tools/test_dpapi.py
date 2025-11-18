@@ -12,9 +12,10 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 import os
+
 os.environ["ENABLE_SECURE_SECRETS"] = "true"
 
-from backend.security.secrets import get_secrets_manager, DPAPI_AVAILABLE
+from backend.security.secrets import DPAPI_AVAILABLE, get_secrets_manager
 
 print("=" * 80)
 print("VERITAS DPAPI Test")

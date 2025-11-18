@@ -15,13 +15,13 @@ Features:
 
 Usage:
     from config.production import ProductionConfig
-    
+
     config = ProductionConfig()
-    
+
     # Access settings
     db_url = config.database_url
     jwt_secret = config.jwt_secret_key
-    
+
     # Validate configuration
     config.validate()
 
@@ -30,19 +30,20 @@ Date: 2025-10-08
 Version: 1.0.0
 """
 
+import logging
 import os
+import secrets
 import sys
-from typing import Optional, List, Dict, Any
-from pathlib import Path
 from dataclasses import dataclass, field
 from datetime import timedelta
-import secrets
-import logging
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 
 @dataclass
 class DatabaseConfig:
     """Database configuration."""
+
     type: str = "postgresql"
     host: str = "localhost"
     port: int = 5432
@@ -54,7 +55,7 @@ class DatabaseConfig:
     pool_timeout: int = 30
     pool_recycle: int = 3600
     ssl_mode: str = "prefer"
-    
+
     @property
     def url(self) -> str:
         """Generate database URL."""
@@ -62,15 +63,9 @@ class DatabaseConfig:
             sqlite_path = os.getenv("SQLITE_DB_PATH", "./data/veritas.sqlite")
             return f"sqlite:///{sqlite_path}"
         elif self.type == "postgresql":
-            return (
-                f"postgresql://{self.user}:{self.password}@"
-                f"{self.host}:{self.port}/{self.name}?sslmode={self.ssl_mode}"
-            )
+            return f"postgresql://{self.user}:{self.password}@" f"{self.host}:{self.port}/{self.name}?sslmode={self.ssl_mode}"
         elif self.type == "mysql":
-            return (
-                f"mysql://{self.user}:{self.password}@"
-                f"{self.host}:{self.port}/{self.name}"
-            )
+            return f"mysql://{self.user}:{self.password}@" f"{self.host}:{self.port}/{self.name}"
         else:
             raise ValueError(f"Unsupported database type: {self.type}")
 
@@ -78,6 +73,7 @@ class DatabaseConfig:
 @dataclass
 class RedisConfig:
     """Redis configuration."""
+
     host: str = "localhost"
     port: int = 6379
     password: str = ""
@@ -85,7 +81,7 @@ class RedisConfig:
     ssl: bool = False
     pool_size: int = 10
     pool_timeout: int = 5
-    
+
     @property
     def url(self) -> str:
         """Generate Redis URL."""
@@ -97,6 +93,7 @@ class RedisConfig:
 @dataclass
 class SecurityConfig:
     """Security configuration."""
+
     secret_key: str = ""
     jwt_secret_key: str = ""
     jwt_algorithm: str = "HS256"
@@ -118,6 +115,7 @@ class SecurityConfig:
 @dataclass
 class LoggingConfig:
     """Logging configuration."""
+
     level: str = "INFO"
     format: str = "json"
     output: str = "both"
@@ -133,6 +131,7 @@ class LoggingConfig:
 @dataclass
 class MonitoringConfig:
     """Monitoring configuration."""
+
     metrics_enabled: bool = True
     metrics_port: int = 9090
     metrics_path: str = "/metrics"
@@ -148,6 +147,7 @@ class MonitoringConfig:
 @dataclass
 class BackupConfig:
     """Backup configuration."""
+
     enabled: bool = True
     path: str = "./backups"
     schedule: str = "0 2 * * *"
@@ -164,6 +164,7 @@ class BackupConfig:
 @dataclass
 class AgentConfig:
     """Agent orchestration configuration."""
+
     max_concurrent_agents: int = 10
     timeout: int = 300
     max_retries: int = 3
@@ -175,6 +176,7 @@ class AgentConfig:
 @dataclass
 class OllamaConfig:
     """Ollama integration configuration."""
+
     enabled: bool = True
     api_url: str = "http://localhost:11434"
     default_model: str = "llama3.2:latest"
@@ -186,11 +188,11 @@ class OllamaConfig:
 class ProductionConfig:
     """
     Production configuration for VERITAS framework.
-    
+
     Loads configuration from environment variables with validation
     and provides sensible defaults.
     """
-    
+
     def __init__(self):
         """Initialize configuration from environment variables."""
         # Application settings
@@ -200,7 +202,7 @@ class ProductionConfig:
         self.debug = self._get_bool("DEBUG", False)
         self.host = os.getenv("HOST", "0.0.0.0")
         self.port = int(os.getenv("PORT", "8000"))
-        
+
         # Component configurations
         self.database = self._load_database_config()
         self.redis = self._load_redis_config()
@@ -210,21 +212,21 @@ class ProductionConfig:
         self.backup = self._load_backup_config()
         self.agent = self._load_agent_config()
         self.ollama = self._load_ollama_config()
-        
+
         # Additional settings
         self.websocket_enabled = self._get_bool("WEBSOCKET_ENABLED", True)
         self.websocket_port = int(os.getenv("WEBSOCKET_PORT", "8001"))
         self.cache_enabled = self._get_bool("CACHE_ENABLED", True)
         self.queue_enabled = self._get_bool("QUEUE_ENABLED", True)
-        
+
         # Feature flags
         self.feature_flags = self._load_feature_flags()
-    
+
     def _get_bool(self, key: str, default: bool = False) -> bool:
         """Get boolean from environment variable."""
         value = os.getenv(key, str(default)).lower()
         return value in ("true", "1", "yes", "on")
-    
+
     def _get_list(self, key: str, default: List[str] = None) -> List[str]:
         """Get list from environment variable (comma-separated)."""
         if default is None:
@@ -233,7 +235,7 @@ class ProductionConfig:
         if not value:
             return default
         return [item.strip() for item in value.split(",") if item.strip()]
-    
+
     def _load_database_config(self) -> DatabaseConfig:
         """Load database configuration."""
         return DatabaseConfig(
@@ -247,9 +249,9 @@ class ProductionConfig:
             max_overflow=int(os.getenv("DB_MAX_OVERFLOW", "10")),
             pool_timeout=int(os.getenv("DB_POOL_TIMEOUT", "30")),
             pool_recycle=int(os.getenv("DB_POOL_RECYCLE", "3600")),
-            ssl_mode=os.getenv("DB_SSL_MODE", "prefer")
+            ssl_mode=os.getenv("DB_SSL_MODE", "prefer"),
         )
-    
+
     def _load_redis_config(self) -> RedisConfig:
         """Load Redis configuration."""
         return RedisConfig(
@@ -259,9 +261,9 @@ class ProductionConfig:
             db=int(os.getenv("REDIS_DB", "0")),
             ssl=self._get_bool("REDIS_SSL", False),
             pool_size=int(os.getenv("REDIS_POOL_SIZE", "10")),
-            pool_timeout=int(os.getenv("REDIS_POOL_TIMEOUT", "5"))
+            pool_timeout=int(os.getenv("REDIS_POOL_TIMEOUT", "5")),
         )
-    
+
     def _load_security_config(self) -> SecurityConfig:
         """Load security configuration."""
         secret_key = os.getenv("SECRET_KEY")
@@ -269,13 +271,13 @@ class ProductionConfig:
             if self.app_env == "production":
                 raise ValueError("SECRET_KEY must be set in production!")
             secret_key = secrets.token_hex(32)
-        
+
         jwt_secret = os.getenv("JWT_SECRET_KEY")
         if not jwt_secret or jwt_secret == "your-jwt-secret-key-here-change-me":
             if self.app_env == "production":
                 raise ValueError("JWT_SECRET_KEY must be set in production!")
             jwt_secret = secrets.token_hex(32)
-        
+
         return SecurityConfig(
             secret_key=secret_key,
             jwt_secret_key=jwt_secret,
@@ -292,9 +294,9 @@ class ProductionConfig:
             rate_limit_window_seconds=int(os.getenv("RATE_LIMIT_WINDOW_SECONDS", "60")),
             api_key_expiry_days=int(os.getenv("API_KEY_EXPIRY_DAYS", "365")),
             session_max_age=int(os.getenv("SESSION_MAX_AGE", "86400")),
-            cors_origins=self._get_list("CORS_ORIGINS", [])
+            cors_origins=self._get_list("CORS_ORIGINS", []),
         )
-    
+
     def _load_logging_config(self) -> LoggingConfig:
         """Load logging configuration."""
         return LoggingConfig(
@@ -307,9 +309,9 @@ class ProductionConfig:
             include_timestamp=self._get_bool("LOG_INCLUDE_TIMESTAMP", True),
             include_level=self._get_bool("LOG_INCLUDE_LEVEL", True),
             include_module=self._get_bool("LOG_INCLUDE_MODULE", True),
-            include_function=self._get_bool("LOG_INCLUDE_FUNCTION", True)
+            include_function=self._get_bool("LOG_INCLUDE_FUNCTION", True),
         )
-    
+
     def _load_monitoring_config(self) -> MonitoringConfig:
         """Load monitoring configuration."""
         return MonitoringConfig(
@@ -322,9 +324,9 @@ class ProductionConfig:
             apm_service_name=os.getenv("APM_SERVICE_NAME", "veritas"),
             apm_server_url=os.getenv("APM_SERVER_URL", ""),
             grafana_enabled=self._get_bool("GRAFANA_ENABLED", False),
-            grafana_url=os.getenv("GRAFANA_URL", "")
+            grafana_url=os.getenv("GRAFANA_URL", ""),
         )
-    
+
     def _load_backup_config(self) -> BackupConfig:
         """Load backup configuration."""
         return BackupConfig(
@@ -338,9 +340,9 @@ class ProductionConfig:
             remote_backup_enabled=self._get_bool("REMOTE_BACKUP_ENABLED", False),
             remote_backup_type=os.getenv("REMOTE_BACKUP_TYPE", "s3"),
             remote_backup_bucket=os.getenv("REMOTE_BACKUP_BUCKET", ""),
-            remote_backup_region=os.getenv("REMOTE_BACKUP_REGION", "us-east-1")
+            remote_backup_region=os.getenv("REMOTE_BACKUP_REGION", "us-east-1"),
         )
-    
+
     def _load_agent_config(self) -> AgentConfig:
         """Load agent configuration."""
         return AgentConfig(
@@ -349,9 +351,9 @@ class ProductionConfig:
             max_retries=int(os.getenv("AGENT_MAX_RETRIES", "3")),
             retry_delay=int(os.getenv("AGENT_RETRY_DELAY", "5")),
             quality_gate_min_score=float(os.getenv("QUALITY_GATE_MIN_SCORE", "0.7")),
-            quality_gate_enabled=self._get_bool("QUALITY_GATE_ENABLED", True)
+            quality_gate_enabled=self._get_bool("QUALITY_GATE_ENABLED", True),
         )
-    
+
     def _load_ollama_config(self) -> OllamaConfig:
         """Load Ollama configuration."""
         return OllamaConfig(
@@ -360,9 +362,9 @@ class ProductionConfig:
             default_model=os.getenv("OLLAMA_DEFAULT_MODEL", "llama3.2:latest"),
             timeout=int(os.getenv("OLLAMA_TIMEOUT", "120")),
             embedding_model=os.getenv("OLLAMA_EMBEDDING_MODEL", "nomic-embed-text"),
-            embedding_dimension=int(os.getenv("OLLAMA_EMBEDDING_DIMENSION", "768"))
+            embedding_dimension=int(os.getenv("OLLAMA_EMBEDDING_DIMENSION", "768")),
         )
-    
+
     def _load_feature_flags(self) -> Dict[str, bool]:
         """Load feature flags."""
         return {
@@ -374,18 +376,18 @@ class ProductionConfig:
             "ai_insights": self._get_bool("FEATURE_AI_INSIGHTS", False),
             "multi_tenancy": self._get_bool("EXPERIMENTAL_MULTI_TENANCY", False),
             "graph_database": self._get_bool("EXPERIMENTAL_GRAPH_DATABASE", False),
-            "vector_search": self._get_bool("EXPERIMENTAL_VECTOR_SEARCH", False)
+            "vector_search": self._get_bool("EXPERIMENTAL_VECTOR_SEARCH", False),
         }
-    
+
     def validate(self) -> List[str]:
         """
         Validate configuration.
-        
+
         Returns:
             List of validation errors (empty if valid)
         """
         errors = []
-        
+
         # Validate secrets in production
         if self.app_env == "production":
             if not self.security.secret_key:
@@ -394,41 +396,38 @@ class ProductionConfig:
                 errors.append("JWT_SECRET_KEY must be set in production")
             if not self.database.password:
                 errors.append("DB_PASSWORD must be set in production")
-        
+
         # Validate database configuration
         if self.database.type not in ("sqlite", "postgresql", "mysql"):
             errors.append(f"Unsupported database type: {self.database.type}")
-        
+
         # Validate ports
         if not (1 <= self.port <= 65535):
             errors.append(f"Invalid PORT: {self.port}")
         if not (1 <= self.websocket_port <= 65535):
             errors.append(f"Invalid WEBSOCKET_PORT: {self.websocket_port}")
-        
+
         # Validate log level
         valid_levels = ("DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL")
         if self.logging.level not in valid_levels:
             errors.append(f"Invalid LOG_LEVEL: {self.logging.level}")
-        
+
         # Validate paths exist or can be created
-        paths = [
-            Path(self.logging.file_path).parent,
-            Path(self.backup.path) if self.backup.enabled else None
-        ]
-        
+        paths = [Path(self.logging.file_path).parent, Path(self.backup.path) if self.backup.enabled else None]
+
         for path in paths:
             if path and not path.exists():
                 try:
                     path.mkdir(parents=True, exist_ok=True)
                 except Exception as e:
                     errors.append(f"Cannot create directory {path}: {str(e)}")
-        
+
         return errors
-    
+
     def summary(self) -> Dict[str, Any]:
         """
         Get configuration summary.
-        
+
         Returns:
             Dictionary with configuration summary
         """
@@ -441,18 +440,15 @@ class ProductionConfig:
             "redis_enabled": bool(self.redis.host),
             "security": {
                 "rate_limiting": self.security.rate_limit_enabled,
-                "cors_configured": bool(self.security.cors_origins)
+                "cors_configured": bool(self.security.cors_origins),
             },
             "monitoring": {
                 "metrics": self.monitoring.metrics_enabled,
                 "health_check": self.monitoring.health_check_enabled,
-                "apm": self.monitoring.apm_enabled
+                "apm": self.monitoring.apm_enabled,
             },
-            "backup": {
-                "enabled": self.backup.enabled,
-                "remote": self.backup.remote_backup_enabled
-            },
-            "features": self.feature_flags
+            "backup": {"enabled": self.backup.enabled, "remote": self.backup.remote_backup_enabled},
+            "features": self.feature_flags,
         }
 
 
@@ -463,14 +459,14 @@ _config_instance: Optional[ProductionConfig] = None
 def get_config() -> ProductionConfig:
     """
     Get singleton configuration instance.
-    
+
     Returns:
         ProductionConfig instance
     """
     global _config_instance
     if _config_instance is None:
         _config_instance = ProductionConfig()
-        
+
         # Validate on first load
         errors = _config_instance.validate()
         if errors:
@@ -479,7 +475,7 @@ def get_config() -> ProductionConfig:
                 print(f"  - {error}", file=sys.stderr)
             if _config_instance.app_env == "production":
                 sys.exit(1)
-    
+
     return _config_instance
 
 
@@ -496,19 +492,19 @@ if __name__ == "__main__":
     print("VERITAS Production Configuration Test")
     print("=" * 80)
     print()
-    
+
     # Set test environment to avoid production validation
     os.environ["APP_ENV"] = "development"
-    
+
     config = get_config()
-    
+
     print("Configuration Summary:")
     print("-" * 80)
     summary = config.summary()
     for key, value in summary.items():
         print(f"{key}: {value}")
     print()
-    
+
     print("Validation:")
     print("-" * 80)
     errors = config.validate()
@@ -519,7 +515,7 @@ if __name__ == "__main__":
     else:
         print("✅ Configuration is valid!")
     print()
-    
+
     print("Database URL (masked):")
     print("-" * 80)
     db_url = config.database.url
@@ -527,7 +523,7 @@ if __name__ == "__main__":
         db_url = db_url.replace(config.database.password, "***MASKED***")
     print(db_url)
     print()
-    
+
     print("Redis URL (masked):")
     print("-" * 80)
     redis_url = config.redis.url
@@ -535,7 +531,7 @@ if __name__ == "__main__":
         redis_url = redis_url.replace(config.redis.password, "***MASKED***")
     print(redis_url)
     print()
-    
+
     print("=" * 80)
     print("✅ Configuration test complete!")
     print("=" * 80)

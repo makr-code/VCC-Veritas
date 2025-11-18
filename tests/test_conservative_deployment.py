@@ -9,17 +9,17 @@ Expected Behavior:
 - Execution time: 34-52s
 - No agent selection/execution
 """
-import sys
-import os
 import json
+import os
+import sys
 import time
 from pathlib import Path
 
 # Setup paths
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
-sys.path.insert(0, str(project_root / 'backend'))
-sys.path.insert(0, str(project_root / 'backend' / 'orchestration'))
+sys.path.insert(0, str(project_root / "backend"))
+sys.path.insert(0, str(project_root / "backend" / "orchestration"))
 
 print("=" * 80)
 print("CONSERVATIVE DEPLOYMENT TEST - Phase 1")
@@ -28,21 +28,22 @@ print("=" * 80)
 # Test 1: Verify Configuration
 print("\n[Test 1/4] Verifying Configuration...")
 config_path = project_root / "config" / "scientific_methods" / "default_method.json"
-with open(config_path, 'r', encoding='utf-8') as f:
+with open(config_path, "r", encoding="utf-8") as f:
     config = json.load(f)
 
 print(f"  ✅ Config Version: {config.get('version')}")
 print(f"  ✅ Supervisor Enabled: {config.get('supervisor_enabled')}")
 print(f"  ✅ Total Phases in Config: {len(config.get('phases', []))}")
 
-assert config.get('version') == '2.0.0', "Config version should be 2.0.0"
-assert config.get('supervisor_enabled') == False, "Supervisor should be DISABLED for conservative deployment"
+assert config.get("version") == "2.0.0", "Config version should be 2.0.0"
+assert config.get("supervisor_enabled") == False, "Supervisor should be DISABLED for conservative deployment"
 print("  ✅ Configuration correct for Conservative Mode")
 
 # Test 2: Import Orchestrator
 print("\n[Test 2/4] Importing Orchestrator...")
 try:
     from unified_orchestrator_v7 import UnifiedOrchestratorV7
+
     print("  ✅ UnifiedOrchestratorV7 imported successfully")
 except ImportError as e:
     print(f"  ❌ Import failed: {e}")
@@ -55,18 +56,19 @@ try:
         config_dir="config",
         method_id="default_method",
         uds3_strategy=None,  # Will use mock
-        ollama_client=None  # Will use mock or skip LLM tests
+        ollama_client=None,  # Will use mock or skip LLM tests
     )
     print("  ✅ Orchestrator initialized")
-    
+
     # Check supervisor status
     supervisor_enabled = orchestrator._is_supervisor_enabled()
     print(f"  ✅ Supervisor Enabled (Runtime): {supervisor_enabled}")
     assert supervisor_enabled == False, "Supervisor should be disabled at runtime"
-    
+
 except Exception as e:
     print(f"  ❌ Initialization failed: {e}")
     import traceback
+
     traceback.print_exc()
     sys.exit(1)
 
@@ -74,15 +76,15 @@ except Exception as e:
 print("\n[Test 4/4] Phase Execution Flow (Dry Run)...")
 print("  Checking which phases would execute...")
 
-phases = config.get('phases', [])
+phases = config.get("phases", [])
 expected_phases = []
 supervisor_phases = []
 
 for phase in phases:
-    phase_num = phase.get('phase_number')
-    executor = phase.get('execution', {}).get('executor', 'llm')
-    
-    if executor in ['supervisor', 'agent_coordinator']:
+    phase_num = phase.get("phase_number")
+    executor = phase.get("execution", {}).get("executor", "llm")
+
+    if executor in ["supervisor", "agent_coordinator"]:
         supervisor_phases.append(phase_num)
         print(f"    ⏸️  Phase {phase_num} ({phase.get('phase_id')}): SKIPPED (supervisor executor)")
     else:

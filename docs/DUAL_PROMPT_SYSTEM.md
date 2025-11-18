@@ -1,8 +1,8 @@
 # 🎯 VERITAS Dual-Prompt System - Dokumentation
 
-**Datum:** 2025-01-07  
-**Version:** 1.0  
-**Autor:** VERITAS System  
+**Datum:** 2025-01-07
+**Version:** 1.0
+**Autor:** VERITAS System
 
 ---
 
@@ -28,7 +28,7 @@ Das LLM (llama3:latest) generierte generische Antworten mit Meta-Kommentaren:
 ```
 ❌ SCHLECHT:
 "Antwort auf die Frage 'Was brauche ich für eine Baugenehmigung?':
-Basierend auf den bereitgestellten Informationen kann ich Ihnen mitteilen, 
+Basierend auf den bereitgestellten Informationen kann ich Ihnen mitteilen,
 dass Sie verschiedene Unterlagen benötigen..."
 ```
 
@@ -39,10 +39,10 @@ dass Sie verschiedene Unterlagen benötigen..."
 PipelineStage.RESULT_AGGREGATION: {
     "system": "Du bist Experte für die Zusammenführung von Multi-Agent-Ergebnissen...",
     "user_template": """Füge die folgenden Agent-Ergebnisse zusammen:
-    
+
     **Query:** {query}
     **Agent-Ergebnisse:** {agent_results}
-    
+
     Erstelle eine strukturierte, verständliche Antwort die:
     1. Die Hauptfrage beantwortet
     2. Alle relevanten Erkenntnisse einbezieht
@@ -161,14 +161,14 @@ class EnhancedPromptTemplates:
     # Internal RAG Processing
     INTERNAL_QUERY_ENRICHMENT = {...}
     INTERNAL_RAG_FILTER = {...}
-    
+
     # User-Facing Output
     USER_FACING_RESPONSE = {...}
     USER_FACING_CLARIFICATION = {...}
-    
+
     # Hybrid Mode
     HYBRID_FULL_PIPELINE = {...}
-    
+
     # Domänen-spezifisch
     DOMAIN_BUILDING = {...}
     DOMAIN_ENVIRONMENTAL = {...}
@@ -206,7 +206,7 @@ FORMAT:
 2. **Details** (strukturiert mit Aufzählungen)
 3. **Quellen** (wenn relevant)
 4. **Nächste Schritte** (optional, wenn sinnvoll)""",
-    
+
     "user_template": """**User fragte:** {query}
 
 **Kontext aus Dokumenten:** {rag_context}
@@ -243,9 +243,9 @@ async def enrich_query_for_rag(self,
                                user_context: Dict[str, Any] = None) -> Dict[str, Any]:
     """
     🔍 Erweitert User-Query mit Fachbegriffen für RAG-Retrieval
-    
+
     INTERNAL PROCESSING: Nutzt Anweisungssprache für optimale RAG-Qualität
-    
+
     Returns:
         {
             "keywords": [...],
@@ -264,10 +264,10 @@ Nutzt jetzt das neue USER_FACING_RESPONSE Template:
 async def synthesize_agent_results(self, ...):
     """
     Synthetisiert Multi-Agent-Ergebnisse zu finaler Antwort
-    
+
     EXTERNAL PROCESSING: Nutzt natürliche Sprache für User
     """
-    
+
     template = self.prompt_templates[PipelineStage.RESULT_AGGREGATION]
     # Template ist jetzt USER_FACING_RESPONSE!
 ```
@@ -288,13 +288,13 @@ async def _step_rag_search(self, ...):
         domain=domain,
         user_context=context.get("user_context")
     )
-    
+
     # Nutze enriched["search_terms"] für RAG
     search_results = await self.rag_client.vector_search(
         query=enriched["search_terms"],
         ...
     )
-    
+
     return search_results
 
 async def _step_result_aggregation(self, ...):
@@ -304,7 +304,7 @@ async def _step_result_aggregation(self, ...):
         agent_results=agent_results,
         ...
     )
-    
+
     return synthesis
 ```
 
@@ -324,7 +324,7 @@ async with VeritasOllamaClient() as client:
         domain="building",
         user_context={"location": "Brandenburg", "user_type": "citizen"}
     )
-    
+
     print("🔍 Enriched Query:")
     print(f"Keywords: {enriched['keywords']}")
     print(f"Search Terms: {enriched['search_terms']}")
@@ -379,7 +379,7 @@ async with VeritasOllamaClient() as client:
             "documents": ["Merkblatt Baugenehmigung Brandenburg"]
         }
     )
-    
+
     print("💬 User Response:")
     print(response["response_text"])
 ```
@@ -396,7 +396,7 @@ Für eine Baugenehmigung in Brandenburg benötigen Sie folgende Unterlagen:
 • Statische Berechnungen
 • Baubeschreibung
 
-Der Bauantrag wird beim zuständigen Bauordnungsamt eingereicht. 
+Der Bauantrag wird beim zuständigen Bauordnungsamt eingereicht.
 Die Bearbeitungsdauer beträgt in der Regel 2-3 Monate.
 
 📋 Nächste Schritte:
@@ -512,8 +512,8 @@ Für eine Baugenehmigung gehen Sie wie folgt vor:
    • Regelverfahren: 2-3 Monate
    • Vereinfachtes Verfahren: 4-6 Wochen
 
-💡 Tipp: Bei Unsicherheiten können Sie vorab eine Bauvoranfrage stellen. 
-Diese klärt grundsätzliche baurechtliche Fragen, bevor Sie die vollständigen 
+💡 Tipp: Bei Unsicherheiten können Sie vorab eine Bauvoranfrage stellen.
+Diese klärt grundsätzliche baurechtliche Fragen, bevor Sie die vollständigen
 Unterlagen einreichen.
 
 📞 Kontakt: Ihr zuständiges Bauordnungsamt finden Sie auf der Gemeinde-Website.
@@ -560,14 +560,14 @@ Quelle: Merkblatt Baugenehmigung Brandenburg, BauGB §§ 29-38
 #### PHASE 2: External User Response
 
 ```
-Die Emissionsgrenzwerte für Industrieanlagen sind in der **TA Luft** 
-(Technische Anleitung zur Reinhaltung der Luft) und im **BImSchG** 
+Die Emissionsgrenzwerte für Industrieanlagen sind in der **TA Luft**
+(Technische Anleitung zur Reinhaltung der Luft) und im **BImSchG**
 (Bundesimmissionsschutzgesetz) geregelt.
 
 **Wichtigste Grenzwerte:**
 
 • **Stickoxide (NOx):** 200 mg/m³ (allgemeine Feuerungsanlagen)
-• **Schwefeldioxid (SO₂):** 350 mg/m³ 
+• **Schwefeldioxid (SO₂):** 350 mg/m³
 • **Staub:** 20 mg/m³ (neue Anlagen), 50 mg/m³ (Bestandsanlagen)
 • **Kohlenmonoxid (CO):** 100 mg/m³
 
@@ -577,7 +577,7 @@ Die genauen Werte hängen ab von:
 ✓ Errichtungsjahr (Neu- vs. Bestandsanlage)
 
 **Überwachung:**
-Betreiber müssen kontinuierliche Emissionsmessungen durchführen und 
+Betreiber müssen kontinuierliche Emissionsmessungen durchführen und
 jährlich der zuständigen Behörde berichten.
 
 📋 Mehr Infos:
@@ -623,13 +623,13 @@ _query_enrichment_cache: Dict[str, Dict[str, Any]] = {}
 
 async def enrich_query_for_rag(self, query: str, domain: str, ...):
     cache_key = f"{domain}:{query[:50]}"  # First 50 chars
-    
+
     if cache_key in _query_enrichment_cache:
         logger.info(f"✅ Query-Enrichment aus Cache: {cache_key}")
         return _query_enrichment_cache[cache_key]
-    
+
     # ... normale Enrichment-Logik ...
-    
+
     _query_enrichment_cache[cache_key] = enriched
     return enriched
 ```
@@ -839,7 +839,6 @@ Document Relevance:
 
 ---
 
-**Autor:** VERITAS System  
-**Lizenz:** MIT  
+**Autor:** VERITAS System
+**Lizenz:** MIT
 **Kontakt:** GitHub Issues
-

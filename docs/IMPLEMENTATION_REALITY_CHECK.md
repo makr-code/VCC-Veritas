@@ -1,6 +1,6 @@
 # 🔍 VERITAS Agent-System: Dokumentation vs. Implementierung
 
-**Analyse-Datum**: 16. Oktober 2025  
+**Analyse-Datum**: 16. Oktober 2025
 **Scope**: Vergleich der Doku (`docs/VERITAS_API_BACKEND_DOCUMENTATION.md`) mit Backend-Code (`backend/api/veritas_api_backend.py`)
 
 ---
@@ -44,7 +44,7 @@ DOMAIN_AGENTS = {
         "rag_focus": ["immissionsschutz", "umweltrecht"],
         "external_apis": ["umweltbundesamt", "landesumweltämter"]
     },
-    
+
     "construction": {
         "workers": [
             "building_permit_worker",       # Baugenehmigungen
@@ -56,7 +56,7 @@ DOMAIN_AGENTS = {
         "rag_focus": ["bauplanungsrecht", "denkmalschutz"],
         "external_apis": ["bauaufsicht", "stadtplanung"]
     },
-    
+
     # + 3 weitere Domänen mit je 5 Workers
 }
 ```
@@ -98,7 +98,7 @@ domain_agents = {
 | `construction.construction_safety_worker` | ❌ Nicht vorhanden | **FEHLT** |
 | `construction.zoning_analysis_worker` | ❌ Nicht vorhanden | **FEHLT** |
 
-**Stattdessen**: Ein generischer `'environmental'` Agent  
+**Stattdessen**: Ein generischer `'environmental'` Agent
 **Stattdessen**: Ein generischer `'construction'` Agent
 
 **Implementierung**: 0% der dokumentierten Workers vorhanden
@@ -247,21 +247,21 @@ def _synthesize_final_response(...):
 # 1. Simple Agent Selection
 def _select_agents_for_query(query, complexity, domain):
     base_agents = ['geo_context', 'legal_framework']  # Immer
-    
+
     # Domain → 1-2 Agenten
     domain_agents = {
         'building': ['construction', 'document_retrieval'],
         'environmental': ['environmental', 'external_api'],
         # ...
     }
-    
+
     selected = base_agents + domain_agents.get(domain, ['document_retrieval'])
-    
+
     # Komplexität → Mehr Agenten
     if complexity == 'advanced':
         selected.append('financial')
         selected.append('social')
-    
+
     return list(set(selected))  # 3-6 Agenten total
 
 # 2. Generic Agent Execution
@@ -270,24 +270,24 @@ def _generate_agent_result(agent_type, query, complexity):
     if uds3_strategy is not None:
         result = uds3_strategy.query_across_databases(...)
         return real_result
-    
+
     # VERSUCH 2: Fallback auf Mock
     agent_specialties = {
         'geo_context': {'summary': 'Geografischer Kontext...', 'sources': [...]},
         'legal_framework': {'summary': 'Rechtliche Rahmenbedingungen...', 'sources': [...]},
         # ... 8 hardcoded Dictionaries
     }
-    
+
     return mock_result
 
 # 3. Simple Synthesis
 def _synthesize_final_response(query, agent_results, complexity, domain):
     # String concatenation von Agent-Results
     response = "Basierend auf der Analyse:\n\n"
-    
+
     for agent, result in agent_results.items():
         response += f"• {result['summary']}\n"
-    
+
     return response
 ```
 
@@ -314,27 +314,27 @@ def _synthesize_final_response(query, agent_results, complexity, domain):
 ## 🎯 Was in der Dokumentation IST aber im Code FEHLT
 
 ### 1. Spezialisierte Worker-Klassen
-**Dokumentiert**: `air_quality_worker`, `building_permit_worker`, etc.  
+**Dokumentiert**: `air_quality_worker`, `building_permit_worker`, etc.
 **Realität**: Nur generische Agent-Types
 
 ### 2. Worker-zu-Worker Kommunikation
-**Dokumentiert**: "Multi-Worker Koordination"  
+**Dokumentiert**: "Multi-Worker Koordination"
 **Realität**: Agenten arbeiten unabhängig, keine Kommunikation
 
 ### 3. External API Integration
-**Dokumentiert**: 50+ APIs (Umweltbundesamt, Bauaufsicht, etc.)  
+**Dokumentiert**: 50+ APIs (Umweltbundesamt, Bauaufsicht, etc.)
 **Realität**: Nur Platzhalter in Mock-Daten, keine echten API-Calls
 
 ### 4. Advanced NLP
-**Dokumentiert**: "NLP, Entity Recognition, Domain Classification"  
+**Dokumentiert**: "NLP, Entity Recognition, Domain Classification"
 **Realität**: Simple keyword matching (`if 'bau' in query.lower()`)
 
 ### 5. Quality Metrics
-**Dokumentiert**: "Completeness, Accuracy, Relevance, Consistency"  
+**Dokumentiert**: "Completeness, Accuracy, Relevance, Consistency"
 **Realität**: Keine automatische Bewertung
 
 ### 6. Multi-Source Aggregation
-**Dokumentiert**: "Weighted Voting, Confidence Scoring, Deduplication"  
+**Dokumentiert**: "Weighted Voting, Confidence Scoring, Deduplication"
 **Realität**: Einfache String-Konkatenation
 
 ---
@@ -426,7 +426,7 @@ def _synthesize_final_response(query, agent_results, complexity, domain):
 
 ---
 
-### Option 2: **Code an Dokumentation anpassen** (3-6 Monate) 
+### Option 2: **Code an Dokumentation anpassen** (3-6 Monate)
 **Ziel**: Implementiere was dokumentiert ist
 
 **Aufgaben**:
@@ -455,7 +455,7 @@ def _synthesize_final_response(query, agent_results, complexity, domain):
 
 ## ✅ Fazit
 
-**Die Wahrheit**: 
+**Die Wahrheit**:
 - Dokumentation = Marketing-Vision (was es sein könnte)
 - Code = Pragmatische Realität (was es ist)
 - Gap = 80% nicht implementiert

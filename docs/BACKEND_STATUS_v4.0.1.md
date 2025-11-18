@@ -1,7 +1,7 @@
 # VERITAS Backend - Status & Entwicklungsstand
 
-**Version:** 4.0.1  
-**Datum:** 20. Oktober 2025  
+**Version:** 4.0.1
+**Datum:** 20. Oktober 2025
 **Status:** 🚀 **PRODUCTION READY** (mit aktiven Optimierungen)
 
 ---
@@ -283,7 +283,7 @@ result = {
 async def stream_progress(session_id: str):
     while True:
         progress = get_pipeline_progress(session_id)
-        
+
         yield {
             "event": "progress",
             "data": {
@@ -728,6 +728,6 @@ python tests/run_all_tests.py --coverage
 
 ---
 
-*Letzte Aktualisierung: 20. Oktober 2025*  
-*Version: 4.0.1*  
+*Letzte Aktualisierung: 20. Oktober 2025*
+*Version: 4.0.1*
 *Autor: VERITAS Development Team*

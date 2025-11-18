@@ -1,6 +1,6 @@
 # 🎯 Phase 1 Abgeschlossen - Intelligent Pipeline funktioniert!
 
-**Datum**: 16. Oktober 2025  
+**Datum**: 16. Oktober 2025
 **Status**: ✅ **ERFOLGREICH**
 
 ---
@@ -94,7 +94,7 @@ Die Münchner Bauordnung und das Bayerische BauGB sind hierbei zu beachten...
 ## 🚀 Nächste Schritte
 
 ### Option A: Integration Spezialisierter Agenten (Optimal)
-**Aufwand**: 2-3 Stunden  
+**Aufwand**: 2-3 Stunden
 **Impact**: Echte BuildingPermitWorker-Logik statt Mock
 
 **Vorteile**:
@@ -110,7 +110,7 @@ Die Münchner Bauordnung und das Bayerische BauGB sind hierbei zu beachten...
 ---
 
 ### Option B: Backend API Integration JETZT (Quick Win) ⭐
-**Aufwand**: 30 Minuten  
+**Aufwand**: 30 Minuten
 **Impact**: Streaming nutzt Intelligent Pipeline statt separate Mock-Funktion
 
 **Vorteile**:
@@ -132,7 +132,7 @@ Die Münchner Bauordnung und das Bayerische BauGB sind hierbei zu beachten...
 ---
 
 ### Option C: UDS3 Integration (Nachhaltig)
-**Aufwand**: 4-6 Stunden (unklar)  
+**Aufwand**: 4-6 Stunden (unklar)
 **Impact**: Echte Datenbank-Suche statt Mock
 
 **Problem**:
@@ -190,7 +190,7 @@ Die Tests zeigen, dass die Pipeline:
 
 **Ziel**: `/v2/query/stream` nutzt `IntelligentPipeline` statt separate Mock-Funktion
 
-**Datei**: `backend/api/veritas_api_backend.py`  
+**Datei**: `backend/api/veritas_api_backend.py`
 **Funktion**: `_process_streaming_query()` (Zeile ~950-1010)
 
 **Änderung**: Ersetze `_generate_agent_result()` Loop durch Pipeline-Call

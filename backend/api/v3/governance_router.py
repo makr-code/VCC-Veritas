@@ -20,6 +20,10 @@ import time
 import uuid
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timedelta
+<<<<<<< Updated upstream
+=======
+from typing import Any, Dict, List, Optional, cast
+>>>>>>> Stashed changes
 
 from fastapi import APIRouter, Request, HTTPException, Query
 
@@ -171,9 +175,10 @@ async def search_data_catalog(
             # Apply filters
             if entity_type and entry["entity_type"] != entity_type:
                 continue
-            if tags and not any(tag in entry["tags"] for tag in tags):
+            entry_tags_list = list(cast(Optional[List[Any]], entry.get("tags")) or [])
+            if tags and not any(tag in entry_tags_list for tag in tags):
                 continue
-            if query and query.lower() not in entry["name"].lower():
+            if query and query.lower() not in str(entry.get("name", "")).lower():
                 continue
             
             catalog_entries.append(entry)

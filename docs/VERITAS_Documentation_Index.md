@@ -222,9 +222,9 @@ Diese Dokumentationssammlung bietet eine umfassende technische und architektonis
 
 ---
 
-**Dokumentations-Version:** 1.0  
-**Letztes Update:** September 2025  
-**Nächste Überprüfung:** Dezember 2025  
+**Dokumentations-Version:** 1.0
+**Letztes Update:** September 2025
+**Nächste Überprüfung:** Dezember 2025
 
 *Diese Dokumentationssammlung repräsentiert den aktuellen Stand des VERITAS Ecosystems und wird kontinuierlich weiterentwickelt, um die Evolution des Systems zu reflektieren und zu unterstützen.*
 

@@ -34,14 +34,14 @@ build_image() {
     local name=$1
     local dockerfile=$2
     local tag="${REGISTRY}${REGISTRY:+/}veritas/${name}:${VERSION}"
-    
+
     echo -e "${GREEN}Building ${name}...${NC}"
     docker build ${BUILD_ARGS} \
         -t "${tag}" \
         -t "${REGISTRY}${REGISTRY:+/}veritas/${name}:latest" \
         -f "${dockerfile}" \
         .
-    
+
     echo -e "${GREEN}✓ Built ${tag}${NC}"
     echo ""
 }

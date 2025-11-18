@@ -14,9 +14,13 @@ Date: 2025-01-07
 
 import os
 import sys
+<<<<<<< Updated upstream
 import asyncio
 import json
 from typing import Dict, Any
+=======
+from typing import Any, Dict, List, cast
+>>>>>>> Stashed changes
 
 # Projekt-Root für Paketimporte
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -28,8 +32,13 @@ from backend.agents.veritas_ollama_client import VeritasOllamaClient
 
 class DualPromptTester:
     """Test Suite für Dual-Prompt-System"""
+<<<<<<< Updated upstream
     
     TEST_QUERIES = [
+=======
+
+    TEST_QUERIES: List[Dict[str, Any]] = [
+>>>>>>> Stashed changes
         {
             "query": "Was brauche ich für eine Baugenehmigung?",
             "domain": "building",
@@ -60,7 +69,7 @@ class DualPromptTester:
     ]
     
     def __init__(self):
-        self.results = {
+        self.results: Dict[str, Any] = {
             "query_enrichment": [],
             "user_responses": [],
             "validation": {
@@ -84,6 +93,7 @@ class DualPromptTester:
             
             try:
                 # Query-Enrichment durchführen
+<<<<<<< Updated upstream
                 enriched = await client.enrich_query_for_rag(
                     query=test_case["query"],
                     domain=test_case["domain"],
@@ -94,6 +104,21 @@ class DualPromptTester:
                 keywords_found = enriched.get("keywords", [])
                 search_terms_found = enriched.get("search_terms", [])
                 
+=======
+                # Normalize types for mypy: ensure we pass `str` values
+                query: str = str(test_case.get("query", ""))
+                domain: str = str(test_case.get("domain", ""))
+
+                temp = await client.enrich_query_for_rag(
+                    query=query, domain=domain, user_context={}
+                )
+                enriched: Dict[str, Any] = temp
+
+                # Validierung
+                keywords_found: List[str] = list(enriched.get("keywords", []))
+                search_terms_found: List[str] = list(enriched.get("search_terms", []))
+
+>>>>>>> Stashed changes
                 # Check: Expected Keywords vorhanden?
                 keywords_match = any(
                     expected_keyword.lower() in str(keywords_found).lower()
@@ -158,16 +183,26 @@ class DualPromptTester:
                 }
                 
                 # User-Response generieren
-                response = await client.synthesize_agent_results(
-                    query=test_case["query"],
+                # Normalize types for mypy: ensure we pass `str` values
+                query: str = str(test_case.get("query", ""))
+
+                response_temp = await client.synthesize_agent_results(
+                    query=query,
                     agent_results=mock_agent_results,
                     rag_context=mock_rag_context,
                     aggregation_summary={},
                     consensus_summary={}
                 )
+<<<<<<< Updated upstream
                 
                 response_text = response.get("response_text", "")
                 
+=======
+                response: Dict[str, Any] = response_temp
+
+                response_text = str(response.get("response_text", ""))
+
+>>>>>>> Stashed changes
                 # Validierung: Forbidden Phrases dürfen NICHT vorkommen
                 forbidden_found = []
                 for forbidden_phrase in test_case["forbidden_phrases"]:
@@ -236,6 +271,7 @@ class DualPromptTester:
         print(f"❌ Failed: {failed} ({failed/total*100:.1f}%)")
         
         print("\n🔍 Query-Enrichment Details:")
+<<<<<<< Updated upstream
         for result in self.results["query_enrichment"]:
             status = "✅" if result["test_passed"] else "❌"
             print(f"  {status} {result['query'][:50]}... → {result['search_terms_count']} search-terms")
@@ -246,6 +282,22 @@ class DualPromptTester:
             forbidden_count = len(result["forbidden_found"])
             print(f"  {status} {result['query'][:50]}... → {forbidden_count} forbidden phrases")
         
+=======
+        for raw in self.results.get("query_enrichment", []):
+            result = cast(Dict[str, Any], raw)
+            status = "✅" if result.get("test_passed") else "❌"
+            query_preview = str(result.get("query", ""))[:50]
+            print(f"  {status} {query_preview}... → {result.get('search_terms_count', 0)} search-terms")
+
+        print("\n💬 User-Response Details:")
+        for raw in self.results.get("user_responses", []):
+            result = cast(Dict[str, Any], raw)
+            status = "✅" if result.get("test_passed") else "❌"
+            forbidden_count = len(result.get("forbidden_found", []))
+            query_preview = str(result.get("query", ""))[:50]
+            print(f"  {status} {query_preview}... → {forbidden_count} forbidden phrases")
+
+>>>>>>> Stashed changes
         print("\n" + "=" * 60)
         if failed == 0:
             print("🎉 ALL TESTS PASSED!")
@@ -277,10 +329,20 @@ async def main():
             print("\n❌ Ollama Server nicht erreichbar!")
             print("   Starte Ollama mit: ollama serve")
             return
+<<<<<<< Updated upstream
         
         print(f"   Available Models: {list(client.available_models.keys())}")
         print(f"   Default Model: {client.default_model}")
         
+=======
+
+        # Cast for mypy so we don't index unknown container types
+        available_models_list = [str(k) for k in list(getattr(client, "available_models", {}).keys())]
+        default_model = str(getattr(client, "default_model", ""))
+        print(f"   Available Models: {available_models_list}")
+        print(f"   Default Model: {default_model}")
+
+>>>>>>> Stashed changes
         # Test PHASE 1: Query-Enrichment
         await tester.test_query_enrichment(client)
         

@@ -1,7 +1,7 @@
 # PKI/CA Integration in VERITAS
 
-**Version**: 0.1.0  
-**Status**: Mock-Implementierung (Entwicklung)  
+**Version**: 0.1.0
+**Status**: Mock-Implementierung (Entwicklung)
 **Datum**: 8. Oktober 2025
 
 ---
@@ -12,11 +12,11 @@ Die PKI (Public Key Infrastructure) Integration ermöglicht Zertifikatsverwaltun
 
 ### Hauptfunktionen
 
-✅ **Zertifikatsverwaltung**: Erstellung, Widerruf, Erneuerung, Verifikation  
-✅ **Certificate Authority (CA)**: CSR-Signierung, CRL-Verwaltung  
-✅ **Kryptografische Operationen**: Verschlüsselung, Signierung, Hash-Funktionen  
-✅ **REST API**: Vollständige API-Endpunkte für alle PKI-Operationen  
-✅ **Mock-Mode**: Entwicklung ohne echte PKI-Infrastruktur  
+✅ **Zertifikatsverwaltung**: Erstellung, Widerruf, Erneuerung, Verifikation
+✅ **Certificate Authority (CA)**: CSR-Signierung, CRL-Verwaltung
+✅ **Kryptografische Operationen**: Verschlüsselung, Signierung, Hash-Funktionen
+✅ **REST API**: Vollständige API-Endpunkte für alle PKI-Operationen
+✅ **Mock-Mode**: Entwicklung ohne echte PKI-Infrastruktur
 
 ---
 
@@ -356,7 +356,7 @@ from pki import CertificateManager
 def test_create_certificate():
     manager = CertificateManager(mock_mode=True)
     cert = manager.create_certificate("test.local")
-    
+
     assert cert["common_name"] == "test.local"
     assert cert["status"] == "valid"
 ```
@@ -488,18 +488,18 @@ def generate_key_pair(key_size: int = 2048):
         public_exponent=65537,
         key_size=key_size
     )
-    
+
     private_pem = private_key.private_bytes(
         encoding=serialization.Encoding.PEM,
         format=serialization.PrivateFormat.PKCS8,
         encryption_algorithm=serialization.NoEncryption()
     )
-    
+
     public_pem = private_key.public_key().public_bytes(
         encoding=serialization.Encoding.PEM,
         format=serialization.PublicFormat.SubjectPublicKeyInfo
     )
-    
+
     return private_pem.decode(), public_pem.decode()
 ```
 
@@ -648,9 +648,9 @@ if not cert:
 
 ## 🤝 Kontakt & Support
 
-**Entwickler**: VERITAS Team  
-**Dokumentation**: `docs/PKI_INTEGRATION.md`  
-**Tests**: `tests/test_pki/`  
+**Entwickler**: VERITAS Team
+**Dokumentation**: `docs/PKI_INTEGRATION.md`
+**Tests**: `tests/test_pki/`
 **API**: `backend/api/pki_endpoints.py`
 
 ---
@@ -661,6 +661,6 @@ Internes Projekt - VERITAS Framework
 
 ---
 
-**Erstellt**: 8. Oktober 2025  
-**Letzte Aktualisierung**: 8. Oktober 2025  
+**Erstellt**: 8. Oktober 2025
+**Letzte Aktualisierung**: 8. Oktober 2025
 **Version**: 0.1.0 (Mock-Implementation)

@@ -229,7 +229,7 @@ class DatabaseAgentTestServerExtension:
                 )
             
             # Prepare params
-            params = filters or {}
+            params: Dict[str, Any] = filters or {}
             params["limit"] = limit
             
             # Execute query via client

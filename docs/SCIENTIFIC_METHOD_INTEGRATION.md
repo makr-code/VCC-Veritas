@@ -1,7 +1,7 @@
 # 🔬 Wissenschaftliche Methodik in VERITAS v6.0
 
-**Erstellt:** 12. Oktober 2025, 21:00 Uhr  
-**Version:** v6.0 (Wissenschaftliche Vollständigkeit)  
+**Erstellt:** 12. Oktober 2025, 21:00 Uhr
+**Version:** v6.0 (Wissenschaftliche Vollständigkeit)
 **Status:** 📋 KONZEPT - Erweiterung von v5.0
 
 ---
@@ -379,10 +379,10 @@ class EvidenceCluster:
     synthesis: str
     strength: float
     cross_references: List[Dict]
-    
+
 class SynthesisService:
     """Evidence Aggregation + Cross-Referencing"""
-    
+
     async def synthesize_evidence(
         self,
         hypothesis: Dict,
@@ -393,30 +393,30 @@ class SynthesisService:
         Erkenne Cross-References (Zitate, Verweise)
         Aggregiere zu kohärenten Evidence Clusters
         """
-        
+
         # 1. Thematic Clustering (keyword-based + embedding similarity)
         clusters = await self._cluster_by_theme(rag_results, hypothesis)
-        
+
         # 2. Cross-Reference Detection
         cross_refs = await self._detect_cross_references(rag_results)
-        
+
         # 3. Evidence Strength Scoring
         for cluster in clusters:
             cluster.strength = self._calculate_cluster_strength(cluster)
-        
+
         # 4. Gap Detection
         gaps = self._detect_knowledge_gaps(hypothesis, clusters)
-        
+
         return {
             "evidence_clusters": [c.to_dict() for c in clusters],
             "cross_references": cross_refs,
             "gaps": gaps
         }
-    
+
     def _cluster_by_theme(self, results: List[Dict], hypothesis: Dict) -> List[EvidenceCluster]:
         """Gruppiere Dokumente nach Themen aus Hypothesis.required_criteria"""
         themes = hypothesis["required_criteria"]  # z.B. ["Verfahrensfreiheit", "Abstandsflächen"]
-        
+
         clusters = []
         for theme in themes:
             # Keyword-Matching + Embedding-Similarity
@@ -424,7 +424,7 @@ class SynthesisService:
                 doc for doc in results
                 if self._is_relevant_to_theme(doc, theme)
             ]
-            
+
             if relevant_docs:
                 cluster = EvidenceCluster(
                     theme=theme,
@@ -434,13 +434,13 @@ class SynthesisService:
                     cross_references=[]
                 )
                 clusters.append(cluster)
-        
+
         return clusters
-    
+
     def _detect_cross_references(self, results: List[Dict]) -> List[Dict]:
         """Erkenne Verweise zwischen Dokumenten (z.B. 'siehe § 50 LBO')"""
         cross_refs = []
-        
+
         for i, doc1 in enumerate(results):
             for doc2 in results[i+1:]:
                 # Regex: "siehe § X", "vgl. § Y", "i.V.m. § Z"
@@ -451,9 +451,9 @@ class SynthesisService:
                         "relationship": "citing",  # oder "supporting", "contradicting"
                         "strength": 0.85
                     })
-        
+
         return cross_refs
-    
+
     def _calculate_cluster_strength(self, cluster: EvidenceCluster) -> float:
         """Bewerte Cluster-Stärke basierend auf:
         - Anzahl Sources (mehr = besser)
@@ -463,9 +463,9 @@ class SynthesisService:
         num_sources = len(cluster.sources)
         avg_authority = sum(self._get_source_authority(s) for s in cluster.sources) / num_sources
         cross_ref_bonus = len(cluster.cross_references) * 0.05
-        
+
         return min(1.0, avg_authority + cross_ref_bonus)
-    
+
     def _get_source_authority(self, source: Dict) -> float:
         """Gesetz (0.95) > Rechtsprechung (0.90) > Verwaltungsvorschrift (0.80) > Merkblatt (0.60)"""
         source_type = source.get("metadata", {}).get("type", "unknown")
@@ -504,7 +504,7 @@ class Conflict:
 
 class AnalysisService:
     """Pattern Detection + Conflict Resolution"""
-    
+
     async def analyze_evidence(
         self,
         evidence_clusters: List[Dict]
@@ -514,30 +514,30 @@ class AnalysisService:
         Erkenne Widersprüche zwischen Sources
         Löse Konflikte auf (Authoritative Source, Temporal Precedence)
         """
-        
+
         # 1. Pattern Detection
         patterns = await self._detect_patterns(evidence_clusters)
-        
+
         # 2. Conflict Detection
         conflicts = await self._detect_conflicts(evidence_clusters)
-        
+
         # 3. Conflict Resolution
         for conflict in conflicts:
             conflict.resolution = await self._resolve_conflict(conflict)
-        
+
         # 4. Anomaly Detection
         anomalies = await self._detect_anomalies(evidence_clusters)
-        
+
         return {
             "patterns": [p.__dict__ for p in patterns],
             "conflicts": [c.__dict__ for c in conflicts],
             "anomalies": anomalies
         }
-    
+
     def _detect_patterns(self, clusters: List[Dict]) -> List[Pattern]:
         """Erkenne wiederkehrende Regeln/Muster in Evidence"""
         patterns = []
-        
+
         # Beispiel: "Verfahrensfreiheit = Größe + Nutzung" (in allen Bundesländern)
         if self._has_size_based_rule_pattern(clusters):
             patterns.append(Pattern(
@@ -546,7 +546,7 @@ class AnalysisService:
                 evidence=self._get_supporting_laws(clusters, "verfahrensfreiheit"),
                 confidence=0.93
             ))
-        
+
         # Beispiel: "Außenbereich = immer genehmigungspflichtig"
         if self._has_outside_area_pattern(clusters):
             patterns.append(Pattern(
@@ -555,16 +555,16 @@ class AnalysisService:
                 evidence=["BauGB § 35"],
                 confidence=0.98
             ))
-        
+
         return patterns
-    
+
     def _detect_conflicts(self, clusters: List[Dict]) -> List[Conflict]:
         """Erkenne Widersprüche zwischen Sources"""
         conflicts = []
-        
+
         for cluster in clusters:
             sources = cluster["sources"]
-            
+
             # Vergleiche alle Source-Paare
             for i, s1 in enumerate(sources):
                 for s2 in sources[i+1:]:
@@ -574,9 +574,9 @@ class AnalysisService:
                             sources=[s1["source"], s2["source"]],
                             resolution={}  # Later filled
                         ))
-        
+
         return conflicts
-    
+
     def _resolve_conflict(self, conflict: Conflict) -> Dict:
         """Löse Konflikte auf:
         - Authoritative Source (Gesetz > Merkblatt)
@@ -584,13 +584,13 @@ class AnalysisService:
         - Jurisdiction (Bundesgesetz > Landesgesetz in Kompetenzen)
         """
         sources = conflict.sources
-        
+
         # Strategie 1: Authority-based
         authority_winner = max(sources, key=lambda s: self._get_source_authority(s))
-        
+
         # Strategie 2: Temporal (falls Authority gleich)
         temporal_winner = max(sources, key=lambda s: s.get("metadata", {}).get("year", 0))
-        
+
         return {
             "method": "authoritative_source",
             "winner": authority_winner,
@@ -610,7 +610,7 @@ from typing import Dict
 
 class ValidationService:
     """Hypothesis Testing + Evidence Scoring"""
-    
+
     async def validate_hypothesis(
         self,
         hypothesis: Dict,
@@ -622,30 +622,30 @@ class ValidationService:
         Berechne Evidence Score (supporting vs. contradicting)
         Update Confidence basierend auf Evidence Quality
         """
-        
+
         # 1. Evidence Scoring
         evidence_score = self._score_evidence(hypothesis, synthesized_evidence)
-        
+
         # 2. Validation Checks (pro Criterion)
         validation_checks = []
         for criterion in hypothesis["required_criteria"]:
             check = self._validate_criterion(criterion, synthesized_evidence)
             validation_checks.append(check)
-        
+
         # 3. Confidence Update
         new_confidence = self._update_confidence(
             hypothesis["confidence"],
             evidence_score,
             validation_checks
         )
-        
+
         # 4. Hypothesis Refinement
         refined_hypothesis = self._refine_hypothesis(
             hypothesis,
             synthesized_evidence,
             analysis
         )
-        
+
         return {
             "hypothesis_test": {
                 "original": hypothesis["hypothesis"],
@@ -664,18 +664,18 @@ class ValidationService:
                 if c["status"] == "NEEDS_USER_INPUT"
             ]
         }
-    
+
     def _score_evidence(self, hypothesis: Dict, evidence: Dict) -> Dict:
         """Berechne Supporting vs. Contradicting Evidence"""
         clusters = evidence["evidence_clusters"]
-        
+
         supporting = 0.0
         contradicting = 0.0
         neutral = 0.0
-        
+
         for cluster in clusters:
             strength = cluster["strength"]
-            
+
             # Prüfe ob Cluster Hypothese unterstützt oder widerspricht
             if self._supports_hypothesis(cluster, hypothesis):
                 supporting += strength
@@ -683,15 +683,15 @@ class ValidationService:
                 contradicting += strength
             else:
                 neutral += strength
-        
+
         total = supporting + contradicting + neutral
-        
+
         return {
             "supporting": supporting / total if total > 0 else 0,
             "contradicting": contradicting / total if total > 0 else 0,
             "neutral": neutral / total if total > 0 else 0
         }
-    
+
     def _update_confidence(
         self,
         initial_confidence: float,
@@ -699,18 +699,18 @@ class ValidationService:
         validation_checks: List[Dict]
     ) -> float:
         """Update Confidence basierend auf Evidence Quality"""
-        
+
         # Starke Evidence → Confidence steigt
         # Widersprüche → Confidence sinkt
         evidence_boost = evidence_score["supporting"] - evidence_score["contradicting"]
-        
+
         # Validation Checks: Wie viele Kriterien validiert?
         validated_count = sum(1 for c in validation_checks if c["status"] == "VALIDATED")
         total_criteria = len(validation_checks)
         validation_ratio = validated_count / total_criteria if total_criteria > 0 else 0
-        
+
         new_confidence = initial_confidence + (evidence_boost * 0.3) + (validation_ratio * 0.2)
-        
+
         return min(1.0, max(0.0, new_confidence))
 ```
 
@@ -723,7 +723,7 @@ class ValidationService:
 ```python
 class ConclusionService:
     """Final Synthesis + Answer Construction"""
-    
+
     async def generate_conclusion(
         self,
         validated_hypothesis: Dict,
@@ -735,14 +735,14 @@ class ConclusionService:
         Integriere alle wissenschaftlichen Schritte
         Output: Strukturierte Conclusion mit Conditions + Next Steps
         """
-        
+
         # 1. Build LLM Prompt mit allen wissenschaftlichen Schritten
         prompt = self._build_conclusion_prompt(
             validated_hypothesis,
             synthesized_evidence,
             analysis
         )
-        
+
         # 2. LLM Call 2 (Größer: ~3000-4000 Tokens)
         llm_response = await self.ollama_client.generate(
             prompt=prompt,
@@ -750,10 +750,10 @@ class ConclusionService:
             temperature=0.3,  # Deterministischer
             max_tokens=4000
         )
-        
+
         # 3. Parse LLM Response to Structured Conclusion
         conclusion = self._parse_llm_conclusion(llm_response)
-        
+
         # 4. Add Conditions + Next Steps
         conclusion["conditions"] = self._extract_conditions(
             synthesized_evidence,
@@ -763,9 +763,9 @@ class ConclusionService:
             validated_hypothesis,
             conclusion
         )
-        
+
         return conclusion
-    
+
     def _build_conclusion_prompt(self, hypothesis, evidence, analysis) -> str:
         """Multi-Step Scientific Reasoning Prompt"""
         return f"""
@@ -827,7 +827,7 @@ Generate a **scientifically validated final answer** that:
 ```python
 class MetacognitionService:
     """Self-Assessment + Quality Metrics + Improvement Suggestions"""
-    
+
     async def assess_processing(
         self,
         full_processing_chain: Dict  # Alle Phasen 1-5
@@ -837,28 +837,28 @@ class MetacognitionService:
         Bewerte Reasoning Quality, Uncertainty Sources, Knowledge Gaps
         Generiere Improvement Suggestions
         """
-        
+
         # 1. Reasoning Quality Metrics
         reasoning_quality = self._assess_reasoning_quality(full_processing_chain)
-        
+
         # 2. Uncertainty Sources
         uncertainty_sources = self._identify_uncertainty_sources(full_processing_chain)
-        
+
         # 3. Knowledge Gaps
         knowledge_gaps = self._identify_knowledge_gaps(full_processing_chain)
-        
+
         # 4. Quality Metrics
         quality_metrics = self._calculate_quality_metrics(full_processing_chain)
-        
+
         # 5. Improvement Suggestions
         improvements = self._generate_improvement_suggestions(
             reasoning_quality,
             knowledge_gaps
         )
-        
+
         # 6. Fallback Strategies
         fallbacks = self._evaluate_fallback_strategies(quality_metrics)
-        
+
         return {
             "metacognitive_assessment": {
                 "overall_confidence": full_processing_chain["conclusion"]["confidence"],
@@ -870,14 +870,14 @@ class MetacognitionService:
             "quality_metrics": quality_metrics,
             "fallback_strategies": fallbacks
         }
-    
+
     def _assess_reasoning_quality(self, chain: Dict) -> Dict:
         """Bewerte Evidence Strength, Source Diversity, Logical Consistency"""
-        
+
         # Evidence Strength: Durchschnittliche Cluster Strength
         clusters = chain["synthesis"]["evidence_clusters"]
         evidence_strength = sum(c["strength"] for c in clusters) / len(clusters)
-        
+
         # Source Diversity: Anzahl unterschiedlicher Source-Typen
         source_types = set(
             s.get("metadata", {}).get("type", "unknown")
@@ -885,24 +885,24 @@ class MetacognitionService:
             for s in cluster["sources"]
         )
         source_diversity = min(1.0, len(source_types) / 4)  # Max 4 Typen
-        
+
         # Logical Consistency: Anzahl aufgelöster Konflikte / Gesamt-Konflikte
         conflicts = chain["analysis"]["conflicts"]
         resolved = sum(1 for c in conflicts if c.get("resolution"))
         logical_consistency = resolved / len(conflicts) if conflicts else 1.0
-        
+
         # Completeness: Validated Criteria / Total Criteria
         validation_checks = chain["validation"]["validation_checks"]
         validated = sum(1 for c in validation_checks if c["status"] == "VALIDATED")
         completeness = validated / len(validation_checks) if validation_checks else 0.5
-        
+
         return {
             "evidence_strength": evidence_strength,
             "source_diversity": source_diversity,
             "logical_consistency": logical_consistency,
             "completeness": completeness
         }
-    
+
     def _identify_uncertainty_sources(self, chain: Dict) -> List[Dict]:
         """Erkenne Unsicherheitsquellen:
         - Missing User Input (z.B. Bundesland, Größe)
@@ -910,7 +910,7 @@ class MetacognitionService:
         - Conflicting Evidence (unaufgelöste Widersprüche)
         """
         uncertainties = []
-        
+
         # Missing User Input
         missing = chain["validation"]["missing_validations"]
         for item in missing:
@@ -920,7 +920,7 @@ class MetacognitionService:
                 "impact": "HIGH",
                 "mitigation": f"Formular: {item}"
             })
-        
+
         # Ambiguous Context (niedrige Confidence in Validation Checks)
         low_conf_checks = [
             c for c in chain["validation"]["validation_checks"]
@@ -933,9 +933,9 @@ class MetacognitionService:
                 "impact": "MEDIUM",
                 "mitigation": "Zusätzliche RAG-Suche oder User-Klarstellung"
             })
-        
+
         return uncertainties
-    
+
     def _calculate_quality_metrics(self, chain: Dict) -> Dict:
         """VERITAS Quality Metrics:
         - Completeness: Alle Kriterien adressiert?
@@ -943,25 +943,25 @@ class MetacognitionService:
         - Relevance: Beantwortet User Query?
         - Actionability: Next Steps klar?
         """
-        
+
         conclusion = chain["conclusion"]
         validation = chain["validation"]
-        
+
         # Completeness
         validated_ratio = sum(
             1 for c in validation["validation_checks"]
             if c["status"] == "VALIDATED"
         ) / len(validation["validation_checks"])
-        
+
         # Accuracy (Evidence Score Supporting)
         accuracy = validation["hypothesis_test"]["evidence_score"]["supporting"]
-        
+
         # Relevance (LLM Answer Quality - simple heuristic)
         relevance = 0.92  # Annahme: LLM generiert relevante Antworten
-        
+
         # Actionability (Next Steps vorhanden?)
         actionability = 1.0 if conclusion.get("next_steps") else 0.5
-        
+
         return {
             "answer_completeness": validated_ratio,
             "answer_accuracy": accuracy,
@@ -981,7 +981,7 @@ class MetacognitionService:
 
 class ScientificQueryProcessor:
     """Orchestrates all 6 scientific phases"""
-    
+
     def __init__(self):
         self.nlp_service = NLPService()
         self.rag_service = RAGService()
@@ -992,37 +992,37 @@ class ScientificQueryProcessor:
         self.conclusion_service = ConclusionService()  # NEW (enhanced)
         self.metacognition_service = MetacognitionService()  # NEW
         self.streaming_service = StreamingService()
-    
+
     async def process_query(self, query: str, user_id: str) -> Dict:
         """
         Execute complete scientific reasoning pipeline
         """
-        
+
         # Phase 0: NLP Preprocessing
         nlp_result = await self.nlp_service.process(query)
         await self.streaming_service.send_step("nlp_complete", nlp_result)
-        
+
         # Phase 1: Initial RAG Retrieval
         rag_results = await self.rag_service.retrieve(nlp_result)
         await self.streaming_service.send_step("rag_complete", rag_results)
-        
+
         # Phase 1: HYPOTHESIS GENERATION (v5.0)
         hypothesis = await self.hypothesis_service.generate(query, rag_results)
         await self.streaming_service.send_step("hypothesis_complete", hypothesis)
-        
+
         # Phase 2: SYNTHESE (NEW)
         synthesis = await self.synthesis_service.synthesize_evidence(
             hypothesis,
             rag_results
         )
         await self.streaming_service.send_step("synthesis_complete", synthesis)
-        
+
         # Phase 3: ANALYSE (NEW)
         analysis = await self.analysis_service.analyze_evidence(
             synthesis["evidence_clusters"]
         )
         await self.streaming_service.send_step("analysis_complete", analysis)
-        
+
         # Phase 4: VALIDATION (NEW)
         validation = await self.validation_service.validate_hypothesis(
             hypothesis,
@@ -1030,7 +1030,7 @@ class ScientificQueryProcessor:
             analysis
         )
         await self.streaming_service.send_step("validation_complete", validation)
-        
+
         # Phase 5: CONCLUSION (NEW Enhanced)
         conclusion = await self.conclusion_service.generate_conclusion(
             validation,
@@ -1038,7 +1038,7 @@ class ScientificQueryProcessor:
             analysis
         )
         await self.streaming_service.send_step("conclusion_complete", conclusion)
-        
+
         # Phase 6: METACOGNITION (NEW)
         metacognition = await self.metacognition_service.assess_processing({
             "hypothesis": hypothesis,
@@ -1048,7 +1048,7 @@ class ScientificQueryProcessor:
             "conclusion": conclusion
         })
         await self.streaming_service.send_step("metacognition_complete", metacognition)
-        
+
         # Final Response
         return {
             "query": query,

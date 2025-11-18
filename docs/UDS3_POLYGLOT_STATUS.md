@@ -1,6 +1,6 @@
 # UDS3 PolyglotQuery Integration Status
 
-**Date:** 2025-01-11  
+**Date:** 2025-01-11
 **Status:** 🔄 IN PROGRESS (MVP reached, refinements needed)
 
 ---
@@ -47,7 +47,7 @@ WARNING:uds3.uds3_polyglot_query:GraphFilter not available
 **Error:**
 ```
 ERROR:uds3_relational_filter:Cannot execute: no backend set
-ERROR:uds3.uds3_polyglot_query:Error executing relational query: 
+ERROR:uds3.uds3_polyglot_query:Error executing relational query:
 'RelationalQueryResult' object has no attribute 'get'
 ```
 
@@ -97,17 +97,17 @@ if self.has_graph and enable_graph and search_weights.get("graph", 0) > 0:
     try:
         # Create graph filter
         graph_filter = self.strategy.create_graph_filter()
-        
+
         # Configure filter
         graph_filter.by_relationship(
             relationship_type="RELATED_TO",
             direction="BOTH"
         )
         graph_filter.with_depth(2)
-        
+
         # Add to query (use private _add_context method or find public API)
         # poly_query._add_context(QueryContext(...))
-        
+
     except Exception as e:
         logger.error(f"Graph query failed: {e}")
 ```
@@ -118,11 +118,11 @@ if self.has_relational and search_weights.get("keyword", 0) > 0:
     try:
         # Create relational filter
         rel_filter = self.strategy.create_relational_filter()
-        
+
         # Configure filter (use FilterOperator enums!)
         rel_filter.from_table("documents_metadata")
         rel_filter.where("status", FilterOperator.EQ, "active")
-        
+
         # Apply custom filters
         if filters:
             for field, value in filters.items():
@@ -130,12 +130,12 @@ if self.has_relational and search_weights.get("keyword", 0) > 0:
                     rel_filter.where(field, FilterOperator.LIKE, f"%{value}%")
                 else:
                     rel_filter.where(field, FilterOperator.EQ, value)
-        
+
         rel_filter.limit(top_k * 3)
-        
+
         # Add to query
         # poly_query._add_context(QueryContext(...))
-        
+
     except Exception as e:
         logger.error(f"Relational query failed: {e}")
 ```
@@ -168,17 +168,17 @@ c:\VCC\uds3\tests\test_polyglot_query.py (831 LOC)
 ```python
 async def hybrid_search(self, query, top_k=10, weights=None):
     results = []
-    
+
     # Direct PostgreSQL query (if backend available)
     if self.strategy.relational_backend:
         rel_results = await self._query_relational_direct(query, top_k)
         results.extend(rel_results)
-    
+
     # Direct Neo4j query (if backend available)
     if self.strategy.graph_backend:
         graph_results = await self._query_graph_direct(query, top_k)
         results.extend(graph_results)
-    
+
     # Merge and rank
     return self._merge_and_rank(results, weights, top_k)
 ```
@@ -297,5 +297,5 @@ pip install sentence-transformers
 
 ---
 
-**Last Updated:** 2025-01-11 14:30  
+**Last Updated:** 2025-01-11 14:30
 **Next Review:** After studying test files

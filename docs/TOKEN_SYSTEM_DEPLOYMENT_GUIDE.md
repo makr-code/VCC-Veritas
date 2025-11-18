@@ -1,7 +1,7 @@
 # Token-Management-System - Production Deployment Guide 🚀
 
-**Version:** 1.0  
-**Datum:** 17. Oktober 2025, 17:00 Uhr  
+**Version:** 1.0
+**Datum:** 17. Oktober 2025, 17:00 Uhr
 **Status:** ✅ PRODUCTION-READY
 
 ---
@@ -130,7 +130,7 @@ def analyze_response(response):
     """Extrahiere Token-Budget-Metriken aus Response."""
     if "token_budget" not in response:
         return None
-    
+
     tb = response["token_budget"]
     return {
         "timestamp": datetime.now().isoformat(),
@@ -147,7 +147,7 @@ def analyze_response(response):
 # metrics = analyze_response(response)
 # if metrics:
 #     stats[metrics["intent"]].append(metrics)
-#     
+#
 #     # Alle 10 Queries: Report
 #     if len(sum(stats.values(), [])) % 10 == 0:
 #         print("\n=== Token Budget Statistics ===")
@@ -166,14 +166,14 @@ def export_token_stats(stats, filename=None):
     """Exportiere Token-Budget-Statistiken als CSV."""
     if filename is None:
         filename = f"token_stats_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
-    
+
     all_data = sum(stats.values(), [])
-    
+
     with open(filename, 'w', newline='', encoding='utf-8') as f:
         writer = csv.DictWriter(f, fieldnames=all_data[0].keys())
         writer.writeheader()
         writer.writerows(all_data)
-    
+
     print(f"✅ Stats exported to {filename}")
     return filename
 ```
@@ -193,8 +193,8 @@ def export_token_stats(stats, filename=None):
 **Monitoring Commands:**
 ```powershell
 # 1. Check Response Times
-Get-Content data\veritas_auto_server.log | Select-String "Budget calculation took" | 
-    ForEach-Object { [regex]::Match($_, "\d+ms").Value } | 
+Get-Content data\veritas_auto_server.log | Select-String "Budget calculation took" |
+    ForEach-Object { [regex]::Match($_, "\d+ms").Value } |
     Measure-Object -Average
 
 # 2. Check Overflow Events

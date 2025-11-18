@@ -26,8 +26,8 @@ Beispiel: Ein 15-Jähriger kauft mit seinem Taschengeld ein Computerspiel. Der K
             "paragraph": "110",
             "category": "Legal",
             "topic": "Vertragsrecht",
-            "keywords": ["Minderjährige", "Taschengeld", "Vertragsrecht", "BGB"]
-        }
+            "keywords": ["Minderjährige", "Taschengeld", "Vertragsrecht", "BGB"],
+        },
     },
     {
         "doc_id": "bgb_433",
@@ -46,8 +46,8 @@ Beispiel: Beim Autokauf muss der Verkäufer das Auto übergeben und Eigentum ver
             "paragraph": "433",
             "category": "Legal",
             "topic": "Kaufrecht",
-            "keywords": ["Kaufvertrag", "Verkäufer", "Käufer", "Pflichten"]
-        }
+            "keywords": ["Kaufvertrag", "Verkäufer", "Käufer", "Pflichten"],
+        },
     },
     {
         "doc_id": "vwvfg_24",
@@ -69,8 +69,8 @@ Beispiel: Bevor ein Bußgeldbescheid erlassen wird, muss dem Betroffenen Gelegen
             "paragraph": "24",
             "category": "Administrative",
             "topic": "Verwaltungsverfahren",
-            "keywords": ["Anhörung", "Verwaltungsakt", "Rechtliches Gehör", "Verfahren"]
-        }
+            "keywords": ["Anhörung", "Verwaltungsakt", "Rechtliches Gehör", "Verfahren"],
+        },
     },
     {
         "doc_id": "vwvfg_35",
@@ -87,8 +87,8 @@ Beispiel: Ein Baugenehmigungsbescheid ist ein Verwaltungsakt. Ein Verkehrsschild
             "paragraph": "35",
             "category": "Administrative",
             "topic": "Verwaltungsrecht",
-            "keywords": ["Verwaltungsakt", "Behörde", "Einzelfall", "Rechtswirkung"]
-        }
+            "keywords": ["Verwaltungsakt", "Behörde", "Einzelfall", "Rechtswirkung"],
+        },
     },
     {
         "doc_id": "uwg_3",
@@ -109,8 +109,8 @@ Beispiel: Irreführende Werbung oder aggressive Verkaufsmethoden sind unlautere 
             "paragraph": "3",
             "category": "Legal",
             "topic": "Wettbewerbsrecht",
-            "keywords": ["Unlautere Wettbewerb", "Verbraucherschutz", "Geschäftliche Handlung"]
-        }
+            "keywords": ["Unlautere Wettbewerb", "Verbraucherschutz", "Geschäftliche Handlung"],
+        },
     },
     {
         "doc_id": "umweltg_45",
@@ -133,8 +133,8 @@ Beispiel: Ein Kraftwerk muss moderne Filter installieren, um CO2- und Stickoxid-
             "paragraph": "45",
             "category": "Environmental",
             "topic": "Umweltschutz",
-            "keywords": ["Emissionen", "Umweltschutz", "Grenzwerte", "Stand der Technik"]
-        }
+            "keywords": ["Emissionen", "Umweltschutz", "Grenzwerte", "Stand der Technik"],
+        },
     },
     {
         "doc_id": "stgb_242",
@@ -159,8 +159,8 @@ Beispiel: Jemand nimmt im Supermarkt eine Flasche Wasser und verlässt das Gesch
             "paragraph": "242",
             "category": "Legal",
             "topic": "Strafrecht",
-            "keywords": ["Diebstahl", "Eigentum", "Straftat", "Wegnahme"]
-        }
+            "keywords": ["Diebstahl", "Eigentum", "Straftat", "Wegnahme"],
+        },
     },
     {
         "doc_id": "gg_1",
@@ -187,10 +187,11 @@ Beispiel: Folter ist mit der Menschenwürde unvereinbar und absolut verboten, se
             "paragraph": "1",
             "category": "Constitutional",
             "topic": "Grundrechte",
-            "keywords": ["Menschenwürde", "Grundrechte", "Verfassung", "Schutzpflicht"]
-        }
-    }
+            "keywords": ["Menschenwürde", "Grundrechte", "Verfassung", "Schutzpflicht"],
+        },
+    },
 ]
+
 
 async def index_demo_corpus():
     """Indexiert Demo-Corpus in UDS3"""
@@ -198,68 +199,57 @@ async def index_demo_corpus():
     print("UDS3 DEMO CORPUS INDEXIERUNG")
     print("=" * 80)
     print()
-    
+
     try:
         from uds3.uds3_core import get_optimized_unified_strategy
-        
+
         print(f"📊 Demo-Corpus: {len(DEMO_CORPUS)} Dokumente")
         print(f"   • {sum(1 for d in DEMO_CORPUS if d['metadata']['category'] == 'Legal')} Legal")
         print(f"   • {sum(1 for d in DEMO_CORPUS if d['metadata']['category'] == 'Administrative')} Administrative")
         print(f"   • {sum(1 for d in DEMO_CORPUS if d['metadata']['category'] == 'Environmental')} Environmental")
         print(f"   • {sum(1 for d in DEMO_CORPUS if d['metadata']['category'] == 'Constitutional')} Constitutional")
         print()
-        
+
         print("🔄 Initialisiere UDS3...")
         uds3 = get_optimized_unified_strategy()
         print(f"✅ UDS3 Strategy: {uds3.__class__.__name__}")
         print()
-        
+
         # Index Documents
         print("📥 Indexiere Dokumente...")
-        
+
         # Check if we have create_secure_document (UDS3 v3.0 method)
-        if hasattr(uds3, 'create_secure_document'):
+        if hasattr(uds3, "create_secure_document"):
             for i, doc in enumerate(DEMO_CORPUS, 1):
                 try:
                     print(f"   [{i}/{len(DEMO_CORPUS)}] {doc['doc_id']}... ", end="")
                     result = uds3.create_secure_document(
                         file_path=f"demo/{doc['doc_id']}.txt",
-                        content=doc['content'],
-                        chunks=[doc['content']],  # Single chunk
+                        content=doc["content"],
+                        chunks=[doc["content"]],  # Single chunk
                         security_level="PUBLIC",
-                        metadata=doc['metadata']
+                        metadata=doc["metadata"],
                     )
                     print("✅")
                 except Exception as e:
                     print(f"❌ Error: {e}")
-        
-        elif hasattr(uds3, 'db_manager') and uds3.db_manager:
+
+        elif hasattr(uds3, "db_manager") and uds3.db_manager:
             # Direct vector backend access
             dm = uds3.db_manager
-            if hasattr(dm, 'vector_backend') and dm.vector_backend:
+            if hasattr(dm, "vector_backend") and dm.vector_backend:
                 vb = dm.vector_backend
-                
+
                 # Prepare data for batch insert
-                texts = [doc['content'] for doc in DEMO_CORPUS]
-                metadatas = [
-                    {
-                        "doc_id": doc['doc_id'],
-                        "title": doc['title'],
-                        **doc['metadata']
-                    }
-                    for doc in DEMO_CORPUS
-                ]
-                ids = [doc['doc_id'] for doc in DEMO_CORPUS]
-                
+                texts = [doc["content"] for doc in DEMO_CORPUS]
+                metadatas = [{"doc_id": doc["doc_id"], "title": doc["title"], **doc["metadata"]} for doc in DEMO_CORPUS]
+                ids = [doc["doc_id"] for doc in DEMO_CORPUS]
+
                 print(f"   🔄 Batch-Insert {len(texts)} Dokumente...")
-                
+
                 try:
-                    if hasattr(vb, 'collection') and vb.collection:
-                        vb.collection.add(
-                            documents=texts,
-                            metadatas=metadatas,
-                            ids=ids
-                        )
+                    if hasattr(vb, "collection") and vb.collection:
+                        vb.collection.add(documents=texts, metadatas=metadatas, ids=ids)
                         print(f"   ✅ {len(texts)} Dokumente indexiert!")
                     else:
                         print(f"   ❌ Collection nicht verfügbar")
@@ -271,13 +261,9 @@ async def index_demo_corpus():
                         try:
                             print(f"   [{i}/{len(DEMO_CORPUS)}] {doc['doc_id']}... ", end="")
                             vb.collection.add(
-                                documents=[doc['content']],
-                                metadatas=[{
-                                    "doc_id": doc['doc_id'],
-                                    "title": doc['title'],
-                                    **doc['metadata']
-                                }],
-                                ids=[doc['doc_id']]
+                                documents=[doc["content"]],
+                                metadatas=[{"doc_id": doc["doc_id"], "title": doc["title"], **doc["metadata"]}],
+                                ids=[doc["doc_id"]],
                             )
                             print("✅")
                         except Exception as e:
@@ -289,20 +275,20 @@ async def index_demo_corpus():
             print(f"   ❌ Keine Index-Methode gefunden")
             print(f"   📝 Verfügbare Methoden: {[m for m in dir(uds3) if not m.startswith('_')]}")
             return False
-        
+
         print()
         print("=" * 80)
         print("✅ INDEXIERUNG ABGESCHLOSSEN")
         print("=" * 80)
         print()
-        
+
         # Verify
         print("🔍 Verifikation...")
-        if hasattr(uds3.db_manager, 'vector_backend') and uds3.db_manager.vector_backend:
-            if hasattr(uds3.db_manager.vector_backend, 'collection'):
+        if hasattr(uds3.db_manager, "vector_backend") and uds3.db_manager.vector_backend:
+            if hasattr(uds3.db_manager.vector_backend, "collection"):
                 count = uds3.db_manager.vector_backend.collection.count()
                 print(f"   📄 Vector DB enthält jetzt: {count} Dokumente")
-                
+
                 if count >= len(DEMO_CORPUS):
                     print(f"   ✅ Alle Dokumente erfolgreich indexiert!")
                     print()
@@ -314,17 +300,19 @@ async def index_demo_corpus():
                 else:
                     print(f"   ⚠️ Nur {count}/{len(DEMO_CORPUS)} Dokumente indexiert")
                     return False
-        
+
         return True
-        
+
     except ImportError as e:
         print(f"❌ UDS3 Import-Fehler: {e}")
         return False
     except Exception as e:
         print(f"❌ Fehler: {e}")
         import traceback
+
         traceback.print_exc()
         return False
+
 
 if __name__ == "__main__":
     result = asyncio.run(index_demo_corpus())

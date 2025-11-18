@@ -21,9 +21,13 @@ Version: 1.0
 from dataclasses import dataclass, field
 from typing import List, Dict, Any, Optional, Tuple
 from enum import Enum
+<<<<<<< Updated upstream
 import logging
 import hashlib
 from datetime import datetime
+=======
+from typing import Any, Dict, List, Optional, Tuple, cast
+>>>>>>> Stashed changes
 
 # ============================================================================
 # UDS3 Polyglot Manager - STRICT SEPARATION OF CONCERNS
@@ -186,7 +190,18 @@ class RAGService:
         - USE_UDS3_FALLBACK: Enable UDS3 fallback (default: true)
         """
         self.logger = logging.getLogger(__name__)
+<<<<<<< Updated upstream
         
+=======
+
+        # Known optional adapters/connections (initialized to None,
+        # populated by selected db_adapter at runtime). Typed to satisfy mypy.
+        self.db_adapter: Any = None
+        self.chromadb: Optional[Any] = None
+        self.neo4j: Optional[Any] = None
+        self.postgresql: Optional[Any] = None
+
+>>>>>>> Stashed changes
         # ============================================================================
         # Database Adapter - Environment-Controlled Selection
         # ============================================================================
@@ -194,6 +209,7 @@ class RAGService:
         # Fallback: UDS3 Polyglot (multi-backend orchestration)
         
         try:
+<<<<<<< Updated upstream
             from backend.adapters import get_database_adapter
             
             # Get adapter with automatic fallback
@@ -203,6 +219,30 @@ class RAGService:
             adapter_name = self.db_adapter.__class__.__name__
             self.logger.info(f"✅ RAG Service initialized with {adapter_name}")
             
+=======
+            # Use role-specific factories: retrieval vs persistence
+            from backend.adapters import get_retrieval_adapter, get_persistence_adapter
+            from backend.utils.persistence_queue import PersistenceQueue
+
+            # Retrieval adapter (preferred UDS3)
+            self.retrieval_adapter = get_retrieval_adapter()
+            # Persistence adapter (preferred Themis) - may be None if Themis down
+            self.persistence_adapter = get_persistence_adapter()
+
+            # Start persistence queue (worker will keep tasks until adapter available)
+            self.persistence_queue = PersistenceQueue(self.persistence_adapter)
+            try:
+                self.persistence_queue.start()
+            except Exception:
+                self.logger.warning("⚠️ PersistenceQueue failed to start")
+
+            # For backward compatibility many components expect `db_adapter`
+            # to be present; map it to retrieval adapter (UDS3 preferred).
+            self.db_adapter = self.retrieval_adapter
+            adapter_name = getattr(self.db_adapter, "__class__", type(self.db_adapter)).__name__
+            self.logger.info(f"✅ RAG Service initialized with retrieval adapter {adapter_name}")
+
+>>>>>>> Stashed changes
         except Exception as e:
             self.logger.error(f"❌ CRITICAL: Database Adapter Init FAILED: {e}")
             raise RuntimeError(f"RAG Service requires database adapter - Init failed: {e}")
@@ -214,6 +254,7 @@ class RAGService:
         Returns:
             True if adapter initialized successfully
         """
+<<<<<<< Updated upstream
         return hasattr(self, 'db_adapter') and self.db_adapter is not None
     
     def vector_search(
@@ -221,6 +262,58 @@ class RAGService:
         query: str,
         filters: Optional[SearchFilters] = None
     ) -> List[SearchResult]:
+=======
+        return hasattr(self, "db_adapter") and self.db_adapter is not None
+
+    async def persist_document(self, collection: str, document: Dict[str, Any], key: Optional[str] = None, sync: bool = False) -> Optional[Dict[str, Any]]:
+        """
+        Persist a document using the persistence adapter / queue.
+
+        If a persistence adapter (Themis) is available and `sync` is True, this
+        will attempt a synchronous insert. Otherwise the document is enqueued
+        to the `persistence_queue` for background mirroring.
+
+        Returns the adapter response on successful synchronous insert, or None
+        when enqueued / deferred.
+        """
+        try:
+            # Prefer synchronous persist when explicitly requested
+            if sync and getattr(self, "persistence_adapter", None):
+                insert = getattr(self.persistence_adapter, "insert_document", None)
+                if insert is None:
+                    raise RuntimeError("persistence_adapter does not implement insert_document")
+
+                if asyncio := __import__("asyncio") and asyncio.iscoroutinefunction(insert):
+                    return await insert(collection, document, key)
+                else:
+                    loop = __import__("asyncio").get_event_loop()
+                    return await loop.run_in_executor(None, insert, collection, document, key)
+
+            # Otherwise enqueue for background persistence
+            if getattr(self, "persistence_queue", None):
+                await self.persistence_queue.enqueue(collection, document, key)
+                return None
+
+            # If no queue but adapter exists, try best-effort async insert
+            if getattr(self, "persistence_adapter", None):
+                insert = getattr(self, "persistence_adapter", "insert_document", None)
+                if insert is None:
+                    raise RuntimeError("persistence_adapter does not implement insert_document")
+                if __import__("asyncio").iscoroutinefunction(insert):
+                    return await insert(collection, document, key)
+                else:
+                    loop = __import__("asyncio").get_event_loop()
+                    return await loop.run_in_executor(None, insert, collection, document, key)
+
+            # Nothing to do - neither adapter nor queue available
+            self.logger.warning("⚠️ No persistence adapter or queue available - document not persisted")
+            return None
+        except Exception as e:
+            self.logger.error(f"❌ persist_document failed: {e}")
+            raise
+
+    def vector_search(self, query: str, filters: Optional[SearchFilters] = None) -> List[SearchResult]:
+>>>>>>> Stashed changes
         """
         Perform vector search using ChromaDB
         
@@ -246,7 +339,7 @@ class RAGService:
             )
             
             # Convert ChromaDB results to SearchResult format
-            search_results = []
+            search_results: List[SearchResult] = []
             for i, result in enumerate(results):
                 metadata = DocumentMetadata(
                     document_id=result.get('id', f'doc_{i}'),
@@ -313,6 +406,7 @@ class RAGService:
             """
             
             with self.neo4j.driver.session() as session:
+<<<<<<< Updated upstream
                 result = session.run(
                     cypher_query,
                     query=query,
@@ -320,6 +414,11 @@ class RAGService:
                 )
                 
                 search_results = []
+=======
+                result = session.run(cypher_query, query=query, limit=filters.max_results)
+
+                search_results: List[SearchResult] = []
+>>>>>>> Stashed changes
                 for i, record in enumerate(result):
                     doc = record['d']
                     rel_count = record['relationship_count']
@@ -387,6 +486,7 @@ class RAGService:
             ORDER BY relevance DESC
             LIMIT %s
             """
+<<<<<<< Updated upstream
             
             results = self.postgresql.execute_query(
                 sql_query,
@@ -394,6 +494,12 @@ class RAGService:
             )
             
             search_results = []
+=======
+
+            results = self.postgresql.execute_query(sql_query, (query, query, filters.max_results))
+
+            search_results: List[SearchResult] = []
+>>>>>>> Stashed changes
             for i, row in enumerate(results):
                 metadata = DocumentMetadata(
                     document_id=str(row['id']),
@@ -450,9 +556,15 @@ class RAGService:
         filters = filters or SearchFilters()
         
         # Perform all searches
+<<<<<<< Updated upstream
         methods_used = []
         all_results = []
         
+=======
+        methods_used: List[SearchMethod] = []
+        all_results: List[SearchResult] = []
+
+>>>>>>> Stashed changes
         if self.chromadb and weights.vector_weight > 0:
             vector_results = self.vector_search(query, filters)
             all_results.extend(vector_results)
@@ -470,7 +582,7 @@ class RAGService:
         
         # Deduplicate results
         seen_hashes = set()
-        unique_results = []
+        unique_results: List[SearchResult] = []
         for result in all_results:
             result_hash = result.get_hash()
             if result_hash not in seen_hashes:
@@ -616,7 +728,7 @@ class RAGService:
         results = await asyncio.gather(*tasks, return_exceptions=True)
         
         # Handle exceptions
-        processed_results = []
+        processed_results: List[HybridSearchResult] = []
         for i, result in enumerate(results):
             if isinstance(result, Exception):
                 self.logger.error(f"Batch search failed for query '{queries[i]}': {result}")
@@ -631,8 +743,14 @@ class RAGService:
                     execution_time_ms=0.0
                 ))
             else:
+<<<<<<< Updated upstream
                 processed_results.append(result)
         
+=======
+                # result should be a HybridSearchResult for batch queries
+                processed_results.append(cast(HybridSearchResult, result))
+
+>>>>>>> Stashed changes
         total_time = (time.time() - start_time) * 1000
         avg_time = total_time / len(queries) if queries else 0
         
@@ -670,8 +788,13 @@ class RAGService:
             >>> print(expansions)
             ['Bauantrag Stuttgart', 'Baugenehmigung Stuttgart', 'Bauantragsverfahren Stuttgart']
         """
+<<<<<<< Updated upstream
         expansions = []
         
+=======
+        expansions: List[Any] = []
+
+>>>>>>> Stashed changes
         if include_original:
             expansions.append(query)
         
@@ -776,7 +899,7 @@ class RAGService:
     ) -> List[SearchResult]:
         """Apply Borda count ranking"""
         # Group by method
-        method_results = {}
+        method_results: Dict[SearchMethod, List[SearchResult]] = {}
         for result in results:
             method = result.search_method
             if method not in method_results:
@@ -784,7 +907,7 @@ class RAGService:
             method_results[method].append(result)
         
         # Calculate Borda scores
-        borda_scores = {}
+        borda_scores: Dict[str, float] = {}
         for method, method_res in method_results.items():
             n = len(method_res)
             weight = self._get_weight_for_method(method, weights)
@@ -834,7 +957,7 @@ class RAGService:
         search_result = self.hybrid_search(query, filters=filters)
         
         # Build context with token limit
-        context_parts = []
+        context_parts: List[str] = []
         current_tokens = 0
         chars_per_token = 4  # Rough estimate
         max_chars = max_tokens * chars_per_token
@@ -878,6 +1001,7 @@ class RAGService:
                 'relevance': 0.85
             }
         ]
+<<<<<<< Updated upstream
         
         results = []
         for i, doc in enumerate(mock_docs):
@@ -885,6 +1009,28 @@ class RAGService:
                 document_id=doc['id'],
                 title=doc['title'],
                 source_type='mock'
+=======
+
+        results: List[SearchResult] = []
+        for i, doc in enumerate(mock_docs):
+            # Coerce literal mock values to expected types for mypy
+            doc_id = str(doc["id"])
+            title = str(doc["title"])
+            content = str(doc["content"])
+            from typing import Any as _Any
+
+            relevance = float(cast(_Any, doc["relevance"]))
+            metadata = DocumentMetadata(document_id=doc_id, title=title, source_type="mock")
+            results.append(
+                SearchResult(
+                    document_id=doc_id,
+                    content=content,
+                    relevance_score=relevance,
+                    metadata=metadata,
+                    search_method=SearchMethod.VECTOR,
+                    rank=i + 1,
+                )
+>>>>>>> Stashed changes
             )
             results.append(SearchResult(
                 document_id=doc['id'],

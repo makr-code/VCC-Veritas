@@ -685,24 +685,24 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration |    Query Expansion: False
 2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration |    RRF k: 60
 2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration |    BM25 k1=1.5, b=0.75
-2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 1: Initializing Dense Retriever...
 2025-10-17 07:11:41 | INFO     | backend.agents.veritas_uds3_adapter | ✅ UDS3VectorSearchAdapter initialisiert
 2025-10-17 07:11:41 | INFO     | backend.agents.veritas_uds3_adapter | ℹ️ Hinweis: UDS3 benötigt konfigurierte Datenbanken (Vector/Graph/Relational) für Ergebnisse
 2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter initialized with UDS3 strategy
-2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 2: Initializing BM25 Sparse Retriever...
 2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration |    📚 Indexing 8 demo documents...
 2025-10-17 07:11:41 | INFO     | backend.agents.veritas_sparse_retrieval | 📥 Indexiere 8 Dokumente für BM25...
 2025-10-17 07:11:41 | INFO     | backend.agents.veritas_sparse_retrieval | ✅ BM25-Index erstellt in 0.00s (8 Docs, 152 Tokens)
 2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 indexed 8 documents
-2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 3: Initializing Hybrid Retriever (Dense + Sparse + RRF)...
 2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever initialized
 2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration |    📊 Dense Weight: 0.6
 2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration |    📊 Sparse Weight: 0.4
 2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration |    📊 RRF k: 60
-2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration |
 🔍 Step 4: Validation...
 2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration |    Running test query: 'Test Query'
 2025-10-17 07:11:41 | DEBUG    | backend.agents.veritas_uds3_adapter | ℹ️ UDS3 Query: No database queries configured (DB-Konfiguration erforderlich)
@@ -715,7 +715,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration |       doc_id: doc_7
 2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration |       score: 0.006557377049180329
 2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration |       content: Verkehrssicherungspflicht auf Baustellen: Bauherr und Unternehmer haften für Schäden durch unzureich...
-2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration |
 ================================================================================
 2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration | ✅ PHASE 5 HYBRID SEARCH INITIALIZED SUCCESSFULLY
 2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration | ================================================================================
@@ -723,11 +723,11 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter: OK (with DB)
 2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 Retriever: OK (8 docs indexed)
 2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever: OK
-2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration |
 📝 Usage:
 2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration |    from backend.api.veritas_phase5_integration import hybrid_retriever
 2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration |    results = await hybrid_retriever.retrieve(query, top_k=10)
-2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration |
 ⚡ Expected Performance:
 2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration |    BM25-only mode: <50ms (Dense=0.0)
 2025-10-17 07:11:41 | INFO     | backend.api.veritas_phase5_integration |    Full Hybrid mode: <150ms (when Vector DB populated)
@@ -1093,24 +1093,24 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration |    Query Expansion: False
 2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration |    RRF k: 60
 2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration |    BM25 k1=1.5, b=0.75
-2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 1: Initializing Dense Retriever...
 2025-10-17 08:15:04 | INFO     | backend.agents.veritas_uds3_adapter | ✅ UDS3VectorSearchAdapter initialisiert
 2025-10-17 08:15:04 | INFO     | backend.agents.veritas_uds3_adapter | ℹ️ Hinweis: UDS3 benötigt konfigurierte Datenbanken (Vector/Graph/Relational) für Ergebnisse
 2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter initialized with UDS3 strategy
-2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 2: Initializing BM25 Sparse Retriever...
 2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration |    📚 Indexing 8 demo documents...
 2025-10-17 08:15:04 | INFO     | backend.agents.veritas_sparse_retrieval | 📥 Indexiere 8 Dokumente für BM25...
 2025-10-17 08:15:04 | INFO     | backend.agents.veritas_sparse_retrieval | ✅ BM25-Index erstellt in 0.00s (8 Docs, 152 Tokens)
 2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 indexed 8 documents
-2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 3: Initializing Hybrid Retriever (Dense + Sparse + RRF)...
 2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever initialized
 2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration |    📊 Dense Weight: 0.6
 2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration |    📊 Sparse Weight: 0.4
 2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration |    📊 RRF k: 60
-2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration |
 🔍 Step 4: Validation...
 2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration |    Running test query: 'Test Query'
 2025-10-17 08:15:04 | DEBUG    | backend.agents.veritas_uds3_adapter | ℹ️ UDS3 Query: No database queries configured (DB-Konfiguration erforderlich)
@@ -1123,7 +1123,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration |       doc_id: doc_7
 2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration |       score: 0.006557377049180329
 2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration |       content: Verkehrssicherungspflicht auf Baustellen: Bauherr und Unternehmer haften für Schäden durch unzureich...
-2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration |
 ================================================================================
 2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration | ✅ PHASE 5 HYBRID SEARCH INITIALIZED SUCCESSFULLY
 2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration | ================================================================================
@@ -1131,11 +1131,11 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter: OK (with DB)
 2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 Retriever: OK (8 docs indexed)
 2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever: OK
-2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration |
 📝 Usage:
 2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration |    from backend.api.veritas_phase5_integration import hybrid_retriever
 2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration |    results = await hybrid_retriever.retrieve(query, top_k=10)
-2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration |
 ⚡ Expected Performance:
 2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration |    BM25-only mode: <50ms (Dense=0.0)
 2025-10-17 08:15:04 | INFO     | backend.api.veritas_phase5_integration |    Full Hybrid mode: <150ms (when Vector DB populated)
@@ -1470,24 +1470,24 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration |    Query Expansion: False
 2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration |    RRF k: 60
 2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration |    BM25 k1=1.5, b=0.75
-2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 1: Initializing Dense Retriever...
 2025-10-17 10:56:06 | INFO     | backend.agents.veritas_uds3_adapter | ✅ UDS3VectorSearchAdapter initialisiert
 2025-10-17 10:56:06 | INFO     | backend.agents.veritas_uds3_adapter | ℹ️ Hinweis: UDS3 benötigt konfigurierte Datenbanken (Vector/Graph/Relational) für Ergebnisse
 2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter initialized with UDS3 strategy
-2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 2: Initializing BM25 Sparse Retriever...
 2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration |    📚 Indexing 8 demo documents...
 2025-10-17 10:56:06 | INFO     | backend.agents.veritas_sparse_retrieval | 📥 Indexiere 8 Dokumente für BM25...
 2025-10-17 10:56:06 | INFO     | backend.agents.veritas_sparse_retrieval | ✅ BM25-Index erstellt in 0.00s (8 Docs, 152 Tokens)
 2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 indexed 8 documents
-2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 3: Initializing Hybrid Retriever (Dense + Sparse + RRF)...
 2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever initialized
 2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration |    📊 Dense Weight: 0.6
 2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration |    📊 Sparse Weight: 0.4
 2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration |    📊 RRF k: 60
-2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration |
 🔍 Step 4: Validation...
 2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration |    Running test query: 'Test Query'
 2025-10-17 10:56:06 | DEBUG    | backend.agents.veritas_uds3_adapter | ℹ️ UDS3 Query: No database queries configured (DB-Konfiguration erforderlich)
@@ -1500,7 +1500,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration |       doc_id: doc_7
 2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration |       score: 0.006557377049180329
 2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration |       content: Verkehrssicherungspflicht auf Baustellen: Bauherr und Unternehmer haften für Schäden durch unzureich...
-2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration |
 ================================================================================
 2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration | ✅ PHASE 5 HYBRID SEARCH INITIALIZED SUCCESSFULLY
 2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration | ================================================================================
@@ -1508,11 +1508,11 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter: OK (with DB)
 2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 Retriever: OK (8 docs indexed)
 2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever: OK
-2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration |
 📝 Usage:
 2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration |    from backend.api.veritas_phase5_integration import hybrid_retriever
 2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration |    results = await hybrid_retriever.retrieve(query, top_k=10)
-2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration |
 ⚡ Expected Performance:
 2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration |    BM25-only mode: <50ms (Dense=0.0)
 2025-10-17 10:56:06 | INFO     | backend.api.veritas_phase5_integration |    Full Hybrid mode: <150ms (when Vector DB populated)
@@ -1862,24 +1862,24 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration |    Query Expansion: False
 2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration |    RRF k: 60
 2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration |    BM25 k1=1.5, b=0.75
-2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 1: Initializing Dense Retriever...
 2025-10-17 12:51:01 | INFO     | backend.agents.veritas_uds3_adapter | ✅ UDS3VectorSearchAdapter initialisiert
 2025-10-17 12:51:01 | INFO     | backend.agents.veritas_uds3_adapter | ℹ️ Hinweis: UDS3 benötigt konfigurierte Datenbanken (Vector/Graph/Relational) für Ergebnisse
 2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter initialized with UDS3 strategy
-2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 2: Initializing BM25 Sparse Retriever...
 2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration |    📚 Indexing 8 demo documents...
 2025-10-17 12:51:01 | INFO     | backend.agents.veritas_sparse_retrieval | 📥 Indexiere 8 Dokumente für BM25...
 2025-10-17 12:51:01 | INFO     | backend.agents.veritas_sparse_retrieval | ✅ BM25-Index erstellt in 0.00s (8 Docs, 152 Tokens)
 2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 indexed 8 documents
-2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 3: Initializing Hybrid Retriever (Dense + Sparse + RRF)...
 2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever initialized
 2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration |    📊 Dense Weight: 0.6
 2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration |    📊 Sparse Weight: 0.4
 2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration |    📊 RRF k: 60
-2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration |
 🔍 Step 4: Validation...
 2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration |    Running test query: 'Test Query'
 2025-10-17 12:51:01 | DEBUG    | backend.agents.veritas_uds3_adapter | ℹ️ UDS3 Query: No database queries configured (DB-Konfiguration erforderlich)
@@ -1892,7 +1892,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration |       doc_id: doc_7
 2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration |       score: 0.006557377049180329
 2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration |       content: Verkehrssicherungspflicht auf Baustellen: Bauherr und Unternehmer haften für Schäden durch unzureich...
-2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration |
 ================================================================================
 2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration | ✅ PHASE 5 HYBRID SEARCH INITIALIZED SUCCESSFULLY
 2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration | ================================================================================
@@ -1900,11 +1900,11 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter: OK (with DB)
 2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 Retriever: OK (8 docs indexed)
 2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever: OK
-2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration |
 📝 Usage:
 2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration |    from backend.api.veritas_phase5_integration import hybrid_retriever
 2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration |    results = await hybrid_retriever.retrieve(query, top_k=10)
-2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration |
 ⚡ Expected Performance:
 2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration |    BM25-only mode: <50ms (Dense=0.0)
 2025-10-17 12:51:01 | INFO     | backend.api.veritas_phase5_integration |    Full Hybrid mode: <150ms (when Vector DB populated)
@@ -2284,24 +2284,24 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration |    Query Expansion: False
 2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration |    RRF k: 60
 2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration |    BM25 k1=1.5, b=0.75
-2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 1: Initializing Dense Retriever...
 2025-10-17 13:45:29 | INFO     | backend.agents.veritas_uds3_adapter | ✅ UDS3VectorSearchAdapter initialisiert
 2025-10-17 13:45:29 | INFO     | backend.agents.veritas_uds3_adapter | ℹ️ Hinweis: UDS3 benötigt konfigurierte Datenbanken (Vector/Graph/Relational) für Ergebnisse
 2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter initialized with UDS3 strategy
-2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 2: Initializing BM25 Sparse Retriever...
 2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration |    📚 Indexing 8 demo documents...
 2025-10-17 13:45:29 | INFO     | backend.agents.veritas_sparse_retrieval | 📥 Indexiere 8 Dokumente für BM25...
 2025-10-17 13:45:29 | INFO     | backend.agents.veritas_sparse_retrieval | ✅ BM25-Index erstellt in 0.00s (8 Docs, 152 Tokens)
 2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 indexed 8 documents
-2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 3: Initializing Hybrid Retriever (Dense + Sparse + RRF)...
 2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever initialized
 2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration |    📊 Dense Weight: 0.6
 2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration |    📊 Sparse Weight: 0.4
 2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration |    📊 RRF k: 60
-2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration |
 🔍 Step 4: Validation...
 2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration |    Running test query: 'Test Query'
 2025-10-17 13:45:29 | DEBUG    | backend.agents.veritas_uds3_adapter | ℹ️ UDS3 Query: No database queries configured (DB-Konfiguration erforderlich)
@@ -2314,7 +2314,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration |       doc_id: doc_7
 2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration |       score: 0.006557377049180329
 2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration |       content: Verkehrssicherungspflicht auf Baustellen: Bauherr und Unternehmer haften für Schäden durch unzureich...
-2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration |
 ================================================================================
 2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration | ✅ PHASE 5 HYBRID SEARCH INITIALIZED SUCCESSFULLY
 2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration | ================================================================================
@@ -2322,11 +2322,11 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter: OK (with DB)
 2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 Retriever: OK (8 docs indexed)
 2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever: OK
-2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration |
 📝 Usage:
 2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration |    from backend.api.veritas_phase5_integration import hybrid_retriever
 2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration |    results = await hybrid_retriever.retrieve(query, top_k=10)
-2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration |
 ⚡ Expected Performance:
 2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration |    BM25-only mode: <50ms (Dense=0.0)
 2025-10-17 13:45:29 | INFO     | backend.api.veritas_phase5_integration |    Full Hybrid mode: <150ms (when Vector DB populated)
@@ -2468,7 +2468,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 16:30:25 | INFO     | backend.api.veritas_phase5_integration |    Query Expansion: False
 2025-10-17 16:30:25 | INFO     | backend.api.veritas_phase5_integration |    RRF k: 60
 2025-10-17 16:30:25 | INFO     | backend.api.veritas_phase5_integration |    BM25 k1=1.5, b=0.75
-2025-10-17 16:30:25 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 16:30:25 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 1: Initializing Dense Retriever...
 2025-10-17 16:30:25 | INFO     | root | ✅ Mock SQLite-Backend für relational_db KeyError-Workaround aktiviert
 2025-10-17 16:30:25 | INFO     | uds3.uds3_core | ✅ UDS3 Identity Service integriert
@@ -2684,19 +2684,19 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 16:30:33 | INFO     | backend.agents.veritas_uds3_adapter | ✅ UDS3VectorSearchAdapter initialisiert
 2025-10-17 16:30:33 | INFO     | backend.agents.veritas_uds3_adapter | ℹ️ Hinweis: UDS3 benötigt konfigurierte Datenbanken (Vector/Graph/Relational) für Ergebnisse
 2025-10-17 16:30:33 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter initialized with UDS3 strategy
-2025-10-17 16:30:33 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 16:30:33 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 2: Initializing BM25 Sparse Retriever...
 2025-10-17 16:30:33 | INFO     | backend.api.veritas_phase5_integration |    📚 Indexing 8 demo documents...
 2025-10-17 16:30:33 | INFO     | backend.agents.veritas_sparse_retrieval | 📥 Indexiere 8 Dokumente für BM25...
 2025-10-17 16:30:33 | INFO     | backend.agents.veritas_sparse_retrieval | ✅ BM25-Index erstellt in 0.00s (8 Docs, 152 Tokens)
 2025-10-17 16:30:33 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 indexed 8 documents
-2025-10-17 16:30:33 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 16:30:33 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 3: Initializing Hybrid Retriever (Dense + Sparse + RRF)...
 2025-10-17 16:30:33 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever initialized
 2025-10-17 16:30:33 | INFO     | backend.api.veritas_phase5_integration |    📊 Dense Weight: 0.6
 2025-10-17 16:30:33 | INFO     | backend.api.veritas_phase5_integration |    📊 Sparse Weight: 0.4
 2025-10-17 16:30:33 | INFO     | backend.api.veritas_phase5_integration |    📊 RRF k: 60
-2025-10-17 16:30:33 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 16:30:33 | INFO     | backend.api.veritas_phase5_integration |
 🔍 Step 4: Validation...
 2025-10-17 16:30:33 | INFO     | backend.api.veritas_phase5_integration |    Running test query: 'Test Query'
 2025-10-17 16:30:33 | DEBUG    | backend.agents.veritas_uds3_adapter | ℹ️ UDS3 Query: No database queries configured (DB-Konfiguration erforderlich)
@@ -2709,7 +2709,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 16:30:33 | INFO     | backend.api.veritas_phase5_integration |       doc_id: doc_7
 2025-10-17 16:30:33 | INFO     | backend.api.veritas_phase5_integration |       score: 0.006557377049180329
 2025-10-17 16:30:33 | INFO     | backend.api.veritas_phase5_integration |       content: Verkehrssicherungspflicht auf Baustellen: Bauherr und Unternehmer haften für Schäden durch unzureich...
-2025-10-17 16:30:33 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 16:30:33 | INFO     | backend.api.veritas_phase5_integration |
 ================================================================================
 2025-10-17 16:30:33 | INFO     | backend.api.veritas_phase5_integration | ✅ PHASE 5 HYBRID SEARCH INITIALIZED SUCCESSFULLY
 2025-10-17 16:30:33 | INFO     | backend.api.veritas_phase5_integration | ================================================================================
@@ -2717,11 +2717,11 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 16:30:33 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter: OK (with DB)
 2025-10-17 16:30:33 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 Retriever: OK (8 docs indexed)
 2025-10-17 16:30:33 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever: OK
-2025-10-17 16:30:33 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 16:30:33 | INFO     | backend.api.veritas_phase5_integration |
 📝 Usage:
 2025-10-17 16:30:33 | INFO     | backend.api.veritas_phase5_integration |    from backend.api.veritas_phase5_integration import hybrid_retriever
 2025-10-17 16:30:33 | INFO     | backend.api.veritas_phase5_integration |    results = await hybrid_retriever.retrieve(query, top_k=10)
-2025-10-17 16:30:33 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 16:30:33 | INFO     | backend.api.veritas_phase5_integration |
 ⚡ Expected Performance:
 2025-10-17 16:30:33 | INFO     | backend.api.veritas_phase5_integration |    BM25-only mode: <50ms (Dense=0.0)
 2025-10-17 16:30:33 | INFO     | backend.api.veritas_phase5_integration |    Full Hybrid mode: <150ms (when Vector DB populated)
@@ -2845,7 +2845,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 16:31:23 | INFO     | backend.api.veritas_phase5_integration |    Query Expansion: False
 2025-10-17 16:31:23 | INFO     | backend.api.veritas_phase5_integration |    RRF k: 60
 2025-10-17 16:31:23 | INFO     | backend.api.veritas_phase5_integration |    BM25 k1=1.5, b=0.75
-2025-10-17 16:31:23 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 16:31:23 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 1: Initializing Dense Retriever...
 2025-10-17 16:31:23 | INFO     | root | ✅ Mock SQLite-Backend für relational_db KeyError-Workaround aktiviert
 2025-10-17 16:31:23 | INFO     | uds3.uds3_core | ✅ UDS3 Identity Service integriert
@@ -3061,19 +3061,19 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 16:31:31 | INFO     | backend.agents.veritas_uds3_adapter | ✅ UDS3VectorSearchAdapter initialisiert
 2025-10-17 16:31:31 | INFO     | backend.agents.veritas_uds3_adapter | ℹ️ Hinweis: UDS3 benötigt konfigurierte Datenbanken (Vector/Graph/Relational) für Ergebnisse
 2025-10-17 16:31:31 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter initialized with UDS3 strategy
-2025-10-17 16:31:31 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 16:31:31 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 2: Initializing BM25 Sparse Retriever...
 2025-10-17 16:31:31 | INFO     | backend.api.veritas_phase5_integration |    📚 Indexing 8 demo documents...
 2025-10-17 16:31:31 | INFO     | backend.agents.veritas_sparse_retrieval | 📥 Indexiere 8 Dokumente für BM25...
 2025-10-17 16:31:31 | INFO     | backend.agents.veritas_sparse_retrieval | ✅ BM25-Index erstellt in 0.00s (8 Docs, 152 Tokens)
 2025-10-17 16:31:31 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 indexed 8 documents
-2025-10-17 16:31:31 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 16:31:31 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 3: Initializing Hybrid Retriever (Dense + Sparse + RRF)...
 2025-10-17 16:31:31 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever initialized
 2025-10-17 16:31:31 | INFO     | backend.api.veritas_phase5_integration |    📊 Dense Weight: 0.6
 2025-10-17 16:31:31 | INFO     | backend.api.veritas_phase5_integration |    📊 Sparse Weight: 0.4
 2025-10-17 16:31:31 | INFO     | backend.api.veritas_phase5_integration |    📊 RRF k: 60
-2025-10-17 16:31:31 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 16:31:31 | INFO     | backend.api.veritas_phase5_integration |
 🔍 Step 4: Validation...
 2025-10-17 16:31:31 | INFO     | backend.api.veritas_phase5_integration |    Running test query: 'Test Query'
 2025-10-17 16:31:31 | DEBUG    | backend.agents.veritas_uds3_adapter | ℹ️ UDS3 Query: No database queries configured (DB-Konfiguration erforderlich)
@@ -3086,7 +3086,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 16:31:31 | INFO     | backend.api.veritas_phase5_integration |       doc_id: doc_7
 2025-10-17 16:31:31 | INFO     | backend.api.veritas_phase5_integration |       score: 0.006557377049180329
 2025-10-17 16:31:31 | INFO     | backend.api.veritas_phase5_integration |       content: Verkehrssicherungspflicht auf Baustellen: Bauherr und Unternehmer haften für Schäden durch unzureich...
-2025-10-17 16:31:31 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 16:31:31 | INFO     | backend.api.veritas_phase5_integration |
 ================================================================================
 2025-10-17 16:31:31 | INFO     | backend.api.veritas_phase5_integration | ✅ PHASE 5 HYBRID SEARCH INITIALIZED SUCCESSFULLY
 2025-10-17 16:31:31 | INFO     | backend.api.veritas_phase5_integration | ================================================================================
@@ -3094,11 +3094,11 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 16:31:31 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter: OK (with DB)
 2025-10-17 16:31:31 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 Retriever: OK (8 docs indexed)
 2025-10-17 16:31:31 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever: OK
-2025-10-17 16:31:31 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 16:31:31 | INFO     | backend.api.veritas_phase5_integration |
 📝 Usage:
 2025-10-17 16:31:31 | INFO     | backend.api.veritas_phase5_integration |    from backend.api.veritas_phase5_integration import hybrid_retriever
 2025-10-17 16:31:31 | INFO     | backend.api.veritas_phase5_integration |    results = await hybrid_retriever.retrieve(query, top_k=10)
-2025-10-17 16:31:31 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 16:31:31 | INFO     | backend.api.veritas_phase5_integration |
 ⚡ Expected Performance:
 2025-10-17 16:31:31 | INFO     | backend.api.veritas_phase5_integration |    BM25-only mode: <50ms (Dense=0.0)
 2025-10-17 16:31:31 | INFO     | backend.api.veritas_phase5_integration |    Full Hybrid mode: <150ms (when Vector DB populated)
@@ -3228,7 +3228,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 16:32:48 | INFO     | backend.api.veritas_phase5_integration |    Query Expansion: False
 2025-10-17 16:32:48 | INFO     | backend.api.veritas_phase5_integration |    RRF k: 60
 2025-10-17 16:32:48 | INFO     | backend.api.veritas_phase5_integration |    BM25 k1=1.5, b=0.75
-2025-10-17 16:32:48 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 16:32:48 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 1: Initializing Dense Retriever...
 2025-10-17 16:32:48 | INFO     | root | ✅ Mock SQLite-Backend für relational_db KeyError-Workaround aktiviert
 2025-10-17 16:32:48 | INFO     | uds3.uds3_core | ✅ UDS3 Identity Service integriert
@@ -3444,19 +3444,19 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 16:32:57 | INFO     | backend.agents.veritas_uds3_adapter | ✅ UDS3VectorSearchAdapter initialisiert
 2025-10-17 16:32:57 | INFO     | backend.agents.veritas_uds3_adapter | ℹ️ Hinweis: UDS3 benötigt konfigurierte Datenbanken (Vector/Graph/Relational) für Ergebnisse
 2025-10-17 16:32:57 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter initialized with UDS3 strategy
-2025-10-17 16:32:57 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 16:32:57 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 2: Initializing BM25 Sparse Retriever...
 2025-10-17 16:32:57 | INFO     | backend.api.veritas_phase5_integration |    📚 Indexing 8 demo documents...
 2025-10-17 16:32:57 | INFO     | backend.agents.veritas_sparse_retrieval | 📥 Indexiere 8 Dokumente für BM25...
 2025-10-17 16:32:57 | INFO     | backend.agents.veritas_sparse_retrieval | ✅ BM25-Index erstellt in 0.00s (8 Docs, 152 Tokens)
 2025-10-17 16:32:57 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 indexed 8 documents
-2025-10-17 16:32:57 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 16:32:57 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 3: Initializing Hybrid Retriever (Dense + Sparse + RRF)...
 2025-10-17 16:32:57 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever initialized
 2025-10-17 16:32:57 | INFO     | backend.api.veritas_phase5_integration |    📊 Dense Weight: 0.6
 2025-10-17 16:32:57 | INFO     | backend.api.veritas_phase5_integration |    📊 Sparse Weight: 0.4
 2025-10-17 16:32:57 | INFO     | backend.api.veritas_phase5_integration |    📊 RRF k: 60
-2025-10-17 16:32:57 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 16:32:57 | INFO     | backend.api.veritas_phase5_integration |
 🔍 Step 4: Validation...
 2025-10-17 16:32:57 | INFO     | backend.api.veritas_phase5_integration |    Running test query: 'Test Query'
 2025-10-17 16:32:57 | DEBUG    | backend.agents.veritas_uds3_adapter | ℹ️ UDS3 Query: No database queries configured (DB-Konfiguration erforderlich)
@@ -3469,7 +3469,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 16:32:57 | INFO     | backend.api.veritas_phase5_integration |       doc_id: doc_7
 2025-10-17 16:32:57 | INFO     | backend.api.veritas_phase5_integration |       score: 0.006557377049180329
 2025-10-17 16:32:57 | INFO     | backend.api.veritas_phase5_integration |       content: Verkehrssicherungspflicht auf Baustellen: Bauherr und Unternehmer haften für Schäden durch unzureich...
-2025-10-17 16:32:57 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 16:32:57 | INFO     | backend.api.veritas_phase5_integration |
 ================================================================================
 2025-10-17 16:32:57 | INFO     | backend.api.veritas_phase5_integration | ✅ PHASE 5 HYBRID SEARCH INITIALIZED SUCCESSFULLY
 2025-10-17 16:32:57 | INFO     | backend.api.veritas_phase5_integration | ================================================================================
@@ -3477,11 +3477,11 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 16:32:57 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter: OK (with DB)
 2025-10-17 16:32:57 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 Retriever: OK (8 docs indexed)
 2025-10-17 16:32:57 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever: OK
-2025-10-17 16:32:57 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 16:32:57 | INFO     | backend.api.veritas_phase5_integration |
 📝 Usage:
 2025-10-17 16:32:57 | INFO     | backend.api.veritas_phase5_integration |    from backend.api.veritas_phase5_integration import hybrid_retriever
 2025-10-17 16:32:57 | INFO     | backend.api.veritas_phase5_integration |    results = await hybrid_retriever.retrieve(query, top_k=10)
-2025-10-17 16:32:57 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 16:32:57 | INFO     | backend.api.veritas_phase5_integration |
 ⚡ Expected Performance:
 2025-10-17 16:32:57 | INFO     | backend.api.veritas_phase5_integration |    BM25-only mode: <50ms (Dense=0.0)
 2025-10-17 16:32:57 | INFO     | backend.api.veritas_phase5_integration |    Full Hybrid mode: <150ms (when Vector DB populated)
@@ -3860,7 +3860,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 16:58:30 | INFO     | backend.api.veritas_phase5_integration |    Query Expansion: False
 2025-10-17 16:58:30 | INFO     | backend.api.veritas_phase5_integration |    RRF k: 60
 2025-10-17 16:58:30 | INFO     | backend.api.veritas_phase5_integration |    BM25 k1=1.5, b=0.75
-2025-10-17 16:58:30 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 16:58:30 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 1: Initializing Dense Retriever...
 2025-10-17 16:58:30 | INFO     | root | ✅ Mock SQLite-Backend für relational_db KeyError-Workaround aktiviert
 2025-10-17 16:58:30 | INFO     | uds3.uds3_core | ✅ UDS3 Identity Service integriert
@@ -4076,19 +4076,19 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 16:58:38 | INFO     | backend.agents.veritas_uds3_adapter | ✅ UDS3VectorSearchAdapter initialisiert
 2025-10-17 16:58:38 | INFO     | backend.agents.veritas_uds3_adapter | ℹ️ Hinweis: UDS3 benötigt konfigurierte Datenbanken (Vector/Graph/Relational) für Ergebnisse
 2025-10-17 16:58:38 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter initialized with UDS3 strategy
-2025-10-17 16:58:38 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 16:58:38 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 2: Initializing BM25 Sparse Retriever...
 2025-10-17 16:58:38 | INFO     | backend.api.veritas_phase5_integration |    📚 Indexing 8 demo documents...
 2025-10-17 16:58:38 | INFO     | backend.agents.veritas_sparse_retrieval | 📥 Indexiere 8 Dokumente für BM25...
 2025-10-17 16:58:38 | INFO     | backend.agents.veritas_sparse_retrieval | ✅ BM25-Index erstellt in 0.00s (8 Docs, 152 Tokens)
 2025-10-17 16:58:38 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 indexed 8 documents
-2025-10-17 16:58:38 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 16:58:38 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 3: Initializing Hybrid Retriever (Dense + Sparse + RRF)...
 2025-10-17 16:58:38 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever initialized
 2025-10-17 16:58:38 | INFO     | backend.api.veritas_phase5_integration |    📊 Dense Weight: 0.6
 2025-10-17 16:58:38 | INFO     | backend.api.veritas_phase5_integration |    📊 Sparse Weight: 0.4
 2025-10-17 16:58:38 | INFO     | backend.api.veritas_phase5_integration |    📊 RRF k: 60
-2025-10-17 16:58:38 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 16:58:38 | INFO     | backend.api.veritas_phase5_integration |
 🔍 Step 4: Validation...
 2025-10-17 16:58:38 | INFO     | backend.api.veritas_phase5_integration |    Running test query: 'Test Query'
 2025-10-17 16:58:38 | DEBUG    | backend.agents.veritas_uds3_adapter | ℹ️ UDS3 Query: No database queries configured (DB-Konfiguration erforderlich)
@@ -4101,7 +4101,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 16:58:38 | INFO     | backend.api.veritas_phase5_integration |       doc_id: doc_7
 2025-10-17 16:58:38 | INFO     | backend.api.veritas_phase5_integration |       score: 0.006557377049180329
 2025-10-17 16:58:38 | INFO     | backend.api.veritas_phase5_integration |       content: Verkehrssicherungspflicht auf Baustellen: Bauherr und Unternehmer haften für Schäden durch unzureich...
-2025-10-17 16:58:38 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 16:58:38 | INFO     | backend.api.veritas_phase5_integration |
 ================================================================================
 2025-10-17 16:58:38 | INFO     | backend.api.veritas_phase5_integration | ✅ PHASE 5 HYBRID SEARCH INITIALIZED SUCCESSFULLY
 2025-10-17 16:58:38 | INFO     | backend.api.veritas_phase5_integration | ================================================================================
@@ -4109,11 +4109,11 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 16:58:38 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter: OK (with DB)
 2025-10-17 16:58:38 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 Retriever: OK (8 docs indexed)
 2025-10-17 16:58:38 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever: OK
-2025-10-17 16:58:38 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 16:58:38 | INFO     | backend.api.veritas_phase5_integration |
 📝 Usage:
 2025-10-17 16:58:38 | INFO     | backend.api.veritas_phase5_integration |    from backend.api.veritas_phase5_integration import hybrid_retriever
 2025-10-17 16:58:38 | INFO     | backend.api.veritas_phase5_integration |    results = await hybrid_retriever.retrieve(query, top_k=10)
-2025-10-17 16:58:38 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 16:58:38 | INFO     | backend.api.veritas_phase5_integration |
 ⚡ Expected Performance:
 2025-10-17 16:58:38 | INFO     | backend.api.veritas_phase5_integration |    BM25-only mode: <50ms (Dense=0.0)
 2025-10-17 16:58:38 | INFO     | backend.api.veritas_phase5_integration |    Full Hybrid mode: <150ms (when Vector DB populated)
@@ -4243,7 +4243,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 16:59:25 | INFO     | backend.api.veritas_phase5_integration |    Query Expansion: False
 2025-10-17 16:59:25 | INFO     | backend.api.veritas_phase5_integration |    RRF k: 60
 2025-10-17 16:59:25 | INFO     | backend.api.veritas_phase5_integration |    BM25 k1=1.5, b=0.75
-2025-10-17 16:59:25 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 16:59:25 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 1: Initializing Dense Retriever...
 2025-10-17 16:59:25 | INFO     | root | ✅ Mock SQLite-Backend für relational_db KeyError-Workaround aktiviert
 2025-10-17 16:59:25 | INFO     | uds3.uds3_core | ✅ UDS3 Identity Service integriert
@@ -4459,19 +4459,19 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 16:59:34 | INFO     | backend.agents.veritas_uds3_adapter | ✅ UDS3VectorSearchAdapter initialisiert
 2025-10-17 16:59:34 | INFO     | backend.agents.veritas_uds3_adapter | ℹ️ Hinweis: UDS3 benötigt konfigurierte Datenbanken (Vector/Graph/Relational) für Ergebnisse
 2025-10-17 16:59:34 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter initialized with UDS3 strategy
-2025-10-17 16:59:34 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 16:59:34 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 2: Initializing BM25 Sparse Retriever...
 2025-10-17 16:59:34 | INFO     | backend.api.veritas_phase5_integration |    📚 Indexing 8 demo documents...
 2025-10-17 16:59:34 | INFO     | backend.agents.veritas_sparse_retrieval | 📥 Indexiere 8 Dokumente für BM25...
 2025-10-17 16:59:34 | INFO     | backend.agents.veritas_sparse_retrieval | ✅ BM25-Index erstellt in 0.00s (8 Docs, 152 Tokens)
 2025-10-17 16:59:34 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 indexed 8 documents
-2025-10-17 16:59:34 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 16:59:34 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 3: Initializing Hybrid Retriever (Dense + Sparse + RRF)...
 2025-10-17 16:59:34 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever initialized
 2025-10-17 16:59:34 | INFO     | backend.api.veritas_phase5_integration |    📊 Dense Weight: 0.6
 2025-10-17 16:59:34 | INFO     | backend.api.veritas_phase5_integration |    📊 Sparse Weight: 0.4
 2025-10-17 16:59:34 | INFO     | backend.api.veritas_phase5_integration |    📊 RRF k: 60
-2025-10-17 16:59:34 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 16:59:34 | INFO     | backend.api.veritas_phase5_integration |
 🔍 Step 4: Validation...
 2025-10-17 16:59:34 | INFO     | backend.api.veritas_phase5_integration |    Running test query: 'Test Query'
 2025-10-17 16:59:34 | DEBUG    | backend.agents.veritas_uds3_adapter | ℹ️ UDS3 Query: No database queries configured (DB-Konfiguration erforderlich)
@@ -4484,7 +4484,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 16:59:34 | INFO     | backend.api.veritas_phase5_integration |       doc_id: doc_7
 2025-10-17 16:59:34 | INFO     | backend.api.veritas_phase5_integration |       score: 0.006557377049180329
 2025-10-17 16:59:34 | INFO     | backend.api.veritas_phase5_integration |       content: Verkehrssicherungspflicht auf Baustellen: Bauherr und Unternehmer haften für Schäden durch unzureich...
-2025-10-17 16:59:34 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 16:59:34 | INFO     | backend.api.veritas_phase5_integration |
 ================================================================================
 2025-10-17 16:59:34 | INFO     | backend.api.veritas_phase5_integration | ✅ PHASE 5 HYBRID SEARCH INITIALIZED SUCCESSFULLY
 2025-10-17 16:59:34 | INFO     | backend.api.veritas_phase5_integration | ================================================================================
@@ -4492,11 +4492,11 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 16:59:34 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter: OK (with DB)
 2025-10-17 16:59:34 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 Retriever: OK (8 docs indexed)
 2025-10-17 16:59:34 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever: OK
-2025-10-17 16:59:34 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 16:59:34 | INFO     | backend.api.veritas_phase5_integration |
 📝 Usage:
 2025-10-17 16:59:34 | INFO     | backend.api.veritas_phase5_integration |    from backend.api.veritas_phase5_integration import hybrid_retriever
 2025-10-17 16:59:34 | INFO     | backend.api.veritas_phase5_integration |    results = await hybrid_retriever.retrieve(query, top_k=10)
-2025-10-17 16:59:34 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 16:59:34 | INFO     | backend.api.veritas_phase5_integration |
 ⚡ Expected Performance:
 2025-10-17 16:59:34 | INFO     | backend.api.veritas_phase5_integration |    BM25-only mode: <50ms (Dense=0.0)
 2025-10-17 16:59:34 | INFO     | backend.api.veritas_phase5_integration |    Full Hybrid mode: <150ms (when Vector DB populated)
@@ -5607,7 +5607,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 17:26:30 | INFO     | backend.api.veritas_phase5_integration |    Query Expansion: False
 2025-10-17 17:26:30 | INFO     | backend.api.veritas_phase5_integration |    RRF k: 60
 2025-10-17 17:26:30 | INFO     | backend.api.veritas_phase5_integration |    BM25 k1=1.5, b=0.75
-2025-10-17 17:26:30 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 17:26:30 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 1: Initializing Dense Retriever...
 2025-10-17 17:26:30 | INFO     | root | ✅ Mock SQLite-Backend für relational_db KeyError-Workaround aktiviert
 2025-10-17 17:26:30 | INFO     | uds3.uds3_core | ✅ UDS3 Identity Service integriert
@@ -5823,19 +5823,19 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 17:26:39 | INFO     | backend.agents.veritas_uds3_adapter | ✅ UDS3VectorSearchAdapter initialisiert
 2025-10-17 17:26:39 | INFO     | backend.agents.veritas_uds3_adapter | ℹ️ Hinweis: UDS3 benötigt konfigurierte Datenbanken (Vector/Graph/Relational) für Ergebnisse
 2025-10-17 17:26:39 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter initialized with UDS3 strategy
-2025-10-17 17:26:39 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 17:26:39 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 2: Initializing BM25 Sparse Retriever...
 2025-10-17 17:26:39 | INFO     | backend.api.veritas_phase5_integration |    📚 Indexing 8 demo documents...
 2025-10-17 17:26:39 | INFO     | backend.agents.veritas_sparse_retrieval | 📥 Indexiere 8 Dokumente für BM25...
 2025-10-17 17:26:39 | INFO     | backend.agents.veritas_sparse_retrieval | ✅ BM25-Index erstellt in 0.00s (8 Docs, 152 Tokens)
 2025-10-17 17:26:39 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 indexed 8 documents
-2025-10-17 17:26:39 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 17:26:39 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 3: Initializing Hybrid Retriever (Dense + Sparse + RRF)...
 2025-10-17 17:26:39 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever initialized
 2025-10-17 17:26:39 | INFO     | backend.api.veritas_phase5_integration |    📊 Dense Weight: 0.6
 2025-10-17 17:26:39 | INFO     | backend.api.veritas_phase5_integration |    📊 Sparse Weight: 0.4
 2025-10-17 17:26:39 | INFO     | backend.api.veritas_phase5_integration |    📊 RRF k: 60
-2025-10-17 17:26:39 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 17:26:39 | INFO     | backend.api.veritas_phase5_integration |
 🔍 Step 4: Validation...
 2025-10-17 17:26:39 | INFO     | backend.api.veritas_phase5_integration |    Running test query: 'Test Query'
 2025-10-17 17:26:39 | DEBUG    | backend.agents.veritas_uds3_adapter | ℹ️ UDS3 Query: No database queries configured (DB-Konfiguration erforderlich)
@@ -5848,7 +5848,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 17:26:39 | INFO     | backend.api.veritas_phase5_integration |       doc_id: doc_7
 2025-10-17 17:26:39 | INFO     | backend.api.veritas_phase5_integration |       score: 0.006557377049180329
 2025-10-17 17:26:39 | INFO     | backend.api.veritas_phase5_integration |       content: Verkehrssicherungspflicht auf Baustellen: Bauherr und Unternehmer haften für Schäden durch unzureich...
-2025-10-17 17:26:39 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 17:26:39 | INFO     | backend.api.veritas_phase5_integration |
 ================================================================================
 2025-10-17 17:26:39 | INFO     | backend.api.veritas_phase5_integration | ✅ PHASE 5 HYBRID SEARCH INITIALIZED SUCCESSFULLY
 2025-10-17 17:26:39 | INFO     | backend.api.veritas_phase5_integration | ================================================================================
@@ -5856,11 +5856,11 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 17:26:39 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter: OK (with DB)
 2025-10-17 17:26:39 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 Retriever: OK (8 docs indexed)
 2025-10-17 17:26:39 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever: OK
-2025-10-17 17:26:39 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 17:26:39 | INFO     | backend.api.veritas_phase5_integration |
 📝 Usage:
 2025-10-17 17:26:39 | INFO     | backend.api.veritas_phase5_integration |    from backend.api.veritas_phase5_integration import hybrid_retriever
 2025-10-17 17:26:39 | INFO     | backend.api.veritas_phase5_integration |    results = await hybrid_retriever.retrieve(query, top_k=10)
-2025-10-17 17:26:39 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 17:26:39 | INFO     | backend.api.veritas_phase5_integration |
 ⚡ Expected Performance:
 2025-10-17 17:26:39 | INFO     | backend.api.veritas_phase5_integration |    BM25-only mode: <50ms (Dense=0.0)
 2025-10-17 17:26:39 | INFO     | backend.api.veritas_phase5_integration |    Full Hybrid mode: <150ms (when Vector DB populated)
@@ -8368,7 +8368,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 17:45:31 | INFO     | backend.api.veritas_phase5_integration |    Query Expansion: False
 2025-10-17 17:45:31 | INFO     | backend.api.veritas_phase5_integration |    RRF k: 60
 2025-10-17 17:45:31 | INFO     | backend.api.veritas_phase5_integration |    BM25 k1=1.5, b=0.75
-2025-10-17 17:45:31 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 17:45:31 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 1: Initializing Dense Retriever...
 2025-10-17 17:45:31 | INFO     | root | ✅ Mock SQLite-Backend für relational_db KeyError-Workaround aktiviert
 2025-10-17 17:45:31 | INFO     | uds3.uds3_core | ✅ UDS3 Identity Service integriert
@@ -8584,19 +8584,19 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 17:45:39 | INFO     | backend.agents.veritas_uds3_adapter | ✅ UDS3VectorSearchAdapter initialisiert
 2025-10-17 17:45:39 | INFO     | backend.agents.veritas_uds3_adapter | ℹ️ Hinweis: UDS3 benötigt konfigurierte Datenbanken (Vector/Graph/Relational) für Ergebnisse
 2025-10-17 17:45:39 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter initialized with UDS3 strategy
-2025-10-17 17:45:39 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 17:45:39 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 2: Initializing BM25 Sparse Retriever...
 2025-10-17 17:45:39 | INFO     | backend.api.veritas_phase5_integration |    📚 Indexing 8 demo documents...
 2025-10-17 17:45:39 | INFO     | backend.agents.veritas_sparse_retrieval | 📥 Indexiere 8 Dokumente für BM25...
 2025-10-17 17:45:39 | INFO     | backend.agents.veritas_sparse_retrieval | ✅ BM25-Index erstellt in 0.00s (8 Docs, 152 Tokens)
 2025-10-17 17:45:39 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 indexed 8 documents
-2025-10-17 17:45:39 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 17:45:39 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 3: Initializing Hybrid Retriever (Dense + Sparse + RRF)...
 2025-10-17 17:45:39 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever initialized
 2025-10-17 17:45:39 | INFO     | backend.api.veritas_phase5_integration |    📊 Dense Weight: 0.6
 2025-10-17 17:45:39 | INFO     | backend.api.veritas_phase5_integration |    📊 Sparse Weight: 0.4
 2025-10-17 17:45:39 | INFO     | backend.api.veritas_phase5_integration |    📊 RRF k: 60
-2025-10-17 17:45:39 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 17:45:39 | INFO     | backend.api.veritas_phase5_integration |
 🔍 Step 4: Validation...
 2025-10-17 17:45:39 | INFO     | backend.api.veritas_phase5_integration |    Running test query: 'Test Query'
 2025-10-17 17:45:39 | DEBUG    | backend.agents.veritas_uds3_adapter | ℹ️ UDS3 Query: No database queries configured (DB-Konfiguration erforderlich)
@@ -8609,7 +8609,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 17:45:39 | INFO     | backend.api.veritas_phase5_integration |       doc_id: doc_7
 2025-10-17 17:45:39 | INFO     | backend.api.veritas_phase5_integration |       score: 0.006557377049180329
 2025-10-17 17:45:39 | INFO     | backend.api.veritas_phase5_integration |       content: Verkehrssicherungspflicht auf Baustellen: Bauherr und Unternehmer haften für Schäden durch unzureich...
-2025-10-17 17:45:39 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 17:45:39 | INFO     | backend.api.veritas_phase5_integration |
 ================================================================================
 2025-10-17 17:45:39 | INFO     | backend.api.veritas_phase5_integration | ✅ PHASE 5 HYBRID SEARCH INITIALIZED SUCCESSFULLY
 2025-10-17 17:45:39 | INFO     | backend.api.veritas_phase5_integration | ================================================================================
@@ -8617,11 +8617,11 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 17:45:39 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter: OK (with DB)
 2025-10-17 17:45:39 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 Retriever: OK (8 docs indexed)
 2025-10-17 17:45:39 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever: OK
-2025-10-17 17:45:39 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 17:45:39 | INFO     | backend.api.veritas_phase5_integration |
 📝 Usage:
 2025-10-17 17:45:39 | INFO     | backend.api.veritas_phase5_integration |    from backend.api.veritas_phase5_integration import hybrid_retriever
 2025-10-17 17:45:39 | INFO     | backend.api.veritas_phase5_integration |    results = await hybrid_retriever.retrieve(query, top_k=10)
-2025-10-17 17:45:39 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 17:45:39 | INFO     | backend.api.veritas_phase5_integration |
 ⚡ Expected Performance:
 2025-10-17 17:45:39 | INFO     | backend.api.veritas_phase5_integration |    BM25-only mode: <50ms (Dense=0.0)
 2025-10-17 17:45:39 | INFO     | backend.api.veritas_phase5_integration |    Full Hybrid mode: <150ms (when Vector DB populated)
@@ -9480,7 +9480,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 19:38:09 | INFO     | backend.api.veritas_phase5_integration |    Query Expansion: False
 2025-10-17 19:38:09 | INFO     | backend.api.veritas_phase5_integration |    RRF k: 60
 2025-10-17 19:38:09 | INFO     | backend.api.veritas_phase5_integration |    BM25 k1=1.5, b=0.75
-2025-10-17 19:38:09 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 19:38:09 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 1: Initializing Dense Retriever...
 2025-10-17 19:38:09 | INFO     | root | ✅ Mock SQLite-Backend für relational_db KeyError-Workaround aktiviert
 2025-10-17 19:38:09 | INFO     | uds3.uds3_core | ✅ UDS3 Identity Service integriert
@@ -9673,7 +9673,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 19:42:31 | INFO     | backend.api.veritas_phase5_integration |    Query Expansion: False
 2025-10-17 19:42:31 | INFO     | backend.api.veritas_phase5_integration |    RRF k: 60
 2025-10-17 19:42:31 | INFO     | backend.api.veritas_phase5_integration |    BM25 k1=1.5, b=0.75
-2025-10-17 19:42:31 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 19:42:31 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 1: Initializing Dense Retriever...
 2025-10-17 19:42:31 | INFO     | root | ✅ Mock SQLite-Backend für relational_db KeyError-Workaround aktiviert
 2025-10-17 19:42:31 | INFO     | uds3.uds3_core | ✅ UDS3 Identity Service integriert
@@ -9889,19 +9889,19 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 19:42:39 | INFO     | backend.agents.veritas_uds3_adapter | ✅ UDS3VectorSearchAdapter initialisiert
 2025-10-17 19:42:39 | INFO     | backend.agents.veritas_uds3_adapter | ℹ️ Hinweis: UDS3 benötigt konfigurierte Datenbanken (Vector/Graph/Relational) für Ergebnisse
 2025-10-17 19:42:39 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter initialized with UDS3 strategy
-2025-10-17 19:42:39 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 19:42:39 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 2: Initializing BM25 Sparse Retriever...
 2025-10-17 19:42:39 | INFO     | backend.api.veritas_phase5_integration |    📚 Indexing 8 demo documents...
 2025-10-17 19:42:39 | INFO     | backend.agents.veritas_sparse_retrieval | 📥 Indexiere 8 Dokumente für BM25...
 2025-10-17 19:42:39 | INFO     | backend.agents.veritas_sparse_retrieval | ✅ BM25-Index erstellt in 0.00s (8 Docs, 152 Tokens)
 2025-10-17 19:42:39 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 indexed 8 documents
-2025-10-17 19:42:39 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 19:42:39 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 3: Initializing Hybrid Retriever (Dense + Sparse + RRF)...
 2025-10-17 19:42:39 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever initialized
 2025-10-17 19:42:39 | INFO     | backend.api.veritas_phase5_integration |    📊 Dense Weight: 0.6
 2025-10-17 19:42:39 | INFO     | backend.api.veritas_phase5_integration |    📊 Sparse Weight: 0.4
 2025-10-17 19:42:39 | INFO     | backend.api.veritas_phase5_integration |    📊 RRF k: 60
-2025-10-17 19:42:39 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 19:42:39 | INFO     | backend.api.veritas_phase5_integration |
 🔍 Step 4: Validation...
 2025-10-17 19:42:39 | INFO     | backend.api.veritas_phase5_integration |    Running test query: 'Test Query'
 2025-10-17 19:42:39 | DEBUG    | backend.agents.veritas_uds3_adapter | ℹ️ UDS3 Query: No database queries configured (DB-Konfiguration erforderlich)
@@ -9914,7 +9914,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 19:42:39 | INFO     | backend.api.veritas_phase5_integration |       doc_id: doc_7
 2025-10-17 19:42:39 | INFO     | backend.api.veritas_phase5_integration |       score: 0.006557377049180329
 2025-10-17 19:42:39 | INFO     | backend.api.veritas_phase5_integration |       content: Verkehrssicherungspflicht auf Baustellen: Bauherr und Unternehmer haften für Schäden durch unzureich...
-2025-10-17 19:42:39 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 19:42:39 | INFO     | backend.api.veritas_phase5_integration |
 ================================================================================
 2025-10-17 19:42:39 | INFO     | backend.api.veritas_phase5_integration | ✅ PHASE 5 HYBRID SEARCH INITIALIZED SUCCESSFULLY
 2025-10-17 19:42:39 | INFO     | backend.api.veritas_phase5_integration | ================================================================================
@@ -9922,11 +9922,11 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 19:42:39 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter: OK (with DB)
 2025-10-17 19:42:39 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 Retriever: OK (8 docs indexed)
 2025-10-17 19:42:39 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever: OK
-2025-10-17 19:42:39 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 19:42:39 | INFO     | backend.api.veritas_phase5_integration |
 📝 Usage:
 2025-10-17 19:42:39 | INFO     | backend.api.veritas_phase5_integration |    from backend.api.veritas_phase5_integration import hybrid_retriever
 2025-10-17 19:42:39 | INFO     | backend.api.veritas_phase5_integration |    results = await hybrid_retriever.retrieve(query, top_k=10)
-2025-10-17 19:42:39 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 19:42:39 | INFO     | backend.api.veritas_phase5_integration |
 ⚡ Expected Performance:
 2025-10-17 19:42:39 | INFO     | backend.api.veritas_phase5_integration |    BM25-only mode: <50ms (Dense=0.0)
 2025-10-17 19:42:39 | INFO     | backend.api.veritas_phase5_integration |    Full Hybrid mode: <150ms (when Vector DB populated)
@@ -10056,7 +10056,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 19:44:00 | INFO     | backend.api.veritas_phase5_integration |    Query Expansion: False
 2025-10-17 19:44:00 | INFO     | backend.api.veritas_phase5_integration |    RRF k: 60
 2025-10-17 19:44:00 | INFO     | backend.api.veritas_phase5_integration |    BM25 k1=1.5, b=0.75
-2025-10-17 19:44:00 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 19:44:00 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 1: Initializing Dense Retriever...
 2025-10-17 19:44:00 | INFO     | root | ✅ Mock SQLite-Backend für relational_db KeyError-Workaround aktiviert
 2025-10-17 19:44:00 | INFO     | uds3.uds3_core | ✅ UDS3 Identity Service integriert
@@ -10272,19 +10272,19 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 19:44:08 | INFO     | backend.agents.veritas_uds3_adapter | ✅ UDS3VectorSearchAdapter initialisiert
 2025-10-17 19:44:08 | INFO     | backend.agents.veritas_uds3_adapter | ℹ️ Hinweis: UDS3 benötigt konfigurierte Datenbanken (Vector/Graph/Relational) für Ergebnisse
 2025-10-17 19:44:08 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter initialized with UDS3 strategy
-2025-10-17 19:44:08 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 19:44:08 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 2: Initializing BM25 Sparse Retriever...
 2025-10-17 19:44:08 | INFO     | backend.api.veritas_phase5_integration |    📚 Indexing 8 demo documents...
 2025-10-17 19:44:08 | INFO     | backend.agents.veritas_sparse_retrieval | 📥 Indexiere 8 Dokumente für BM25...
 2025-10-17 19:44:08 | INFO     | backend.agents.veritas_sparse_retrieval | ✅ BM25-Index erstellt in 0.00s (8 Docs, 152 Tokens)
 2025-10-17 19:44:08 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 indexed 8 documents
-2025-10-17 19:44:08 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 19:44:08 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 3: Initializing Hybrid Retriever (Dense + Sparse + RRF)...
 2025-10-17 19:44:08 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever initialized
 2025-10-17 19:44:08 | INFO     | backend.api.veritas_phase5_integration |    📊 Dense Weight: 0.6
 2025-10-17 19:44:08 | INFO     | backend.api.veritas_phase5_integration |    📊 Sparse Weight: 0.4
 2025-10-17 19:44:08 | INFO     | backend.api.veritas_phase5_integration |    📊 RRF k: 60
-2025-10-17 19:44:08 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 19:44:08 | INFO     | backend.api.veritas_phase5_integration |
 🔍 Step 4: Validation...
 2025-10-17 19:44:08 | INFO     | backend.api.veritas_phase5_integration |    Running test query: 'Test Query'
 2025-10-17 19:44:08 | DEBUG    | backend.agents.veritas_uds3_adapter | ℹ️ UDS3 Query: No database queries configured (DB-Konfiguration erforderlich)
@@ -10297,7 +10297,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 19:44:08 | INFO     | backend.api.veritas_phase5_integration |       doc_id: doc_7
 2025-10-17 19:44:08 | INFO     | backend.api.veritas_phase5_integration |       score: 0.006557377049180329
 2025-10-17 19:44:08 | INFO     | backend.api.veritas_phase5_integration |       content: Verkehrssicherungspflicht auf Baustellen: Bauherr und Unternehmer haften für Schäden durch unzureich...
-2025-10-17 19:44:08 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 19:44:08 | INFO     | backend.api.veritas_phase5_integration |
 ================================================================================
 2025-10-17 19:44:08 | INFO     | backend.api.veritas_phase5_integration | ✅ PHASE 5 HYBRID SEARCH INITIALIZED SUCCESSFULLY
 2025-10-17 19:44:08 | INFO     | backend.api.veritas_phase5_integration | ================================================================================
@@ -10305,11 +10305,11 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 19:44:08 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter: OK (with DB)
 2025-10-17 19:44:08 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 Retriever: OK (8 docs indexed)
 2025-10-17 19:44:08 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever: OK
-2025-10-17 19:44:08 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 19:44:08 | INFO     | backend.api.veritas_phase5_integration |
 📝 Usage:
 2025-10-17 19:44:08 | INFO     | backend.api.veritas_phase5_integration |    from backend.api.veritas_phase5_integration import hybrid_retriever
 2025-10-17 19:44:08 | INFO     | backend.api.veritas_phase5_integration |    results = await hybrid_retriever.retrieve(query, top_k=10)
-2025-10-17 19:44:08 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 19:44:08 | INFO     | backend.api.veritas_phase5_integration |
 ⚡ Expected Performance:
 2025-10-17 19:44:08 | INFO     | backend.api.veritas_phase5_integration |    BM25-only mode: <50ms (Dense=0.0)
 2025-10-17 19:44:08 | INFO     | backend.api.veritas_phase5_integration |    Full Hybrid mode: <150ms (when Vector DB populated)
@@ -10639,24 +10639,24 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration |    Query Expansion: False
 2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration |    RRF k: 60
 2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration |    BM25 k1=1.5, b=0.75
-2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 1: Initializing Dense Retriever...
 2025-10-17 19:58:42 | INFO     | backend.agents.veritas_uds3_adapter | ✅ UDS3VectorSearchAdapter initialisiert
 2025-10-17 19:58:42 | INFO     | backend.agents.veritas_uds3_adapter | ℹ️ Hinweis: UDS3 benötigt konfigurierte Datenbanken (Vector/Graph/Relational) für Ergebnisse
 2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter initialized with UDS3 strategy
-2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 2: Initializing BM25 Sparse Retriever...
 2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration |    📚 Indexing 8 demo documents...
 2025-10-17 19:58:42 | INFO     | backend.agents.veritas_sparse_retrieval | 📥 Indexiere 8 Dokumente für BM25...
 2025-10-17 19:58:42 | INFO     | backend.agents.veritas_sparse_retrieval | ✅ BM25-Index erstellt in 0.00s (8 Docs, 152 Tokens)
 2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 indexed 8 documents
-2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 3: Initializing Hybrid Retriever (Dense + Sparse + RRF)...
 2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever initialized
 2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration |    📊 Dense Weight: 0.6
 2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration |    📊 Sparse Weight: 0.4
 2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration |    📊 RRF k: 60
-2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration |
 🔍 Step 4: Validation...
 2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration |    Running test query: 'Test Query'
 2025-10-17 19:58:42 | DEBUG    | backend.agents.veritas_uds3_adapter | ℹ️ UDS3 Query: No database queries configured (DB-Konfiguration erforderlich)
@@ -10669,7 +10669,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration |       doc_id: doc_7
 2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration |       score: 0.006557377049180329
 2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration |       content: Verkehrssicherungspflicht auf Baustellen: Bauherr und Unternehmer haften für Schäden durch unzureich...
-2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration |
 ================================================================================
 2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration | ✅ PHASE 5 HYBRID SEARCH INITIALIZED SUCCESSFULLY
 2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration | ================================================================================
@@ -10677,11 +10677,11 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter: OK (with DB)
 2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 Retriever: OK (8 docs indexed)
 2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever: OK
-2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration |
 📝 Usage:
 2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration |    from backend.api.veritas_phase5_integration import hybrid_retriever
 2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration |    results = await hybrid_retriever.retrieve(query, top_k=10)
-2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration |
 ⚡ Expected Performance:
 2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration |    BM25-only mode: <50ms (Dense=0.0)
 2025-10-17 19:58:42 | INFO     | backend.api.veritas_phase5_integration |    Full Hybrid mode: <150ms (when Vector DB populated)
@@ -10845,7 +10845,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 20:08:29 | INFO     | backend.api.veritas_phase5_integration |    Query Expansion: False
 2025-10-17 20:08:29 | INFO     | backend.api.veritas_phase5_integration |    RRF k: 60
 2025-10-17 20:08:29 | INFO     | backend.api.veritas_phase5_integration |    BM25 k1=1.5, b=0.75
-2025-10-17 20:08:29 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 20:08:29 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 1: Initializing Dense Retriever...
 2025-10-17 20:08:29 | INFO     | root | ✅ Mock SQLite-Backend für relational_db KeyError-Workaround aktiviert
 2025-10-17 20:08:29 | INFO     | uds3.uds3_core | ✅ UDS3 Identity Service integriert
@@ -11061,19 +11061,19 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 20:08:38 | INFO     | backend.agents.veritas_uds3_adapter | ✅ UDS3VectorSearchAdapter initialisiert
 2025-10-17 20:08:38 | INFO     | backend.agents.veritas_uds3_adapter | ℹ️ Hinweis: UDS3 benötigt konfigurierte Datenbanken (Vector/Graph/Relational) für Ergebnisse
 2025-10-17 20:08:38 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter initialized with UDS3 strategy
-2025-10-17 20:08:38 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 20:08:38 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 2: Initializing BM25 Sparse Retriever...
 2025-10-17 20:08:38 | INFO     | backend.api.veritas_phase5_integration |    📚 Indexing 8 demo documents...
 2025-10-17 20:08:38 | INFO     | backend.agents.veritas_sparse_retrieval | 📥 Indexiere 8 Dokumente für BM25...
 2025-10-17 20:08:38 | INFO     | backend.agents.veritas_sparse_retrieval | ✅ BM25-Index erstellt in 0.00s (8 Docs, 152 Tokens)
 2025-10-17 20:08:38 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 indexed 8 documents
-2025-10-17 20:08:38 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 20:08:38 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 3: Initializing Hybrid Retriever (Dense + Sparse + RRF)...
 2025-10-17 20:08:38 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever initialized
 2025-10-17 20:08:38 | INFO     | backend.api.veritas_phase5_integration |    📊 Dense Weight: 0.6
 2025-10-17 20:08:38 | INFO     | backend.api.veritas_phase5_integration |    📊 Sparse Weight: 0.4
 2025-10-17 20:08:38 | INFO     | backend.api.veritas_phase5_integration |    📊 RRF k: 60
-2025-10-17 20:08:38 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 20:08:38 | INFO     | backend.api.veritas_phase5_integration |
 🔍 Step 4: Validation...
 2025-10-17 20:08:38 | INFO     | backend.api.veritas_phase5_integration |    Running test query: 'Test Query'
 2025-10-17 20:08:38 | DEBUG    | backend.agents.veritas_uds3_adapter | ℹ️ UDS3 Query: No database queries configured (DB-Konfiguration erforderlich)
@@ -11086,7 +11086,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 20:08:38 | INFO     | backend.api.veritas_phase5_integration |       doc_id: doc_7
 2025-10-17 20:08:38 | INFO     | backend.api.veritas_phase5_integration |       score: 0.006557377049180329
 2025-10-17 20:08:38 | INFO     | backend.api.veritas_phase5_integration |       content: Verkehrssicherungspflicht auf Baustellen: Bauherr und Unternehmer haften für Schäden durch unzureich...
-2025-10-17 20:08:38 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 20:08:38 | INFO     | backend.api.veritas_phase5_integration |
 ================================================================================
 2025-10-17 20:08:38 | INFO     | backend.api.veritas_phase5_integration | ✅ PHASE 5 HYBRID SEARCH INITIALIZED SUCCESSFULLY
 2025-10-17 20:08:38 | INFO     | backend.api.veritas_phase5_integration | ================================================================================
@@ -11094,11 +11094,11 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 20:08:38 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter: OK (with DB)
 2025-10-17 20:08:38 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 Retriever: OK (8 docs indexed)
 2025-10-17 20:08:38 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever: OK
-2025-10-17 20:08:38 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 20:08:38 | INFO     | backend.api.veritas_phase5_integration |
 📝 Usage:
 2025-10-17 20:08:38 | INFO     | backend.api.veritas_phase5_integration |    from backend.api.veritas_phase5_integration import hybrid_retriever
 2025-10-17 20:08:38 | INFO     | backend.api.veritas_phase5_integration |    results = await hybrid_retriever.retrieve(query, top_k=10)
-2025-10-17 20:08:38 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 20:08:38 | INFO     | backend.api.veritas_phase5_integration |
 ⚡ Expected Performance:
 2025-10-17 20:08:38 | INFO     | backend.api.veritas_phase5_integration |    BM25-only mode: <50ms (Dense=0.0)
 2025-10-17 20:08:38 | INFO     | backend.api.veritas_phase5_integration |    Full Hybrid mode: <150ms (when Vector DB populated)
@@ -11451,24 +11451,24 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration |    Query Expansion: False
 2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration |    RRF k: 60
 2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration |    BM25 k1=1.5, b=0.75
-2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 1: Initializing Dense Retriever...
 2025-10-17 20:56:42 | INFO     | backend.agents.veritas_uds3_adapter | ✅ UDS3VectorSearchAdapter initialisiert
 2025-10-17 20:56:42 | INFO     | backend.agents.veritas_uds3_adapter | ℹ️ Hinweis: UDS3 benötigt konfigurierte Datenbanken (Vector/Graph/Relational) für Ergebnisse
 2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter initialized with UDS3 strategy
-2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 2: Initializing BM25 Sparse Retriever...
 2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration |    📚 Indexing 8 demo documents...
 2025-10-17 20:56:42 | INFO     | backend.agents.veritas_sparse_retrieval | 📥 Indexiere 8 Dokumente für BM25...
 2025-10-17 20:56:42 | INFO     | backend.agents.veritas_sparse_retrieval | ✅ BM25-Index erstellt in 0.00s (8 Docs, 152 Tokens)
 2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 indexed 8 documents
-2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 3: Initializing Hybrid Retriever (Dense + Sparse + RRF)...
 2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever initialized
 2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration |    📊 Dense Weight: 0.6
 2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration |    📊 Sparse Weight: 0.4
 2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration |    📊 RRF k: 60
-2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration |
 🔍 Step 4: Validation...
 2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration |    Running test query: 'Test Query'
 2025-10-17 20:56:42 | DEBUG    | backend.agents.veritas_uds3_adapter | ℹ️ UDS3 Query: No database queries configured (DB-Konfiguration erforderlich)
@@ -11481,7 +11481,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration |       doc_id: doc_7
 2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration |       score: 0.006557377049180329
 2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration |       content: Verkehrssicherungspflicht auf Baustellen: Bauherr und Unternehmer haften für Schäden durch unzureich...
-2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration |
 ================================================================================
 2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration | ✅ PHASE 5 HYBRID SEARCH INITIALIZED SUCCESSFULLY
 2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration | ================================================================================
@@ -11489,11 +11489,11 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter: OK (with DB)
 2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 Retriever: OK (8 docs indexed)
 2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever: OK
-2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration |
 📝 Usage:
 2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration |    from backend.api.veritas_phase5_integration import hybrid_retriever
 2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration |    results = await hybrid_retriever.retrieve(query, top_k=10)
-2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration |
 ⚡ Expected Performance:
 2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration |    BM25-only mode: <50ms (Dense=0.0)
 2025-10-17 20:56:42 | INFO     | backend.api.veritas_phase5_integration |    Full Hybrid mode: <150ms (when Vector DB populated)
@@ -11876,24 +11876,24 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration |    Query Expansion: False
 2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration |    RRF k: 60
 2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration |    BM25 k1=1.5, b=0.75
-2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 1: Initializing Dense Retriever...
 2025-10-17 21:12:47 | INFO     | backend.agents.veritas_uds3_adapter | ✅ UDS3VectorSearchAdapter initialisiert
 2025-10-17 21:12:47 | INFO     | backend.agents.veritas_uds3_adapter | ℹ️ Hinweis: UDS3 benötigt konfigurierte Datenbanken (Vector/Graph/Relational) für Ergebnisse
 2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter initialized with UDS3 strategy
-2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 2: Initializing BM25 Sparse Retriever...
 2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration |    📚 Indexing 8 demo documents...
 2025-10-17 21:12:47 | INFO     | backend.agents.veritas_sparse_retrieval | 📥 Indexiere 8 Dokumente für BM25...
 2025-10-17 21:12:47 | INFO     | backend.agents.veritas_sparse_retrieval | ✅ BM25-Index erstellt in 0.00s (8 Docs, 152 Tokens)
 2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 indexed 8 documents
-2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 3: Initializing Hybrid Retriever (Dense + Sparse + RRF)...
 2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever initialized
 2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration |    📊 Dense Weight: 0.6
 2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration |    📊 Sparse Weight: 0.4
 2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration |    📊 RRF k: 60
-2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration |
 🔍 Step 4: Validation...
 2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration |    Running test query: 'Test Query'
 2025-10-17 21:12:47 | DEBUG    | backend.agents.veritas_uds3_adapter | ℹ️ UDS3 Query: No database queries configured (DB-Konfiguration erforderlich)
@@ -11906,7 +11906,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration |       doc_id: doc_7
 2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration |       score: 0.006557377049180329
 2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration |       content: Verkehrssicherungspflicht auf Baustellen: Bauherr und Unternehmer haften für Schäden durch unzureich...
-2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration |
 ================================================================================
 2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration | ✅ PHASE 5 HYBRID SEARCH INITIALIZED SUCCESSFULLY
 2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration | ================================================================================
@@ -11914,11 +11914,11 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter: OK (with DB)
 2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 Retriever: OK (8 docs indexed)
 2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever: OK
-2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration |
 📝 Usage:
 2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration |    from backend.api.veritas_phase5_integration import hybrid_retriever
 2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration |    results = await hybrid_retriever.retrieve(query, top_k=10)
-2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration |
 ⚡ Expected Performance:
 2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration |    BM25-only mode: <50ms (Dense=0.0)
 2025-10-17 21:12:47 | INFO     | backend.api.veritas_phase5_integration |    Full Hybrid mode: <150ms (when Vector DB populated)
@@ -12290,24 +12290,24 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration |    Query Expansion: False
 2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration |    RRF k: 60
 2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration |    BM25 k1=1.5, b=0.75
-2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 1: Initializing Dense Retriever...
 2025-10-17 21:18:14 | INFO     | backend.agents.veritas_uds3_adapter | ✅ UDS3VectorSearchAdapter initialisiert
 2025-10-17 21:18:14 | INFO     | backend.agents.veritas_uds3_adapter | ℹ️ Hinweis: UDS3 benötigt konfigurierte Datenbanken (Vector/Graph/Relational) für Ergebnisse
 2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter initialized with UDS3 strategy
-2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 2: Initializing BM25 Sparse Retriever...
 2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration |    📚 Indexing 8 demo documents...
 2025-10-17 21:18:14 | INFO     | backend.agents.veritas_sparse_retrieval | 📥 Indexiere 8 Dokumente für BM25...
 2025-10-17 21:18:14 | INFO     | backend.agents.veritas_sparse_retrieval | ✅ BM25-Index erstellt in 0.00s (8 Docs, 152 Tokens)
 2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 indexed 8 documents
-2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 3: Initializing Hybrid Retriever (Dense + Sparse + RRF)...
 2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever initialized
 2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration |    📊 Dense Weight: 0.6
 2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration |    📊 Sparse Weight: 0.4
 2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration |    📊 RRF k: 60
-2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration |
 🔍 Step 4: Validation...
 2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration |    Running test query: 'Test Query'
 2025-10-17 21:18:14 | DEBUG    | backend.agents.veritas_uds3_adapter | ℹ️ UDS3 Query: No database queries configured (DB-Konfiguration erforderlich)
@@ -12320,7 +12320,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration |       doc_id: doc_7
 2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration |       score: 0.006557377049180329
 2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration |       content: Verkehrssicherungspflicht auf Baustellen: Bauherr und Unternehmer haften für Schäden durch unzureich...
-2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration |
 ================================================================================
 2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration | ✅ PHASE 5 HYBRID SEARCH INITIALIZED SUCCESSFULLY
 2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration | ================================================================================
@@ -12328,11 +12328,11 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter: OK (with DB)
 2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 Retriever: OK (8 docs indexed)
 2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever: OK
-2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration |
 📝 Usage:
 2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration |    from backend.api.veritas_phase5_integration import hybrid_retriever
 2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration |    results = await hybrid_retriever.retrieve(query, top_k=10)
-2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration |
 ⚡ Expected Performance:
 2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration |    BM25-only mode: <50ms (Dense=0.0)
 2025-10-17 21:18:14 | INFO     | backend.api.veritas_phase5_integration |    Full Hybrid mode: <150ms (when Vector DB populated)
@@ -12693,24 +12693,24 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration |    Query Expansion: False
 2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration |    RRF k: 60
 2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration |    BM25 k1=1.5, b=0.75
-2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 1: Initializing Dense Retriever...
 2025-10-17 21:18:53 | INFO     | backend.agents.veritas_uds3_adapter | ✅ UDS3VectorSearchAdapter initialisiert
 2025-10-17 21:18:53 | INFO     | backend.agents.veritas_uds3_adapter | ℹ️ Hinweis: UDS3 benötigt konfigurierte Datenbanken (Vector/Graph/Relational) für Ergebnisse
 2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter initialized with UDS3 strategy
-2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 2: Initializing BM25 Sparse Retriever...
 2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration |    📚 Indexing 8 demo documents...
 2025-10-17 21:18:53 | INFO     | backend.agents.veritas_sparse_retrieval | 📥 Indexiere 8 Dokumente für BM25...
 2025-10-17 21:18:53 | INFO     | backend.agents.veritas_sparse_retrieval | ✅ BM25-Index erstellt in 0.00s (8 Docs, 152 Tokens)
 2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 indexed 8 documents
-2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 3: Initializing Hybrid Retriever (Dense + Sparse + RRF)...
 2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever initialized
 2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration |    📊 Dense Weight: 0.6
 2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration |    📊 Sparse Weight: 0.4
 2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration |    📊 RRF k: 60
-2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration |
 🔍 Step 4: Validation...
 2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration |    Running test query: 'Test Query'
 2025-10-17 21:18:53 | DEBUG    | backend.agents.veritas_uds3_adapter | ℹ️ UDS3 Query: No database queries configured (DB-Konfiguration erforderlich)
@@ -12723,7 +12723,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration |       doc_id: doc_7
 2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration |       score: 0.006557377049180329
 2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration |       content: Verkehrssicherungspflicht auf Baustellen: Bauherr und Unternehmer haften für Schäden durch unzureich...
-2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration |
 ================================================================================
 2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration | ✅ PHASE 5 HYBRID SEARCH INITIALIZED SUCCESSFULLY
 2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration | ================================================================================
@@ -12731,11 +12731,11 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter: OK (with DB)
 2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 Retriever: OK (8 docs indexed)
 2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever: OK
-2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration |
 📝 Usage:
 2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration |    from backend.api.veritas_phase5_integration import hybrid_retriever
 2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration |    results = await hybrid_retriever.retrieve(query, top_k=10)
-2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration |
 ⚡ Expected Performance:
 2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration |    BM25-only mode: <50ms (Dense=0.0)
 2025-10-17 21:18:53 | INFO     | backend.api.veritas_phase5_integration |    Full Hybrid mode: <150ms (when Vector DB populated)
@@ -13109,24 +13109,24 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration |    Query Expansion: False
 2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration |    RRF k: 60
 2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration |    BM25 k1=1.5, b=0.75
-2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 1: Initializing Dense Retriever...
 2025-10-17 21:27:01 | INFO     | backend.agents.veritas_uds3_adapter | ✅ UDS3VectorSearchAdapter initialisiert
 2025-10-17 21:27:01 | INFO     | backend.agents.veritas_uds3_adapter | ℹ️ Hinweis: UDS3 benötigt konfigurierte Datenbanken (Vector/Graph/Relational) für Ergebnisse
 2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter initialized with UDS3 strategy
-2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 2: Initializing BM25 Sparse Retriever...
 2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration |    📚 Indexing 8 demo documents...
 2025-10-17 21:27:01 | INFO     | backend.agents.veritas_sparse_retrieval | 📥 Indexiere 8 Dokumente für BM25...
 2025-10-17 21:27:01 | INFO     | backend.agents.veritas_sparse_retrieval | ✅ BM25-Index erstellt in 0.00s (8 Docs, 152 Tokens)
 2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 indexed 8 documents
-2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 3: Initializing Hybrid Retriever (Dense + Sparse + RRF)...
 2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever initialized
 2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration |    📊 Dense Weight: 0.6
 2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration |    📊 Sparse Weight: 0.4
 2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration |    📊 RRF k: 60
-2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration |
 🔍 Step 4: Validation...
 2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration |    Running test query: 'Test Query'
 2025-10-17 21:27:01 | DEBUG    | backend.agents.veritas_uds3_adapter | ℹ️ UDS3 Query: No database queries configured (DB-Konfiguration erforderlich)
@@ -13139,7 +13139,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration |       doc_id: doc_7
 2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration |       score: 0.006557377049180329
 2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration |       content: Verkehrssicherungspflicht auf Baustellen: Bauherr und Unternehmer haften für Schäden durch unzureich...
-2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration |
 ================================================================================
 2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration | ✅ PHASE 5 HYBRID SEARCH INITIALIZED SUCCESSFULLY
 2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration | ================================================================================
@@ -13147,11 +13147,11 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter: OK (with DB)
 2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 Retriever: OK (8 docs indexed)
 2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever: OK
-2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration |
 📝 Usage:
 2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration |    from backend.api.veritas_phase5_integration import hybrid_retriever
 2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration |    results = await hybrid_retriever.retrieve(query, top_k=10)
-2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration |
 ⚡ Expected Performance:
 2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration |    BM25-only mode: <50ms (Dense=0.0)
 2025-10-17 21:27:01 | INFO     | backend.api.veritas_phase5_integration |    Full Hybrid mode: <150ms (when Vector DB populated)
@@ -13532,24 +13532,24 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration |    Query Expansion: False
 2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration |    RRF k: 60
 2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration |    BM25 k1=1.5, b=0.75
-2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 1: Initializing Dense Retriever...
 2025-10-17 22:02:18 | INFO     | backend.agents.veritas_uds3_adapter | ✅ UDS3VectorSearchAdapter initialisiert
 2025-10-17 22:02:18 | INFO     | backend.agents.veritas_uds3_adapter | ℹ️ Hinweis: UDS3 benötigt konfigurierte Datenbanken (Vector/Graph/Relational) für Ergebnisse
 2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter initialized with UDS3 strategy
-2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 2: Initializing BM25 Sparse Retriever...
 2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration |    📚 Indexing 8 demo documents...
 2025-10-17 22:02:18 | INFO     | backend.agents.veritas_sparse_retrieval | 📥 Indexiere 8 Dokumente für BM25...
 2025-10-17 22:02:18 | INFO     | backend.agents.veritas_sparse_retrieval | ✅ BM25-Index erstellt in 0.00s (8 Docs, 152 Tokens)
 2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 indexed 8 documents
-2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 3: Initializing Hybrid Retriever (Dense + Sparse + RRF)...
 2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever initialized
 2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration |    📊 Dense Weight: 0.6
 2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration |    📊 Sparse Weight: 0.4
 2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration |    📊 RRF k: 60
-2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration |
 🔍 Step 4: Validation...
 2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration |    Running test query: 'Test Query'
 2025-10-17 22:02:18 | DEBUG    | backend.agents.veritas_uds3_adapter | ℹ️ UDS3 Query: No database queries configured (DB-Konfiguration erforderlich)
@@ -13562,7 +13562,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration |       doc_id: doc_7
 2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration |       score: 0.006557377049180329
 2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration |       content: Verkehrssicherungspflicht auf Baustellen: Bauherr und Unternehmer haften für Schäden durch unzureich...
-2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration |
 ================================================================================
 2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration | ✅ PHASE 5 HYBRID SEARCH INITIALIZED SUCCESSFULLY
 2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration | ================================================================================
@@ -13570,11 +13570,11 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter: OK (with DB)
 2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 Retriever: OK (8 docs indexed)
 2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever: OK
-2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration |
 📝 Usage:
 2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration |    from backend.api.veritas_phase5_integration import hybrid_retriever
 2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration |    results = await hybrid_retriever.retrieve(query, top_k=10)
-2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration |
 ⚡ Expected Performance:
 2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration |    BM25-only mode: <50ms (Dense=0.0)
 2025-10-17 22:02:18 | INFO     | backend.api.veritas_phase5_integration |    Full Hybrid mode: <150ms (when Vector DB populated)
@@ -13935,24 +13935,24 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration |    Query Expansion: False
 2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration |    RRF k: 60
 2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration |    BM25 k1=1.5, b=0.75
-2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 1: Initializing Dense Retriever...
 2025-10-17 22:15:15 | INFO     | backend.agents.veritas_uds3_adapter | ✅ UDS3VectorSearchAdapter initialisiert
 2025-10-17 22:15:15 | INFO     | backend.agents.veritas_uds3_adapter | ℹ️ Hinweis: UDS3 benötigt konfigurierte Datenbanken (Vector/Graph/Relational) für Ergebnisse
 2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter initialized with UDS3 strategy
-2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 2: Initializing BM25 Sparse Retriever...
 2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration |    📚 Indexing 8 demo documents...
 2025-10-17 22:15:15 | INFO     | backend.agents.veritas_sparse_retrieval | 📥 Indexiere 8 Dokumente für BM25...
 2025-10-17 22:15:15 | INFO     | backend.agents.veritas_sparse_retrieval | ✅ BM25-Index erstellt in 0.00s (8 Docs, 152 Tokens)
 2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 indexed 8 documents
-2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 3: Initializing Hybrid Retriever (Dense + Sparse + RRF)...
 2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever initialized
 2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration |    📊 Dense Weight: 0.6
 2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration |    📊 Sparse Weight: 0.4
 2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration |    📊 RRF k: 60
-2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration |
 🔍 Step 4: Validation...
 2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration |    Running test query: 'Test Query'
 2025-10-17 22:15:15 | DEBUG    | backend.agents.veritas_uds3_adapter | ℹ️ UDS3 Query: No database queries configured (DB-Konfiguration erforderlich)
@@ -13965,7 +13965,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration |       doc_id: doc_7
 2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration |       score: 0.006557377049180329
 2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration |       content: Verkehrssicherungspflicht auf Baustellen: Bauherr und Unternehmer haften für Schäden durch unzureich...
-2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration |
 ================================================================================
 2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration | ✅ PHASE 5 HYBRID SEARCH INITIALIZED SUCCESSFULLY
 2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration | ================================================================================
@@ -13973,11 +13973,11 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter: OK (with DB)
 2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 Retriever: OK (8 docs indexed)
 2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever: OK
-2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration |
 📝 Usage:
 2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration |    from backend.api.veritas_phase5_integration import hybrid_retriever
 2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration |    results = await hybrid_retriever.retrieve(query, top_k=10)
-2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration |
 ⚡ Expected Performance:
 2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration |    BM25-only mode: <50ms (Dense=0.0)
 2025-10-17 22:15:15 | INFO     | backend.api.veritas_phase5_integration |    Full Hybrid mode: <150ms (when Vector DB populated)
@@ -14345,24 +14345,24 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration |    Query Expansion: False
 2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration |    RRF k: 60
 2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration |    BM25 k1=1.5, b=0.75
-2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 1: Initializing Dense Retriever...
 2025-10-18 09:54:16 | INFO     | backend.agents.veritas_uds3_adapter | ✅ UDS3VectorSearchAdapter initialisiert
 2025-10-18 09:54:16 | INFO     | backend.agents.veritas_uds3_adapter | ℹ️ Hinweis: UDS3 benötigt konfigurierte Datenbanken (Vector/Graph/Relational) für Ergebnisse
 2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter initialized with UDS3 strategy
-2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 2: Initializing BM25 Sparse Retriever...
 2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration |    📚 Indexing 8 demo documents...
 2025-10-18 09:54:16 | INFO     | backend.agents.veritas_sparse_retrieval | 📥 Indexiere 8 Dokumente für BM25...
 2025-10-18 09:54:16 | INFO     | backend.agents.veritas_sparse_retrieval | ✅ BM25-Index erstellt in 0.00s (8 Docs, 152 Tokens)
 2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 indexed 8 documents
-2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 3: Initializing Hybrid Retriever (Dense + Sparse + RRF)...
 2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever initialized
 2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration |    📊 Dense Weight: 0.6
 2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration |    📊 Sparse Weight: 0.4
 2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration |    📊 RRF k: 60
-2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration |
 🔍 Step 4: Validation...
 2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration |    Running test query: 'Test Query'
 2025-10-18 09:54:16 | DEBUG    | backend.agents.veritas_uds3_adapter | ℹ️ UDS3 Query: No database queries configured (DB-Konfiguration erforderlich)
@@ -14375,7 +14375,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration |       doc_id: doc_7
 2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration |       score: 0.006557377049180329
 2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration |       content: Verkehrssicherungspflicht auf Baustellen: Bauherr und Unternehmer haften für Schäden durch unzureich...
-2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration |
 ================================================================================
 2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration | ✅ PHASE 5 HYBRID SEARCH INITIALIZED SUCCESSFULLY
 2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration | ================================================================================
@@ -14383,11 +14383,11 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter: OK (with DB)
 2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 Retriever: OK (8 docs indexed)
 2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever: OK
-2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration |
 📝 Usage:
 2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration |    from backend.api.veritas_phase5_integration import hybrid_retriever
 2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration |    results = await hybrid_retriever.retrieve(query, top_k=10)
-2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration |
 ⚡ Expected Performance:
 2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration |    BM25-only mode: <50ms (Dense=0.0)
 2025-10-18 09:54:16 | INFO     | backend.api.veritas_phase5_integration |    Full Hybrid mode: <150ms (when Vector DB populated)
@@ -14749,24 +14749,24 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration |    Query Expansion: False
 2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration |    RRF k: 60
 2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration |    BM25 k1=1.5, b=0.75
-2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 1: Initializing Dense Retriever...
 2025-10-18 09:55:22 | INFO     | backend.agents.veritas_uds3_adapter | ✅ UDS3VectorSearchAdapter initialisiert
 2025-10-18 09:55:22 | INFO     | backend.agents.veritas_uds3_adapter | ℹ️ Hinweis: UDS3 benötigt konfigurierte Datenbanken (Vector/Graph/Relational) für Ergebnisse
 2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter initialized with UDS3 strategy
-2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 2: Initializing BM25 Sparse Retriever...
 2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration |    📚 Indexing 8 demo documents...
 2025-10-18 09:55:22 | INFO     | backend.agents.veritas_sparse_retrieval | 📥 Indexiere 8 Dokumente für BM25...
 2025-10-18 09:55:22 | INFO     | backend.agents.veritas_sparse_retrieval | ✅ BM25-Index erstellt in 0.00s (8 Docs, 152 Tokens)
 2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 indexed 8 documents
-2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 3: Initializing Hybrid Retriever (Dense + Sparse + RRF)...
 2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever initialized
 2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration |    📊 Dense Weight: 0.6
 2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration |    📊 Sparse Weight: 0.4
 2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration |    📊 RRF k: 60
-2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration |
 🔍 Step 4: Validation...
 2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration |    Running test query: 'Test Query'
 2025-10-18 09:55:22 | DEBUG    | backend.agents.veritas_uds3_adapter | ℹ️ UDS3 Query: No database queries configured (DB-Konfiguration erforderlich)
@@ -14779,7 +14779,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration |       doc_id: doc_7
 2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration |       score: 0.006557377049180329
 2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration |       content: Verkehrssicherungspflicht auf Baustellen: Bauherr und Unternehmer haften für Schäden durch unzureich...
-2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration |
 ================================================================================
 2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration | ✅ PHASE 5 HYBRID SEARCH INITIALIZED SUCCESSFULLY
 2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration | ================================================================================
@@ -14787,11 +14787,11 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter: OK (with DB)
 2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 Retriever: OK (8 docs indexed)
 2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever: OK
-2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration |
 📝 Usage:
 2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration |    from backend.api.veritas_phase5_integration import hybrid_retriever
 2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration |    results = await hybrid_retriever.retrieve(query, top_k=10)
-2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration |
 ⚡ Expected Performance:
 2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration |    BM25-only mode: <50ms (Dense=0.0)
 2025-10-18 09:55:22 | INFO     | backend.api.veritas_phase5_integration |    Full Hybrid mode: <150ms (when Vector DB populated)
@@ -15140,24 +15140,24 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration |    Query Expansion: False
 2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration |    RRF k: 60
 2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration |    BM25 k1=1.5, b=0.75
-2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 1: Initializing Dense Retriever...
 2025-10-18 14:33:53 | INFO     | backend.agents.veritas_uds3_adapter | ✅ UDS3VectorSearchAdapter initialisiert
 2025-10-18 14:33:53 | INFO     | backend.agents.veritas_uds3_adapter | ℹ️ Hinweis: UDS3 benötigt konfigurierte Datenbanken (Vector/Graph/Relational) für Ergebnisse
 2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter initialized with UDS3 strategy
-2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 2: Initializing BM25 Sparse Retriever...
 2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration |    📚 Indexing 8 demo documents...
 2025-10-18 14:33:53 | INFO     | backend.agents.veritas_sparse_retrieval | 📥 Indexiere 8 Dokumente für BM25...
 2025-10-18 14:33:53 | INFO     | backend.agents.veritas_sparse_retrieval | ✅ BM25-Index erstellt in 0.00s (8 Docs, 152 Tokens)
 2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 indexed 8 documents
-2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 3: Initializing Hybrid Retriever (Dense + Sparse + RRF)...
 2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever initialized
 2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration |    📊 Dense Weight: 0.6
 2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration |    📊 Sparse Weight: 0.4
 2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration |    📊 RRF k: 60
-2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration |
 🔍 Step 4: Validation...
 2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration |    Running test query: 'Test Query'
 2025-10-18 14:33:53 | DEBUG    | backend.agents.veritas_uds3_adapter | ℹ️ UDS3 Query: No database queries configured (DB-Konfiguration erforderlich)
@@ -15170,7 +15170,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration |       doc_id: doc_7
 2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration |       score: 0.006557377049180329
 2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration |       content: Verkehrssicherungspflicht auf Baustellen: Bauherr und Unternehmer haften für Schäden durch unzureich...
-2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration |
 ================================================================================
 2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration | ✅ PHASE 5 HYBRID SEARCH INITIALIZED SUCCESSFULLY
 2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration | ================================================================================
@@ -15178,11 +15178,11 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter: OK (with DB)
 2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 Retriever: OK (8 docs indexed)
 2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever: OK
-2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration |
 📝 Usage:
 2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration |    from backend.api.veritas_phase5_integration import hybrid_retriever
 2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration |    results = await hybrid_retriever.retrieve(query, top_k=10)
-2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration |
 ⚡ Expected Performance:
 2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration |    BM25-only mode: <50ms (Dense=0.0)
 2025-10-18 14:33:53 | INFO     | backend.api.veritas_phase5_integration |    Full Hybrid mode: <150ms (when Vector DB populated)
@@ -15433,24 +15433,24 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration |    Query Expansion: False
 2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration |    RRF k: 60
 2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration |    BM25 k1=1.5, b=0.75
-2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 1: Initializing Dense Retriever...
 2025-10-18 14:51:00 | INFO     | backend.agents.veritas_uds3_adapter | ✅ UDS3VectorSearchAdapter initialisiert
 2025-10-18 14:51:00 | INFO     | backend.agents.veritas_uds3_adapter | ℹ️ Hinweis: UDS3 benötigt konfigurierte Datenbanken (Vector/Graph/Relational) für Ergebnisse
 2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter initialized with UDS3 strategy
-2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 2: Initializing BM25 Sparse Retriever...
 2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration |    📚 Indexing 8 demo documents...
 2025-10-18 14:51:00 | INFO     | backend.agents.veritas_sparse_retrieval | 📥 Indexiere 8 Dokumente für BM25...
 2025-10-18 14:51:00 | INFO     | backend.agents.veritas_sparse_retrieval | ✅ BM25-Index erstellt in 0.00s (8 Docs, 152 Tokens)
 2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 indexed 8 documents
-2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 3: Initializing Hybrid Retriever (Dense + Sparse + RRF)...
 2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever initialized
 2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration |    📊 Dense Weight: 0.6
 2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration |    📊 Sparse Weight: 0.4
 2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration |    📊 RRF k: 60
-2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration |
 🔍 Step 4: Validation...
 2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration |    Running test query: 'Test Query'
 2025-10-18 14:51:00 | DEBUG    | backend.agents.veritas_uds3_adapter | ℹ️ UDS3 Query: No database queries configured (DB-Konfiguration erforderlich)
@@ -15463,7 +15463,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration |       doc_id: doc_7
 2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration |       score: 0.006557377049180329
 2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration |       content: Verkehrssicherungspflicht auf Baustellen: Bauherr und Unternehmer haften für Schäden durch unzureich...
-2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration |
 ================================================================================
 2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration | ✅ PHASE 5 HYBRID SEARCH INITIALIZED SUCCESSFULLY
 2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration | ================================================================================
@@ -15471,11 +15471,11 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter: OK (with DB)
 2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 Retriever: OK (8 docs indexed)
 2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever: OK
-2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration |
 📝 Usage:
 2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration |    from backend.api.veritas_phase5_integration import hybrid_retriever
 2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration |    results = await hybrid_retriever.retrieve(query, top_k=10)
-2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration |
 ⚡ Expected Performance:
 2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration |    BM25-only mode: <50ms (Dense=0.0)
 2025-10-18 14:51:00 | INFO     | backend.api.veritas_phase5_integration |    Full Hybrid mode: <150ms (when Vector DB populated)
@@ -15733,24 +15733,24 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration |    Query Expansion: False
 2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration |    RRF k: 60
 2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration |    BM25 k1=1.5, b=0.75
-2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 1: Initializing Dense Retriever...
 2025-10-18 14:59:55 | INFO     | backend.agents.veritas_uds3_adapter | ✅ UDS3VectorSearchAdapter initialisiert
 2025-10-18 14:59:55 | INFO     | backend.agents.veritas_uds3_adapter | ℹ️ Hinweis: UDS3 benötigt konfigurierte Datenbanken (Vector/Graph/Relational) für Ergebnisse
 2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter initialized with UDS3 strategy
-2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 2: Initializing BM25 Sparse Retriever...
 2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration |    📚 Indexing 8 demo documents...
 2025-10-18 14:59:55 | INFO     | backend.agents.veritas_sparse_retrieval | 📥 Indexiere 8 Dokumente für BM25...
 2025-10-18 14:59:55 | INFO     | backend.agents.veritas_sparse_retrieval | ✅ BM25-Index erstellt in 0.00s (8 Docs, 152 Tokens)
 2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 indexed 8 documents
-2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration |
 📦 Step 3: Initializing Hybrid Retriever (Dense + Sparse + RRF)...
 2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever initialized
 2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration |    📊 Dense Weight: 0.6
 2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration |    📊 Sparse Weight: 0.4
 2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration |    📊 RRF k: 60
-2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration |
 🔍 Step 4: Validation...
 2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration |    Running test query: 'Test Query'
 2025-10-18 14:59:55 | DEBUG    | backend.agents.veritas_uds3_adapter | ℹ️ UDS3 Query: No database queries configured (DB-Konfiguration erforderlich)
@@ -15763,7 +15763,7 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration |       doc_id: doc_7
 2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration |       score: 0.006557377049180329
 2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration |       content: Verkehrssicherungspflicht auf Baustellen: Bauherr und Unternehmer haften für Schäden durch unzureich...
-2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration |
 ================================================================================
 2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration | ✅ PHASE 5 HYBRID SEARCH INITIALIZED SUCCESSFULLY
 2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration | ================================================================================
@@ -15771,11 +15771,11 @@ ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt 
 2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration |    ✅ UDS3 Adapter: OK (with DB)
 2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration |    ✅ BM25 Retriever: OK (8 docs indexed)
 2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration |    ✅ Hybrid Retriever: OK
-2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration |
 📝 Usage:
 2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration |    from backend.api.veritas_phase5_integration import hybrid_retriever
 2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration |    results = await hybrid_retriever.retrieve(query, top_k=10)
-2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration | 
+2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration |
 ⚡ Expected Performance:
 2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration |    BM25-only mode: <50ms (Dense=0.0)
 2025-10-18 14:59:55 | INFO     | backend.api.veritas_phase5_integration |    Full Hybrid mode: <150ms (when Vector DB populated)

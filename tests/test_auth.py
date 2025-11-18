@@ -19,11 +19,11 @@ Author: VERITAS Security Team
 Date: 22. Oktober 2025
 """
 
-import requests
 import json
-from typing import Dict, Optional
 from datetime import datetime
+from typing import Dict, Optional
 
+import requests
 
 # ============================================================================
 # Configuration
@@ -34,36 +34,26 @@ AUTH_URL = f"{BASE_URL}/auth"
 
 # Test users (from backend/security/auth.py)
 TEST_USERS = {
-    "admin": {
-        "username": "admin",
-        "password": "admin123",
-        "expected_roles": ["admin", "manager", "user"]
-    },
-    "user": {
-        "username": "user",
-        "password": "user123",
-        "expected_roles": ["user"]
-    },
-    "guest": {
-        "username": "guest",
-        "password": "guest123",
-        "expected_roles": ["guest"]
-    }
+    "admin": {"username": "admin", "password": "admin123", "expected_roles": ["admin", "manager", "user"]},
+    "user": {"username": "user", "password": "user123", "expected_roles": ["user"]},
+    "guest": {"username": "guest", "password": "guest123", "expected_roles": ["guest"]},
 }
+
 
 # Colors for terminal output
 class Colors:
-    GREEN = '\033[92m'
-    RED = '\033[91m'
-    YELLOW = '\033[93m'
-    BLUE = '\033[94m'
-    BOLD = '\033[1m'
-    END = '\033[0m'
+    GREEN = "\033[92m"
+    RED = "\033[91m"
+    YELLOW = "\033[93m"
+    BLUE = "\033[94m"
+    BOLD = "\033[1m"
+    END = "\033[0m"
 
 
 # ============================================================================
 # Helper Functions
 # ============================================================================
+
 
 def print_test(name: str):
     """Print test name"""
@@ -102,17 +92,18 @@ def print_json(data: dict, title: str = "Response"):
 # Test Functions
 # ============================================================================
 
+
 def test_auth_status() -> bool:
     """Test GET /auth/status endpoint"""
     print_test("Auth Status Check")
-    
+
     try:
         response = requests.get(f"{AUTH_URL}/status")
-        
+
         if response.status_code == 200:
             data = response.json()
             print_json(data)
-            
+
             # Check expected fields
             if "enabled" in data and "method" in data:
                 print_success(f"Auth status retrieved successfully")
@@ -125,7 +116,7 @@ def test_auth_status() -> bool:
         else:
             print_error(f"Status check failed: {response.status_code}")
             return False
-            
+
     except Exception as e:
         print_error(f"Exception during status check: {e}")
         return False
@@ -134,29 +125,23 @@ def test_auth_status() -> bool:
 def test_login(username: str, password: str, should_succeed: bool = True):
     """
     Test POST /auth/token endpoint
-    
+
     Returns:
         - For should_succeed=True: token string if successful, None if failed
         - For should_succeed=False: True if correctly rejected, False if not
     """
     print_test(f"Login Test - User: {username}")
-    
+
     try:
-        response = requests.post(
-            f"{AUTH_URL}/token",
-            data={
-                "username": username,
-                "password": password
-            }
-        )
-        
+        response = requests.post(f"{AUTH_URL}/token", data={"username": username, "password": password})
+
         print_info(f"Status Code: {response.status_code}")
-        
+
         if should_succeed:
             if response.status_code == 200:
                 data = response.json()
                 print_json(data)
-                
+
                 # Check for required fields
                 if "access_token" in data and "token_type" in data:
                     token = data["access_token"]
@@ -180,7 +165,7 @@ def test_login(username: str, password: str, should_succeed: bool = True):
             else:
                 print_error(f"Unexpected status code: {response.status_code} (expected 401)")
                 return False  # Test failed!
-                
+
     except Exception as e:
         print_error(f"Exception during login: {e}")
         return None if should_succeed else False
@@ -189,19 +174,16 @@ def test_login(username: str, password: str, should_succeed: bool = True):
 def test_get_current_user(token: str, expected_username: str) -> bool:
     """Test GET /auth/me endpoint"""
     print_test(f"Get Current User - Expected: {expected_username}")
-    
+
     try:
-        response = requests.get(
-            f"{AUTH_URL}/me",
-            headers={"Authorization": f"Bearer {token}"}
-        )
-        
+        response = requests.get(f"{AUTH_URL}/me", headers={"Authorization": f"Bearer {token}"})
+
         print_info(f"Status Code: {response.status_code}")
-        
+
         if response.status_code == 200:
             data = response.json()
             print_json(data)
-            
+
             # Verify username
             if data.get("username") == expected_username:
                 print_success(f"Current user retrieved successfully")
@@ -217,7 +199,7 @@ def test_get_current_user(token: str, expected_username: str) -> bool:
             print_error(f"Get current user failed: {response.status_code}")
             print_json(response.json())
             return False
-            
+
     except Exception as e:
         print_error(f"Exception during get current user: {e}")
         return False
@@ -226,22 +208,19 @@ def test_get_current_user(token: str, expected_username: str) -> bool:
 def test_invalid_token() -> bool:
     """Test with invalid token"""
     print_test("Invalid Token Test")
-    
+
     try:
-        response = requests.get(
-            f"{AUTH_URL}/me",
-            headers={"Authorization": "Bearer invalid_token_12345"}
-        )
-        
+        response = requests.get(f"{AUTH_URL}/me", headers={"Authorization": "Bearer invalid_token_12345"})
+
         print_info(f"Status Code: {response.status_code}")
-        
+
         if response.status_code == 401:
             print_success("Invalid token correctly rejected (401)")
             return True
         else:
             print_error(f"Unexpected status code: {response.status_code} (expected 401)")
             return False
-            
+
     except Exception as e:
         print_error(f"Exception during invalid token test: {e}")
         return False
@@ -250,12 +229,12 @@ def test_invalid_token() -> bool:
 def test_no_token() -> bool:
     """Test without token"""
     print_test("No Token Test")
-    
+
     try:
         response = requests.get(f"{AUTH_URL}/me")
-        
+
         print_info(f"Status Code: {response.status_code}")
-        
+
         # In development mode (ENABLE_AUTH=false), this might return 200
         # In production mode (ENABLE_AUTH=true), this should return 401
         if response.status_code in [200, 401]:
@@ -269,7 +248,7 @@ def test_no_token() -> bool:
         else:
             print_error(f"Unexpected status code: {response.status_code}")
             return False
-            
+
     except Exception as e:
         print_error(f"Exception during no token test: {e}")
         return False
@@ -279,6 +258,7 @@ def test_no_token() -> bool:
 # Main Test Suite
 # ============================================================================
 
+
 def run_all_tests():
     """Run all authentication tests"""
     print(f"\n{Colors.BOLD}{'=' * 80}{Colors.END}")
@@ -287,20 +267,16 @@ def run_all_tests():
     print(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"Backend URL: {BASE_URL}")
     print(f"{Colors.BOLD}{'=' * 80}{Colors.END}")
-    
-    results = {
-        "passed": 0,
-        "failed": 0,
-        "total": 0
-    }
-    
+
+    results = {"passed": 0, "failed": 0, "total": 0}
+
     # Test 1: Auth Status
     results["total"] += 1
     if test_auth_status():
         results["passed"] += 1
     else:
         results["failed"] += 1
-    
+
     # Test 2: Valid logins for all test users
     tokens = {}
     for user_type, user_data in TEST_USERS.items():
@@ -311,14 +287,14 @@ def run_all_tests():
             results["passed"] += 1
         else:
             results["failed"] += 1
-    
+
     # Test 3: Invalid login
     results["total"] += 1
     if test_login("admin", "wrong_password", should_succeed=False):
         results["passed"] += 1
     else:
         results["failed"] += 1
-    
+
     # Test 4: Get current user for each token
     for user_type, token in tokens.items():
         results["total"] += 1
@@ -327,21 +303,21 @@ def run_all_tests():
             results["passed"] += 1
         else:
             results["failed"] += 1
-    
+
     # Test 5: Invalid token
     results["total"] += 1
     if test_invalid_token():
         results["passed"] += 1
     else:
         results["failed"] += 1
-    
+
     # Test 6: No token
     results["total"] += 1
     if test_no_token():
         results["passed"] += 1
     else:
         results["failed"] += 1
-    
+
     # Print summary
     print(f"\n{Colors.BOLD}{'=' * 80}{Colors.END}")
     print(f"{Colors.BOLD}TEST SUMMARY{Colors.END}")
@@ -349,17 +325,17 @@ def run_all_tests():
     print(f"Total Tests: {results['total']}")
     print(f"{Colors.GREEN}Passed: {results['passed']}{Colors.END}")
     print(f"{Colors.RED}Failed: {results['failed']}{Colors.END}")
-    
+
     success_rate = (results["passed"] / results["total"]) * 100 if results["total"] > 0 else 0
     print(f"Success Rate: {success_rate:.1f}%")
-    
+
     if results["failed"] == 0:
         print(f"\n{Colors.GREEN}{Colors.BOLD}🎉 ALL TESTS PASSED!{Colors.END}")
     else:
         print(f"\n{Colors.RED}{Colors.BOLD}❌ SOME TESTS FAILED{Colors.END}")
-    
+
     print(f"{Colors.BOLD}{'=' * 80}{Colors.END}\n")
-    
+
     return results["failed"] == 0
 
 
@@ -369,7 +345,7 @@ def run_all_tests():
 
 if __name__ == "__main__":
     import sys
-    
+
     # Check if backend is running
     try:
         response = requests.get(f"{BASE_URL}/")
@@ -379,9 +355,9 @@ if __name__ == "__main__":
         print_error(f"Error: {e}")
         print_info("Please start the backend with: python backend/app.py")
         sys.exit(1)
-    
+
     # Run tests
     success = run_all_tests()
-    
+
     # Exit with appropriate code
     sys.exit(0 if success else 1)

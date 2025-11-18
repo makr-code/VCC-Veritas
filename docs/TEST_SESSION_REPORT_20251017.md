@@ -1,8 +1,8 @@
 # 📊 Test-Session Report - 17. Oktober 2025
 
-**Session ID:** session_20251017_172846  
-**Durchgeführt:** 17:28:46 - 17:39:00 Uhr (10:14 Minuten)  
-**Backend:** http://localhost:5000  
+**Session ID:** session_20251017_172846
+**Durchgeführt:** 17:28:46 - 17:39:00 Uhr (10:14 Minuten)
+**Backend:** http://localhost:5000
 **Queries:** 20 (100% erfolgreich)
 
 ---
@@ -383,7 +383,7 @@ Das Token-Management-System funktioniert **stabil und zuverlässig**:
 
 ---
 
-**Report erstellt:** 17. Oktober 2025, 17:40 Uhr  
-**Nächste Review:** 24. Oktober 2025 (Wöchentliche Dashboard-Review)  
-**Session Duration:** 10:14 Minuten  
+**Report erstellt:** 17. Oktober 2025, 17:40 Uhr
+**Nächste Review:** 24. Oktober 2025 (Wöchentliche Dashboard-Review)
+**Session Duration:** 10:14 Minuten
 **Backend Uptime:** Stabil, keine Errors

@@ -81,15 +81,15 @@ graph TD
     A[VERITAS Core] --> B[Legal Research & AI]
     A --> C[Knowledge Graph]
     A --> D[Document Processing]
-    
+
     E[Covina Framework] --> F[Compliance Monitoring]
     E --> G[Risk Assessment]
     E --> H[Regulatory Updates]
-    
+
     I[Clara CRM] --> J[Client Management]
     I --> K[Case Tracking]
     I --> L[Communication Hub]
-    
+
     A -.-> E
     A -.-> I
     E -.-> I

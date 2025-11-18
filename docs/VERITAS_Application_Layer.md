@@ -209,7 +209,7 @@ Backend Response ← Core Engine ← Application Layer ← GUI Layer ← User
 
 #### Core UI Components
 - **ChatToolbar** - Chat-Symbolleiste
-- **StatusBar** - Statusleiste  
+- **StatusBar** - Statusleiste
 - **FeedbackSystem** - Feedback-System
 - **ThemeManager** - Design-Manager
 

@@ -154,9 +154,9 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.warning(f"⚠️ UDS3 Init failed: {e}")
         app.state.uds3 = None
-    
+
     yield
-    
+
     # Shutdown
     if hasattr(app.state, 'uds3') and app.state.uds3:
         # Cleanup if needed
@@ -170,7 +170,7 @@ async def lifespan(app: FastAPI):
 class IntelligentMultiAgentPipeline:
     def __init__(self):
         self.uds3_strategy: Optional[UDS3PolyglotManager] = None
-        
+
     async def initialize(self):
         if RAG_INTEGRATION_AVAILABLE:
             try:
@@ -202,7 +202,7 @@ class SharedResourcePool:
                 )
             except Exception as e:
                 logger.error(f"UDS3 Init failed: {e}")
-        
+
         return self._database_api, self._uds3_strategy
 ```
 
@@ -218,10 +218,10 @@ class UDS3PolyglotManager:
     """Mock UDS3 Polyglot Manager für Fallback"""
     def __init__(self, backend_config=None, enable_rag=True, **kwargs):
         pass
-    
+
     def semantic_search(self, query_text, top_k=10):
         return []  # Leere Ergebnisse
-    
+
     def answer_query(self, query_text):
         return {"answer": "", "sources": []}
 ```
@@ -341,6 +341,6 @@ pip install chromadb
 
 ---
 
-**Version**: UDS3 v2.0.0  
-**Last Updated**: 18. Oktober 2025  
+**Version**: UDS3 v2.0.0
+**Last Updated**: 18. Oktober 2025
 **Author**: VERITAS Development Team

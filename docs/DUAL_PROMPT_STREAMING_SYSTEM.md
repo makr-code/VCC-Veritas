@@ -1,8 +1,8 @@
 # VERITAS Dual-Prompt Streaming System
 ## LLM-gestützte Stage-Reflections für detailliertes User-Feedback
 
-**Erstellt:** 2025-10-15  
-**Version:** 1.0.0  
+**Erstellt:** 2025-10-15
+**Version:** 1.0.0
 **Status:** ✅ Implementiert & getestet
 
 ---
@@ -156,7 +156,7 @@ class ProgressUpdate:
 ```python
 def _handle_progress_event(self, stream_session_id: str, event_data: Dict[str, Any]):
     # ... existing handling ...
-    
+
     elif event_type == 'stage_reflection':
         # Stage-Reflection Event
         reflection_data = event_data.get('details', {})
@@ -184,7 +184,7 @@ class StreamingMessageType(Enum):
 def _add_stage_reflection(self, reflection_data: Dict[str, Any]):
     """
     Zeigt Stage-Reflection in erweitertem Format an
-    
+
     Ausgabe-Format:
     ┌─────────────────────────────────────────────┐
     │ 🟡 Stage Reflection: RETRIEVAL              │
@@ -214,11 +214,11 @@ def _add_stage_reflection(self, reflection_data: Dict[str, Any]):
 ```python
 def setup_streaming_chat_tags(chat_display):
     # ... existing tags ...
-    chat_display.tag_config("reflection", 
+    chat_display.tag_config("reflection",
                           foreground="#9900CC",      # Lila
-                          font=('Arial', 9), 
+                          font=('Arial', 9),
                           background="#F8F0FF",      # Helles Lila
-                          spacing1=4, 
+                          spacing1=4,
                           spacing3=4)
 ```
 
@@ -233,11 +233,11 @@ def setup_streaming_chat_tags(chat_display):
 async def _process_streaming_query(session_id: str, query_id: str, request):
     # 1. Lade Reflection-Service
     reflection_service = get_reflection_service(ollama_client)
-    
+
     # 2. Nach Query-Analyse → Hypothesen-Reflection
     complexity = _analyze_query_complexity(request.query)
     domain = _analyze_query_domain(request.query)
-    
+
     if reflection_service and request.enable_llm_thinking:
         hypothesis_reflection = await reflection_service.reflect_on_stage(
             stage=ReflectionStage.HYPOTHESIS,
@@ -245,10 +245,10 @@ async def _process_streaming_query(session_id: str, query_id: str, request):
             stage_data={'hypotheses': [...], 'complexity': complexity}
         )
         progress_manager.add_stage_reflection(session_id, ...)
-    
+
     # 3. Nach Agent-Auswahl → Agent-Selection-Reflection
     selected_agents = _select_agents_for_query(...)
-    
+
     if reflection_service:
         agent_selection_reflection = await reflection_service.reflect_on_stage(
             stage=ReflectionStage.AGENT_SELECTION,
@@ -256,10 +256,10 @@ async def _process_streaming_query(session_id: str, query_id: str, request):
             stage_data={'selected_agents': selected_agents}
         )
         progress_manager.add_stage_reflection(session_id, ...)
-    
+
     # 4. Nach Agent-Execution → Retrieval-Reflection
     # ... agent execution ...
-    
+
     if reflection_service:
         retrieval_reflection = await reflection_service.reflect_on_stage(
             stage=ReflectionStage.RETRIEVAL,
@@ -267,10 +267,10 @@ async def _process_streaming_query(session_id: str, query_id: str, request):
             stage_data={'agent_results': agent_results}
         )
         progress_manager.add_stage_reflection(session_id, ...)
-    
+
     # 5. Nach Synthese → Synthesis-Reflection
     final_response = _synthesize_final_response(...)
-    
+
     if reflection_service:
         synthesis_reflection = await reflection_service.reflect_on_stage(
             stage=ReflectionStage.SYNTHESIS,
@@ -566,7 +566,7 @@ class VeritasStreamingQueryRequest(BaseModel):
 
 **Chat-Tag-Styling:**
 ```python
-chat_display.tag_config("reflection", 
+chat_display.tag_config("reflection",
     foreground="#9900CC",      # Farbe anpassen
     font=('Arial', 9),         # Font anpassen
     background="#F8F0FF",      # Hintergrund anpassen
@@ -607,14 +607,14 @@ from backend.services.stage_reflection_service import StageReflectionService, Re
 @pytest.mark.asyncio
 async def test_hypothesis_reflection():
     service = StageReflectionService(ollama_client=None)  # Fallback-Mode
-    
+
     reflection = await service.reflect_on_stage(
         stage=ReflectionStage.HYPOTHESIS,
         user_query="Test query",
         stage_data={'hypotheses': ['h1', 'h2']},
         context={}
     )
-    
+
     assert reflection.stage == ReflectionStage.HYPOTHESIS
     assert 0 <= reflection.completion_percent <= 100
     assert reflection.fulfillment_status in ["incomplete", "partial", "complete"]
@@ -762,5 +762,5 @@ def _build_prompt(self, lang='de'):
 
 ---
 
-**Status:** ✅ **Produktionsbereit**  
+**Status:** ✅ **Produktionsbereit**
 **Nächste Schritte:** User-Testing mit realen Queries durchführen

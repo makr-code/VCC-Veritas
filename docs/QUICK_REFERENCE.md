@@ -1,6 +1,6 @@
 # VERITAS Documentation Quick Reference
 
-**Version:** 3.25.0  
+**Version:** 3.25.0
 **Last Updated:** 14. Oktober 2025
 
 ---
@@ -250,6 +250,6 @@ docs/
 
 ---
 
-**Quick Reference Version:** 1.0  
-**Last Updated:** 14. Oktober 2025  
+**Quick Reference Version:** 1.0
+**Last Updated:** 14. Oktober 2025
 **Status:** ✅ Current

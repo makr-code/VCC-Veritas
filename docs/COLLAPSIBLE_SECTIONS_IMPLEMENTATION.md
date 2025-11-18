@@ -1,10 +1,10 @@
 # COLLAPSIBLE SECTIONS IMPLEMENTATION - Feature #1
 
-**Version:** 3.13.0  
-**Datum:** 2025-10-09  
-**Status:** ✅ Vollständig implementiert  
-**Entwicklungszeit:** ~35 Minuten  
-**Syntax-Fehler:** 0  
+**Version:** 3.13.0
+**Datum:** 2025-10-09
+**Status:** ✅ Vollständig implementiert
+**Entwicklungszeit:** ~35 Minuten
+**Syntax-Fehler:** 0
 
 ---
 
@@ -14,14 +14,14 @@
 
 ### Hauptmerkmale
 
-✅ **CollapsibleSection-Klasse** - Wiederverwendbare Widget-Klasse für Tkinter Text-Widgets  
-✅ **Toggle-Funktionalität** - Click-Handler für ▶/▼ Icons  
-✅ **Message-ID-basiertes State-Management** - Individuelle Sections pro Nachricht  
-✅ **Default States** - Quellen/Agents: collapsed, Vorschläge: expanded  
-✅ **Animation** - Optional: Smooth Expand/Collapse  
-✅ **Icon-Integration** - Dynamische Icons aus Feature #10  
-✅ **Fallback-Mechanismus** - Rückfall auf alte Methode wenn Feature nicht verfügbar  
-✅ **0 Syntax-Fehler** - Alle modifizierten Dateien validiert  
+✅ **CollapsibleSection-Klasse** - Wiederverwendbare Widget-Klasse für Tkinter Text-Widgets
+✅ **Toggle-Funktionalität** - Click-Handler für ▶/▼ Icons
+✅ **Message-ID-basiertes State-Management** - Individuelle Sections pro Nachricht
+✅ **Default States** - Quellen/Agents: collapsed, Vorschläge: expanded
+✅ **Animation** - Optional: Smooth Expand/Collapse
+✅ **Icon-Integration** - Dynamische Icons aus Feature #10
+✅ **Fallback-Mechanismus** - Rückfall auf alte Methode wenn Feature nicht verfügbar
+✅ **0 Syntax-Fehler** - Alle modifizierten Dateien validiert
 
 ---
 
@@ -56,14 +56,14 @@
 class CollapsibleSection:
     """
     Wiederverwendbare Collapsible Section für Text-Widgets
-    
+
     Ermöglicht Expand/Collapse von Sections mit:
     - Toggle-Icons (▶/▼)
     - Click-Handler
     - State-Management
     - Optional: Animation
     """
-    
+
     def __init__(
         self,
         text_widget: tk.Text,
@@ -187,17 +187,17 @@ class ChatDisplayFormatter:
     def __init__(self, ...):
         # ✨ Feature #1: Message-ID Counter für eindeutige Section-IDs
         self._message_counter = 0
-    
+
     def update_chat_display(self, chat_messages):
         # Reset Counter bei jedem Display-Update
         self._message_counter = 0
-        
+
         for msg in chat_messages:
             if msg['role'] == 'assistant':
                 # Inkrementiere Counter
                 self._message_counter += 1
                 msg_id = f"msg_{self._message_counter}"
-                
+
                 # Übergebe Message-ID
                 self.insert_formatted_content(content, tag, message_id=msg_id)
 ```
@@ -226,11 +226,11 @@ if COLLAPSIBLE_AVAILABLE and message_id:
     # === QUELLEN (Collapsible) ===
     if sections.get('sources'):
         self._insert_sources_collapsible(sections['sources'], message_id)
-    
+
     # === AGENTS (Collapsible) ===
     if sections.get('agents'):
         self._insert_agents_collapsible(sections['agents'], message_id)
-    
+
     # === VORSCHLÄGE (Collapsible) ===
     if sections.get('suggestions'):
         self._insert_suggestions_collapsible(sections['suggestions'], message_id)
@@ -248,17 +248,17 @@ else:
 def _insert_sources_collapsible(self, sources: List[str], message_id: str) -> None:
     """
     Fügt Quellen-Liste als Collapsible Section ein
-    
+
     Args:
         sources: Liste von Quellen
         message_id: Message-ID für eindeutige Section-ID
     """
     if not sources:
         return
-    
+
     # ✨ Dynamisches Icon
     sources_icon = VeritasIcons.source('sources') if ICONS_AVAILABLE else '📚'
-    
+
     # Collapsible Section erstellen (initial collapsed)
     section = CollapsibleSection(
         text_widget=self.text_widget,
@@ -268,19 +268,19 @@ def _insert_sources_collapsible(self, sources: List[str], message_id: str) -> No
         parent_window=self.parent_window,
         animate=True
     )
-    
+
     # Header einfügen
     section.insert_header()
-    
+
     # Content-Callback: Rendere Quellen mit existierender Logik
     def render_sources():
         for i, source in enumerate(sources, 1):
             # Verwende existierende _insert_single_source Logik
             self._insert_single_source(i, source)
-    
+
     # Content einfügen
     section.insert_content(render_sources)
-    
+
     self.text_widget.insert(tk.END, "\n")
 ```
 
@@ -302,17 +302,17 @@ def _insert_sources_collapsible(self, sources: List[str], message_id: str) -> No
 def _insert_agents_collapsible(self, agents: Dict[str, str], message_id: str) -> None:
     """
     Fügt Agent-Analysen als Collapsible Section ein
-    
+
     Args:
         agents: Dict von Agent-Name → Result
         message_id: Message-ID für eindeutige Section-ID
     """
     if not agents:
         return
-    
+
     # ✨ Dynamisches Icon
     agents_icon = VeritasIcons.agent('agents') if ICONS_AVAILABLE else '🤖'
-    
+
     # Collapsible Section erstellen (initial collapsed)
     section = CollapsibleSection(
         text_widget=self.text_widget,
@@ -322,19 +322,19 @@ def _insert_agents_collapsible(self, agents: Dict[str, str], message_id: str) ->
         parent_window=self.parent_window,
         animate=True
     )
-    
+
     # Header einfügen
     section.insert_header()
-    
+
     # Content-Callback
     def render_agents():
         for agent_name, agent_result in agents.items():
             self.text_widget.insert(tk.END, f"  • {agent_name}: ", "agent")
             self.text_widget.insert(tk.END, f"{agent_result}\n", "assistant")
-    
+
     # Content einfügen
     section.insert_content(render_agents)
-    
+
     self.text_widget.insert(tk.END, "\n")
 ```
 
@@ -355,17 +355,17 @@ def _insert_agents_collapsible(self, agents: Dict[str, str], message_id: str) ->
 def _insert_suggestions_collapsible(self, suggestions: List[str], message_id: str) -> None:
     """
     Fügt Vorschläge als Collapsible Section ein
-    
+
     Args:
         suggestions: Liste von Vorschlägen
         message_id: Message-ID für eindeutige Section-ID
     """
     if not suggestions:
         return
-    
+
     # ✨ Dynamisches Icon
     suggestion_icon = VeritasIcons.get('special', 'suggestion') if ICONS_AVAILABLE else '💡'
-    
+
     # Collapsible Section erstellen (initial expanded)
     section = CollapsibleSection(
         text_widget=self.text_widget,
@@ -375,18 +375,18 @@ def _insert_suggestions_collapsible(self, suggestions: List[str], message_id: st
         parent_window=self.parent_window,
         animate=True
     )
-    
+
     # Header einfügen
     section.insert_header()
-    
+
     # Content-Callback
     def render_suggestions():
         for suggestion in suggestions:
             self.text_widget.insert(tk.END, f"  • {suggestion}\n", "source")
-    
+
     # Content einfügen
     section.insert_content(render_suggestions)
-    
+
     self.text_widget.insert(tk.END, "\n")
 ```
 
@@ -409,43 +409,43 @@ def _insert_suggestions_collapsible(self, suggestions: List[str], message_id: st
 def _insert_single_source(self, index: int, source: str) -> None:
     """
     Fügt eine einzelne Quelle ein (Helper für _insert_sources_collapsible)
-    
+
     Args:
         index: Quellen-Nummer (1-basiert)
         source: Quellen-String
     """
     # Extrahiere Metadaten
     metadata = self._extract_source_metadata(source)
-    
+
     # ✨ Dynamisches Source-Icon basierend auf Typ
     source_icon = get_source_icon(source) if ICONS_AVAILABLE else '📄'
-    
+
     # Regex-Patterns
     url_pattern = r'(https?://[^\s]+|www\.[^\s]+)'
     file_pattern = r'([A-Za-z]:\\[\\\w\s\.-]+|/[\w/\.-]+|[\w\.-]+\.(?:pdf|docx?|txt|md|html?))'
-    
+
     urls = re.findall(url_pattern, source)
     files = re.findall(file_pattern, source)
-    
+
     if urls or files:
         # Source hat Links - klickbar machen MIT Hover-Tooltip
         parts = re.split(f'({url_pattern}|{file_pattern})', source)
         self.text_widget.insert(tk.END, f"  {source_icon} {index}. ", "source")
-        
+
         for part in parts:
             if not part:
                 continue
-            
+
             if re.match(url_pattern, part) or re.match(file_pattern, part):
                 # Klickbarer Link
                 link_start = self.text_widget.index(tk.END)
                 self.text_widget.insert(tk.END, part, ("clickable_link", "source"))
                 link_end = self.text_widget.index(tk.END)
-                
+
                 # Unique Tag
                 link_tag = f"link_{index}_{hash(part)}"
                 self.text_widget.tag_add(link_tag, link_start, link_end)
-                
+
                 # Click-Handler wenn SourceLinkHandler verfügbar
                 if self.source_link_handler:
                     # ✨ Scroll-to-Source Animation (Feature #5)
@@ -457,32 +457,32 @@ def _insert_single_source(self, index: int, source: str) -> None:
                                 lambda: self.source_link_handler.open_source_link(url)
                             )
                         return handler
-                    
+
                     self.text_widget.tag_bind(
-                        link_tag, 
-                        "<Button-1>", 
+                        link_tag,
+                        "<Button-1>",
                         create_click_handler(index, part)
                     )
-                    
+
                     # Hover-Tooltip hinzufügen (Feature #7)
                     self._add_source_hover_tooltip(link_tag, part, metadata)
-                
+
                 self.text_widget.tag_configure(link_tag, cursor="hand2")
             else:
                 # Normaler Text
                 self.text_widget.insert(tk.END, part, "source")
-        
+
         self.text_widget.insert(tk.END, "\n")
     else:
         # Keine Links - normale Darstellung MIT Hover-Tooltip
         link_start = self.text_widget.index(tk.END)
         self.text_widget.insert(tk.END, f"  {source_icon} {index}. {source}\n", "source")
         link_end = self.text_widget.index(tk.END)
-        
+
         # Unique Tag für DB-Quelle
         db_source_tag = f"db_source_{index}_{hash(source)}"
         self.text_widget.tag_add(db_source_tag, link_start, link_end)
-        
+
         # Hover-Tooltip für DB-Quellen (Feature #7)
         if self.source_link_handler:
             self._add_source_hover_tooltip(db_source_tag, source, metadata)
@@ -566,7 +566,7 @@ __history__: +12 Changelog-Einträge
 
 #### ✅ Test 2: Mehrere Sections in einer Nachricht
 1. Sende Frage die Sources UND Agents zurückgibt
-2. **Erwartung:** 
+2. **Erwartung:**
    - "▶ 📚 Quellen (X)" (collapsed)
    - "▶ 🤖 Agent-Analysen (X)" (collapsed)
    - Beide unabhängig toggle-bar
@@ -725,7 +725,7 @@ def __init__(self, ..., restore_state_callback=None):
 def reveal_line(line_index=0):
     if line_index < total_lines:
         progress = (line_index + 1) / total_lines
-        
+
         if progress >= 0.3:  # Instant-Reveal nach 30% Progress
             self.text_widget.tag_configure("hidden_details", elide=False)
 ```
@@ -972,9 +972,9 @@ def search_in_sections(self, query: str):
 
 ## 📞 Support & Kontakt
 
-**Feature Owner:** VERITAS Team  
-**Implementiert:** 2025-10-09  
-**Version:** 3.13.0  
+**Feature Owner:** VERITAS Team
+**Implementiert:** 2025-10-09
+**Version:** 3.13.0
 
 **Fragen/Issues:**
 - Dokumentation: `docs/COLLAPSIBLE_SECTIONS_IMPLEMENTATION.md`

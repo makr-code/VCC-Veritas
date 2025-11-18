@@ -2867,3 +2867,693 @@ Das BImSchG (Bundes-Immissionsschutzgesetz) ist ein deutsches Gesetz, das den Sc
 2025-10-20 16:00:20,558 - INFO [shared.core.veritas_core] - Alle Threads beendet
 2025-10-20 16:00:20,596 - INFO [__main__] - Anwendung beendet
 2025-10-20 16:00:20,596 - INFO [__main__] - 🏁 Veritas App beendet
+2025-11-12 16:15:38,718 - INFO [__main__] - ============================================================
+2025-11-12 16:15:38,719 - INFO [__main__] - 🚀 STARTE VERITAS APP v3.15.0
+2025-11-12 16:15:38,719 - INFO [__main__] - ============================================================
+2025-11-12 16:15:38,719 - INFO [__main__] - 🌐 Backend-API: http://127.0.0.1:5000/api
+2025-11-12 16:15:38,719 - INFO [__main__] - 🏗️ OOP-Architektur: Multi-Window mit Queue-Threading
+2025-11-12 16:15:38,719 - INFO [__main__] - ============================================================
+2025-11-12 16:15:38,719 - INFO [shared.core.veritas_core] - ThreadManager initialisiert
+2025-11-12 16:15:38,719 - INFO [shared.core.veritas_core] - ✅ VERITAS Core Engine initialisiert
+2025-11-12 16:15:38,719 - INFO [__main__] - ✅ VERITAS Core Engine initialisiert
+2025-11-12 16:15:38,719 - INFO [__main__] - ✅ VERITAS Core Engine eingebunden
+2025-11-12 16:15:38,719 - INFO [__main__] - 🔍 Prüfe Backend Health...
+2025-11-12 16:15:38,726 - INFO [__main__] - ✅ Backend Health: healthy
+2025-11-12 16:15:38,726 - INFO [__main__] - 🔍 Lade Backend Capabilities...
+2025-11-12 16:15:38,729 - INFO [__main__] - ✅ Backend Capabilities geladen:
+2025-11-12 16:15:38,729 - INFO [__main__] -    Query-Modi: rag, hybrid, streaming, agent, ask
+2025-11-12 16:15:38,730 - INFO [__main__] -    ✅ UDS3 v2.0 verfügbar
+2025-11-12 16:15:38,730 - INFO [__main__] -    ✅ Intelligent Pipeline verfügbar
+2025-11-12 16:15:38,730 - INFO [__main__] -    ✅ Streaming verfügbar
+2025-11-12 16:15:38,730 - INFO [__main__] -    📍 Query-Endpoints: 5 verfügbar
+2025-11-12 16:15:38,730 - INFO [__main__] -       -  / api/query
+2025-11-12 16:15:38,730 - INFO [__main__] -       -  / api/query / ask
+2025-11-12 16:15:38,730 - INFO [__main__] -       -  / api/query / rag
+2025-11-12 16:15:38,730 - INFO [__main__] -       -  / api/query / hybrid
+2025-11-12 16:15:38,730 - INFO [__main__] -       -  / api/query / stream
+2025-11-12 16:15:38,730 - INFO [__main__] - VeritasApp v3.15.0 initialisiert
+2025-11-12 16:15:38,731 - INFO [__main__] - ✅ Chat Bubbles UI aktiviert
+2025-11-12 16:15:38,731 - INFO [frontend.services.backend_api_client] - ✅ BackendAPIClient initialisiert: http://127.0.0.1:5000/api
+2025-11-12 16:15:38,731 - INFO [frontend.services.backend_api_client] - ✅ Session erstellt: session_355af010bcf4
+2025-11-12 16:15:38,731 - INFO [__main__] - ✅ BackendAPIClient für MainChat initialisiert
+2025-11-12 16:15:38,731 - INFO [shared.core.veritas_core] - Queue für Thread MainChat erstellt
+2025-11-12 16:15:38,731 - INFO [backend.services.veritas_streaming_service] - ✅ VeritasStreamingService initialisiert
+2025-11-12 16:15:38,731 - INFO [backend.services.veritas_streaming_service] - 🔗 Streaming Service an Window MainChat gebunden
+2025-11-12 16:15:38,731 - INFO [__main__] - ✅ Streaming-Integration für MainChat aktiviert
+2025-11-12 16:15:38,731 - INFO [__main__] - ChatWindowBase MainChat initialisiert
+2025-11-12 16:15:39,397 - INFO [frontend.services.theme_manager] - ✅ ThemeManager initialisiert: light
+2025-11-12 16:15:39,397 - INFO [__main__] - ✅ ThemeManager initialisiert: light
+2025-11-12 16:15:39,399 - INFO [ui.veritas_ui_chat_bubbles] - ✅ Theme-Farben aktualisiert: 41 Einträge
+2025-11-12 16:15:39,399 - INFO [__main__] - ✅ Theme-Farben in Chat-Bubbles-Modul injiziert
+2025-11-12 16:15:39,401 - INFO [frontend.ui.veritas_ui_syntax] - ✅ SyntaxHighlighter initialisiert (Pygments verfügbar)
+2025-11-12 16:15:39,401 - INFO [frontend.ui.veritas_ui_markdown] - ✅ Syntax-Highlighting aktiviert
+2025-11-12 16:15:39,402 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Modern UI Components initialisiert (Bubbles, IEEE-Citations, Best-Practices)
+2025-11-12 16:15:39,402 - INFO [frontend.services.feedback_api_client] - ✅ FeedbackAPIClientSync initialisiert: http://localhost:5000
+2025-11-12 16:15:39,402 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Feedback API Client initialisiert: http://localhost:5000
+2025-11-12 16:15:39,402 - INFO [frontend.components.error_handler] - ✅ ErrorHandler initialisiert
+2025-11-12 16:15:39,402 - INFO [__main__] - ✅ ErrorHandler initialisiert
+2025-11-12 16:15:39,404 - INFO [frontend.components.scroll_manager] - ✅ ScrollManager initialisiert
+2025-11-12 16:15:39,404 - INFO [__main__] - ✅ ScrollManager initialisiert
+2025-11-12 16:15:39,404 - INFO [__main__] - ✅ TypingIndicator initialisiert
+2025-11-12 16:15:39,407 - INFO [frontend.ui.veritas_ui_markdown] - ✅ Markdown-Tags konfiguriert
+2025-11-12 16:15:39,408 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Chat-Tags konfiguriert (inkl. Sprechblasen-Design + Raw-Response)
+2025-11-12 16:15:39,408 - INFO [__main__] - ✅ Chat Bubbles & UX Best Practices aktiviert (Smooth Scrolling, Shortcuts, Performance)
+2025-11-12 16:15:39,408 - INFO [__main__] - ✅ UI-Module initialisiert (Markdown, SourceLinks, ChatFormatter, DialogManager)
+2025-11-12 16:15:39,432 - INFO [__main__] - 🔄 Lade Frage-Modi für GUI...
+2025-11-12 16:15:39,432 - INFO [__main__] - 🔍 Lade verfügbare Frage-Modi vom API...
+2025-11-12 16:15:39,437 - INFO [__main__] - ✅ 7 Frage-Modi verfügbar: ['hybrid', 'rag', 'streaming', 'agent', 'ask', 'veritas', 'chat']
+2025-11-12 16:15:39,437 - INFO [__main__] - 📋 GUI: 7 Modi geladen: ['🔍 Hybrid Search', 'RAG Query', 'Streaming Query', 'Agent Query', 'Simple Ask', 'Standard RAG', 'Conversational Chat']
+2025-11-12 16:15:39,448 - INFO [__main__] - 📋 Standard-Modus gesetzt: 🔍 Hybrid Search
+2025-11-12 16:15:39,463 - INFO [__main__] - 🔍 Versuche LLM-Modelle von Parent-App zu laden...
+2025-11-12 16:15:39,466 - ERROR [__main__] - ❌ API-Fehler beim Abrufen der Modelle: Status 404
+2025-11-12 16:15:39,467 - INFO [__main__] - ✅ 3 LLM-Modelle aus Parent-App Capabilities
+2025-11-12 16:15:39,468 - INFO [__main__] - 🎯 Default-Modell gesetzt: llama3:latest
+2025-11-12 16:15:39,563 - INFO [__main__] - MainChatWindow erstellt
+2025-11-12 16:15:39,563 - INFO [__main__] - Hauptfenster erstellt
+2025-11-12 16:15:39,563 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🖼️ update_chat_display: 1 Messages
+2025-11-12 16:15:39,575 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Chat-Display aktualisiert
+2025-11-12 16:15:39,575 - INFO [__main__] - Starte Tkinter Main-Loop...
+2025-11-12 16:15:39,697 - INFO [__main__] - Message-Loop für MainChat gestartet (Tkinter after-basiert)
+2025-11-12 16:15:44,542 - INFO [__main__] - 💾 Auto-Save beim Fenster-Schließen...
+2025-11-12 16:15:44,544 - INFO [__main__] - ✅ Session gespeichert: C:\vcc\veritas\data\sessions\auto_save_MainChat_20251112_161544.json (1 Messages)
+2025-11-12 16:15:44,545 - INFO [__main__] - 🔄 Auto-Save erfolgreich: C:\vcc\veritas\data\sessions\auto_save_MainChat_20251112_161544.json
+2025-11-12 16:15:44,546 - INFO [__main__] - 🗑️ Alte Auto-Save-Datei gelöscht: C:\vcc\veritas\data\sessions\auto_save_MainChat_20251020_115833.json
+2025-11-12 16:15:44,546 - INFO [__main__] - Beende Anwendung...
+2025-11-12 16:15:44,546 - INFO [shared.core.veritas_core] - Alle Threads beendet
+2025-11-12 16:15:44,579 - INFO [__main__] - Anwendung beendet
+2025-11-12 16:15:44,579 - INFO [__main__] - 🏁 Veritas App beendet
+2025-11-13 06:33:29,890 - INFO [__main__] - ============================================================
+2025-11-13 06:33:29,890 - INFO [__main__] - 🚀 STARTE VERITAS APP v3.15.0
+2025-11-13 06:33:29,891 - INFO [__main__] - ============================================================
+2025-11-13 06:33:29,891 - INFO [__main__] - 🌐 Backend-API: http://127.0.0.1:5000/api
+2025-11-13 06:33:29,891 - INFO [__main__] - 🏗️ OOP-Architektur: Multi-Window mit Queue-Threading
+2025-11-13 06:33:29,891 - INFO [__main__] - ============================================================
+2025-11-13 06:33:29,891 - INFO [shared.core.veritas_core] - ThreadManager initialisiert
+2025-11-13 06:33:29,891 - INFO [shared.core.veritas_core] - ✅ VERITAS Core Engine initialisiert
+2025-11-13 06:33:29,891 - INFO [__main__] - ✅ VERITAS Core Engine initialisiert
+2025-11-13 06:33:29,891 - INFO [__main__] - ✅ VERITAS Core Engine eingebunden
+2025-11-13 06:33:29,891 - INFO [__main__] - 🔍 Prüfe Backend Health...
+2025-11-13 06:33:29,899 - INFO [__main__] - ✅ Backend Health: healthy
+2025-11-13 06:33:29,899 - INFO [__main__] - 🔍 Lade Backend Capabilities...
+2025-11-13 06:33:29,902 - INFO [__main__] - ✅ Backend Capabilities geladen:
+2025-11-13 06:33:29,902 - INFO [__main__] -    Query-Modi: rag, hybrid, streaming, agent, ask
+2025-11-13 06:33:29,902 - INFO [__main__] -    ✅ UDS3 v2.0 verfügbar
+2025-11-13 06:33:29,903 - INFO [__main__] -    ✅ Intelligent Pipeline verfügbar
+2025-11-13 06:33:29,903 - INFO [__main__] -    ✅ Streaming verfügbar
+2025-11-13 06:33:29,903 - INFO [__main__] -    📍 Query-Endpoints: 5 verfügbar
+2025-11-13 06:33:29,903 - INFO [__main__] -       -  / api/query
+2025-11-13 06:33:29,903 - INFO [__main__] -       -  / api/query / ask
+2025-11-13 06:33:29,903 - INFO [__main__] -       -  / api/query / rag
+2025-11-13 06:33:29,903 - INFO [__main__] -       -  / api/query / hybrid
+2025-11-13 06:33:29,903 - INFO [__main__] -       -  / api/query / stream
+2025-11-13 06:33:29,903 - INFO [__main__] - VeritasApp v3.15.0 initialisiert
+2025-11-13 06:33:29,903 - INFO [__main__] - ✅ Chat Bubbles UI aktiviert
+2025-11-13 06:33:29,903 - INFO [frontend.services.backend_api_client] - ✅ BackendAPIClient initialisiert: http://127.0.0.1:5000/api
+2025-11-13 06:33:29,904 - INFO [frontend.services.backend_api_client] - ✅ Session erstellt: session_74810bdf12ad
+2025-11-13 06:33:29,904 - INFO [__main__] - ✅ BackendAPIClient für MainChat initialisiert
+2025-11-13 06:33:29,904 - INFO [shared.core.veritas_core] - Queue für Thread MainChat erstellt
+2025-11-13 06:33:29,904 - INFO [backend.services.veritas_streaming_service] - ✅ VeritasStreamingService initialisiert
+2025-11-13 06:33:29,904 - INFO [backend.services.veritas_streaming_service] - 🔗 Streaming Service an Window MainChat gebunden
+2025-11-13 06:33:29,904 - INFO [__main__] - ✅ Streaming-Integration für MainChat aktiviert
+2025-11-13 06:33:29,904 - INFO [__main__] - ChatWindowBase MainChat initialisiert
+2025-11-13 06:33:30,409 - INFO [frontend.services.theme_manager] - ✅ ThemeManager initialisiert: light
+2025-11-13 06:33:30,410 - INFO [__main__] - ✅ ThemeManager initialisiert: light
+2025-11-13 06:33:30,412 - INFO [ui.veritas_ui_chat_bubbles] - ✅ Theme-Farben aktualisiert: 41 Einträge
+2025-11-13 06:33:30,412 - INFO [__main__] - ✅ Theme-Farben in Chat-Bubbles-Modul injiziert
+2025-11-13 06:33:30,413 - INFO [frontend.ui.veritas_ui_syntax] - ✅ SyntaxHighlighter initialisiert (Pygments verfügbar)
+2025-11-13 06:33:30,413 - INFO [frontend.ui.veritas_ui_markdown] - ✅ Syntax-Highlighting aktiviert
+2025-11-13 06:33:30,413 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Modern UI Components initialisiert (Bubbles, IEEE-Citations, Best-Practices)
+2025-11-13 06:33:30,413 - INFO [frontend.services.feedback_api_client] - ✅ FeedbackAPIClientSync initialisiert: http://localhost:5000
+2025-11-13 06:33:30,414 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Feedback API Client initialisiert: http://localhost:5000
+2025-11-13 06:33:30,414 - INFO [frontend.components.error_handler] - ✅ ErrorHandler initialisiert
+2025-11-13 06:33:30,414 - INFO [__main__] - ✅ ErrorHandler initialisiert
+2025-11-13 06:33:30,415 - INFO [frontend.components.scroll_manager] - ✅ ScrollManager initialisiert
+2025-11-13 06:33:30,415 - INFO [__main__] - ✅ ScrollManager initialisiert
+2025-11-13 06:33:30,415 - INFO [__main__] - ✅ TypingIndicator initialisiert
+2025-11-13 06:33:30,418 - INFO [frontend.ui.veritas_ui_markdown] - ✅ Markdown-Tags konfiguriert
+2025-11-13 06:33:30,419 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Chat-Tags konfiguriert (inkl. Sprechblasen-Design + Raw-Response)
+2025-11-13 06:33:30,419 - INFO [__main__] - ✅ Chat Bubbles & UX Best Practices aktiviert (Smooth Scrolling, Shortcuts, Performance)
+2025-11-13 06:33:30,420 - INFO [__main__] - ✅ UI-Module initialisiert (Markdown, SourceLinks, ChatFormatter, DialogManager)
+2025-11-13 06:33:30,442 - INFO [__main__] - 🔄 Lade Frage-Modi für GUI...
+2025-11-13 06:33:30,442 - INFO [__main__] - 🔍 Lade verfügbare Frage-Modi vom API...
+2025-11-13 06:33:30,445 - INFO [__main__] - ✅ 7 Frage-Modi verfügbar: ['hybrid', 'rag', 'streaming', 'agent', 'ask', 'veritas', 'chat']
+2025-11-13 06:33:30,445 - INFO [__main__] - 📋 GUI: 7 Modi geladen: ['🔍 Hybrid Search', 'RAG Query', 'Streaming Query', 'Agent Query', 'Simple Ask', 'Standard RAG', 'Conversational Chat']
+2025-11-13 06:33:30,456 - INFO [__main__] - 📋 Standard-Modus gesetzt: 🔍 Hybrid Search
+2025-11-13 06:33:30,471 - INFO [__main__] - 🔍 Versuche LLM-Modelle von Parent-App zu laden...
+2025-11-13 06:33:30,474 - ERROR [__main__] - ❌ API-Fehler beim Abrufen der Modelle: Status 404
+2025-11-13 06:33:30,475 - INFO [__main__] - ✅ 3 LLM-Modelle aus Parent-App Capabilities
+2025-11-13 06:33:30,476 - INFO [__main__] - 🎯 Default-Modell gesetzt: llama3:latest
+2025-11-13 06:33:30,565 - INFO [__main__] - MainChatWindow erstellt
+2025-11-13 06:33:30,565 - INFO [__main__] - Hauptfenster erstellt
+2025-11-13 06:33:30,566 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🖼️ update_chat_display: 1 Messages
+2025-11-13 06:33:30,575 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Chat-Display aktualisiert
+2025-11-13 06:33:30,575 - INFO [__main__] - Starte Tkinter Main-Loop...
+2025-11-13 06:33:30,676 - INFO [__main__] - Message-Loop für MainChat gestartet (Tkinter after-basiert)
+2025-11-13 06:36:45,311 - INFO [__main__] - 📚 Sende 1 Nachrichten als Kontext
+2025-11-13 06:36:45,312 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🖼️ update_chat_display: 2 Messages
+2025-11-13 06:36:45,312 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Chat-Display aktualisiert
+2025-11-13 06:36:45,325 - INFO [frontend.services.backend_api_client] - 🚀 Sende Query an /query/hybrid (Modus: hybrid)
+2025-11-13 06:37:30,506 - INFO [__main__] - 🔍 Versuche LLM-Modelle von Parent-App zu laden...
+2025-11-13 06:37:30,512 - ERROR [__main__] - ❌ API-Fehler beim Abrufen der Modelle: Status 404
+2025-11-13 06:37:30,512 - INFO [__main__] - ✅ 3 LLM-Modelle aus Parent-App Capabilities
+2025-11-13 06:37:30,512 - INFO [__main__] - 🔄 Modelle erfolgreich aktualisiert: 3 verfügbar
+2025-11-13 06:37:45,329 - ERROR [frontend.services.backend_api_client] - ❌ Query Timeout: ⏱️ Timeout nach 60s
+2025-11-13 06:37:45,329 - ERROR [__main__] - ❌ Query fehlgeschlagen: ⏱️ Timeout nach 60s
+2025-11-13 06:37:45,330 - INFO [frontend.components.error_handler] - ❌ Error angezeigt: api_error
+2025-11-13 06:52:59,840 - INFO [frontend.components.error_handler] - 🔄 Retry Query: test...
+2025-11-13 06:52:59,845 - INFO [__main__] - 📚 Sende 2 Nachrichten als Kontext
+2025-11-13 06:52:59,845 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🖼️ update_chat_display: 4 Messages
+2025-11-13 06:52:59,850 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Chat-Display aktualisiert
+2025-11-13 06:52:59,861 - INFO [frontend.services.backend_api_client] - 🚀 Sende Query an /query/hybrid (Modus: hybrid)
+2025-11-13 06:53:29,230 - INFO [frontend.services.backend_api_client] - ✅ Query erfolgreich: 749 Zeichen, Confidence: 0.00%, Zeit: 29.37s
+2025-11-13 06:53:29,231 - INFO [__main__] - ✅ Query erfolgreich via BackendAPIClient
+2025-11-13 06:53:29,231 - INFO [__main__] - 🔔 _handle_backend_response aufgerufen für MainChat
+2025-11-13 06:53:29,231 - ERROR [__main__] - Fehler in Message-Queue-Verarbeitung MainChat: '>' not supported between instances of 'NoneType' and 'int'
+2025-11-13 10:25:25,533 - INFO [__main__] - 📚 Sende 3 Nachrichten als Kontext
+2025-11-13 10:25:25,534 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🖼️ update_chat_display: 5 Messages
+2025-11-13 10:25:25,539 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Chat-Display aktualisiert
+2025-11-13 10:25:25,558 - INFO [frontend.services.backend_api_client] - 🚀 Sende Query an /query/hybrid (Modus: hybrid)
+2025-11-13 10:25:42,237 - INFO [__main__] - 💾 Auto-Save beim Fenster-Schließen...
+2025-11-13 10:25:42,245 - INFO [__main__] - ✅ Session gespeichert: C:\vcc\veritas\data\sessions\auto_save_MainChat_20251113_102542.json (5 Messages)
+2025-11-13 10:25:42,245 - INFO [__main__] - 🔄 Auto-Save erfolgreich: C:\vcc\veritas\data\sessions\auto_save_MainChat_20251113_102542.json
+2025-11-13 10:25:42,248 - INFO [__main__] - 🗑️ Alte Auto-Save-Datei gelöscht: C:\vcc\veritas\data\sessions\auto_save_MainChat_20251020_160020.json
+2025-11-13 10:25:42,249 - INFO [__main__] - 🗑️ Alte Auto-Save-Datei gelöscht: C:\vcc\veritas\data\sessions\auto_save_MainChat_20251020_122740.json
+2025-11-13 10:25:42,249 - INFO [__main__] - Beende Anwendung...
+2025-11-13 10:25:42,250 - INFO [shared.core.veritas_core] - Alle Threads beendet
+2025-11-13 10:25:42,289 - INFO [__main__] - Anwendung beendet
+2025-11-13 10:25:42,289 - INFO [__main__] - 🏁 Veritas App beendet
+2025-11-15 11:11:03,448 - INFO [__main__] - ============================================================
+2025-11-15 11:11:03,449 - INFO [__main__] - 🚀 STARTE VERITAS APP v3.15.0
+2025-11-15 11:11:03,449 - INFO [__main__] - ============================================================
+2025-11-15 11:11:03,449 - INFO [__main__] - 🌐 Backend-API: http://127.0.0.1:5000/api
+2025-11-15 11:11:03,449 - INFO [__main__] - 🏗️ OOP-Architektur: Multi-Window mit Queue-Threading
+2025-11-15 11:11:03,449 - INFO [__main__] - ============================================================
+2025-11-15 11:11:03,449 - INFO [shared.core.veritas_core] - ThreadManager initialisiert
+2025-11-15 11:11:03,449 - INFO [shared.core.veritas_core] - ✅ VERITAS Core Engine initialisiert
+2025-11-15 11:11:03,450 - INFO [__main__] - ✅ VERITAS Core Engine initialisiert
+2025-11-15 11:11:03,450 - INFO [__main__] - ✅ VERITAS Core Engine eingebunden
+2025-11-15 11:11:03,450 - INFO [__main__] - 🔍 Prüfe Backend Health...
+2025-11-15 11:11:03,458 - INFO [__main__] - ✅ Backend Health: healthy
+2025-11-15 11:11:03,458 - INFO [__main__] - 🔍 Lade Backend Capabilities...
+2025-11-15 11:11:03,461 - INFO [__main__] - ✅ Backend Capabilities geladen:
+2025-11-15 11:11:03,461 - INFO [__main__] -    Query-Modi: rag, hybrid, streaming, agent, ask
+2025-11-15 11:11:03,461 - INFO [__main__] -    ✅ UDS3 v2.0 verfügbar
+2025-11-15 11:11:03,461 - INFO [__main__] -    ✅ Intelligent Pipeline verfügbar
+2025-11-15 11:11:03,461 - INFO [__main__] -    ✅ Streaming verfügbar
+2025-11-15 11:11:03,461 - INFO [__main__] -    📍 Query-Endpoints: 5 verfügbar
+2025-11-15 11:11:03,461 - INFO [__main__] -       -  / api/query
+2025-11-15 11:11:03,461 - INFO [__main__] -       -  / api/query / ask
+2025-11-15 11:11:03,461 - INFO [__main__] -       -  / api/query / rag
+2025-11-15 11:11:03,462 - INFO [__main__] -       -  / api/query / hybrid
+2025-11-15 11:11:03,462 - INFO [__main__] -       -  / api/query / stream
+2025-11-15 11:11:03,462 - INFO [__main__] - VeritasApp v3.15.0 initialisiert
+2025-11-15 11:11:03,462 - INFO [__main__] - ✅ Chat Bubbles UI aktiviert
+2025-11-15 11:11:03,462 - INFO [frontend.services.backend_api_client] - ✅ BackendAPIClient initialisiert: http://127.0.0.1:5000/api
+2025-11-15 11:11:03,462 - INFO [frontend.services.backend_api_client] - ✅ Session erstellt: session_a4bfb4113e8f
+2025-11-15 11:11:03,462 - INFO [__main__] - ✅ BackendAPIClient für MainChat initialisiert
+2025-11-15 11:11:03,463 - INFO [shared.core.veritas_core] - Queue für Thread MainChat erstellt
+2025-11-15 11:11:03,463 - INFO [backend.services.veritas_streaming_service] - ✅ VeritasStreamingService initialisiert
+2025-11-15 11:11:03,463 - INFO [backend.services.veritas_streaming_service] - 🔗 Streaming Service an Window MainChat gebunden
+2025-11-15 11:11:03,463 - INFO [__main__] - ✅ Streaming-Integration für MainChat aktiviert
+2025-11-15 11:11:03,463 - INFO [__main__] - ChatWindowBase MainChat initialisiert
+2025-11-15 11:11:03,951 - INFO [frontend.services.theme_manager] - ✅ ThemeManager initialisiert: light
+2025-11-15 11:11:03,951 - INFO [__main__] - ✅ ThemeManager initialisiert: light
+2025-11-15 11:11:03,953 - INFO [ui.veritas_ui_chat_bubbles] - ✅ Theme-Farben aktualisiert: 41 Einträge
+2025-11-15 11:11:03,953 - INFO [__main__] - ✅ Theme-Farben in Chat-Bubbles-Modul injiziert
+2025-11-15 11:11:03,955 - INFO [frontend.ui.veritas_ui_syntax] - ✅ SyntaxHighlighter initialisiert (Pygments verfügbar)
+2025-11-15 11:11:03,955 - INFO [frontend.ui.veritas_ui_markdown] - ✅ Syntax-Highlighting aktiviert
+2025-11-15 11:11:03,955 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Modern UI Components initialisiert (Bubbles, IEEE-Citations, Best-Practices)
+2025-11-15 11:11:03,955 - INFO [frontend.services.feedback_api_client] - ✅ FeedbackAPIClientSync initialisiert: http://localhost:5000
+2025-11-15 11:11:03,955 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Feedback API Client initialisiert: http://localhost:5000
+2025-11-15 11:11:03,956 - INFO [frontend.components.error_handler] - ✅ ErrorHandler initialisiert
+2025-11-15 11:11:03,956 - INFO [__main__] - ✅ ErrorHandler initialisiert
+2025-11-15 11:11:03,957 - INFO [frontend.components.scroll_manager] - ✅ ScrollManager initialisiert
+2025-11-15 11:11:03,957 - INFO [__main__] - ✅ ScrollManager initialisiert
+2025-11-15 11:11:03,957 - INFO [__main__] - ✅ TypingIndicator initialisiert
+2025-11-15 11:11:03,962 - INFO [frontend.ui.veritas_ui_markdown] - ✅ Markdown-Tags konfiguriert
+2025-11-15 11:11:03,963 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Chat-Tags konfiguriert (inkl. Sprechblasen-Design + Raw-Response)
+2025-11-15 11:11:03,963 - INFO [__main__] - ✅ Chat Bubbles & UX Best Practices aktiviert (Smooth Scrolling, Shortcuts, Performance)
+2025-11-15 11:11:03,963 - INFO [__main__] - ✅ UI-Module initialisiert (Markdown, SourceLinks, ChatFormatter, DialogManager)
+2025-11-15 11:11:03,988 - INFO [__main__] - 🔄 Lade Frage-Modi für GUI...
+2025-11-15 11:11:03,988 - INFO [__main__] - 🔍 Lade verfügbare Frage-Modi vom API...
+2025-11-15 11:11:03,992 - INFO [__main__] - ✅ 7 Frage-Modi verfügbar: ['hybrid', 'rag', 'streaming', 'agent', 'ask', 'veritas', 'chat']
+2025-11-15 11:11:03,992 - INFO [__main__] - 📋 GUI: 7 Modi geladen: ['🔍 Hybrid Search', 'RAG Query', 'Streaming Query', 'Agent Query', 'Simple Ask', 'Standard RAG', 'Conversational Chat']
+2025-11-15 11:11:04,002 - INFO [__main__] - 📋 Standard-Modus gesetzt: 🔍 Hybrid Search
+2025-11-15 11:11:04,015 - INFO [__main__] - 🔍 Versuche LLM-Modelle von Parent-App zu laden...
+2025-11-15 11:11:04,018 - ERROR [__main__] - ❌ API-Fehler beim Abrufen der Modelle: Status 404
+2025-11-15 11:11:04,019 - INFO [__main__] - ✅ 3 LLM-Modelle aus Parent-App Capabilities
+2025-11-15 11:11:04,020 - INFO [__main__] - 🎯 Default-Modell gesetzt: llama3:latest
+2025-11-15 11:11:04,120 - INFO [__main__] - MainChatWindow erstellt
+2025-11-15 11:11:04,120 - INFO [__main__] - Hauptfenster erstellt
+2025-11-15 11:11:04,120 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🖼️ update_chat_display: 1 Messages
+2025-11-15 11:11:04,133 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Chat-Display aktualisiert
+2025-11-15 11:11:04,133 - INFO [__main__] - Starte Tkinter Main-Loop...
+2025-11-15 11:11:04,238 - INFO [__main__] - Message-Loop für MainChat gestartet (Tkinter after-basiert)
+2025-11-15 11:11:45,373 - INFO [__main__] - 💾 Auto-Save beim Fenster-Schließen...
+2025-11-15 11:11:45,378 - INFO [__main__] - ✅ Session gespeichert: C:\vcc\veritas\data\sessions\auto_save_MainChat_20251115_111145.json (1 Messages)
+2025-11-15 11:11:45,378 - INFO [__main__] - 🔄 Auto-Save erfolgreich: C:\vcc\veritas\data\sessions\auto_save_MainChat_20251115_111145.json
+2025-11-15 11:11:45,380 - INFO [__main__] - 🗑️ Alte Auto-Save-Datei gelöscht: C:\vcc\veritas\data\sessions\auto_save_MainChat_20251020_191241.json
+2025-11-15 11:11:45,380 - INFO [__main__] - Beende Anwendung...
+2025-11-15 11:11:45,380 - INFO [shared.core.veritas_core] - Alle Threads beendet
+2025-11-15 11:11:45,406 - INFO [__main__] - Anwendung beendet
+2025-11-15 11:11:45,406 - INFO [__main__] - 🏁 Veritas App beendet
+2025-11-16 08:25:14,411 - INFO [__main__] - ============================================================
+2025-11-16 08:25:14,411 - INFO [__main__] - 🚀 STARTE VERITAS APP v3.15.0
+2025-11-16 08:25:14,411 - INFO [__main__] - ============================================================
+2025-11-16 08:25:14,412 - INFO [__main__] - 🌐 Backend-API: http://127.0.0.1:5000/api
+2025-11-16 08:25:14,412 - INFO [__main__] - 🏗️ OOP-Architektur: Multi-Window mit Queue-Threading
+2025-11-16 08:25:14,412 - INFO [__main__] - ============================================================
+2025-11-16 08:25:14,412 - INFO [shared.core.veritas_core] - ThreadManager initialisiert
+2025-11-16 08:25:14,412 - INFO [shared.core.veritas_core] - ✅ VERITAS Core Engine initialisiert
+2025-11-16 08:25:14,412 - INFO [__main__] - ✅ VERITAS Core Engine initialisiert
+2025-11-16 08:25:14,412 - INFO [__main__] - ✅ VERITAS Core Engine eingebunden
+2025-11-16 08:25:14,412 - INFO [__main__] - 🔍 Prüfe Backend Health...
+2025-11-16 08:25:14,420 - INFO [__main__] - ✅ Backend Health: healthy
+2025-11-16 08:25:14,420 - INFO [__main__] - 🔍 Lade Backend Capabilities...
+2025-11-16 08:25:14,425 - INFO [__main__] - ✅ Backend Capabilities geladen:
+2025-11-16 08:25:14,425 - INFO [__main__] -    Query-Modi: rag, hybrid, streaming, agent, ask
+2025-11-16 08:25:14,425 - INFO [__main__] -    ✅ UDS3 v2.0 verfügbar
+2025-11-16 08:25:14,425 - INFO [__main__] -    ✅ Intelligent Pipeline verfügbar
+2025-11-16 08:25:14,425 - INFO [__main__] -    ✅ Streaming verfügbar
+2025-11-16 08:25:14,425 - INFO [__main__] -    📍 Query-Endpoints: 5 verfügbar
+2025-11-16 08:25:14,425 - INFO [__main__] -       -  / api/query
+2025-11-16 08:25:14,426 - INFO [__main__] -       -  / api/query / ask
+2025-11-16 08:25:14,426 - INFO [__main__] -       -  / api/query / rag
+2025-11-16 08:25:14,426 - INFO [__main__] -       -  / api/query / hybrid
+2025-11-16 08:25:14,426 - INFO [__main__] -       -  / api/query / stream
+2025-11-16 08:25:14,426 - INFO [__main__] - VeritasApp v3.15.0 initialisiert
+2025-11-16 08:25:14,426 - INFO [__main__] - ✅ Chat Bubbles UI aktiviert
+2025-11-16 08:25:14,427 - INFO [frontend.services.backend_api_client] - ✅ BackendAPIClient initialisiert: http://127.0.0.1:5000/api
+2025-11-16 08:25:14,427 - INFO [frontend.services.backend_api_client] - ✅ Session erstellt: session_52f8af34c2dc
+2025-11-16 08:25:14,427 - INFO [__main__] - ✅ BackendAPIClient für MainChat initialisiert
+2025-11-16 08:25:14,427 - INFO [shared.core.veritas_core] - Queue für Thread MainChat erstellt
+2025-11-16 08:25:14,427 - INFO [backend.services.veritas_streaming_service] - ✅ VeritasStreamingService initialisiert
+2025-11-16 08:25:14,427 - INFO [backend.services.veritas_streaming_service] - 🔗 Streaming Service an Window MainChat gebunden
+2025-11-16 08:25:14,427 - INFO [__main__] - ✅ Streaming-Integration für MainChat aktiviert
+2025-11-16 08:25:14,427 - INFO [__main__] - ChatWindowBase MainChat initialisiert
+2025-11-16 08:25:14,967 - INFO [frontend.services.theme_manager] - ✅ ThemeManager initialisiert: light
+2025-11-16 08:25:14,967 - INFO [__main__] - ✅ ThemeManager initialisiert: light
+2025-11-16 08:25:14,969 - INFO [ui.veritas_ui_chat_bubbles] - ✅ Theme-Farben aktualisiert: 41 Einträge
+2025-11-16 08:25:14,969 - INFO [__main__] - ✅ Theme-Farben in Chat-Bubbles-Modul injiziert
+2025-11-16 08:25:14,972 - INFO [frontend.ui.veritas_ui_syntax] - ✅ SyntaxHighlighter initialisiert (Pygments verfügbar)
+2025-11-16 08:25:14,972 - INFO [frontend.ui.veritas_ui_markdown] - ✅ Syntax-Highlighting aktiviert
+2025-11-16 08:25:14,972 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Modern UI Components initialisiert (Bubbles, IEEE-Citations, Best-Practices)
+2025-11-16 08:25:14,972 - INFO [frontend.services.feedback_api_client] - ✅ FeedbackAPIClientSync initialisiert: http://localhost:5000
+2025-11-16 08:25:14,972 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Feedback API Client initialisiert: http://localhost:5000
+2025-11-16 08:25:14,973 - INFO [frontend.components.error_handler] - ✅ ErrorHandler initialisiert
+2025-11-16 08:25:14,973 - INFO [__main__] - ✅ ErrorHandler initialisiert
+2025-11-16 08:25:14,974 - INFO [frontend.components.scroll_manager] - ✅ ScrollManager initialisiert
+2025-11-16 08:25:14,974 - INFO [__main__] - ✅ ScrollManager initialisiert
+2025-11-16 08:25:14,974 - INFO [__main__] - ✅ TypingIndicator initialisiert
+2025-11-16 08:25:14,978 - INFO [frontend.ui.veritas_ui_markdown] - ✅ Markdown-Tags konfiguriert
+2025-11-16 08:25:14,979 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Chat-Tags konfiguriert (inkl. Sprechblasen-Design + Raw-Response)
+2025-11-16 08:25:14,979 - INFO [__main__] - ✅ Chat Bubbles & UX Best Practices aktiviert (Smooth Scrolling, Shortcuts, Performance)
+2025-11-16 08:25:14,979 - INFO [__main__] - ✅ UI-Module initialisiert (Markdown, SourceLinks, ChatFormatter, DialogManager)
+2025-11-16 08:25:15,006 - INFO [__main__] - 🔄 Lade Frage-Modi für GUI...
+2025-11-16 08:25:15,006 - INFO [__main__] - 🔍 Lade verfügbare Frage-Modi vom API...
+2025-11-16 08:25:15,011 - INFO [__main__] - ✅ 7 Frage-Modi verfügbar: ['hybrid', 'rag', 'streaming', 'agent', 'ask', 'veritas', 'chat']
+2025-11-16 08:25:15,011 - INFO [__main__] - 📋 GUI: 7 Modi geladen: ['🔍 Hybrid Search', 'RAG Query', 'Streaming Query', 'Agent Query', 'Simple Ask', 'Standard RAG', 'Conversational Chat']
+2025-11-16 08:25:15,022 - INFO [__main__] - 📋 Standard-Modus gesetzt: 🔍 Hybrid Search
+2025-11-16 08:25:15,038 - INFO [__main__] - 🔍 Versuche LLM-Modelle von Parent-App zu laden...
+2025-11-16 08:25:15,043 - ERROR [__main__] - ❌ API-Fehler beim Abrufen der Modelle: Status 404
+2025-11-16 08:25:15,043 - INFO [__main__] - ✅ 3 LLM-Modelle aus Parent-App Capabilities
+2025-11-16 08:25:15,044 - INFO [__main__] - 🎯 Default-Modell gesetzt: llama3:latest
+2025-11-16 08:25:15,148 - INFO [__main__] - MainChatWindow erstellt
+2025-11-16 08:25:15,148 - INFO [__main__] - Hauptfenster erstellt
+2025-11-16 08:25:15,148 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🖼️ update_chat_display: 1 Messages
+2025-11-16 08:25:15,161 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Chat-Display aktualisiert
+2025-11-16 08:25:15,161 - INFO [__main__] - Starte Tkinter Main-Loop...
+2025-11-16 08:25:15,266 - INFO [__main__] - Message-Loop für MainChat gestartet (Tkinter after-basiert)
+2025-11-16 08:25:22,189 - INFO [__main__] - 📚 Sende 1 Nachrichten als Kontext
+2025-11-16 08:25:22,189 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🖼️ update_chat_display: 2 Messages
+2025-11-16 08:25:22,191 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Chat-Display aktualisiert
+2025-11-16 08:25:22,201 - INFO [frontend.services.backend_api_client] - 🚀 Sende Query an /query/hybrid (Modus: hybrid)
+2025-11-16 08:26:14,543 - INFO [frontend.services.backend_api_client] - ✅ Query erfolgreich: 972 Zeichen, Confidence: 0.00%, Zeit: 52.34s
+2025-11-16 08:26:14,544 - INFO [__main__] - ✅ Query erfolgreich via BackendAPIClient
+2025-11-16 08:26:14,596 - INFO [__main__] - 🔔 _handle_backend_response aufgerufen für MainChat
+2025-11-16 08:26:14,597 - INFO [__main__] - 📝 Assistant message zu chat_messages hinzugefügt. Total: 3
+2025-11-16 08:26:14,603 - INFO [__main__] - 📺 Aktualisiere Chat-Display via window.after()
+2025-11-16 08:26:14,603 - INFO [__main__] - ✅ Chat-Display-Update und Status-Update angefordert
+2025-11-16 08:26:14,604 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🖼️ update_chat_display: 3 Messages
+2025-11-16 08:26:14,606 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🔍 _format_assistant_message() aufgerufen
+2025-11-16 08:26:14,606 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - enable_modern_ui: True
+2025-11-16 08:26:14,606 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - assistant_layout: <frontend.ui.veritas_ui_chat_bubbles.AssistantFullWidthLayout object at 0x000001A48E0582F0>
+2025-11-16 08:26:14,606 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - Bedingung erfüllt: <frontend.ui.veritas_ui_chat_bubbles.AssistantFullWidthLayout object at 0x000001A48E0582F0>
+2025-11-16 08:26:14,606 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Modern UI Pfad wird verwendet!
+2025-11-16 08:26:14,606 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🔍 RAW metadata['sources_metadata']: NOT FOUND
+2025-11-16 08:26:14,606 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🔍 DEBUG - Rendering Modern Layout:
+2025-11-16 08:26:14,607 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - content type: <class 'str'>, length: 998
+2025-11-16 08:26:14,607 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - content preview: **Direkte Antwort:**
+
+Für Ihre Frage "test" gibt es keine direkte Antwort, da keine spezifische Frage gestellt wurde. Wir haben jedoch eine Analyse von verschiedenen Agenten durchgeführt, um Ihnen hil
+2025-11-16 08:26:14,607 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - metadata type: <class 'dict'>
+2025-11-16 08:26:14,607 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - metadata keys: ['model', 'mode', 'duration', 'tokens_used', 'tokens_input', 'tokens_output', 'sources_count', 'sources_retrieved', 'sources_filtered', 'complexity', 'domain', 'agents_involved', 'agents_count', 'stream_enabled', 'progress_updates', 'search_method', 'rerank_applied', 'bm25_results', 'dense_results', 'rrf_fusion', 'quality_score', 'confidence', 'suggestions']
+2025-11-16 08:26:14,607 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - sources count: 0
+2025-11-16 08:26:14,607 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - enable_citations: True
+2025-11-16 08:26:14,607 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - enable_modern_ui: True
+2025-11-16 08:26:14,607 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - assistant_layout exists: True
+2025-11-16 08:27:15,190 - INFO [__main__] - 📚 Sende 3 Nachrichten als Kontext
+2025-11-16 08:27:15,190 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🖼️ update_chat_display: 4 Messages
+2025-11-16 08:27:15,192 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🔍 _format_assistant_message() aufgerufen
+2025-11-16 08:27:15,192 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - enable_modern_ui: True
+2025-11-16 08:27:15,192 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - assistant_layout: <frontend.ui.veritas_ui_chat_bubbles.AssistantFullWidthLayout object at 0x000001A48E0582F0>
+2025-11-16 08:27:15,192 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - Bedingung erfüllt: <frontend.ui.veritas_ui_chat_bubbles.AssistantFullWidthLayout object at 0x000001A48E0582F0>
+2025-11-16 08:27:15,192 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Modern UI Pfad wird verwendet!
+2025-11-16 08:27:15,193 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🔍 RAW metadata['sources_metadata']: NOT FOUND
+2025-11-16 08:27:15,193 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🔍 DEBUG - Rendering Modern Layout:
+2025-11-16 08:27:15,193 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - content type: <class 'str'>, length: 998
+2025-11-16 08:27:15,193 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - content preview: **Direkte Antwort:**
+
+Für Ihre Frage "test" gibt es keine direkte Antwort, da keine spezifische Frage gestellt wurde. Wir haben jedoch eine Analyse von verschiedenen Agenten durchgeführt, um Ihnen hil
+2025-11-16 08:27:15,193 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - metadata type: <class 'dict'>
+2025-11-16 08:27:15,193 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - metadata keys: ['model', 'mode', 'duration', 'tokens_used', 'tokens_input', 'tokens_output', 'sources_count', 'sources_retrieved', 'sources_filtered', 'complexity', 'domain', 'agents_involved', 'agents_count', 'stream_enabled', 'progress_updates', 'search_method', 'rerank_applied', 'bm25_results', 'dense_results', 'rrf_fusion', 'quality_score', 'confidence', 'suggestions']
+2025-11-16 08:27:15,193 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - sources count: 0
+2025-11-16 08:27:15,193 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - enable_citations: True
+2025-11-16 08:27:15,193 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - enable_modern_ui: True
+2025-11-16 08:27:15,193 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - assistant_layout exists: True
+2025-11-16 08:27:15,229 - INFO [frontend.services.backend_api_client] - 🚀 Sende Query an /query/hybrid (Modus: hybrid)
+2025-11-16 08:27:45,858 - INFO [frontend.services.backend_api_client] - ✅ Query erfolgreich: 987 Zeichen, Confidence: 0.00%, Zeit: 30.63s
+2025-11-16 08:27:45,858 - INFO [__main__] - ✅ Query erfolgreich via BackendAPIClient
+2025-11-16 08:27:45,942 - INFO [__main__] - 🔔 _handle_backend_response aufgerufen für MainChat
+2025-11-16 08:27:45,943 - ERROR [__main__] - Fehler in Message-Queue-Verarbeitung MainChat: '>' not supported between instances of 'NoneType' and 'int'
+2025-11-16 09:05:59,479 - INFO [__main__] - 📚 Sende 4 Nachrichten als Kontext
+2025-11-16 09:05:59,479 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🖼️ update_chat_display: 5 Messages
+2025-11-16 09:05:59,481 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🔍 _format_assistant_message() aufgerufen
+2025-11-16 09:05:59,481 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - enable_modern_ui: True
+2025-11-16 09:05:59,482 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - assistant_layout: <frontend.ui.veritas_ui_chat_bubbles.AssistantFullWidthLayout object at 0x000001A48E0582F0>
+2025-11-16 09:05:59,482 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - Bedingung erfüllt: <frontend.ui.veritas_ui_chat_bubbles.AssistantFullWidthLayout object at 0x000001A48E0582F0>
+2025-11-16 09:05:59,482 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Modern UI Pfad wird verwendet!
+2025-11-16 09:05:59,482 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🔍 RAW metadata['sources_metadata']: NOT FOUND
+2025-11-16 09:05:59,482 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🔍 DEBUG - Rendering Modern Layout:
+2025-11-16 09:05:59,482 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - content type: <class 'str'>, length: 998
+2025-11-16 09:05:59,482 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - content preview: **Direkte Antwort:**
+
+Für Ihre Frage "test" gibt es keine direkte Antwort, da keine spezifische Frage gestellt wurde. Wir haben jedoch eine Analyse von verschiedenen Agenten durchgeführt, um Ihnen hil
+2025-11-16 09:05:59,482 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - metadata type: <class 'dict'>
+2025-11-16 09:05:59,482 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - metadata keys: ['model', 'mode', 'duration', 'tokens_used', 'tokens_input', 'tokens_output', 'sources_count', 'sources_retrieved', 'sources_filtered', 'complexity', 'domain', 'agents_involved', 'agents_count', 'stream_enabled', 'progress_updates', 'search_method', 'rerank_applied', 'bm25_results', 'dense_results', 'rrf_fusion', 'quality_score', 'confidence', 'suggestions']
+2025-11-16 09:05:59,483 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - sources count: 0
+2025-11-16 09:05:59,483 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - enable_citations: True
+2025-11-16 09:05:59,483 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - enable_modern_ui: True
+2025-11-16 09:05:59,483 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - assistant_layout exists: True
+2025-11-16 09:05:59,515 - INFO [frontend.services.backend_api_client] - 🚀 Sende Query an /query/hybrid (Modus: hybrid)
+2025-11-16 09:06:25,228 - INFO [frontend.services.backend_api_client] - ✅ Query erfolgreich: 942 Zeichen, Confidence: 0.00%, Zeit: 25.71s
+2025-11-16 09:06:25,229 - INFO [__main__] - ✅ Query erfolgreich via BackendAPIClient
+2025-11-16 09:06:25,321 - INFO [__main__] - 🔔 _handle_backend_response aufgerufen für MainChat
+2025-11-16 09:06:25,321 - INFO [__main__] - 📝 Assistant message zu chat_messages hinzugefügt. Total: 6
+2025-11-16 09:06:25,337 - INFO [__main__] - 📺 Aktualisiere Chat-Display via window.after()
+2025-11-16 09:06:25,337 - INFO [__main__] - ✅ Chat-Display-Update und Status-Update angefordert
+2025-11-16 09:06:25,338 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🖼️ update_chat_display: 6 Messages
+2025-11-16 09:06:25,340 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🔍 _format_assistant_message() aufgerufen
+2025-11-16 09:06:25,340 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - enable_modern_ui: True
+2025-11-16 09:06:25,340 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - assistant_layout: <frontend.ui.veritas_ui_chat_bubbles.AssistantFullWidthLayout object at 0x000001A48E0582F0>
+2025-11-16 09:06:25,340 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - Bedingung erfüllt: <frontend.ui.veritas_ui_chat_bubbles.AssistantFullWidthLayout object at 0x000001A48E0582F0>
+2025-11-16 09:06:25,340 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Modern UI Pfad wird verwendet!
+2025-11-16 09:06:25,340 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🔍 RAW metadata['sources_metadata']: NOT FOUND
+2025-11-16 09:06:25,340 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🔍 DEBUG - Rendering Modern Layout:
+2025-11-16 09:06:25,341 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - content type: <class 'str'>, length: 998
+2025-11-16 09:06:25,341 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - content preview: **Direkte Antwort:**
+
+Für Ihre Frage "test" gibt es keine direkte Antwort, da keine spezifische Frage gestellt wurde. Wir haben jedoch eine Analyse von verschiedenen Agenten durchgeführt, um Ihnen hil
+2025-11-16 09:06:25,341 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - metadata type: <class 'dict'>
+2025-11-16 09:06:25,341 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - metadata keys: ['model', 'mode', 'duration', 'tokens_used', 'tokens_input', 'tokens_output', 'sources_count', 'sources_retrieved', 'sources_filtered', 'complexity', 'domain', 'agents_involved', 'agents_count', 'stream_enabled', 'progress_updates', 'search_method', 'rerank_applied', 'bm25_results', 'dense_results', 'rrf_fusion', 'quality_score', 'confidence', 'suggestions']
+2025-11-16 09:06:25,341 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - sources count: 0
+2025-11-16 09:06:25,341 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - enable_citations: True
+2025-11-16 09:06:25,341 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - enable_modern_ui: True
+2025-11-16 09:06:25,341 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - assistant_layout exists: True
+2025-11-16 09:12:53,533 - INFO [__main__] - 💾 Auto-Save beim Fenster-Schließen...
+2025-11-16 09:12:53,537 - INFO [__main__] - ✅ Session gespeichert: C:\vcc\veritas\data\sessions\auto_save_MainChat_20251116_091253.json (6 Messages)
+2025-11-16 09:12:53,538 - INFO [__main__] - 🔄 Auto-Save erfolgreich: C:\vcc\veritas\data\sessions\auto_save_MainChat_20251116_091253.json
+2025-11-16 09:12:53,539 - INFO [__main__] - 🗑️ Alte Auto-Save-Datei gelöscht: C:\vcc\veritas\data\sessions\auto_save_MainChat_20251022_133407.json
+2025-11-16 09:12:53,540 - INFO [__main__] - Beende Anwendung...
+2025-11-16 09:12:53,540 - INFO [shared.core.veritas_core] - Alle Threads beendet
+2025-11-16 09:12:53,575 - INFO [__main__] - Anwendung beendet
+2025-11-16 09:12:53,575 - INFO [__main__] - 🏁 Veritas App beendet
+2025-11-17 17:38:21,124 - INFO [__main__] - ============================================================
+2025-11-17 17:38:21,124 - INFO [__main__] - 🚀 STARTE VERITAS APP v3.15.0
+2025-11-17 17:38:21,125 - INFO [__main__] - ============================================================
+2025-11-17 17:38:21,125 - INFO [__main__] - 🌐 Backend-API: http://127.0.0.1:5000/api
+2025-11-17 17:38:21,125 - INFO [__main__] - 🏗️ OOP-Architektur: Multi-Window mit Queue-Threading
+2025-11-17 17:38:21,125 - INFO [__main__] - ============================================================
+2025-11-17 17:38:21,125 - INFO [shared.core.veritas_core] - ThreadManager initialisiert
+2025-11-17 17:38:21,125 - INFO [shared.core.veritas_core] - ✅ VERITAS Core Engine initialisiert
+2025-11-17 17:38:21,126 - INFO [__main__] - ✅ VERITAS Core Engine initialisiert
+2025-11-17 17:38:21,126 - INFO [__main__] - ✅ VERITAS Core Engine eingebunden
+2025-11-17 17:38:21,126 - INFO [__main__] - 🔍 Prüfe Backend Health...
+2025-11-17 17:38:21,133 - INFO [__main__] - ✅ Backend Health: healthy
+2025-11-17 17:38:21,133 - INFO [__main__] - 🔍 Lade Backend Capabilities...
+2025-11-17 17:38:21,137 - INFO [__main__] - ✅ Backend Capabilities geladen:
+2025-11-17 17:38:21,137 - INFO [__main__] -    Query-Modi: rag, hybrid, streaming, agent, ask
+2025-11-17 17:38:21,137 - INFO [__main__] -    ✅ UDS3 v2.0 verfügbar
+2025-11-17 17:38:21,137 - INFO [__main__] -    ✅ Intelligent Pipeline verfügbar
+2025-11-17 17:38:21,137 - INFO [__main__] -    ✅ Streaming verfügbar
+2025-11-17 17:38:21,138 - INFO [__main__] -    📍 Query-Endpoints: 5 verfügbar
+2025-11-17 17:38:21,138 - INFO [__main__] -       -  / api/query
+2025-11-17 17:38:21,138 - INFO [__main__] -       -  / api/query / ask
+2025-11-17 17:38:21,138 - INFO [__main__] -       -  / api/query / rag
+2025-11-17 17:38:21,138 - INFO [__main__] -       -  / api/query / hybrid
+2025-11-17 17:38:21,138 - INFO [__main__] -       -  / api/query / stream
+2025-11-17 17:38:21,138 - INFO [__main__] - VeritasApp v3.15.0 initialisiert
+2025-11-17 17:38:21,139 - INFO [__main__] - ✅ Chat Bubbles UI aktiviert
+2025-11-17 17:38:21,139 - INFO [frontend.services.backend_api_client] - ✅ BackendAPIClient initialisiert: http://127.0.0.1:5000/api
+2025-11-17 17:38:21,139 - INFO [frontend.services.backend_api_client] - ✅ Session erstellt: session_660dce44a44f
+2025-11-17 17:38:21,139 - INFO [__main__] - ✅ BackendAPIClient für MainChat initialisiert
+2025-11-17 17:38:21,139 - INFO [shared.core.veritas_core] - Queue für Thread MainChat erstellt
+2025-11-17 17:38:21,139 - INFO [backend.services.veritas_streaming_service] - ✅ VeritasStreamingService initialisiert
+2025-11-17 17:38:21,139 - INFO [backend.services.veritas_streaming_service] - 🔗 Streaming Service an Window MainChat gebunden
+2025-11-17 17:38:21,139 - INFO [__main__] - ✅ Streaming-Integration für MainChat aktiviert
+2025-11-17 17:38:21,140 - INFO [__main__] - ChatWindowBase MainChat initialisiert
+2025-11-17 17:38:21,820 - INFO [frontend.services.theme_manager] - ✅ ThemeManager initialisiert: light
+2025-11-17 17:38:21,821 - INFO [__main__] - ✅ ThemeManager initialisiert: light
+2025-11-17 17:38:21,823 - INFO [ui.veritas_ui_chat_bubbles] - ✅ Theme-Farben aktualisiert: 41 Einträge
+2025-11-17 17:38:21,823 - INFO [__main__] - ✅ Theme-Farben in Chat-Bubbles-Modul injiziert
+2025-11-17 17:38:21,824 - INFO [frontend.ui.veritas_ui_syntax] - ✅ SyntaxHighlighter initialisiert (Pygments verfügbar)
+2025-11-17 17:38:21,824 - INFO [frontend.ui.veritas_ui_markdown] - ✅ Syntax-Highlighting aktiviert
+2025-11-17 17:38:21,824 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Modern UI Components initialisiert (Bubbles, IEEE-Citations, Best-Practices)
+2025-11-17 17:38:21,824 - INFO [frontend.services.feedback_api_client] - ✅ FeedbackAPIClientSync initialisiert: http://localhost:5000
+2025-11-17 17:38:21,825 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Feedback API Client initialisiert: http://localhost:5000
+2025-11-17 17:38:21,825 - INFO [frontend.components.error_handler] - ✅ ErrorHandler initialisiert
+2025-11-17 17:38:21,825 - INFO [__main__] - ✅ ErrorHandler initialisiert
+2025-11-17 17:38:21,826 - INFO [frontend.components.scroll_manager] - ✅ ScrollManager initialisiert
+2025-11-17 17:38:21,826 - INFO [__main__] - ✅ ScrollManager initialisiert
+2025-11-17 17:38:21,826 - INFO [__main__] - ✅ TypingIndicator initialisiert
+2025-11-17 17:38:21,830 - INFO [frontend.ui.veritas_ui_markdown] - ✅ Markdown-Tags konfiguriert
+2025-11-17 17:38:21,831 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Chat-Tags konfiguriert (inkl. Sprechblasen-Design + Raw-Response)
+2025-11-17 17:38:21,832 - INFO [__main__] - ✅ Chat Bubbles & UX Best Practices aktiviert (Smooth Scrolling, Shortcuts, Performance)
+2025-11-17 17:38:21,832 - INFO [__main__] - ✅ UI-Module initialisiert (Markdown, SourceLinks, ChatFormatter, DialogManager)
+2025-11-17 17:38:21,855 - INFO [__main__] - 🔄 Lade Frage-Modi für GUI...
+2025-11-17 17:38:21,855 - INFO [__main__] - 🔍 Lade verfügbare Frage-Modi vom API...
+2025-11-17 17:38:21,860 - INFO [__main__] - ✅ 7 Frage-Modi verfügbar: ['hybrid', 'rag', 'streaming', 'agent', 'ask', 'veritas', 'chat']
+2025-11-17 17:38:21,860 - INFO [__main__] - 📋 GUI: 7 Modi geladen: ['🔍 Hybrid Search', 'RAG Query', 'Streaming Query', 'Agent Query', 'Simple Ask', 'Standard RAG', 'Conversational Chat']
+2025-11-17 17:38:21,870 - INFO [__main__] - 📋 Standard-Modus gesetzt: 🔍 Hybrid Search
+2025-11-17 17:38:21,884 - INFO [__main__] - 🔍 Versuche LLM-Modelle von Parent-App zu laden...
+2025-11-17 17:38:21,888 - ERROR [__main__] - ❌ API-Fehler beim Abrufen der Modelle: Status 404
+2025-11-17 17:38:21,888 - INFO [__main__] - ✅ 3 LLM-Modelle aus Parent-App Capabilities
+2025-11-17 17:38:21,889 - INFO [__main__] - 🎯 Default-Modell gesetzt: llama3:latest
+2025-11-17 17:38:21,980 - INFO [__main__] - MainChatWindow erstellt
+2025-11-17 17:38:21,980 - INFO [__main__] - Hauptfenster erstellt
+2025-11-17 17:38:21,980 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🖼️ update_chat_display: 1 Messages
+2025-11-17 17:38:21,990 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Chat-Display aktualisiert
+2025-11-17 17:38:21,990 - INFO [__main__] - Starte Tkinter Main-Loop...
+2025-11-17 17:38:22,629 - INFO [__main__] - Message-Loop für MainChat gestartet (Tkinter after-basiert)
+2025-11-17 18:07:09,457 - INFO [__main__] - ============================================================
+2025-11-17 18:07:09,457 - INFO [__main__] - 🚀 STARTE VERITAS APP v3.15.0
+2025-11-17 18:07:09,457 - INFO [__main__] - ============================================================
+2025-11-17 18:07:09,457 - INFO [__main__] - 🌐 Backend-API: http://127.0.0.1:5000/api
+2025-11-17 18:07:09,457 - INFO [__main__] - 🏗️ OOP-Architektur: Multi-Window mit Queue-Threading
+2025-11-17 18:07:09,457 - INFO [__main__] - ============================================================
+2025-11-17 18:07:09,457 - INFO [shared.core.veritas_core] - ThreadManager initialisiert
+2025-11-17 18:07:09,457 - INFO [shared.core.veritas_core] - ✅ VERITAS Core Engine initialisiert
+2025-11-17 18:07:09,457 - INFO [__main__] - ✅ VERITAS Core Engine initialisiert
+2025-11-17 18:07:09,458 - INFO [__main__] - ✅ VERITAS Core Engine eingebunden
+2025-11-17 18:07:09,458 - INFO [__main__] - 🔍 Prüfe Backend Health...
+2025-11-17 18:07:09,466 - INFO [__main__] - ✅ Backend Health: healthy
+2025-11-17 18:07:09,466 - INFO [__main__] - 🔍 Lade Backend Capabilities...
+2025-11-17 18:07:09,470 - INFO [__main__] - ✅ Backend Capabilities geladen:
+2025-11-17 18:07:09,470 - INFO [__main__] -    Query-Modi: rag, hybrid, streaming, agent, ask
+2025-11-17 18:07:09,470 - INFO [__main__] -    ✅ UDS3 v2.0 verfügbar
+2025-11-17 18:07:09,470 - INFO [__main__] -    ✅ Intelligent Pipeline verfügbar
+2025-11-17 18:07:09,470 - INFO [__main__] -    ✅ Streaming verfügbar
+2025-11-17 18:07:09,470 - INFO [__main__] -    📍 Query-Endpoints: 5 verfügbar
+2025-11-17 18:07:09,470 - INFO [__main__] -       -  / api/query
+2025-11-17 18:07:09,470 - INFO [__main__] -       -  / api/query / ask
+2025-11-17 18:07:09,470 - INFO [__main__] -       -  / api/query / rag
+2025-11-17 18:07:09,471 - INFO [__main__] -       -  / api/query / hybrid
+2025-11-17 18:07:09,471 - INFO [__main__] -       -  / api/query / stream
+2025-11-17 18:07:09,471 - INFO [__main__] - VeritasApp v3.15.0 initialisiert
+2025-11-17 18:07:09,471 - INFO [__main__] - ✅ Chat Bubbles UI aktiviert
+2025-11-17 18:07:09,471 - INFO [frontend.services.backend_api_client] - ✅ BackendAPIClient initialisiert: http://127.0.0.1:5000/api
+2025-11-17 18:07:09,471 - INFO [frontend.services.backend_api_client] - ✅ Session erstellt: session_c2a875811113
+2025-11-17 18:07:09,471 - INFO [__main__] - ✅ BackendAPIClient für MainChat initialisiert
+2025-11-17 18:07:09,472 - INFO [shared.core.veritas_core] - Queue für Thread MainChat erstellt
+2025-11-17 18:07:09,472 - INFO [backend.services.veritas_streaming_service] - ✅ VeritasStreamingService initialisiert
+2025-11-17 18:07:09,472 - INFO [backend.services.veritas_streaming_service] - 🔗 Streaming Service an Window MainChat gebunden
+2025-11-17 18:07:09,472 - INFO [__main__] - ✅ Streaming-Integration für MainChat aktiviert
+2025-11-17 18:07:09,472 - INFO [__main__] - ChatWindowBase MainChat initialisiert
+2025-11-17 18:07:09,899 - INFO [frontend.services.theme_manager] - ✅ ThemeManager initialisiert: light
+2025-11-17 18:07:09,899 - INFO [__main__] - ✅ ThemeManager initialisiert: light
+2025-11-17 18:07:09,901 - INFO [ui.veritas_ui_chat_bubbles] - ✅ Theme-Farben aktualisiert: 41 Einträge
+2025-11-17 18:07:09,901 - INFO [__main__] - ✅ Theme-Farben in Chat-Bubbles-Modul injiziert
+2025-11-17 18:07:09,903 - INFO [frontend.ui.veritas_ui_syntax] - ✅ SyntaxHighlighter initialisiert (Pygments verfügbar)
+2025-11-17 18:07:09,903 - INFO [frontend.ui.veritas_ui_markdown] - ✅ Syntax-Highlighting aktiviert
+2025-11-17 18:07:09,903 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Modern UI Components initialisiert (Bubbles, IEEE-Citations, Best-Practices)
+2025-11-17 18:07:09,903 - INFO [frontend.services.feedback_api_client] - ✅ FeedbackAPIClientSync initialisiert: http://localhost:5000
+2025-11-17 18:07:09,903 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Feedback API Client initialisiert: http://localhost:5000
+2025-11-17 18:07:09,903 - INFO [frontend.components.error_handler] - ✅ ErrorHandler initialisiert
+2025-11-17 18:07:09,903 - INFO [__main__] - ✅ ErrorHandler initialisiert
+2025-11-17 18:07:09,905 - INFO [frontend.components.scroll_manager] - ✅ ScrollManager initialisiert
+2025-11-17 18:07:09,906 - INFO [__main__] - ✅ ScrollManager initialisiert
+2025-11-17 18:07:09,906 - INFO [__main__] - ✅ TypingIndicator initialisiert
+2025-11-17 18:07:09,909 - INFO [frontend.ui.veritas_ui_markdown] - ✅ Markdown-Tags konfiguriert
+2025-11-17 18:07:09,911 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Chat-Tags konfiguriert (inkl. Sprechblasen-Design + Raw-Response)
+2025-11-17 18:07:09,911 - INFO [__main__] - ✅ Chat Bubbles & UX Best Practices aktiviert (Smooth Scrolling, Shortcuts, Performance)
+2025-11-17 18:07:09,912 - INFO [__main__] - ✅ UI-Module initialisiert (Markdown, SourceLinks, ChatFormatter, DialogManager)
+2025-11-17 18:07:09,935 - INFO [__main__] - 🔄 Lade Frage-Modi für GUI...
+2025-11-17 18:07:09,935 - INFO [__main__] - 🔍 Lade verfügbare Frage-Modi vom API...
+2025-11-17 18:07:09,939 - INFO [__main__] - ✅ 7 Frage-Modi verfügbar: ['hybrid', 'rag', 'streaming', 'agent', 'ask', 'veritas', 'chat']
+2025-11-17 18:07:09,939 - INFO [__main__] - 📋 GUI: 7 Modi geladen: ['🔍 Hybrid Search', 'RAG Query', 'Streaming Query', 'Agent Query', 'Simple Ask', 'Standard RAG', 'Conversational Chat']
+2025-11-17 18:07:09,949 - INFO [__main__] - 📋 Standard-Modus gesetzt: 🔍 Hybrid Search
+2025-11-17 18:07:09,961 - INFO [__main__] - 🔍 Versuche LLM-Modelle von Parent-App zu laden...
+2025-11-17 18:07:09,965 - ERROR [__main__] - ❌ API-Fehler beim Abrufen der Modelle: Status 404
+2025-11-17 18:07:09,966 - INFO [__main__] - ✅ 3 LLM-Modelle aus Parent-App Capabilities
+2025-11-17 18:07:09,967 - INFO [__main__] - 🎯 Default-Modell gesetzt: llama3:latest
+2025-11-17 18:07:10,060 - INFO [__main__] - MainChatWindow erstellt
+2025-11-17 18:07:10,061 - INFO [__main__] - Hauptfenster erstellt
+2025-11-17 18:07:10,061 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🖼️ update_chat_display: 1 Messages
+2025-11-17 18:07:10,075 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Chat-Display aktualisiert
+2025-11-17 18:07:10,075 - INFO [__main__] - Starte Tkinter Main-Loop...
+2025-11-17 18:07:10,187 - INFO [__main__] - Message-Loop für MainChat gestartet (Tkinter after-basiert)
+2025-11-17 18:26:28,039 - INFO [__main__] - 📚 Sende 1 Nachrichten als Kontext
+2025-11-17 18:26:28,039 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🖼️ update_chat_display: 2 Messages
+2025-11-17 18:26:28,040 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Chat-Display aktualisiert
+2025-11-17 18:26:28,052 - INFO [frontend.services.backend_api_client] - 🚀 Sende Query an /query/hybrid (Modus: hybrid)
+2025-11-17 18:27:19,936 - INFO [frontend.services.backend_api_client] - ✅ Query erfolgreich: 850 Zeichen, Confidence: 0.00%, Zeit: 51.88s
+2025-11-17 18:27:19,936 - INFO [__main__] - ✅ Query erfolgreich via BackendAPIClient
+2025-11-17 18:27:20,033 - INFO [__main__] - 🔔 _handle_backend_response aufgerufen für MainChat
+2025-11-17 18:27:20,034 - ERROR [__main__] - Fehler in Message-Queue-Verarbeitung MainChat: '>' not supported between instances of 'NoneType' and 'int'
+2025-11-17 20:26:11,409 - INFO [__main__] - 💾 Auto-Save beim Fenster-Schließen...
+2025-11-17 20:26:11,411 - INFO [__main__] - ✅ Session gespeichert: C:\vcc\veritas\data\sessions\auto_save_MainChat_20251117_202611.json (2 Messages)
+2025-11-17 20:26:11,411 - INFO [__main__] - 🔄 Auto-Save erfolgreich: C:\vcc\veritas\data\sessions\auto_save_MainChat_20251117_202611.json
+2025-11-17 20:26:11,412 - INFO [__main__] - 🗑️ Alte Auto-Save-Datei gelöscht: C:\vcc\veritas\data\sessions\auto_save_MainChat_20251112_161544.json
+2025-11-17 20:26:11,413 - INFO [__main__] - Beende Anwendung...
+2025-11-17 20:26:11,413 - INFO [shared.core.veritas_core] - Alle Threads beendet
+2025-11-17 20:26:11,441 - INFO [__main__] - Anwendung beendet
+2025-11-17 20:26:11,441 - INFO [__main__] - 🏁 Veritas App beendet
+2025-11-18 14:23:39,325 - INFO [__main__] - ============================================================
+2025-11-18 14:23:39,325 - INFO [__main__] - 🚀 STARTE VERITAS APP v3.15.0
+2025-11-18 14:23:39,325 - INFO [__main__] - ============================================================
+2025-11-18 14:23:39,325 - INFO [__main__] - 🌐 Backend-API: http://127.0.0.1:5000/api
+2025-11-18 14:23:39,325 - INFO [__main__] - 🏗️ OOP-Architektur: Multi-Window mit Queue-Threading
+2025-11-18 14:23:39,325 - INFO [__main__] - ============================================================
+2025-11-18 14:23:39,325 - INFO [shared.core.veritas_core] - ThreadManager initialisiert
+2025-11-18 14:23:39,326 - INFO [shared.core.veritas_core] - ✅ VERITAS Core Engine initialisiert
+2025-11-18 14:23:39,326 - INFO [__main__] - ✅ VERITAS Core Engine initialisiert
+2025-11-18 14:23:39,326 - INFO [__main__] - ✅ VERITAS Core Engine eingebunden
+2025-11-18 14:23:39,326 - INFO [__main__] - 🔍 Prüfe Backend Health...
+2025-11-18 14:23:39,333 - INFO [__main__] - ✅ Backend Health: healthy
+2025-11-18 14:23:39,333 - INFO [__main__] - 🔍 Lade Backend Capabilities...
+2025-11-18 14:23:39,337 - INFO [__main__] - ✅ Backend Capabilities geladen:
+2025-11-18 14:23:39,337 - INFO [__main__] -    Query-Modi: rag, hybrid, streaming, agent, ask
+2025-11-18 14:23:39,337 - INFO [__main__] -    ✅ UDS3 v2.0 verfügbar
+2025-11-18 14:23:39,337 - INFO [__main__] -    ✅ Intelligent Pipeline verfügbar
+2025-11-18 14:23:39,337 - INFO [__main__] -    ✅ Streaming verfügbar
+2025-11-18 14:23:39,337 - INFO [__main__] -    📍 Query-Endpoints: 5 verfügbar
+2025-11-18 14:23:39,337 - INFO [__main__] -       -  / api/query
+2025-11-18 14:23:39,337 - INFO [__main__] -       -  / api/query / ask
+2025-11-18 14:23:39,337 - INFO [__main__] -       -  / api/query / rag
+2025-11-18 14:23:39,337 - INFO [__main__] -       -  / api/query / hybrid
+2025-11-18 14:23:39,338 - INFO [__main__] -       -  / api/query / stream
+2025-11-18 14:23:39,338 - INFO [__main__] - VeritasApp v3.15.0 initialisiert
+2025-11-18 14:23:39,338 - INFO [__main__] - ✅ Chat Bubbles UI aktiviert
+2025-11-18 14:23:39,338 - INFO [frontend.services.backend_api_client] - ✅ BackendAPIClient initialisiert: http://127.0.0.1:5000/api
+2025-11-18 14:23:39,338 - INFO [frontend.services.backend_api_client] - ✅ Session erstellt: session_78795f9b622b
+2025-11-18 14:23:39,338 - INFO [__main__] - ✅ BackendAPIClient für MainChat initialisiert
+2025-11-18 14:23:39,338 - INFO [shared.core.veritas_core] - Queue für Thread MainChat erstellt
+2025-11-18 14:23:39,338 - INFO [backend.services.veritas_streaming_service] - ✅ VeritasStreamingService initialisiert
+2025-11-18 14:23:39,339 - INFO [backend.services.veritas_streaming_service] - 🔗 Streaming Service an Window MainChat gebunden
+2025-11-18 14:23:39,339 - INFO [__main__] - ✅ Streaming-Integration für MainChat aktiviert
+2025-11-18 14:23:39,339 - INFO [__main__] - ChatWindowBase MainChat initialisiert
+2025-11-18 14:23:39,830 - INFO [frontend.services.theme_manager] - ✅ ThemeManager initialisiert: light
+2025-11-18 14:23:39,830 - INFO [__main__] - ✅ ThemeManager initialisiert: light
+2025-11-18 14:23:39,832 - INFO [ui.veritas_ui_chat_bubbles] - ✅ Theme-Farben aktualisiert: 41 Einträge
+2025-11-18 14:23:39,832 - INFO [__main__] - ✅ Theme-Farben in Chat-Bubbles-Modul injiziert
+2025-11-18 14:23:39,833 - INFO [frontend.ui.veritas_ui_syntax] - ✅ SyntaxHighlighter initialisiert (Pygments verfügbar)
+2025-11-18 14:23:39,834 - INFO [frontend.ui.veritas_ui_markdown] - ✅ Syntax-Highlighting aktiviert
+2025-11-18 14:23:39,834 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Modern UI Components initialisiert (Bubbles, IEEE-Citations, Best-Practices)
+2025-11-18 14:23:39,834 - INFO [frontend.services.feedback_api_client] - ✅ FeedbackAPIClientSync initialisiert: http://localhost:5000
+2025-11-18 14:23:39,834 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Feedback API Client initialisiert: http://localhost:5000
+2025-11-18 14:23:39,834 - INFO [frontend.components.error_handler] - ✅ ErrorHandler initialisiert
+2025-11-18 14:23:39,834 - INFO [__main__] - ✅ ErrorHandler initialisiert
+2025-11-18 14:23:39,836 - INFO [frontend.components.scroll_manager] - ✅ ScrollManager initialisiert
+2025-11-18 14:23:39,836 - INFO [__main__] - ✅ ScrollManager initialisiert
+2025-11-18 14:23:39,836 - INFO [__main__] - ✅ TypingIndicator initialisiert
+2025-11-18 14:23:39,840 - INFO [frontend.ui.veritas_ui_markdown] - ✅ Markdown-Tags konfiguriert
+2025-11-18 14:23:39,841 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Chat-Tags konfiguriert (inkl. Sprechblasen-Design + Raw-Response)
+2025-11-18 14:23:39,842 - INFO [__main__] - ✅ Chat Bubbles & UX Best Practices aktiviert (Smooth Scrolling, Shortcuts, Performance)
+2025-11-18 14:23:39,842 - INFO [__main__] - ✅ UI-Module initialisiert (Markdown, SourceLinks, ChatFormatter, DialogManager)
+2025-11-18 14:23:39,864 - INFO [__main__] - 🔄 Lade Frage-Modi für GUI...
+2025-11-18 14:23:39,864 - INFO [__main__] - 🔍 Lade verfügbare Frage-Modi vom API...
+2025-11-18 14:23:39,868 - INFO [__main__] - ✅ 7 Frage-Modi verfügbar: ['hybrid', 'rag', 'streaming', 'agent', 'ask', 'veritas', 'chat']
+2025-11-18 14:23:39,868 - INFO [__main__] - 📋 GUI: 7 Modi geladen: ['🔍 Hybrid Search', 'RAG Query', 'Streaming Query', 'Agent Query', 'Simple Ask', 'Standard RAG', 'Conversational Chat']
+2025-11-18 14:23:39,879 - INFO [__main__] - 📋 Standard-Modus gesetzt: 🔍 Hybrid Search
+2025-11-18 14:23:39,892 - INFO [__main__] - 🔍 Versuche LLM-Modelle von Parent-App zu laden...
+2025-11-18 14:23:39,897 - ERROR [__main__] - ❌ API-Fehler beim Abrufen der Modelle: Status 404
+2025-11-18 14:23:39,897 - INFO [__main__] - ✅ 3 LLM-Modelle aus Parent-App Capabilities
+2025-11-18 14:23:39,898 - INFO [__main__] - 🎯 Default-Modell gesetzt: llama3:latest
+2025-11-18 14:23:39,987 - INFO [__main__] - MainChatWindow erstellt
+2025-11-18 14:23:39,987 - INFO [__main__] - Hauptfenster erstellt
+2025-11-18 14:23:39,987 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🖼️ update_chat_display: 1 Messages
+2025-11-18 14:23:39,998 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Chat-Display aktualisiert
+2025-11-18 14:23:39,998 - INFO [__main__] - Starte Tkinter Main-Loop...
+2025-11-18 14:23:40,133 - INFO [__main__] - Message-Loop für MainChat gestartet (Tkinter after-basiert)
+2025-11-18 14:24:09,920 - INFO [__main__] - 📚 Sende 1 Nachrichten als Kontext
+2025-11-18 14:24:09,920 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🖼️ update_chat_display: 2 Messages
+2025-11-18 14:24:09,921 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Chat-Display aktualisiert
+2025-11-18 14:24:09,932 - INFO [frontend.services.backend_api_client] - 🚀 Sende Query an /query/hybrid (Modus: hybrid)
+2025-11-18 14:25:00,690 - INFO [frontend.services.backend_api_client] - ✅ Query erfolgreich: 1030 Zeichen, Confidence: 0.00%, Zeit: 50.76s
+2025-11-18 14:25:00,690 - INFO [__main__] - ✅ Query erfolgreich via BackendAPIClient
+2025-11-18 14:25:00,781 - INFO [__main__] - 🔔 _handle_backend_response aufgerufen für MainChat
+2025-11-18 14:25:00,781 - INFO [__main__] - 📝 Assistant message zu chat_messages hinzugefügt. Total: 3
+2025-11-18 14:25:00,787 - INFO [__main__] - 📺 Aktualisiere Chat-Display via window.after()
+2025-11-18 14:25:00,788 - INFO [__main__] - ✅ Chat-Display-Update und Status-Update angefordert
+2025-11-18 14:25:00,788 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🖼️ update_chat_display: 3 Messages
+2025-11-18 14:25:00,789 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🔍 _format_assistant_message() aufgerufen
+2025-11-18 14:25:00,789 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - enable_modern_ui: True
+2025-11-18 14:25:00,789 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - assistant_layout: <frontend.ui.veritas_ui_chat_bubbles.AssistantFullWidthLayout object at 0x000001EA0E964C20>
+2025-11-18 14:25:00,790 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - Bedingung erfüllt: <frontend.ui.veritas_ui_chat_bubbles.AssistantFullWidthLayout object at 0x000001EA0E964C20>
+2025-11-18 14:25:00,790 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Modern UI Pfad wird verwendet!
+2025-11-18 14:25:00,790 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🔍 RAW metadata['sources_metadata']: NOT FOUND
+2025-11-18 14:25:00,790 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🔍 DEBUG - Rendering Modern Layout:
+2025-11-18 14:25:00,790 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - content type: <class 'str'>, length: 1056
+2025-11-18 14:25:00,790 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - content preview: **Direkte Antwort:**
+Ich sehe, dass Sie eine Analyse durchgeführt haben. Ich kann Ihnen sagen, dass die EnvironmentalAgent, ChemicalDataAgent und TechnicalStandardsAgent alle ihre Analysen erfolgreich
+2025-11-18 14:25:00,790 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - metadata type: <class 'dict'>
+2025-11-18 14:25:00,790 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - metadata keys: ['model', 'mode', 'duration', 'tokens_used', 'tokens_input', 'tokens_output', 'sources_count', 'sources_retrieved', 'sources_filtered', 'complexity', 'domain', 'agents_involved', 'agents_count', 'stream_enabled', 'progress_updates', 'search_method', 'rerank_applied', 'bm25_results', 'dense_results', 'rrf_fusion', 'quality_score', 'confidence', 'suggestions']
+2025-11-18 14:25:00,790 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - sources count: 0
+2025-11-18 14:25:00,790 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - enable_citations: True
+2025-11-18 14:25:00,790 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - enable_modern_ui: True
+2025-11-18 14:25:00,791 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - assistant_layout exists: True
+2025-11-18 14:25:00,936 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Chat-Display aktualisiert
+2025-11-18 14:29:39,113 - INFO [__main__] - 📚 Sende 3 Nachrichten als Kontext
+2025-11-18 14:29:39,114 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🖼️ update_chat_display: 4 Messages
+2025-11-18 14:29:39,120 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🔍 _format_assistant_message() aufgerufen
+2025-11-18 14:29:39,120 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - enable_modern_ui: True
+2025-11-18 14:29:39,120 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - assistant_layout: <frontend.ui.veritas_ui_chat_bubbles.AssistantFullWidthLayout object at 0x000001EA0E964C20>
+2025-11-18 14:29:39,120 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - Bedingung erfüllt: <frontend.ui.veritas_ui_chat_bubbles.AssistantFullWidthLayout object at 0x000001EA0E964C20>
+2025-11-18 14:29:39,120 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Modern UI Pfad wird verwendet!
+2025-11-18 14:29:39,121 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🔍 RAW metadata['sources_metadata']: NOT FOUND
+2025-11-18 14:29:39,121 - INFO [frontend.ui.veritas_ui_chat_formatter] - 🔍 DEBUG - Rendering Modern Layout:
+2025-11-18 14:29:39,121 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - content type: <class 'str'>, length: 1056
+2025-11-18 14:29:39,121 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - content preview: **Direkte Antwort:**
+Ich sehe, dass Sie eine Analyse durchgeführt haben. Ich kann Ihnen sagen, dass die EnvironmentalAgent, ChemicalDataAgent und TechnicalStandardsAgent alle ihre Analysen erfolgreich
+2025-11-18 14:29:39,121 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - metadata type: <class 'dict'>
+2025-11-18 14:29:39,121 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - metadata keys: ['model', 'mode', 'duration', 'tokens_used', 'tokens_input', 'tokens_output', 'sources_count', 'sources_retrieved', 'sources_filtered', 'complexity', 'domain', 'agents_involved', 'agents_count', 'stream_enabled', 'progress_updates', 'search_method', 'rerank_applied', 'bm25_results', 'dense_results', 'rrf_fusion', 'quality_score', 'confidence', 'suggestions']
+2025-11-18 14:29:39,121 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - sources count: 0
+2025-11-18 14:29:39,121 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - enable_citations: True
+2025-11-18 14:29:39,121 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - enable_modern_ui: True
+2025-11-18 14:29:39,121 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - assistant_layout exists: True
+2025-11-18 14:29:39,126 - INFO [frontend.ui.veritas_ui_chat_formatter] - ✅ Chat-Display aktualisiert
+2025-11-18 14:29:39,148 - INFO [frontend.services.backend_api_client] - 🚀 Sende Query an /query/hybrid (Modus: hybrid)
+2025-11-18 14:30:12,538 - INFO [frontend.services.backend_api_client] - ✅ Query erfolgreich: 822 Zeichen, Confidence: 0.00%, Zeit: 33.39s
+2025-11-18 14:30:12,538 - INFO [__main__] - ✅ Query erfolgreich via BackendAPIClient
+2025-11-18 14:30:12,636 - INFO [__main__] - 🔔 _handle_backend_response aufgerufen für MainChat
+2025-11-18 14:30:12,636 - ERROR [__main__] - Fehler in Message-Queue-Verarbeitung MainChat: '>' not supported between instances of 'NoneType' and 'int'

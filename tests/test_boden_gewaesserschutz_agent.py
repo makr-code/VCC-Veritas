@@ -13,15 +13,18 @@ Author: VERITAS Development Team
 Date: 2025-10-16
 """
 
-import sys
 import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import sys
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from backend.agents.veritas_api_agent_boden_gewaesserschutz import BodenGewaesserschutzAgent
+
 
 def print_result(result_type, message):
     symbols = {"PASS": "✅", "FAIL": "❌", "INFO": "ℹ️", "WARN": "⚠️"}
     print(f"  {symbols.get(result_type, '•')} {message}")
+
 
 def test_initialization():
     print("\n=== Test: Initialisierung ===")
@@ -35,6 +38,7 @@ def test_initialization():
     except Exception as e:
         print_result("FAIL", f"Fehler: {e}")
         return False
+
 
 def test_query_capabilities():
     print("\n=== Test: Query für Capabilities ===")
@@ -52,17 +56,21 @@ def test_query_capabilities():
     print(f"  Gesamt: {passed}/{len(agent.capabilities)} Capabilities erfolgreich")
     return failed == 0
 
+
 def test_fallback_query():
     print("\n=== Test: Fallback-Query ===")
     agent = BodenGewaesserschutzAgent()
     query = "BBodSchG Sanierung"
     result = agent.query(query)
     if result["success"] and len(result["results"]) > 0:
-        print_result("PASS", f"Fallback-Query '{query}' → {len(result['results'])} Ergebnisse (Konfidenz: {result['confidence']})")
+        print_result(
+            "PASS", f"Fallback-Query '{query}' → {len(result['results'])} Ergebnisse (Konfidenz: {result['confidence']})"
+        )
         return True
     else:
         print_result("FAIL", f"Fallback-Query '{query}' → Keine Ergebnisse")
         return False
+
 
 def test_get_info():
     print("\n=== Test: get_info() ===")
@@ -74,6 +82,7 @@ def test_get_info():
     else:
         print_result("FAIL", "get_info() liefert falsche Daten")
         return False
+
 
 def run_all_tests():
     print("\n==============================")
@@ -102,6 +111,7 @@ def run_all_tests():
         print_result("PASS", "ALLE TESTS BESTANDEN!")
     else:
         print_result("FAIL", f"{failed} Test(s) fehlgeschlagen")
+
 
 if __name__ == "__main__":
     run_all_tests()

@@ -1,8 +1,8 @@
 # PKI Security Architecture Analysis
 
-**Datum:** 13. Oktober 2025  
-**Status:** ✅ **READY FOR mTLS IMPLEMENTATION**  
-**Analyst:** GitHub Copilot  
+**Datum:** 13. Oktober 2025
+**Status:** ✅ **READY FOR mTLS IMPLEMENTATION**
+**Analyst:** GitHub Copilot
 
 ---
 
@@ -284,13 +284,13 @@ Additional Features:
    - Create SSL context with ca_certs
    - Set verify_mode = ssl.CERT_REQUIRED
    - Load server cert + key
-   
+
 2. **Client Certificate Validation:**
    - Extract cert from request.client
    - Validate against Root CA
    - Check not_valid_before/after
    - Verify issuer = VCC/VERITAS CA
-   
+
 3. **Service Whitelist:**
    - Define allowed service CNs
    - Map CN to service identity
@@ -375,16 +375,16 @@ def create_mtls_ssl_context(
 ) -> ssl.SSLContext:
     """
     Create SSL context for mTLS.
-    
+
     Args:
         server_cert: Path to server certificate (PEM)
         server_key: Path to server private key (PEM)
         ca_cert: Path to CA certificate for client validation (PEM)
         require_client_cert: Whether to require client certificates
-    
+
     Returns:
         Configured SSL context
-    
+
     Example:
         >>> context = create_mtls_ssl_context(
         ...     "ca_storage/server_cert.pem",
@@ -396,25 +396,25 @@ def create_mtls_ssl_context(
     """
     # Create SSL context (TLS 1.2 + TLS 1.3)
     context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-    
+
     # Load server certificate and key
     context.load_cert_chain(server_cert, server_key)
-    
+
     # Load CA certificate for client validation
     context.load_verify_locations(ca_cert)
-    
+
     # Client certificate mode
     if require_client_cert:
         context.verify_mode = ssl.CERT_REQUIRED
     else:
         context.verify_mode = ssl.CERT_OPTIONAL
-    
+
     # Set secure ciphers (TLS 1.2 + TLS 1.3)
     context.set_ciphers('ECDHE+AESGCM:ECDHE+CHACHA20:DHE+AESGCM:DHE+CHACHA20:!aNULL:!MD5:!DSS')
-    
+
     # Enable hostname checking (for server certs)
     # context.check_hostname = False  # Disable for local development
-    
+
     return context
 ```
 
@@ -436,7 +436,7 @@ logger = logging.getLogger(__name__)
 class MTLSValidationMiddleware(BaseHTTPMiddleware):
     """
     FastAPI middleware for mTLS client certificate validation.
-    
+
     Features:
     - Extract client certificate from TLS connection
     - Validate against Root CA
@@ -445,12 +445,12 @@ class MTLSValidationMiddleware(BaseHTTPMiddleware):
     - Add certificate info to request.state
     - Whitelist allowed services
     """
-    
+
     def __init__(self, app, ca_service: CAService, cert_manager: CertificateManager):
         super().__init__(app)
         self.ca_service = ca_service
         self.cert_manager = cert_manager
-        
+
         # Allowed service CNs (whitelist)
         self.allowed_services = {
             'veritas-client',
@@ -459,26 +459,26 @@ class MTLSValidationMiddleware(BaseHTTPMiddleware):
             'admin-client',
             'test-client'  # For development/testing
         }
-    
+
     async def dispatch(self, request: Request, call_next):
         # Skip mTLS validation for health checks
         if request.url.path in ['/health', '/api/v1/health']:
             return await call_next(request)
-        
+
         # Extract client certificate
         client_cert_pem = request.scope.get('client')
-        
+
         if not client_cert_pem:
             logger.warning(f"No client certificate provided for {request.url.path}")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Client certificate required"
             )
-        
+
         try:
             # Parse certificate
             cert = x509.load_pem_x509_certificate(client_cert_pem)
-            
+
             # Validate certificate
             if not self._validate_client_certificate(cert):
                 logger.warning(f"Invalid client certificate: {cert.subject}")
@@ -486,71 +486,71 @@ class MTLSValidationMiddleware(BaseHTTPMiddleware):
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail="Invalid client certificate"
                 )
-            
+
             # Add certificate info to request state
             request.state.client_certificate = cert
             request.state.client_service = self._extract_service_name(cert)
             request.state.client_cn = self._extract_cn(cert)
-            
+
             logger.info(f"mTLS validation successful for service: {request.state.client_service}")
-            
+
         except Exception as e:
             logger.error(f"Certificate validation error: {e}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Certificate validation failed"
             )
-        
+
         return await call_next(request)
-    
+
     def _validate_client_certificate(self, certificate: x509.Certificate) -> bool:
         """Validate client certificate"""
         try:
             # 1. Extract service name
             service_name = self._extract_service_name(certificate)
-            
+
             # 2. Check whitelist
             if service_name not in self.allowed_services:
                 logger.warning(f"Service not in whitelist: {service_name}")
                 return False
-            
+
             # 3. Validate dates
             from datetime import datetime, timezone
             now = datetime.now(timezone.utc)
-            
+
             if now < certificate.not_valid_before or now > certificate.not_valid_after:
                 logger.warning(f"Certificate expired or not yet valid")
                 return False
-            
+
             # 4. Validate issuer (must be VERITAS CA)
             issuer_org = self._extract_issuer_org(certificate)
             if issuer_org != 'VERITAS Framework':
                 logger.warning(f"Invalid issuer: {issuer_org}")
                 return False
-            
+
             # 5. Check revocation status
             serial = str(certificate.serial_number)
             if self.cert_manager.is_revoked(serial):
                 logger.warning(f"Certificate revoked: {serial}")
                 return False
-            
+
             return True
-        
+
         except Exception as e:
             logger.error(f"Certificate validation failed: {e}")
             return False
-    
+
     def _extract_service_name(self, certificate: x509.Certificate) -> str:
         """Extract service name from CN"""
         for attr in certificate.subject:
             if attr.oid == NameOID.COMMON_NAME:
                 return attr.value
         return 'unknown'
-    
+
     def _extract_cn(self, certificate: x509.Certificate) -> str:
         """Extract Common Name"""
         return self._extract_service_name(certificate)
-    
+
     def _extract_issuer_org(self, certificate: x509.Certificate) -> str:
         """Extract issuer organization"""
         for attr in certificate.issuer:
@@ -598,7 +598,7 @@ if __name__ == "__main__":
         server_key="ca_storage/server_key.pem",
         ca_cert="ca_storage/ca_certificates/root_ca.pem"
     )
-    
+
     # Run with mTLS
     uvicorn.run(
         app,
@@ -718,7 +718,7 @@ All core components are in place:
 
 ---
 
-**Report Generated:** 13. Oktober 2025  
-**Version:** 1.0  
-**Status:** ✅ READY FOR IMPLEMENTATION  
+**Report Generated:** 13. Oktober 2025
+**Version:** 1.0
+**Status:** ✅ READY FOR IMPLEMENTATION
 **Rating:** ⭐⭐⭐⭐⭐ (5/5 - Excellent Preparation)

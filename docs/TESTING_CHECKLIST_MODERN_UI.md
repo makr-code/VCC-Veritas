@@ -1,8 +1,8 @@
 # 🧪 VERITAS Modern UI - Testing Checklist
 
-**Datum:** 17. Oktober 2025, 21:56 Uhr  
-**Version:** 3.16.0  
-**Tester:** _________________  
+**Datum:** 17. Oktober 2025, 21:56 Uhr
+**Version:** 3.16.0
+**Tester:** _________________
 **Status:** ⏳ In Bearbeitung
 
 ---
@@ -328,10 +328,10 @@ enable_modern_ui = False
 - [ ] Keine Crashes/Freezes beobachtet
 - [ ] UX-Feedback positiv
 
-**Tester Unterschrift:** _____________________  
+**Tester Unterschrift:** _____________________
 **Datum:** _____________________
 
-**Lead Developer Freigabe:** _____________________  
+**Lead Developer Freigabe:** _____________________
 **Datum:** _____________________
 
 ---

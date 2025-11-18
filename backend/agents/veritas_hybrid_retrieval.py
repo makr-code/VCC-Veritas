@@ -36,7 +36,7 @@ import asyncio
 import logging
 import time
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, cast
 
 logger = logging.getLogger(__name__)
 
@@ -103,10 +103,13 @@ class HybridRetrievalConfig:
     
     # Fallback-Verhalten
     fallback_to_dense: bool = True  # Fallback auf Dense wenn Sparse fehlt
+<<<<<<< Updated upstream
     enable_fusion: bool = True  # RRF-Fusion aktivieren
     
     # Fallback-Verhalten
     fallback_to_dense: bool = True  # Fallback auf Dense wenn Sparse fehlt
+=======
+>>>>>>> Stashed changes
 
 
 @dataclass
@@ -277,7 +280,15 @@ class HybridRetriever:
         enable_query_expansion = enable_query_expansion if enable_query_expansion is not None else self.config.enable_query_expansion
         
         start_time = time.time()
+<<<<<<< Updated upstream
         
+=======
+
+        # Normalize optional params to well-typed dicts for mypy
+        dense_params_local: Dict[str, Any] = dense_params or {}
+        sparse_params_local: Dict[str, Any] = sparse_params or {}
+
+>>>>>>> Stashed changes
         # === QUERY EXPANSION (Optional) ===
         queries_to_search = [query]  # Original Query
         query_expansion_applied = False
@@ -306,39 +317,52 @@ class HybridRetriever:
         
         # === MULTI-QUERY RETRIEVAL ===
         # Für jede Query: Dense + Sparse Retrieval
+<<<<<<< Updated upstream
         all_dense_results = []
         all_sparse_results = []
         
+=======
+        all_dense_results: List[Dict[str, Any]] = []
+        all_sparse_results: List[Dict[str, Any]] = []
+
+>>>>>>> Stashed changes
         for q in queries_to_search:
             # Parallel Retrieval: Dense + Sparse
             tasks = []
             
             # Dense Retrieval (immer)
-            dense_task = self._retrieve_dense(q, dense_params or {})
+            dense_task = self._retrieve_dense(q, dense_params_local)
             tasks.append(dense_task)
             
             # Sparse Retrieval (optional)
             if enable_sparse and self._sparse_available:
-                sparse_task = self._retrieve_sparse(q, sparse_params or {})
+                sparse_task = self._retrieve_sparse(q, sparse_params_local)
                 tasks.append(sparse_task)
             
             # Parallel ausführen
             results = await asyncio.gather(*tasks, return_exceptions=True)
             
             # Extract Dense Results
-            dense_results = results[0] if not isinstance(results[0], Exception) else []
             if isinstance(results[0], Exception):
                 logger.error(f"❌ Dense Retrieval fehler für '{q[:30]}...': {results[0]}")
+<<<<<<< Updated upstream
                 dense_results = []
             
+=======
+                dense_results: List[Dict[str, Any]] = []
+            else:
+                dense_results = cast(List[Dict[str, Any]], results[0])
+
+>>>>>>> Stashed changes
             all_dense_results.extend(dense_results)
             
             # Extract Sparse Results (wenn vorhanden)
             if len(results) > 1:
-                sparse_results = results[1] if not isinstance(results[1], Exception) else []
                 if isinstance(results[1], Exception):
                     logger.warning(f"⚠️ Sparse Retrieval fehler für '{q[:30]}...': {results[1]}")
+                    sparse_results: List[Dict[str, Any]] = []
                 else:
+                    sparse_results = cast(List[Dict[str, Any]], results[1])
                     all_sparse_results.extend(sparse_results)
         
         # RRF-Fusion oder Fallback
@@ -391,8 +415,13 @@ class HybridRetriever:
         # UDS3 v2.0.0 Semantic Search (oder Legacy vector_search/search_documents)
         try:
             # Remove top_k from params if present to avoid conflict
+<<<<<<< Updated upstream
             clean_params = {k: v for k, v in params.items() if k != 'top_k'}
             
+=======
+            clean_params: Dict[str, Any] = {k: v for k, v in params.items() if k != "top_k"}
+
+>>>>>>> Stashed changes
             # Priority 1: UDS3 v2.0.0 semantic_search
             if self._semantic_search_available:
                 results = await self.dense_retriever.semantic_search(
@@ -419,7 +448,7 @@ class HybridRetriever:
                 return []
             
             # Normalisiere zu einheitlichem Format
-            normalized = []
+            normalized: List[Dict[str, Any]] = []
             for result in results:
                 normalized.append({
                     "doc_id": result.get("id") or result.get("doc_id"),
@@ -454,6 +483,7 @@ class HybridRetriever:
         """
         try:
             # Remove top_k from params if present to avoid conflict
+<<<<<<< Updated upstream
             clean_params = {k: v for k, v in params.items() if k != 'top_k'}
             
             results = await self.sparse_retriever.retrieve(
@@ -462,6 +492,12 @@ class HybridRetriever:
                 **clean_params
             )
             
+=======
+            clean_params: Dict[str, Any] = {k: v for k, v in params.items() if k != "top_k"}
+
+            results = await self.sparse_retriever.retrieve(query=query, top_k=self.config.sparse_top_k, **clean_params)
+
+>>>>>>> Stashed changes
             # Konvertiere zu Dict-Format
             return [
                 {

@@ -4,7 +4,7 @@
   "name": "Standard Wissenschaftliche Methodik",
   "description": "6-Phasen wissenschaftliche Methodik für Verwaltungsfragen mit evidenzbasiertem Reasoning",
   "last_updated": "2025-10-12T22:30:00Z",
-  
+
   "_metadata": {
     "author": "VERITAS System",
     "use_case": "Administrative queries requiring systematic, evidence-based reasoning",
@@ -15,22 +15,22 @@
       "avg_tokens_per_phase": 800
     }
   },
-  
+
   "phases": [
     {
       "phase_id": "hypothesis",
       "phase_number": 1,
       "name": "Hypothesengenerierung",
       "description": "Erste wissenschaftliche Vermutung basierend auf RAG-Kontext",
-      
+
       "prompt_template": "scientific/phase1_hypothesis.json",
-      
+
       "dependencies": {
         "required_steps": ["rag_semantic", "rag_graph"],
         "optional_steps": ["nlp_analysis"],
         "wait_for_completion": true
       },
-      
+
       "execution": {
         "model": "llama3.2:latest",
         "temperature": 0.3,
@@ -38,7 +38,7 @@
         "timeout_seconds": 30,
         "stream": false
       },
-      
+
       "output_schema": {
         "type": "object",
         "required": ["hypothesis", "required_criteria", "missing_information", "confidence", "reasoning"],
@@ -78,7 +78,7 @@
           }
         }
       },
-      
+
       "retry_policy": {
         "max_retries": 3,
         "retry_delay_seconds": 2,
@@ -86,7 +86,7 @@
         "temperature_adjustment": 0.8,
         "fallback_behavior": "use_conservative_hypothesis"
       },
-      
+
       "quality_checks": {
         "min_confidence": 0.0,
         "max_confidence": 1.0,
@@ -94,21 +94,21 @@
         "vague_criteria_threshold": 0.3
       }
     },
-    
+
     {
       "phase_id": "synthesis",
       "phase_number": 2,
       "name": "Evidenz-Synthese",
       "description": "Aggregation von Evidenzen aus RAG-Ergebnissen zu thematischen Clustern",
-      
+
       "prompt_template": "scientific/phase2_synthesis.json",
-      
+
       "dependencies": {
         "required_steps": ["hypothesis"],
         "optional_steps": [],
         "wait_for_completion": true
       },
-      
+
       "execution": {
         "model": "llama3.2:latest",
         "temperature": 0.2,
@@ -116,7 +116,7 @@
         "timeout_seconds": 45,
         "stream": false
       },
-      
+
       "output_schema": {
         "type": "object",
         "required": ["evidence_clusters", "cross_references", "synthesis_summary"],
@@ -179,7 +179,7 @@
           }
         }
       },
-      
+
       "retry_policy": {
         "max_retries": 3,
         "retry_delay_seconds": 2,
@@ -187,28 +187,28 @@
         "temperature_adjustment": 0.8,
         "fallback_behavior": "use_raw_rag_results"
       },
-      
+
       "quality_checks": {
         "min_evidence_clusters": 1,
         "min_sources_per_cluster": 1,
         "min_cluster_strength": 0.0
       }
     },
-    
+
     {
       "phase_id": "analysis",
       "phase_number": 3,
       "name": "Mustererkennung & Widerspruchsanalyse",
       "description": "Identifikation von Mustern, Widersprüchen und Konfliktauflösung",
-      
+
       "prompt_template": "scientific/phase3_analysis.json",
-      
+
       "dependencies": {
         "required_steps": ["synthesis"],
         "optional_steps": [],
         "wait_for_completion": true
       },
-      
+
       "execution": {
         "model": "llama3.2:latest",
         "temperature": 0.25,
@@ -216,7 +216,7 @@
         "timeout_seconds": 40,
         "stream": false
       },
-      
+
       "output_schema": {
         "type": "object",
         "required": ["patterns", "contradictions", "conflict_resolution", "analysis_summary"],
@@ -275,7 +275,7 @@
           }
         }
       },
-      
+
       "retry_policy": {
         "max_retries": 3,
         "retry_delay_seconds": 2,
@@ -283,26 +283,26 @@
         "temperature_adjustment": 0.8,
         "fallback_behavior": "skip_conflict_resolution"
       },
-      
+
       "quality_checks": {
         "max_unresolved_contradictions": 5
       }
     },
-    
+
     {
       "phase_id": "validation",
       "phase_number": 4,
       "name": "Hypothesen-Validierung",
       "description": "Testen der initialen Hypothese gegen gesammelte Evidenzen",
-      
+
       "prompt_template": "scientific/phase4_validation.json",
-      
+
       "dependencies": {
         "required_steps": ["hypothesis", "analysis"],
         "optional_steps": [],
         "wait_for_completion": true
       },
-      
+
       "execution": {
         "model": "llama3.2:latest",
         "temperature": 0.2,
@@ -310,7 +310,7 @@
         "timeout_seconds": 35,
         "stream": false
       },
-      
+
       "output_schema": {
         "type": "object",
         "required": ["validation_status", "supporting_evidence", "contradicting_evidence", "hypothesis_adjustment", "validation_confidence"],
@@ -361,7 +361,7 @@
           }
         }
       },
-      
+
       "retry_policy": {
         "max_retries": 3,
         "retry_delay_seconds": 2,
@@ -369,27 +369,27 @@
         "temperature_adjustment": 0.8,
         "fallback_behavior": "mark_inconclusive"
       },
-      
+
       "quality_checks": {
         "min_supporting_evidence": 0,
         "critical_contradiction_threshold": 1
       }
     },
-    
+
     {
       "phase_id": "conclusion",
       "phase_number": 5,
       "name": "Finale Synthese & Schlussfolgerung",
       "description": "Finale evidenzbasierte Antwort mit Handlungsempfehlungen",
-      
+
       "prompt_template": "scientific/phase5_conclusion.json",
-      
+
       "dependencies": {
         "required_steps": ["validation", "analysis"],
         "optional_steps": [],
         "wait_for_completion": true
       },
-      
+
       "execution": {
         "model": "llama3.2:latest",
         "temperature": 0.15,
@@ -397,7 +397,7 @@
         "timeout_seconds": 40,
         "stream": false
       },
-      
+
       "output_schema": {
         "type": "object",
         "required": ["main_answer", "action_recommendations", "confidence", "evidence_summary", "limitations"],
@@ -449,7 +449,7 @@
           }
         }
       },
-      
+
       "retry_policy": {
         "max_retries": 3,
         "retry_delay_seconds": 2,
@@ -457,28 +457,28 @@
         "temperature_adjustment": 0.8,
         "fallback_behavior": "use_hypothesis_as_answer"
       },
-      
+
       "quality_checks": {
         "min_answer_length": 50,
         "min_action_recommendations": 1,
         "min_confidence": 0.0
       }
     },
-    
+
     {
       "phase_id": "metacognition",
       "phase_number": 6,
       "name": "Metakognitive Selbstbewertung",
       "description": "Selbstbewertung des gesamten Reasoning-Prozesses",
-      
+
       "prompt_template": "scientific/phase6_metacognition.json",
-      
+
       "dependencies": {
         "required_steps": ["conclusion"],
         "optional_steps": [],
         "wait_for_completion": true
       },
-      
+
       "execution": {
         "model": "llama3.2:latest",
         "temperature": 0.3,
@@ -486,7 +486,7 @@
         "timeout_seconds": 30,
         "stream": false
       },
-      
+
       "output_schema": {
         "type": "object",
         "required": ["metacognitive_assessment", "information_gaps", "process_quality", "improvement_suggestions"],
@@ -548,7 +548,7 @@
           }
         }
       },
-      
+
       "retry_policy": {
         "max_retries": 2,
         "retry_delay_seconds": 2,
@@ -556,17 +556,17 @@
         "temperature_adjustment": 0.9,
         "fallback_behavior": "skip_metacognition"
       },
-      
+
       "quality_checks": {
         "max_improvement_suggestions": 10
       }
     }
   ],
-  
+
   "orchestration_config": {
     "execution_mode": "sequential",
     "description": "Phasen werden sequenziell ausgeführt (1 → 2 → 3 → 4 → 5 → 6)",
-    
+
     "phase_execution": {
       "allow_phase_skip": false,
       "description": "Keine Phase kann übersprungen werden",
@@ -574,40 +574,40 @@
       "checkpoint_enabled": true,
       "checkpoint_frequency": "per_phase"
     },
-    
+
     "error_handling": {
       "stop_on_critical_error": true,
       "critical_phases": ["hypothesis", "conclusion"],
       "optional_phases": ["metacognition"],
       "fallback_strategy": "use_partial_results"
     },
-    
+
     "parallelization": {
       "enabled": false,
       "description": "Scientific method ist inherently sequential",
       "future_optimization": "Agent tasks können parallel laufen (via UnifiedOrchestrator)"
     },
-    
+
     "progress_tracking": {
       "enabled": true,
       "emit_events": true,
       "event_types": ["phase_start", "phase_complete", "phase_error", "validation_failed"],
       "streaming_protocol": "ndjson"
     },
-    
+
     "timeout_config": {
       "total_timeout_seconds": 300,
       "phase_timeout_multiplier": 1.5,
       "description": "Total max 5min, individual phases get 1.5x their configured timeout"
     }
   },
-  
+
   "quality_standards": {
     "min_overall_confidence": 0.0,
     "max_unresolved_contradictions": 5,
     "min_evidence_sources": 1,
     "required_phases": ["hypothesis", "synthesis", "validation", "conclusion"],
-    
+
     "confidence_calibration": {
       "very_high": {"range": [0.9, 1.0], "requires": "clear_legal_basis_no_contradictions"},
       "high": {"range": [0.75, 0.9], "requires": "legal_basis_minor_contradictions"},
@@ -616,7 +616,7 @@
       "very_low": {"range": [0.0, 0.3], "requires": "insufficient_evidence"}
     }
   },
-  
+
   "version_history": [
     {
       "version": "1.0.0",

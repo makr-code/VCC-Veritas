@@ -29,8 +29,8 @@ from pathlib import Path
 # Add project root to path for imports
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
-sys.path.insert(0, str(project_root / "shared"))
 
+<<<<<<< Updated upstream
 try:
     from shared.protocols.agent_message import (
         AgentMessage,
@@ -66,6 +66,19 @@ except ModuleNotFoundError:
         WorkerPoolManager,
         DEFAULT_CONFIG
     )
+=======
+# NOTE: avoid inserting the `shared` directory itself into sys.path. That makes the
+# same source file importable under two different module names (e.g.:
+# "agent_message" and "shared.protocols.agent_message") which breaks static
+# type checking (mypy) with duplicate-module errors. Always import using the
+# package-qualified path below.
+from shared.protocols.agent_message import AgentIdentity, AgentMessage, MessageMetadata, MessagePriority, MessageType
+
+logger = logging.getLogger(__name__)
+
+# Import Enhanced Components (use package-qualified imports)
+from backend.agents.agent_message_broker_enhanced import DEFAULT_CONFIG, BrokerConfiguration, MessageWorker, WorkerPoolManager
+>>>>>>> Stashed changes
 
 
 class AgentMessageBroker:

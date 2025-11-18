@@ -1,8 +1,8 @@
 # TODO: Kartendienst-Integration für BImSchG/WKA-Datenvisualisierung
 
-**Erstellt:** 10. Oktober 2025  
-**Priorität:** HOCH  
-**Geschätzter Aufwand:** 12-16 Stunden  
+**Erstellt:** 10. Oktober 2025
+**Priorität:** HOCH
+**Geschätzter Aufwand:** 12-16 Stunden
 **Status:** 🟡 PLANUNG
 
 ---
@@ -77,7 +77,7 @@ Integration eines interaktiven Kartendienstes zur geografischen Visualisierung v
 
 ## 📐 Koordinaten-Transformation
 
-**Geodaten-System:** 
+**Geodaten-System:**
 - **Eingabe:** ETRS89 UTM Zone 33N (EPSG:25833)
 - **Ausgabe:** WGS84 (EPSG:4326) für Leaflet/Web-Karten
 
@@ -102,16 +102,16 @@ transformer = Transformer.from_crs(
 def utm33n_to_wgs84(ostwert, nordwert):
     """
     ETRS89 UTM Zone 33N → WGS84
-    
+
     Args:
         ostwert: UTM Easting (Ostwert) in Metern, z.B. 400000 - 600000
         nordwert: UTM Northing (Nordwert) in Metern, z.B. 5700000 - 5950000
-    
+
     Returns:
         tuple: (lon, lat) in WGS84 Grad
-    
+
     Beispiel Brandenburg:
-        ostwert=500000, nordwert=5850000 
+        ostwert=500000, nordwert=5850000
         → lon=13.4°E, lat=52.5°N (Berlin-Region)
     """
     lon, lat = transformer.transform(ostwert, nordwert)
@@ -150,7 +150,7 @@ router = APIRouter(prefix="/api/immi", tags=["IMMI - Immissionsschutz"])
 class GeoCoordinate(BaseModel):
     lat: float
     lon: float
-    
+
 class MapMarker(BaseModel):
     id: str
     lat: float
@@ -227,50 +227,50 @@ class CoordinateService:
     """
     Service für Koordinaten-Transformation und Validierung
     """
-    
+
     @staticmethod
     def utm33n_to_wgs84(ostwert: float, nordwert: float) -> Tuple[float, float]:
         """
         ETRS89 UTM Zone 33N (EPSG:25833) → WGS84 (EPSG:4326)
-        
+
         Args:
             ostwert: UTM Easting in Metern (ca. 350000-600000 für Brandenburg)
             nordwert: UTM Northing in Metern (ca. 5700000-5950000 für Brandenburg)
-        
+
         Returns:
             tuple: (latitude, longitude) in WGS84 Grad
         """
         from pyproj import Transformer
-        
+
         # ETRS89 UTM Zone 33N → WGS84
         transformer = Transformer.from_crs(
             "EPSG:25833",  # ETRS89 UTM Zone 33N
             "EPSG:4326",   # WGS84
             always_xy=True
         )
-        
+
         lon, lat = transformer.transform(ostwert, nordwert)
         return lat, lon
-    
+
     @staticmethod
     def is_valid_coordinate(lat: float, lon: float) -> bool:
         """Validierung: Brandenburg-Region"""
         # Brandenburg: ~51.3 - 53.6°N, ~11.3 - 14.8°E
         return (51.0 <= lat <= 54.0) and (11.0 <= lon <= 15.0)
-    
+
     def get_bimschg_coordinates(
-        self, 
+        self,
         db_path: str,
         filters: dict = None
     ) -> list:
         """
         Alle BImSchG-Koordinaten mit Transformation
-        
+
         Returns:
             [{"id": "...", "lat": 52.5, "lon": 13.4, ...}, ...]
         """
         pass
-    
+
     def get_wka_coordinates(
         self,
         db_path: str,
@@ -292,17 +292,17 @@ class GeoCache:
     - Transformation ist teuer → Cache für 1h
     - Redis optional für Multi-Instance Setup
     """
-    
+
     _cache = {}
     _cache_ttl = timedelta(hours=1)
-    
+
     @classmethod
     def get_or_compute(cls, key: str, compute_fn):
         if key in cls._cache:
             data, timestamp = cls._cache[key]
             if datetime.now() - timestamp < cls._cache_ttl:
                 return data
-        
+
         data = compute_fn()
         cls._cache[key] = (data, datetime.now())
         return data
@@ -321,12 +321,12 @@ class GeoCache:
   <div class="map-container">
     <!-- Karte -->
     <div id="map" ref="mapElement" class="map"></div>
-    
+
     <!-- Kontrollpanel -->
     <div class="map-controls">
       <div class="control-section">
         <h3>Filter</h3>
-        
+
         <!-- Datenlayer Toggle -->
         <label>
           <input type="checkbox" v-model="layers.bimschg" @change="toggleLayer('bimschg')">
@@ -336,7 +336,7 @@ class GeoCache:
           <input type="checkbox" v-model="layers.wka" @change="toggleLayer('wka')">
           Windkraftanlagen ({{ stats.wka }})
         </label>
-        
+
         <!-- Filter: BImSchG -->
         <div v-if="layers.bimschg">
           <select v-model="filters.nr_4bv" @change="applyFilters">
@@ -346,7 +346,7 @@ class GeoCache:
             </option>
           </select>
         </div>
-        
+
         <!-- Filter: WKA -->
         <div v-if="layers.wka">
           <select v-model="filters.wka_status" @change="applyFilters">
@@ -355,26 +355,26 @@ class GeoCache:
             <option value="Im Genehmigungsverfahren">Im Genehmigungsverfahren</option>
           </select>
         </div>
-        
+
         <!-- Clustering Toggle -->
         <label>
           <input type="checkbox" v-model="clustering" @change="toggleClustering">
           Marker gruppieren
         </label>
-        
+
         <!-- Heatmap Toggle -->
         <label>
           <input type="checkbox" v-model="heatmap" @change="toggleHeatmap">
           Heatmap anzeigen
         </label>
       </div>
-      
+
       <!-- Suche -->
       <div class="control-section">
         <h3>Suche</h3>
-        <input 
-          type="text" 
-          v-model="searchQuery" 
+        <input
+          type="text"
+          v-model="searchQuery"
           @input="searchLocation"
           placeholder="Ort, Betriebsstätte..."
         >
@@ -384,7 +384,7 @@ class GeoCache:
           </li>
         </ul>
       </div>
-      
+
       <!-- Statistiken -->
       <div class="control-section">
         <h3>Sichtbarer Bereich</h3>
@@ -450,13 +450,13 @@ onMounted(async () => {
 function initMap() {
   // Initialisiere Karte (Brandenburg-Zentrum)
   map = L.map(mapElement.value).setView([52.4125, 12.5316], 8);
-  
+
   // Tile Layer (OpenStreetMap)
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '© OpenStreetMap contributors'
   }).addTo(map);
-  
+
   // Event-Listener
   map.on('moveend', updateVisibleStats);
   map.on('zoomend', updateVisibleStats);
@@ -467,14 +467,14 @@ async function loadMarkers() {
   if (layers.value.bimschg) {
             const bimschgData = await fetch('/api/immi/markers/bimschg').then(r => r.json());
     stats.value.bimschg = bimschgData.length;
-    
+
     markerClusters.bimschg = L.markerClusterGroup();
-    
+
     bimschgData.forEach(item => {
       const marker = L.marker([item.lat, item.lon], {
         icon: getBimSchGIcon(item.category)
       });
-      
+
       marker.bindPopup(`
         <div class="marker-popup">
           <h4>${item.title}</h4>
@@ -485,25 +485,25 @@ async function loadMarkers() {
           <button onclick="showDetails('${item.id}')">Details</button>
         </div>
       `);
-      
+
       markerClusters.bimschg.addLayer(marker);
     });
-    
+
     map.addLayer(markerClusters.bimschg);
   }
-  
+
   // WKA-Marker
   if (layers.value.wka) {
             const wkaData = await fetch('/api/immi/markers/wka').then(r => r.json());
     stats.value.wka = wkaData.length;
-    
+
     markerClusters.wka = L.markerClusterGroup();
-    
+
     wkaData.forEach(item => {
       const marker = L.marker([item.lat, item.lon], {
         icon: getWKAIcon(item.data.status)
       });
-      
+
       marker.bindPopup(`
         <div class="marker-popup">
           <h4>WKA: ${item.title}</h4>
@@ -515,10 +515,10 @@ async function loadMarkers() {
           <button onclick="showDetails('${item.id}')">Details</button>
         </div>
       `);
-      
+
       markerClusters.wka.addLayer(marker);
     });
-    
+
     map.addLayer(markerClusters.wka);
   }
 }
@@ -531,9 +531,9 @@ function getBimSchGIcon(category) {
     'Abfallbehandlung': 'brown',
     'default': 'blue'
   };
-  
+
   const color = iconColors[category] || iconColors.default;
-  
+
   return L.icon({
     iconUrl: `/assets/markers/bimschg-${color}.png`,
     iconSize: [25, 41],
@@ -543,10 +543,10 @@ function getBimSchGIcon(category) {
 }
 
 function getWKAIcon(status) {
-  const iconUrl = status === 'In Betrieb' 
+  const iconUrl = status === 'In Betrieb'
     ? '/assets/markers/wka-active.png'
     : '/assets/markers/wka-planned.png';
-    
+
   return L.icon({
     iconUrl,
     iconSize: [32, 32],
@@ -587,7 +587,7 @@ async function searchLocation() {
     searchResults.value = [];
     return;
   }
-  
+
   const results = await fetch(`/api/immi/search?query=${searchQuery.value}`)
     .then(r => r.json());
   searchResults.value = results;
@@ -600,7 +600,7 @@ function flyTo(location) {
 
 function updateVisibleStats() {
   const bounds = map.getBounds();
-  
+
   // Count visible markers
   // ... implementation
 }
@@ -678,9 +678,9 @@ function updateVisibleStats() {
   path: '/map',
   name: 'Map',
   component: () => import('@/components/MapView.vue'),
-  meta: { 
+  meta: {
     title: 'Karte',
-    requiresAuth: true 
+    requiresAuth: true
   }
 }
 ```
@@ -697,11 +697,11 @@ function updateVisibleStats() {
 1. **Server-Side Clustering:**
    - Backend berechnet Cluster-Zentren
    - Nur aggregierte Daten senden bei Zoom-Out
-   
+
 2. **Viewport-basiertes Laden:**
    - Nur Marker im sichtbaren Bereich laden
    - "bounds" Parameter in API nutzen
-   
+
 3. **Marker-Simplification:**
    - Zoom < 10: Nur Cluster-Circles (keine Icons)
    - Zoom 10-14: Standard-Icons
@@ -720,7 +720,7 @@ function updateVisibleStats() {
        properties: { ...m.data }
      }))
    };
-   
+
    L.geoJSON(geojsonFeature).addTo(map);
    ```
 
@@ -749,10 +749,10 @@ function updateVisibleStats() {
 def test_gk_to_wgs84_transformation():
     """Test Koordinaten-Transformation"""
     from backend.services.coordinate_service import CoordinateService
-    
+
     # Schwedt/Oder: GK 4587234, 5895678
     lat, lon = CoordinateService.gk_to_wgs84(4587234, 5895678)
-    
+
     assert 53.0 < lat < 53.1  # ~53.06°N
     assert 14.2 < lon < 14.3  # ~14.28°E
 
@@ -770,7 +770,7 @@ def test_bounds_filtering():
     bounds = "52.0,12.0,53.0,14.0"
     response = client.get(f"/api/immi/markers/bimschg?bounds={bounds}")
     data = response.json()
-    
+
     for marker in data:
         assert 52.0 <= marker['lat'] <= 53.0
         assert 12.0 <= marker['lon'] <= 14.0
@@ -789,11 +789,11 @@ def test_bounds_filtering():
 def test_marker_load_performance():
     """10k Marker sollten < 2s laden"""
     import time
-    
+
     start = time.time()
     response = client.get("/api/immi/markers/bimschg?limit=5000")
     duration = time.time() - start
-    
+
     assert duration < 2.0
     assert response.status_code == 200
 ```
@@ -854,23 +854,23 @@ def validate_bimschg_coordinates():
     """Prüfe BImSchG-Koordinaten (ETRS89 UTM Zone 33N)"""
     conn = sqlite3.connect('data/BImSchG.sqlite')
     cursor = conn.cursor()
-    
+
     cursor.execute("""
         SELECT bimschg_id, ostwert, nordwert, bst_name, ort
         FROM BImSchG
         WHERE ostwert IS NOT NULL AND nordwert IS NOT NULL
     """)
-    
+
     service = CoordinateService()
     valid = 0
     invalid = 0
-    
+
     for row in cursor.fetchall():
         bimschg_id, ostwert, nordwert, bst_name, ort = row
-        
+
         try:
             lat, lon = service.utm33n_to_wgs84(ostwert, nordwert)
-            
+
             if service.is_valid_coordinate(lat, lon):
                 valid += 1
             else:
@@ -880,7 +880,7 @@ def validate_bimschg_coordinates():
         except Exception as e:
             invalid += 1
             print(f"❌ Fehler bei {bimschg_id}: {e}")
-    
+
     print(f"\n✅ Gültig: {valid}")
     print(f"❌ Ungültig: {invalid}")
     print(f"📊 Quote: {valid/(valid+invalid)*100:.1f}%")
@@ -1045,6 +1045,6 @@ if __name__ == '__main__':
 
 ---
 
-**Ersteller:** VERITAS Agent System  
-**Version:** 1.0.0  
+**Ersteller:** VERITAS Agent System
+**Version:** 1.0.0
 **Letzte Aktualisierung:** 10. Oktober 2025

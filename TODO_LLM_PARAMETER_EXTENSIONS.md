@@ -1,8 +1,8 @@
 # 📋 TODO: LLM-Parameter UI Erweiterungen (Optional)
 
-**Projekt:** VERITAS RAG System  
-**Version:** v3.18.2 (geplant)  
-**Erstellt:** 10.10.2025  
+**Projekt:** VERITAS RAG System
+**Version:** v3.18.2 (geplant)
+**Erstellt:** 10.10.2025
 **Priorität:** NICE-TO-HAVE (alle Features bereits funktional)
 
 ---
@@ -24,7 +24,7 @@
 ### 🥇 HIGH PRIORITY
 
 #### 1. Preset-Buttons für schnelle Konfiguration
-**Geschätzter Aufwand:** 30-45 Minuten  
+**Geschätzter Aufwand:** 30-45 Minuten
 **Nutzen:** ⭐⭐⭐⭐⭐ (Sehr hoch - User-Convenience)
 
 **Beschreibung:**
@@ -55,16 +55,16 @@ def _create_preset_buttons(self, parent):
     """Erstellt Preset-Buttons"""
     preset_frame = ttk.Frame(parent)
     preset_frame.pack(fill=tk.X, padx=5, pady=3)
-    
+
     ttk.Label(preset_frame, text="Presets:", font=('Segoe UI', 8)).pack(side=tk.LEFT, padx=(0, 5))
-    
+
     presets = [
         ("⚖️ Präzise", 0.3, 300, 0.7, "Fakten, Gesetze"),
         ("✅ Standard", 0.7, 500, 0.9, "Verwaltungsfragen"),
         ("📖 Ausführlich", 0.6, 1000, 0.85, "Detaillierte Analysen"),
         ("🎨 Kreativ", 0.9, 600, 0.95, "Alternative Formulierungen")
     ]
-    
+
     for label, temp, tokens, topp, tooltip_text in presets:
         btn = ttk.Button(
             preset_frame,
@@ -73,7 +73,7 @@ def _create_preset_buttons(self, parent):
             width=12
         )
         btn.pack(side=tk.LEFT, padx=2)
-        
+
         if UI_COMPONENTS_AVAILABLE:
             Tooltip(btn, f"{label}\n\n{tooltip_text}\n\nTemp: {temp} | Tokens: {tokens} | Top-p: {p}")
 
@@ -82,20 +82,20 @@ def _apply_preset(self, temperature, max_tokens, top_p):
     self.temperature_var.set(temperature)
     self.max_tokens_var.set(max_tokens)
     self.top_p_var.set(top_p)
-    
+
     # Labels aktualisieren
     self._update_temperature_label(temperature)
     self._update_topp_label(top_p)
-    
+
     # System-Message im Chat
     self.add_system_message(
         f"🎛️ Preset angewandt: Temp={temperature}, Tokens={max_tokens}, Top-p={top_p}"
     )
-    
+
     logger.info(f"Preset angewandt: T={temperature}, Tokens={max_tokens}, p={top_p}")
 ```
 
-**Datei:** `frontend/veritas_app.py`  
+**Datei:** `frontend/veritas_app.py`
 **Zeilen:** ~1310 (nach top_p Slider)
 
 **Testing:**
@@ -108,7 +108,7 @@ def _apply_preset(self, temperature, max_tokens, top_p):
 ---
 
 #### 2. Token-Counter & Antwortlängen-Schätzung
-**Geschätzter Aufwand:** 45-60 Minuten  
+**Geschätzter Aufwand:** 45-60 Minuten
 **Nutzen:** ⭐⭐⭐⭐ (Hoch - Transparenz)
 
 **Beschreibung:**
@@ -141,13 +141,13 @@ def _update_tokens_label(self, *args):
     """Aktualisiert Token-Counter bei Spinbox-Änderung"""
     try:
         tokens = self.max_tokens_var.get()
-        
+
         # Token → Wörter (Deutsch: 1 Token ≈ 0.75 Wörter)
         estimated_words = int(tokens * 0.75)
-        
+
         # Token → Zeichen (Deutsch: 1 Token ≈ 4 Zeichen)
         estimated_chars = int(tokens * 4)
-        
+
         # Label aktualisieren
         if hasattr(self, 'token_info_label'):
             self.token_info_label.config(
@@ -157,7 +157,7 @@ def _update_tokens_label(self, *args):
         logger.error(f"Fehler beim Aktualisieren des Token-Counters: {e}")
 ```
 
-**Datei:** `frontend/veritas_app.py`  
+**Datei:** `frontend/veritas_app.py`
 **Zeilen:** ~1245 (nach max_tokens_spinbox)
 
 **Erweitert:**
@@ -169,7 +169,7 @@ def _update_tokens_label(self, *args):
 ---
 
 #### 3. Antwortzeit-Prädiktion
-**Geschätzter Aufwand:** 30-45 Minuten  
+**Geschätzter Aufwand:** 30-45 Minuten
 **Nutzen:** ⭐⭐⭐ (Mittel - Erwartungsmanagement)
 
 **Beschreibung:**
@@ -201,23 +201,23 @@ def _estimate_response_time(self):
     try:
         max_tokens = self.max_tokens_var.get()
         model = self.llm_var.get()
-        
+
         # Tokens/Sekunde für aktuelles Modell
         tokens_per_second = MODEL_BENCHMARKS.get(model, 120)  # Default: 120
-        
+
         # Base-Zeit (Generation)
         generation_time = max_tokens / tokens_per_second
-        
+
         # Overhead (RAG, Agents, etc.)
         overhead = 1.5  # Sekunden
-        
+
         # Gesamt
         total_time = generation_time + overhead
-        
+
         # Range (±20%)
         min_time = total_time * 0.8
         max_time = total_time * 1.2
-        
+
         return min_time, max_time
     except Exception as e:
         logger.error(f"Fehler bei Antwortzeit-Schätzung: {e}")
@@ -232,7 +232,7 @@ def _update_response_time_estimate(self):
         )
 ```
 
-**Datei:** `frontend/veritas_app.py`  
+**Datei:** `frontend/veritas_app.py`
 **Zeilen:** ~1260 (nach Token-Counter)
 
 **Features:**
@@ -247,7 +247,7 @@ def _update_response_time_estimate(self):
 ### 🥈 MEDIUM PRIORITY
 
 #### 4. Parameter-History & Gespeicherte Presets
-**Geschätzter Aufwand:** 60-90 Minuten  
+**Geschätzter Aufwand:** 60-90 Minuten
 **Nutzen:** ⭐⭐⭐ (Mittel - Power-User-Feature)
 
 **Beschreibung:**
@@ -278,15 +278,15 @@ def _save_parameter_history(self):
         'top_p': self.top_p_var.get(),
         'timestamp': datetime.now().isoformat()
     }
-    
+
     # Lade History
     history_file = 'config/parameter_history.json'
     history = self._load_json(history_file, default=[])
-    
+
     # Füge hinzu (max 5)
     history.insert(0, current_params)
     history = history[:5]
-    
+
     # Speichere
     self._save_json(history_file, history)
 
@@ -294,7 +294,7 @@ def _load_parameter_preset(self, preset_name):
     """Lädt gespeichertes Preset"""
     presets_file = 'config/user_presets.json'
     presets = self._load_json(presets_file, default={})
-    
+
     if preset_name in presets:
         preset = presets[preset_name]
         self.temperature_var.set(preset['temperature'])
@@ -305,7 +305,7 @@ def _load_parameter_preset(self, preset_name):
 ---
 
 #### 5. Visual Feedback & Farbcodierung
-**Geschätzter Aufwand:** 30-45 Minuten  
+**Geschätzter Aufwand:** 30-45 Minuten
 **Nutzen:** ⭐⭐⭐ (Mittel - UX-Verbesserung)
 
 **Beschreibung:**
@@ -333,7 +333,7 @@ Farbliche Kennzeichnung der Parameter-Werte (Grün=OK, Orange=Hoch, Rot=Sehr hoc
 def _update_temperature_label(self, value):
     """Aktualisiert Temperatur-Label mit Farbcodierung"""
     temp_value = float(value)
-    
+
     # Farbcodierung
     if temp_value <= 0.8:
         color = '#00AA00'  # Grün
@@ -341,7 +341,7 @@ def _update_temperature_label(self, value):
         color = '#FF8800'  # Orange
     else:
         color = '#DD0000'  # Rot
-    
+
     self.temp_label.config(text=f"{temp_value:.1f}", foreground=color)
 ```
 
@@ -350,7 +350,7 @@ def _update_temperature_label(self, value):
 ### 🥉 LOW PRIORITY (Nice-to-Have)
 
 #### 6. A/B Testing Split-View
-**Geschätzter Aufwand:** 120-180 Minuten  
+**Geschätzter Aufwand:** 120-180 Minuten
 **Nutzen:** ⭐⭐ (Niedrig - Expertenfeature)
 
 **Beschreibung:**
@@ -382,7 +382,7 @@ Sendet gleiche Query mit 2 verschiedenen Parameter-Sets parallel und zeigt Ergeb
 ---
 
 #### 7. Parameter-Analytics Dashboard
-**Geschätzter Aufwand:** 90-120 Minuten  
+**Geschätzter Aufwand:** 90-120 Minuten
 **Nutzen:** ⭐⭐ (Niedrig - Statistik für Power-User)
 
 **Beschreibung:**
@@ -514,8 +514,8 @@ Eine Feature gilt als **DONE** wenn:
 
 ---
 
-**Autor:** VERITAS System  
-**Version:** 1.0  
-**Erstellt:** 10.10.2025  
-**Status:** OPEN (0/7 Features)  
+**Autor:** VERITAS System
+**Version:** 1.0
+**Erstellt:** 10.10.2025
+**Status:** OPEN (0/7 Features)
 **Nächste Review:** 17.10.2025

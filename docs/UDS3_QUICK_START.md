@@ -1,6 +1,6 @@
 # UDS3 Hybrid Search - Quick Start Guide
 
-**Datum:** 11. Oktober 2025  
+**Datum:** 11. Oktober 2025
 **Status:** ✅ UDS3 Backends aktiv, ready for integration
 
 ---
@@ -85,30 +85,30 @@ class SupervisorAgent:
         # Zentraler UDS3 Zugriff
         self.uds3_strategy = get_optimized_unified_strategy()
         self.uds3_agent = UDS3HybridSearchAgent(self.uds3_strategy)
-        
+
         # Existing agents
         self.agents = {...}
-    
+
     async def process_query(self, query: str):
         # 1. UDS3 Hybrid Search (1x für alle Agenten!)
         uds3_results = await self.uds3_agent.hybrid_search(
             query=query,
             top_k=20
         )
-        
+
         # 2. Agent Selection
         selected_agents = await self._select_agents(query, uds3_results)
-        
+
         # 3. Agent Execution (mit UDS3 Context!)
         agent_results = await self._execute_agents_with_context(
             selected_agents=selected_agents,
             query=query,
             uds3_context=uds3_results  # Pass pre-fetched results!
         )
-        
+
         # 4. Synthesis
         synthesized = await self.synthesize_results(agent_results, query)
-        
+
         return synthesized
 ```
 
@@ -366,6 +366,6 @@ python -c "from database.config import get_database_backend_dict; print(get_data
 
 ---
 
-**Last Updated:** 11. Oktober 2025  
-**Status:** ✅ Ready for Integration  
+**Last Updated:** 11. Oktober 2025
+**Status:** ✅ Ready for Integration
 **Next:** Hybrid Search Test → SupervisorAgent Integration

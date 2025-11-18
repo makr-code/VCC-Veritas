@@ -1,7 +1,7 @@
 # Token-Budget Monitoring System - Dokumentation 📊
 
-**Version:** 1.0  
-**Datum:** 17. Oktober 2025  
+**Version:** 1.0
+**Datum:** 17. Oktober 2025
 **Status:** ✅ PRODUCTION-READY
 
 ---
@@ -57,7 +57,7 @@ for query in queries:
         json={"query": query, "model": "phi3"},
         timeout=120
     )
-    
+
     if response.status_code == 200:
         monitor.record_query(query, response.json())
 
@@ -339,7 +339,7 @@ python dashboard_token_budgets.py weekly_report_*.csv
 
 **Symptom:** `⚠️ Query ohne Token-Budget`
 
-**Ursache:** 
+**Ursache:**
 - Backend verwendet nicht `/v2/intelligent/query` Endpoint
 - Token-Budget-System nicht initialisiert
 - `processing_metadata` fehlt
@@ -392,22 +392,22 @@ Get-Content data\token_monitoring\test_monitoring.csv | Measure-Object -Line
 ```python
 class TokenBudgetMonitor:
     def __init__(self, data_dir: str = "data/token_monitoring")
-    
+
     def record_query(self, query: str, response: Dict[str, Any])
         """Zeichnet Query + Token-Budget-Metriken auf."""
-    
+
     def export_csv(self, filename: str = None) -> str
         """Exportiert Metriken als CSV."""
-    
+
     def export_json(self, filename: str = None) -> str
         """Exportiert Metriken als JSON."""
-    
+
     def print_statistics(self)
         """Zeigt umfassende Statistiken."""
-    
+
     def analyze_by_domain(self)
         """Domain-spezifische Budget-Analyse."""
-    
+
     def get_recommendations(self)
         """Automatische Optimierungs-Empfehlungen."""
 ```
@@ -448,15 +448,15 @@ test_queries = [
     # Simple Queries
     "Was ist ein Bauantrag?",
     "Wo beantrage ich einen Personalausweis?",
-    
-    # Medium Queries  
+
+    # Medium Queries
     "Wie beantrage ich eine Baugenehmigung in Stuttgart?",
     "Welche Unterlagen brauche ich für eine Gewerbeanmeldung?",
-    
+
     # Complex Queries (Verwaltungsrecht)
     "Erkläre das Ermessen der Behörde im Verwaltungsverfahren nach VwVfG",
     "Wie ist die Verhältnismäßigkeit bei belastenden Verwaltungsakten zu prüfen?",
-    
+
     # Domain-spezifisch
     "Was regelt das BImSchG für Industrieanlagen?",
     "Welche Verkehrssicherungspflichten hat ein Bauherr?",
@@ -468,7 +468,7 @@ for query in test_queries:
         json={"query": query, "model": "phi3"},
         timeout=120
     )
-    
+
     if response.status_code == 200:
         monitor.record_query(query, response.json())
 
@@ -497,11 +497,11 @@ subprocess.run(["python", "dashboard_token_budgets.py", csv_file])
 
 **Das Monitoring-System bietet:**
 
-✅ **Real-time Tracking** - Sofortiges Feedback zu Token-Budgets  
-✅ **Langzeit-Analyse** - CSV/JSON-Exports für historische Auswertung  
-✅ **Automatische Empfehlungen** - Issue-Erkennung mit Lösungsvorschlägen  
-✅ **Domain-Awareness** - Rechtsgebiets-spezifische Auswertungen  
-✅ **Performance-Monitoring** - Budget vs. Time Korrelation  
+✅ **Real-time Tracking** - Sofortiges Feedback zu Token-Budgets
+✅ **Langzeit-Analyse** - CSV/JSON-Exports für historische Auswertung
+✅ **Automatische Empfehlungen** - Issue-Erkennung mit Lösungsvorschlägen
+✅ **Domain-Awareness** - Rechtsgebiets-spezifische Auswertungen
+✅ **Performance-Monitoring** - Budget vs. Time Korrelation
 
 **Nächste Schritte:**
 1. ✅ Monitoring-Tools bereit
@@ -511,6 +511,6 @@ subprocess.run(["python", "dashboard_token_budgets.py", csv_file])
 
 ---
 
-**Status:** ✅ PRODUCTION-READY  
-**Version:** 1.0  
+**Status:** ✅ PRODUCTION-READY
+**Version:** 1.0
 **Erstellt:** 17. Oktober 2025

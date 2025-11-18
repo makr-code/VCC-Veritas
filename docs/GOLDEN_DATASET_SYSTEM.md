@@ -1,7 +1,7 @@
 # Golden Dataset System für RAG Quality Improvement
 
-**Version:** 2.0  
-**Datum:** 10. Oktober 2025  
+**Version:** 2.0
+**Datum:** 10. Oktober 2025
 **Zweck:** Feedback-Schleife zur kontinuierlichen Verbesserung des Prompt-Designs
 
 ---
@@ -120,7 +120,7 @@ class GoldenDatasetEntry:
     expected_citations_min: int          # Mindestanzahl IEEE-Zitationen
     expected_quotes_min: int             # Mindestanzahl direkte Zitate
     expected_legal_refs_min: int         # Mindestanzahl Paragraphen
-    
+
     model_results: Dict[str, Any]        # Ergebnisse pro Modell
     # {
     #   "llama3.1:latest": {
@@ -199,8 +199,8 @@ Total Time:     18.2s
 
 ```python
 # BEISPIEL 1: Gutes direktes Zitat
-"Nach § 58 Abs. 1 LBO BW ist die Baugenehmigung schriftlich zu beantragen [1]. 
-Der Antrag muss enthalten: 'Angaben zur Person des Bauherrn, Beschreibung des 
+"Nach § 58 Abs. 1 LBO BW ist die Baugenehmigung schriftlich zu beantragen [1].
+Der Antrag muss enthalten: 'Angaben zur Person des Bauherrn, Beschreibung des
 Bauvorhabens und Lage des Baugrundstücks' [1]."
                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
                             Direktes Zitat aus LBO BW mit Quelle [1]
@@ -232,7 +232,7 @@ def extract_direct_quotes(answer: str) -> List[str]:
 
 ```python
 # EXZELLENT (Quote + Source + Legal Ref)
-"Gemäß § 59 Abs. 2 LBO BW gilt: 'Die Baugenehmigungsbehörde hat über 
+"Gemäß § 59 Abs. 2 LBO BW gilt: 'Die Baugenehmigungsbehörde hat über
 den Bauantrag innerhalb von drei Monaten zu entscheiden' [1]."
                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
                                   Zitat mit [1] + § 59 Abs. 2
@@ -313,7 +313,7 @@ python tests/test_rag_quality_v3_19_0.py
 {
   "question_id": "Q1",
   "question": "Welche rechtlichen Voraussetzungen, Fristen und Kosten...",
-  
+
   "expected_aspects": [
     "Rechtliche Voraussetzungen (§§ LBO BW)",
     "Fristen (Bearbeitungsdauer)",
@@ -321,13 +321,13 @@ python tests/test_rag_quality_v3_19_0.py
     "Ausnahmen (Genehmigungsfreistellung)",
     "Vereinfachtes Verfahren"
   ],
-  
+
   "expected_citations_min": 3,
   "expected_quotes_min": 2,
   "expected_legal_refs_min": 3,
-  
+
   "model_results": {
-    
+
     "llama3.1:latest": {
       "metrics": {
         "answer_length": 770,
@@ -349,7 +349,7 @@ python tests/test_rag_quality_v3_19_0.py
         "⚠️ Aspekt-Abdeckung zu niedrig: 1/5 (20%)"
       ]
     },
-    
+
     "mistral:latest": {
       "metrics": {
         "answer_length": 821,
@@ -434,16 +434,16 @@ with open('golden_dataset_1760123456.json') as f:
 # Bestes Modell für Zitationen finden
 for question_id, entry in dataset.items():
     print(f"\n{question_id}: {entry['question'][:50]}...")
-    
+
     best_model = None
     best_citations = 0
-    
+
     for model, results in entry['model_results'].items():
         citations = results['metrics']['citation_count']
         if citations > best_citations:
             best_citations = citations
             best_model = model
-    
+
     print(f"  Bestes Modell: {best_model} ({best_citations} Zitationen)")
 ```
 
@@ -499,6 +499,6 @@ python tests/compare_golden_datasets.py \
 
 ---
 
-**Erstellt von:** GitHub Copilot  
-**Datum:** 10. Oktober 2025  
+**Erstellt von:** GitHub Copilot
+**Datum:** 10. Oktober 2025
 **Version:** 2.0

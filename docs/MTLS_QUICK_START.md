@@ -147,7 +147,7 @@ with httpx.Client(verify=ssl_context) as client:
     # Test endpoint
     response = client.get("https://localhost:5000/api/v1/test")
     print(response.json())
-    
+
     # Certificate info
     response = client.get("https://localhost:5000/api/v1/certificate-info")
     cert_info = response.json()
@@ -325,8 +325,7 @@ You now have a **production-ready mTLS-enabled VERITAS API** with:
 
 ---
 
-**Quick Start Version:** 1.0  
-**Last Updated:** 2025-10-13  
-**Estimated Time:** 3 minutes  
+**Quick Start Version:** 1.0
+**Last Updated:** 2025-10-13
+**Estimated Time:** 3 minutes
 **Difficulty:** ⭐☆☆☆☆ (Beginner-friendly)
-

@@ -3,7 +3,8 @@
 Direct Test: HypothesisService Initialisierung
 """
 import sys
-sys.path.append('c:/VCC/veritas')
+
+sys.path.append("c:/VCC/veritas")
 
 print("=" * 60)
 print("HYPOTHESIS SERVICE DIRECT TEST")
@@ -13,6 +14,7 @@ print("=" * 60)
 print("\n1️⃣  Import HypothesisService...")
 try:
     from backend.services.hypothesis_service import HypothesisService
+
     print("   ✅ Import erfolgreich")
 except Exception as e:
     print(f"   ❌ Import fehlgeschlagen: {e}")
@@ -21,10 +23,7 @@ except Exception as e:
 # Test 2: Initialisiere Service
 print("\n2️⃣  Initialisiere HypothesisService...")
 try:
-    service = HypothesisService(
-        model_name="llama3.1:8b",
-        temperature=0.3
-    )
+    service = HypothesisService(model_name="llama3.1:8b", temperature=0.3)
     print(f"   ✅ Service initialisiert")
     print(f"   • Model: {service.model_name}")
     print(f"   • Temperature: {service.temperature}")
@@ -32,6 +31,7 @@ try:
 except Exception as e:
     print(f"   ❌ Init fehlgeschlagen: {e}")
     import traceback
+
     traceback.print_exc()
     sys.exit(1)
 
@@ -39,9 +39,7 @@ except Exception as e:
 print("\n3️⃣  Generiere Test-Hypothese...")
 try:
     hypothesis = service.generate_hypothesis(
-        query="Welche Genehmigungen brauche ich für einen Neubau?",
-        rag_context=[],
-        timeout=15.0
+        query="Welche Genehmigungen brauche ich für einen Neubau?", rag_context=[], timeout=15.0
     )
     print(f"   ✅ Hypothese generiert!")
     print(f"   • Question Type: {hypothesis.question_type.value}")
@@ -59,6 +57,7 @@ try:
 except Exception as e:
     print(f"   ❌ Generierung fehlgeschlagen: {e}")
     import traceback
+
     traceback.print_exc()
     sys.exit(1)
 

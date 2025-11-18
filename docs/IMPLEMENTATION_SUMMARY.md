@@ -3,7 +3,7 @@
 ## ✅ Was wurde implementiert:
 
 ### 1. Backend - Agent Results Markierung
-**Datei**: `backend/api/veritas_api_backend.py`  
+**Datei**: `backend/api/veritas_api_backend.py`
 **Zeilen**: ~1195-1207
 
 ```python
@@ -29,14 +29,14 @@ WARNING: ⚠️ 3 von 3 Agenten nutzen simulierte Daten
 ---
 
 ### 2. Backend - Simulation-Warnung in finaler Antwort
-**Datei**: `backend/api/veritas_api_backend.py`  
+**Datei**: `backend/api/veritas_api_backend.py`
 **Zeilen**: ~1260-1285
 
 ```python
 # 🆕 Prüfe ob Ergebnisse simuliert sind
 simulated_agents = [
-    agent_type.replace('_', ' ').title() 
-    for agent_type, result in agent_results.items() 
+    agent_type.replace('_', ' ').title()
+    for agent_type, result in agent_results.items()
     if result.get('is_simulation', False)
 ]
 
@@ -63,7 +63,7 @@ main_response += simulation_warning
 ---
 
 ### 3. Backend - Metadata erweitert
-**Datei**: `backend/api/veritas_api_backend.py`  
+**Datei**: `backend/api/veritas_api_backend.py`
 **Zeilen**: ~1295-1305
 
 ```python
@@ -84,7 +84,7 @@ main_response += simulation_warning
 ---
 
 ### 4. Frontend - Simulation-Erkennung
-**Datei**: `frontend/veritas_app.py`  
+**Datei**: `frontend/veritas_app.py`
 **Zeilen**: ~590-608
 
 ```python
@@ -96,7 +96,7 @@ has_simulation = metadata.get('has_simulation', False)
 if not has_simulation:
     worker_results = response_data.get('worker_results', {})
     has_simulation = any(
-        result.get('is_simulation', False) 
+        result.get('is_simulation', False)
         for result in worker_results.values()
     )
 ```
@@ -106,7 +106,7 @@ if not has_simulation:
 ---
 
 ### 5. UDS3 Mock Endpoint - Warnung hinzugefügt
-**Datei**: `backend/api/veritas_api_backend.py`  
+**Datei**: `backend/api/veritas_api_backend.py`
 **Zeilen**: ~1850-1870
 
 ```python
@@ -168,20 +168,20 @@ python start_frontend.py
 2. **Erwartete Antwort sollte enthalten**:
    ```markdown
    **Antwort auf Ihre Frage**: ...
-   
+
    **Zusammenfassung der Analyse**:
    🟢 Geo Context: ...
    🟢 Legal Framework: ...
-   
+
    ⚠️ **DEMO-MODUS**: Diese Antwort basiert auf simulierten Beispieldaten.
-   
+
    **Betroffene Bereiche**: Geo Context, Legal Framework, Document Retrieval
-   
-   **Grund**: Die UDS3-Datenbank ist derzeit nicht verfügbar. Die Antworten 
-   basieren auf allgemeinen Mustern und können nicht auf spezifische 
+
+   **Grund**: Die UDS3-Datenbank ist derzeit nicht verfügbar. Die Antworten
+   basieren auf allgemeinen Mustern und können nicht auf spezifische
    regionale oder aktuelle Informationen zugreifen.
-   
-   **Hinweis**: Für produktive Nutzung muss die UDS3-Integration 
+
+   **Hinweis**: Für produktive Nutzung muss die UDS3-Integration
    abgeschlossen werden.
    ```
 
@@ -223,17 +223,17 @@ python start_frontend.py
 
 ## ✅ Was funktioniert:
 
-✅ Conversation History - Vollständig implementiert und getestet  
-✅ Simulation-Markierung - Backend erkennt und loggt  
-✅ Warnung-Text - Wird in Response eingefügt  
-✅ Metadata - Enthält Simulation-Info  
-✅ Frontend-Erkennung - Code vorhanden  
+✅ Conversation History - Vollständig implementiert und getestet
+✅ Simulation-Markierung - Backend erkennt und loggt
+✅ Warnung-Text - Wird in Response eingefügt
+✅ Metadata - Enthält Simulation-Info
+✅ Frontend-Erkennung - Code vorhanden
 
 ## ⏳ Was getestet werden muss:
 
-⏳ Sichtbare Warnung im Frontend-UI  
-⏳ Warnung bei Follow-up Fragen (mit Kontext)  
-⏳ User-Feedback zur Warnung  
+⏳ Sichtbare Warnung im Frontend-UI
+⏳ Warnung bei Follow-up Fragen (mit Kontext)
+⏳ User-Feedback zur Warnung
 
 ---
 

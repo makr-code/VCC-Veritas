@@ -1,6 +1,6 @@
 # 🔍 LLM-Parameter Flow Verification
 
-**Datum:** 10.10.2025  
+**Datum:** 10.10.2025
 **Status:** ✅ VERIFIZIERT - Parameter werden korrekt weitergegeben
 
 ---
@@ -102,16 +102,16 @@ result = await asyncio.get_event_loop().run_in_executor(
 
 **answer_query() → Zeile 454:**
 ```python
-def answer_query(session_id: str, query: str, user_profile: dict, 
+def answer_query(session_id: str, query: str, user_profile: dict,
                 model_name: str = None,  # ✅ Empfängt vom Backend
-                temperature: float = 0.7, 
-                max_tokens: int = None, 
-                top_p: float = None, 
+                temperature: float = 0.7,
+                max_tokens: int = None,
+                top_p: float = None,
                 attachments: list = None):
-    
+
     logging.info(f"Query-Verarbeitung | Modell: {model_name or LLM_MODEL}, "
                 f"Temperatur: {temperature}, Max Tokens: {max_tokens}")
-    
+
     # LLM-Instanz erstellen
     llm = _get_llm_instance(
         model_name=model_name,  # ✅ Weitergegeben
@@ -123,12 +123,12 @@ def answer_query(session_id: str, query: str, user_profile: dict,
 
 **_get_llm_instance() → Zeile 94:**
 ```python
-def _get_llm_instance(model_name: str = None, temperature: float = 0.7, 
+def _get_llm_instance(model_name: str = None, temperature: float = 0.7,
                      max_tokens: int = None, top_p: float = None):
     effective_model = model_name or LLM_MODEL  # ✅ Fallback auf Config
-    
+
     logging.info(f"Lade LLM-Modell: {effective_model} (T={temperature})")
-    
+
     return DirectOllamaLLM(
         model=effective_model,      # ✅ Vom User gewählt!
         base_url=OLLAMA_HOST,
@@ -219,9 +219,9 @@ payload = {
 ttk.Label(settings_frame, text="📝", font=('Segoe UI', 8)).pack(side=tk.LEFT)
 self.max_tokens_var = tk.IntVar(value=500)
 ttk.Spinbox(
-    settings_frame, 
-    from_=100, 
-    to=2000, 
+    settings_frame,
+    from_=100,
+    to=2000,
     width=5,
     textvariable=self.max_tokens_var,
     font=('Segoe UI', 8)
@@ -294,6 +294,6 @@ Die LLM-Parameter-Weiterreichung von Frontend → Backend → Ollama ist vollst�
 
 ---
 
-**Autor:** VERITAS System  
-**Version:** 1.0  
+**Autor:** VERITAS System
+**Version:** 1.0
 **Letzte Aktualisierung:** 10.10.2025

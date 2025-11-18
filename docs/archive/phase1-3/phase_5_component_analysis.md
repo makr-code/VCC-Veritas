@@ -1,6 +1,6 @@
 # Phase 5: Advanced RAG - Bestands-Analyse
 
-**Datum:** 6. Oktober 2025  
+**Datum:** 6. Oktober 2025
 **Status:** 🔍 Analyse abgeschlossen
 
 ---
@@ -113,7 +113,7 @@ class RAGQueryOptions:
     include_vector: bool = True
     include_graph: bool = True
     include_relational: bool = True
-    
+
     # Re-Ranking
     enable_reranking: bool = True
     reranking_initial_k: int = 20  # Initial Retrieval
@@ -140,7 +140,7 @@ Stage 3: Graph Context Synthesis
 - Hybrid Search (Dense + Sparse)
 - Reciprocal Rank Fusion (RRF)
 
-**Impact:** 
+**Impact:**
 - Kein lexikalisches Matching für exakte Begriffe (§ 242 BGB, DIN 18040-1)
 - Keine Hybrid-Search-Vorteile
 
@@ -217,7 +217,7 @@ Stage 3: Graph Context Synthesis
 ### Was wir IMPLEMENTIEREN sollten:
 
 #### **Phase 5.1: Sparse Retrieval & Hybrid Search** (Priorität 1)
-**Zeitaufwand:** 6-8 Stunden  
+**Zeitaufwand:** 6-8 Stunden
 **Code:** 300-400 Zeilen
 
 **Deliverables:**
@@ -235,20 +235,20 @@ class HybridRetriever:
     ) -> List[ScoredChunk]:
         # Dense Retrieval (UDS3 Embeddings)
         dense_results = await uds3.vector_search(query, k=50)
-        
+
         # Sparse Retrieval (BM25)
         sparse_results = await bm25.search(query, k=50)
-        
+
         # Reciprocal Rank Fusion
         fused_results = rrf.fuse(dense_results, sparse_results)
-        
+
         return fused_results[:top_k]
 ```
 
 ---
 
 #### **Phase 5.2: Query Expansion** (Priorität 2)
-**Zeitaufwand:** 4-5 Stunden  
+**Zeitaufwand:** 4-5 Stunden
 **Code:** 200-300 Zeilen
 
 **Deliverables:**
@@ -266,7 +266,7 @@ class QueryExpander:
     ) -> List[str]:
         # LLM-basierte Expansion
         expansions = await llm.expand(query, n=num_expansions)
-        
+
         return [query] + expansions
 
 # Usage
@@ -281,7 +281,7 @@ expanded_queries = await expander.expand_query(
 ---
 
 #### **Phase 5.3: MMR Diversity Re-Ranking** (Priorität 3)
-**Zeitaufwand:** 3-4 Stunden  
+**Zeitaufwand:** 3-4 Stunden
 **Code:** 150-250 Zeilen
 
 **Deliverables:**
@@ -301,24 +301,24 @@ class MMRReranker:
         # MMR Iterative Selection
         selected = []
         remaining = candidates.copy()
-        
+
         for _ in range(top_k):
             mmr_scores = [
-                lambda_param * relevance(q, c) - 
+                lambda_param * relevance(q, c) -
                 (1 - lambda_param) * max_similarity(c, selected)
                 for c in remaining
             ]
             best = remaining[argmax(mmr_scores)]
             selected.append(best)
             remaining.remove(best)
-        
+
         return selected
 ```
 
 ---
 
 #### **Phase 5.4: Semantic Chunking** (Priorität 4 - Optional)
-**Zeitaufwand:** 4-6 Stunden  
+**Zeitaufwand:** 4-6 Stunden
 **Code:** 300-400 Zeilen
 
 **Deliverables:**
@@ -353,7 +353,7 @@ class MMRReranker:
 ## 🚀 Empfohlene Nächste Schritte
 
 ### **Option A: Minimaler Impact (Hybrid Search only)**
-**Zeitaufwand:** 1 Tag  
+**Zeitaufwand:** 1 Tag
 **Code:** ~550 Zeilen
 
 **Implementiere:**
@@ -369,7 +369,7 @@ class MMRReranker:
 ---
 
 ### **Option B: Moderate Impact (Hybrid + Query Expansion)**
-**Zeitaufwand:** 1.5 Tage  
+**Zeitaufwand:** 1.5 Tage
 **Code:** ~850 Zeilen
 
 **Implementiere:**
@@ -385,7 +385,7 @@ class MMRReranker:
 ---
 
 ### **Option C: Vollständig (All Features)**
-**Zeitaufwand:** 2-2.5 Tage  
+**Zeitaufwand:** 2-2.5 Tage
 **Code:** ~1450-1750 Zeilen
 
 **Implementiere:**

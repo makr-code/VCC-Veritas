@@ -21,6 +21,15 @@ from pathlib import Path
 from datetime import datetime
 import json
 import logging
+<<<<<<< Updated upstream
+=======
+import os
+import re
+import sqlite3
+import sys
+from datetime import datetime
+from pathlib import Path
+>>>>>>> Stashed changes
 
 # Setup logging
 logging.basicConfig(
@@ -417,9 +426,31 @@ class SQLiteDatabaseSetup:
                 'agent_execution_log',
                 'agent_registry_metadata'
             ]
+<<<<<<< Updated upstream
             
             for table in tables:
                 cursor.execute(f"SELECT COUNT(*) FROM {table}")
+=======
+
+            # Use a static mapping of allowed internal queries to avoid any
+            # runtime string interpolation that static analyzers flag as
+            # dynamic SQL (Bandit B608). These queries are fixed and internal.
+            queries = {
+                "research_plans": "SELECT COUNT(*) FROM research_plans",
+                "research_plan_steps": "SELECT COUNT(*) FROM research_plan_steps",
+                "step_results": "SELECT COUNT(*) FROM step_results",
+                "agent_execution_log": "SELECT COUNT(*) FROM agent_execution_log",
+                "agent_registry_metadata": "SELECT COUNT(*) FROM agent_registry_metadata",
+            }
+
+            for table in tables:
+                query = queries.get(table)
+                if not query:
+                    logger.error(f"No query defined for internal table: {table}")
+                    continue
+
+                cursor.execute(query)
+>>>>>>> Stashed changes
                 count = cursor.fetchone()[0]
                 stats[table] = count
             

@@ -1,7 +1,7 @@
 # 🎯 VERITAS v3.20.0 - Chat Persistence Phase 3: LLM-Context-Integration
 
-**Status:** ✅ **COMPLETE**  
-**Datum:** 12. Oktober 2025, 15:30 Uhr  
+**Status:** ✅ **COMPLETE**
+**Datum:** 12. Oktober 2025, 15:30 Uhr
 **Phase:** 3 von 4 (LLM-Context-Integration)
 
 ---
@@ -12,9 +12,9 @@ Phase 3 integriert die Chat-History in die LLM-Anfragen, sodass VERITAS **kontex
 
 ### Ziele
 
-✅ **ConversationContextManager** erstellen (Backend)  
-✅ **Ollama Context-Integration** implementieren (Backend)  
-✅ **Frontend-Integration** (API-Payload mit Chat-History)  
+✅ **ConversationContextManager** erstellen (Backend)
+✅ **Ollama Context-Integration** implementieren (Backend)
+✅ **Frontend-Integration** (API-Payload mit Chat-History)
 ⏳ **Testing & Validation** (Phase 4)
 
 ---
@@ -177,7 +177,7 @@ async def query_with_context(
 ) -> OllamaResponse:
     """
     🆕 Sendet Query an LLM mit Chat-History-Context
-    
+
     Args:
         query: Aktuelle Benutzeranfrage
         chat_session: ChatSession-Objekt mit Message-History
@@ -186,7 +186,7 @@ async def query_with_context(
         model: Optionales Modell (default: self.default_model)
         temperature: Sampling-Temperature (0.0-1.0)
         max_tokens: Max. Response-Tokens
-        
+
     Returns:
         OllamaResponse mit kontextueller Antwort
     """
@@ -256,7 +256,7 @@ class VeritasRAGRequest(BaseModel):
     temperature: float = 0.7
     max_tokens: int = 1000
     session_id: Optional[str] = None
-    
+
     # 🆕 Chat-History Support
     chat_history: Optional[List[Dict[str, str]]] = Field(
         default=None,
@@ -272,7 +272,7 @@ async def veritas_rag_query(request: VeritasRAGRequest):
     # 🆕 CONTEXT-INTEGRATION
     enriched_question = request.question
     context_metadata = {}
-    
+
     if request.chat_history and len(request.chat_history) > 0:
         # Mock ChatSession aus History
         mock_session = ChatSession(session_id=session_id)
@@ -281,7 +281,7 @@ async def veritas_rag_query(request: VeritasRAGRequest):
                 role=msg.get('role', 'user'),
                 content=msg.get('content', '')
             )
-        
+
         # Context erstellen
         context_manager = ConversationContextManager(max_tokens=2000)
         context_result = context_manager.build_conversation_context(
@@ -290,7 +290,7 @@ async def veritas_rag_query(request: VeritasRAGRequest):
             strategy="sliding_window",
             max_messages=10
         )
-        
+
         # Frage mit Context erweitern
         if context_result.get('context'):
             enriched_question = f"""Bisherige Konversation:
@@ -298,20 +298,20 @@ async def veritas_rag_query(request: VeritasRAGRequest):
 
 Aktuelle Frage:
 {request.question}"""
-            
+
             context_metadata = {
                 'context_enabled': True,
                 'context_messages': context_result['message_count'],
                 'context_tokens': context_result['token_count'],
                 'context_strategy': context_result['strategy_used']
             }
-    
+
     # Pipeline mit enriched_question aufrufen
     pipeline_request = IntelligentPipelineRequest(
         query_text=enriched_question,  # 🆕 Mit Context
         user_context={**context_metadata}
     )
-    
+
     # Response mit Context-Metadata
     return VeritasRAGResponse(
         answer=pipeline_response.response_text,
@@ -356,7 +356,7 @@ if hasattr(self, 'chat_session') and self.chat_session:
     try:
         # Letzte 10 Messages extrahieren
         recent_messages = self.chat_session.messages[-10:]
-        
+
         # Konvertiere zu API-Format
         chat_history = [
             {
@@ -365,7 +365,7 @@ if hasattr(self, 'chat_session') and self.chat_session:
             }
             for msg in recent_messages
         ]
-        
+
         # Füge zur Payload hinzu (nur für /ask Endpoint)
         if endpoint == "/ask" and len(chat_history) > 0:
             payload["chat_history"] = chat_history
@@ -692,10 +692,10 @@ def _calculate_overlap_score(tokens1, tokens2):
     counter1 = Counter(tokens1)
     counter2 = Counter(tokens2)
     common_tokens = set(counter1.keys()) & set(counter2.keys())
-    
+
     score = sum(min(counter1[token], counter2[token]) for token in common_tokens)
     max_score = math.sqrt(len(tokens1) * len(tokens2))
-    
+
     return score / max_score if max_score > 0 else 0.0
 ```
 

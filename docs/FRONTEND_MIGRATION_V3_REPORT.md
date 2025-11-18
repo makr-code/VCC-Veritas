@@ -1,6 +1,6 @@
 # VERITAS Frontend Migration Report - API v3
 
-**Datum**: 18. Oktober 2025  
+**Datum**: 18. Oktober 2025
 **Status**: ✅ **ABGESCHLOSSEN**
 
 ---
@@ -368,7 +368,7 @@ python frontend\veritas_app.py
 
 ---
 
-**Status**: ✅ **FRONTEND MIGRATION ABGESCHLOSSEN**  
-**Nächster Schritt**: Frontend-Tests mit laufendem Backend durchführen  
-**Verantwortlich**: Development Team  
+**Status**: ✅ **FRONTEND MIGRATION ABGESCHLOSSEN**
+**Nächster Schritt**: Frontend-Tests mit laufendem Backend durchführen
+**Verantwortlich**: Development Team
 **Datum**: 2025-10-18

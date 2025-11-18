@@ -1,7 +1,7 @@
 # NaturschutzAgent
 
-**Typ:** ENVIRONMENTAL Agent  
-**Version:** v1.0  
+**Typ:** ENVIRONMENTAL Agent
+**Version:** v1.0
 **Date:** 2025-10-16
 
 ---

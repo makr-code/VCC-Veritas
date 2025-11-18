@@ -1,10 +1,10 @@
 # VERITAS PKI Integration - Complete Implementation Guide
 
-**Status:** 🎯 **READY TO START**  
-**PKI Server:** ✅ 100% Complete (C:\VCC\PKI)  
-**Client Library:** ✅ Ready (`vcc-pki-client`)  
-**Reference Implementation:** ✅ Covina (can be used as template)  
-**Date:** 22. Oktober 2025  
+**Status:** 🎯 **READY TO START**
+**PKI Server:** ✅ 100% Complete (C:\VCC\PKI)
+**Client Library:** ✅ Ready (`vcc-pki-client`)
+**Reference Implementation:** ✅ Covina (can be used as template)
+**Date:** 22. Oktober 2025
 **Estimated Total Time:** 3-4 hours
 
 ---
@@ -155,22 +155,22 @@ async def startup_event():
     Application startup tasks including PKI certificate management.
     """
     logger.info("🚀 VERITAS Backend starting up...")
-    
+
     # === PKI CERTIFICATE MANAGEMENT ===
     try:
         # Check if certificate already exists
         cert_info = pki_client.get_certificate_info()
         logger.info(f"✅ Certificate found: {cert_info['common_name']}")
         logger.info(f"📅 Expires in {cert_info['days_until_expiry']} days")
-        
+
         # Warn if certificate expires soon
         if cert_info['days_until_expiry'] < 30:
             logger.warning(f"⚠️ Certificate expires in {cert_info['days_until_expiry']} days!")
-        
+
     except FileNotFoundError:
         # No certificate found - request new one
         logger.info("🔐 No certificate found - requesting new certificate from PKI server...")
-        
+
         cert_request = pki_client.request_certificate(
             common_name="veritas-backend.vcc.local",
             san_dns=[
@@ -185,10 +185,10 @@ async def startup_event():
             country="DE",
             validity_days=365
         )
-        
+
         logger.info(f"✅ Certificate issued: {cert_request['certificate_id']}")
         logger.info(f"📅 Valid until: {cert_request['valid_until']}")
-    
+
     # === REGISTER SERVICE ===
     try:
         registration = pki_client.register_service(
@@ -210,7 +210,7 @@ async def startup_event():
     except Exception as e:
         logger.error(f"❌ Service registration failed: {e}")
         # Non-critical - continue startup
-    
+
     # === ENABLE AUTO-RENEWAL ===
     try:
         pki_client.enable_auto_renewal(
@@ -220,13 +220,13 @@ async def startup_event():
         logger.info("✅ Certificate auto-renewal enabled (checks every 6 hours)")
     except Exception as e:
         logger.error(f"❌ Auto-renewal setup failed: {e}")
-    
+
     # === EXISTING STARTUP TASKS ===
     # UDS3 initialization
     # Pipeline initialization
     # Streaming service initialization
     # (keep existing code)
-    
+
     logger.info("🎉 VERITAS Backend startup complete!")
 ```
 
@@ -239,24 +239,24 @@ async def shutdown_event():
     Application shutdown tasks including PKI cleanup.
     """
     logger.info("🛑 VERITAS Backend shutting down...")
-    
+
     # === DISABLE AUTO-RENEWAL ===
     try:
         pki_client.disable_auto_renewal()
         logger.info("✅ Certificate auto-renewal disabled")
     except Exception as e:
         logger.error(f"❌ Auto-renewal disable failed: {e}")
-    
+
     # === DEREGISTER SERVICE ===
     try:
         pki_client.deregister_service()
         logger.info("✅ Service deregistered from PKI")
     except Exception as e:
         logger.error(f"❌ Service deregistration failed: {e}")
-    
+
     # === EXISTING SHUTDOWN TASKS ===
     # (keep existing code)
-    
+
     logger.info("👋 VERITAS Backend shutdown complete!")
 ```
 
@@ -267,14 +267,14 @@ Update the main block at the bottom of `backend/app.py`:
 ```python
 if __name__ == "__main__":
     import uvicorn
-    
+
     # === GET SSL CONTEXT FROM PKI CLIENT ===
     try:
         ssl_context = pki_client.get_ssl_context(
             client_auth=False  # Set to True for mTLS
         )
         logger.info("✅ SSL context created from PKI certificates")
-        
+
         # Start with HTTPS
         uvicorn.run(
             app,
@@ -289,7 +289,7 @@ if __name__ == "__main__":
     except Exception as e:
         logger.error(f"❌ Failed to start with HTTPS: {e}")
         logger.warning("⚠️ Falling back to HTTP (insecure!)")
-        
+
         # Fallback to HTTP
         uvicorn.run(
             app,
@@ -479,24 +479,24 @@ class VeritasAPIClient:
             pki_server_url=os.getenv("PKI_SERVER_URL", "https://localhost:8443"),
             service_id="veritas-frontend"
         )
-        
+
         # Get CA bundle for backend verification
         self.ca_bundle_path = self.pki_client.get_ca_bundle_path()
-        
+
         # Create session with SSL verification
         self.session = requests.Session()
         self.session.verify = str(self.ca_bundle_path)
-        
+
         # Optional: Set timeout
         self.session.timeout = 30
-    
+
     def get(self, endpoint: str, **kwargs):
         """GET request to backend with SSL verification"""
         url = f"{API_BASE_URL}/{endpoint.lstrip('/')}"
         response = self.session.get(url, **kwargs)
         response.raise_for_status()
         return response.json()
-    
+
     def post(self, endpoint: str, data=None, **kwargs):
         """POST request to backend with SSL verification"""
         url = f"{API_BASE_URL}/{endpoint.lstrip('/')}"
@@ -519,25 +519,25 @@ class StreamingClient:
             pki_server_url=os.getenv("PKI_SERVER_URL", "https://localhost:8443"),
             service_id="veritas-frontend"
         )
-        
+
         # Create SSL context for WSS
         self.ssl_context = ssl.create_default_context(
             cafile=str(self.pki_client.get_ca_bundle_path())
         )
-    
+
     def connect_stream(self, session_id: str):
         # Before: ws://localhost:8001/ws/stream/{session_id}
         # After:  wss://veritas-backend.vcc.local:8001/ws/stream/{session_id}
-        
+
         ws_url = f"wss://veritas-backend.vcc.local:8001/ws/stream/{session_id}"
-        
+
         ws = websocket.WebSocketApp(
             ws_url,
             on_message=self.on_message,
             on_error=self.on_error,
             on_close=self.on_close
         )
-        
+
         ws.run_forever(sslopt={"context": self.ssl_context})
 ```
 
@@ -631,14 +631,14 @@ import requests
 
 class VCCServiceClient:
     """Client for calling other VCC services with mTLS authentication"""
-    
+
     def __init__(self, target_service: str):
         self.target_service = target_service
         self.pki_client = PKIClient(
             pki_server_url=os.getenv("PKI_SERVER_URL"),
             service_id="veritas-backend"
         )
-        
+
         # Create session with client certificate
         self.session = requests.Session()
         self.session.cert = (
@@ -646,23 +646,23 @@ class VCCServiceClient:
             self.pki_client.get_client_key_path()
         )
         self.session.verify = str(self.pki_client.get_ca_bundle_path())
-    
+
     def call_service(self, endpoint: str, method: str = "GET", data=None):
         """Call another VCC service with mTLS authentication"""
-        
+
         # Get target service URL from service registry
         service_info = self.pki_client.get_service_info(self.target_service)
         base_url = service_info['endpoints'][0]
-        
+
         url = f"{base_url}/{endpoint.lstrip('/')}"
-        
+
         response = self.session.request(
             method=method,
             url=url,
             json=data,
             timeout=30
         )
-        
+
         response.raise_for_status()
         return response.json()
 
@@ -686,20 +686,20 @@ Update `backend/api/system_router.py`:
 @system_router.get("/health")
 async def health_check(request: Request) -> Dict[str, Any]:
     """System Health Check including PKI status"""
-    
+
     # Existing health checks
     uds3_ok = hasattr(request.app.state, "uds3") and request.app.state.uds3 is not None
     pipeline_ok = hasattr(request.app.state, "pipeline") and request.app.state.pipeline is not None
-    
+
     # === PKI HEALTH CHECK ===
     pki_ok = False
     pki_details = {}
-    
+
     try:
         # Get certificate info from PKI client
         cert_info = pki_client.get_certificate_info()
         days_until_expiry = cert_info['days_until_expiry']
-        
+
         # Determine PKI health status
         if days_until_expiry > 30:
             pki_status = "ok"
@@ -710,7 +710,7 @@ async def health_check(request: Request) -> Dict[str, Any]:
         else:
             pki_status = "critical"
             pki_ok = False
-        
+
         pki_details = {
             "available": True,
             "required": True,
@@ -721,7 +721,7 @@ async def health_check(request: Request) -> Dict[str, Any]:
             "auto_renewal_enabled": cert_info.get('auto_renewal_enabled', False),
             "message": f"Certificate expires in {days_until_expiry} days"
         }
-        
+
     except Exception as e:
         pki_details = {
             "available": False,
@@ -730,10 +730,10 @@ async def health_check(request: Request) -> Dict[str, Any]:
             "error": str(e),
             "message": "PKI certificate not available or invalid"
         }
-    
+
     # Combined health status
     all_components_ok = uds3_ok and pipeline_ok and pki_ok
-    
+
     return {
         "status": "healthy" if all_components_ok else "degraded",
         "timestamp": datetime.now().isoformat(),
@@ -758,11 +758,11 @@ logger = logging.getLogger(__name__)
 
 class CertificateMonitor:
     """Monitor certificate expiry and send alerts"""
-    
+
     def __init__(self, pki_client: PKIClient):
         self.pki_client = pki_client
         self.scheduler = BackgroundScheduler()
-    
+
     def start(self):
         """Start monitoring certificate expiry"""
         # Check every 24 hours
@@ -774,13 +774,13 @@ class CertificateMonitor:
         )
         self.scheduler.start()
         logger.info("✅ Certificate monitoring started (checks every 24 hours)")
-    
+
     def check_certificate_expiry(self):
         """Check certificate expiry and log warnings"""
         try:
             cert_info = self.pki_client.get_certificate_info()
             days_until_expiry = cert_info['days_until_expiry']
-            
+
             if days_until_expiry <= 7:
                 logger.critical(f"🚨 CRITICAL: Certificate expires in {days_until_expiry} days!")
                 # TODO: Send email/Slack notification
@@ -788,10 +788,10 @@ class CertificateMonitor:
                 logger.warning(f"⚠️ WARNING: Certificate expires in {days_until_expiry} days")
             else:
                 logger.info(f"✅ Certificate valid for {days_until_expiry} days")
-        
+
         except Exception as e:
             logger.error(f"❌ Certificate expiry check failed: {e}")
-    
+
     def stop(self):
         """Stop monitoring"""
         self.scheduler.shutdown()
@@ -848,7 +848,7 @@ pki_admin_router = APIRouter(
 async def get_certificate_info() -> Dict[str, Any]:
     """
     Get current service certificate information.
-    
+
     Returns:
         Certificate details including expiry, status, etc.
     """
@@ -865,7 +865,7 @@ async def get_certificate_info() -> Dict[str, Any]:
 async def renew_certificate() -> Dict[str, Any]:
     """
     Manually trigger certificate renewal.
-    
+
     Normally handled automatically, but can be triggered manually.
     """
     try:
@@ -1009,7 +1009,7 @@ BACKEND_URL = "https://localhost:8001"
 
 class TestPKIIntegration:
     """Test PKI integration with VERITAS backend"""
-    
+
     @pytest.fixture
     def pki_client(self):
         """Create PKI client for testing"""
@@ -1017,48 +1017,48 @@ class TestPKIIntegration:
             pki_server_url=PKI_SERVER_URL,
             service_id="veritas-backend-test"
         )
-    
+
     def test_pki_server_running(self):
         """Test PKI server is accessible"""
         response = requests.get(f"{PKI_SERVER_URL}/health", verify=False)
         assert response.status_code == 200
         assert response.json()["status"] == "healthy"
-    
+
     def test_backend_certificate_exists(self, pki_client):
         """Test backend has valid certificate"""
         cert_info = pki_client.get_certificate_info()
-        
+
         assert cert_info["common_name"] == "veritas-backend.vcc.local"
         assert cert_info["certificate_valid"] == True
         assert cert_info["days_until_expiry"] > 0
-    
+
     def test_backend_https_endpoint(self, pki_client):
         """Test backend HTTPS endpoint with certificate verification"""
         ca_bundle = pki_client.get_ca_bundle_path()
-        
+
         response = requests.get(
             f"{BACKEND_URL}/api/system/health",
             verify=str(ca_bundle)
         )
-        
+
         assert response.status_code == 200
         data = response.json()
-        
+
         # Check PKI component in health check
         assert "pki" in data["components"]
         assert data["components"]["pki"]["certificate_valid"] == True
-    
+
     def test_auto_renewal_enabled(self, pki_client):
         """Test auto-renewal is enabled"""
         status = pki_client.get_auto_renewal_status()
-        
+
         assert status["enabled"] == True
         assert status["renewal_threshold_days"] == 30
-    
+
     def test_service_registered(self, pki_client):
         """Test service is registered with PKI"""
         registration = pki_client.get_service_registration()
-        
+
         assert registration["service_id"] == "veritas-backend"
         assert registration["service_name"] == "VERITAS Backend API"
         assert len(registration["endpoints"]) > 0
@@ -1080,7 +1080,7 @@ pytest tests/integration/test_pki_integration.py -v
 # ✅ test_backend_https_endpoint PASSED
 # ✅ test_auto_renewal_enabled PASSED
 # ✅ test_service_registered PASSED
-# 
+#
 # 5 passed in 2.34s
 ```
 
@@ -1167,36 +1167,36 @@ from pathlib import Path
 
 def setup_logging():
     """Configure logging with PKI-specific loggers"""
-    
+
     log_dir = Path("logs")
     log_dir.mkdir(exist_ok=True)
-    
+
     # Main application log
     app_handler = RotatingFileHandler(
         log_dir / "veritas.log",
         maxBytes=10*1024*1024,  # 10 MB
         backupCount=5
     )
-    
+
     # PKI-specific log
     pki_handler = RotatingFileHandler(
         log_dir / "pki.log",
         maxBytes=5*1024*1024,  # 5 MB
         backupCount=3
     )
-    
+
     # Configure formatters
     formatter = logging.Formatter(
         '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     )
     app_handler.setFormatter(formatter)
     pki_handler.setFormatter(formatter)
-    
+
     # Root logger
     root_logger = logging.getLogger()
     root_logger.addHandler(app_handler)
     root_logger.setLevel(logging.INFO)
-    
+
     # PKI logger
     pki_logger = logging.getLogger("vcc_pki_client")
     pki_logger.addHandler(pki_handler)
@@ -1365,6 +1365,6 @@ Mark tasks as completed:
 
 ---
 
-**Last Updated:** 22. Oktober 2025  
-**Version:** 1.0  
+**Last Updated:** 22. Oktober 2025
+**Version:** 1.0
 **Status:** Ready for Implementation 🚀

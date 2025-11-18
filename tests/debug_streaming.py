@@ -2,8 +2,8 @@
 """
 Streaming Debug Test - Prüft warum Streaming nicht verfügbar ist
 """
-import sys
 import os
+import sys
 
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
@@ -16,9 +16,14 @@ print("=" * 60)
 print("\n[TEST 1] Import veritas_streaming_progress...")
 try:
     from shared.pipelines.veritas_streaming_progress import (
-        create_progress_manager, create_progress_streamer,
-        ProgressStage, ProgressType, VeritasProgressManager, VeritasProgressStreamer
+        ProgressStage,
+        ProgressType,
+        VeritasProgressManager,
+        VeritasProgressStreamer,
+        create_progress_manager,
+        create_progress_streamer,
     )
+
     print("✅ SUCCESS: Module imported")
     STREAMING_AVAILABLE = True
 except ImportError as e:
@@ -35,7 +40,7 @@ if STREAMING_AVAILABLE:
         print(f"✅ SUCCESS: {type(progress_manager)}")
     except Exception as e:
         print(f"❌ FAILED: {e}")
-    
+
     print("\n[TEST 3] Create progress streamer...")
     try:
         progress_streamer = create_progress_streamer(progress_manager)
@@ -48,9 +53,14 @@ print("\n[TEST 4] Import from backend/api/veritas_api_backend.py...")
 try:
     # Simulate the import in backend.py
     from shared.pipelines.veritas_streaming_progress import (
-        create_progress_manager, create_progress_streamer,
-        ProgressStage, ProgressType, VeritasProgressManager, VeritasProgressStreamer
+        ProgressStage,
+        ProgressType,
+        VeritasProgressManager,
+        VeritasProgressStreamer,
+        create_progress_manager,
+        create_progress_streamer,
     )
+
     STREAMING_AVAILABLE = True
     print(f"✅ SUCCESS: STREAMING_AVAILABLE = {STREAMING_AVAILABLE}")
 except ImportError as e:

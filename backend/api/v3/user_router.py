@@ -216,7 +216,7 @@ async def update_user_profile(
     
     # Production: Update user in database
     try:
-        update_data = {}
+        update_data: Dict[str, Any] = {}
         if full_name:
             update_data["full_name"] = full_name
         if organization:
@@ -457,7 +457,7 @@ async def get_query_history(
     
     # Production: Load history from database
     try:
-        filters = {"user_id": user_id}
+        filters: Dict[str, Any] = {"user_id": user_id}
         if mode:
             filters["mode"] = mode
         if bookmarked_only:

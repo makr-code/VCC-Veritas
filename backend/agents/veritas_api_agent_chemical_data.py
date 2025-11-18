@@ -509,6 +509,7 @@ class ChemicalDataAgent:
         self._sds_cache: Dict[str, SafetyDataSheet] = {}
         
         # Performance tracking
+<<<<<<< Updated upstream
         self._stats = {
             'queries_processed': 0,
             'substances_found': 0,
@@ -518,6 +519,17 @@ class ChemicalDataAgent:
             'avg_processing_time_ms': 0,
             'total_processing_time_ms': 0,
             'data_sources_used': set()
+=======
+        self._stats: Dict[str, Any] = {
+            "queries_processed": 0,
+            "substances_found": 0,
+            "api_calls_made": 0,
+            "cache_hits": 0,
+            "errors": 0,
+            "avg_processing_time_ms": 0,
+            "total_processing_time_ms": 0,
+            "data_sources_used": set(),
+>>>>>>> Stashed changes
         }
         
         self.logger.info(f"✅ Chemical Data Agent initialized with {len(self.config.enabled_databases)} databases")
@@ -988,9 +1000,17 @@ class ChemicalDataAgent:
             str(request.max_results),
             str(request.include_safety_data_sheet)
         ]
+<<<<<<< Updated upstream
         key_string = "|".join(key_parts)
         return hashlib.md5(key_string.encode()).hexdigest()
     
+=======
+
+        key_string = "|".join(key_parts)
+        # Use SHA-256 for cache keys instead of MD5 (Bandit B324)
+        return hashlib.sha256(key_string.encode()).hexdigest()
+
+>>>>>>> Stashed changes
     def _update_stats(self, processing_time: int, substances_found: int):
         """Statistiken aktualisieren"""
         self._stats['queries_processed'] += 1

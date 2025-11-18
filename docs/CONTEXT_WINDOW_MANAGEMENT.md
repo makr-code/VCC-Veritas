@@ -1,7 +1,7 @@
 # Context Window Management - Implementation Summary
 
-**Status**: ✅ **IMPLEMENTED AND INTEGRATED**  
-**Date**: 2025-10-17  
+**Status**: ✅ **IMPLEMENTED AND INTEGRATED**
+**Date**: 2025-10-17
 **File**: `backend/services/context_window_manager.py`
 
 ---
@@ -67,7 +67,7 @@ class ModelSpec:
     context_window: int
     parameters: str
     recommended_max_output: int
-    
+
     @property
     def safe_max_output(self) -> int:
         return int(self.context_window * 0.8)
@@ -95,7 +95,7 @@ class TokenBudgetContext:
 ```python
 class ContextWindowManager:
     def __init__(self, safety_factor: float = 0.8)
-    
+
     def get_model_spec(self, model_name: str) -> ModelSpec
     def estimate_token_count(self, text: str) -> int
     def calculate_available_output_tokens(...) -> TokenBudgetContext
@@ -133,14 +133,14 @@ if self.context_window_manager:
         user_prompt=user_prompt,
         rag_context=rag_context_str
     )
-    
+
     if adjusted_tokens < max_tokens:
         logger.warning(
             f"⚠️ Token-Budget reduziert: {max_tokens} → {adjusted_tokens} "
             f"(Context-Window-Limit für {model_name})"
         )
         max_tokens = adjusted_tokens
-    
+
     if context.needs_model_upgrade:
         logger.info(
             f"💡 Model-Upgrade empfohlen: {model_name} → {context.recommended_model}"
@@ -295,6 +295,6 @@ python backend/services/context_window_manager.py
 
 ---
 
-**Author**: VERITAS System  
-**Date**: 2025-10-17  
+**Author**: VERITAS System
+**Date**: 2025-10-17
 **Status**: ✅ Production-Ready

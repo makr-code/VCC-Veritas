@@ -132,6 +132,7 @@ class VeritasOllamaClient:
         self.prompt_templates = self._initialize_prompt_templates()
         
         # Statistics
+<<<<<<< Updated upstream
         self.stats = {
             'requests_sent': 0,
             'requests_successful': 0,
@@ -141,6 +142,17 @@ class VeritasOllamaClient:
             'average_response_time': 0.0,
             'model_usage': {},
             'fallback_requests': 0
+=======
+        self.stats: Dict[str, Any] = {
+            "requests_sent": 0,
+            "requests_successful": 0,
+            "requests_failed": 0,
+            "total_tokens": 0,
+            "total_duration": 0.0,
+            "average_response_time": 0.0,
+            "model_usage": {},
+            "fallback_requests": 0,
+>>>>>>> Stashed changes
         }
         
         logger.info(f"🤖 Veritas Ollama Client initialisiert (URL: {base_url})")
@@ -619,10 +631,17 @@ Formatiere die Antwort professionell mit:
 
         logger.warning("⚠️ Ollama Fallback-Antwort genutzt: %s", error_message)
         return response
+<<<<<<< Updated upstream
     
     async def generate_response(self, 
                               request: OllamaRequest,
                               stream: bool = False) -> Union[OllamaResponse, AsyncGenerator[OllamaResponse, None]]:
+=======
+
+    async def generate_response(
+        self, request: OllamaRequest, stream: bool = False
+    ) -> Any:
+>>>>>>> Stashed changes
         """
         Sendet Anfrage an Ollama und verarbeitet Antwort
         
@@ -642,7 +661,7 @@ Formatiere die Antwort professionell mit:
                 start_time = time.time()
 
                 # Request Payload
-                payload = {
+                payload: Dict[str, Any] = {
                     "model": request.model,
                     "prompt": request.prompt,
                     "stream": stream,

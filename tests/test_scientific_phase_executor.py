@@ -3,21 +3,22 @@ Test Script für ScientificPhaseExecutor - JSON Loading & Phase Execution
 """
 
 import sys
-sys.path.insert(0, '.')
 
-from backend.services.scientific_phase_executor import ScientificPhaseExecutor, PhaseExecutionContext
+sys.path.insert(0, ".")
+
 import json
 
-print("\n" + "="*60)
+from backend.services.scientific_phase_executor import PhaseExecutionContext, ScientificPhaseExecutor
+
+print("\n" + "=" * 60)
 print("SCIENTIFIC PHASE EXECUTOR - TEST")
-print("="*60)
+print("=" * 60)
 
 # Test 1: Initialize Executor
 print("\n[Test 1] Initialize ScientificPhaseExecutor...")
 try:
     executor = ScientificPhaseExecutor(
-        config_dir="config",
-        method_id="default_method"  # Dateiname ist default_method.json (nicht default_scientific_method)
+        config_dir="config", method_id="default_method"  # Dateiname ist default_method.json (nicht default_scientific_method)
     )
     print("✅ ScientificPhaseExecutor erfolgreich initialisiert")
     print(f"   📋 Method ID: {executor.method_id}")
@@ -29,11 +30,11 @@ except Exception as e:
 
 # Test 2: List all phases
 print("\n[Test 2] Liste aller Phasen:")
-for idx, phase in enumerate(executor.method_config['phases'], 1):
-    phase_id = phase['phase_id']
-    model = phase['execution']['model']
-    temp = phase['execution']['temperature']
-    max_tokens = phase['execution']['max_tokens']
+for idx, phase in enumerate(executor.method_config["phases"], 1):
+    phase_id = phase["phase_id"]
+    model = phase["execution"]["model"]
+    temp = phase["execution"]["temperature"]
+    max_tokens = phase["execution"]["max_tokens"]
     print(f"   {idx}. {phase_id:15s} | Model: {model:10s} | Temp: {temp:.2f} | Tokens: {max_tokens}")
 
 # Test 3: Load phase prompt
@@ -57,13 +58,13 @@ try:
                 {
                     "source": "LBO BW § 50",
                     "content": "Verfahrensfreie Vorhaben: Gebäude bis 30m² Grundfläche ohne Aufenthaltsräume...",
-                    "confidence": 0.98
+                    "confidence": 0.98,
                 }
             ],
-            "graph": []
-        }
+            "graph": [],
+        },
     )
-    
+
     prompt = executor._construct_prompt("hypothesis", context)
     print(f"✅ Prompt konstruiert: {len(prompt)} Zeichen")
     print(f"\n--- PROMPT PREVIEW (erste 500 Zeichen) ---")
@@ -76,10 +77,10 @@ except Exception as e:
 print("\n[Test 5] Validiere Output Schemas...")
 from jsonschema import Draft7Validator
 
-for phase in executor.method_config['phases']:
-    phase_id = phase['phase_id']
-    schema = phase['output_schema']
-    
+for phase in executor.method_config["phases"]:
+    phase_id = phase["phase_id"]
+    schema = phase["output_schema"]
+
     try:
         validator = Draft7Validator(schema)
         # Check if schema is valid
@@ -88,6 +89,6 @@ for phase in executor.method_config['phases']:
     except Exception as e:
         print(f"   ❌ {phase_id:15s} - Schema error: {e}")
 
-print("\n" + "="*60)
+print("\n" + "=" * 60)
 print("TESTS ABGESCHLOSSEN")
-print("="*60 + "\n")
+print("=" * 60 + "\n")

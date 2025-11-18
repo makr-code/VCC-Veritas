@@ -1,8 +1,8 @@
 -- Migration: create_initial_schema
 -- Version: 1
 -- Created: 2025-10-08T21:05:09.209669
--- 
--- Description: 
+--
+-- Description:
 -- TODO: Add migration description
 --
 

@@ -1,7 +1,7 @@
 # Phase 5 Implementation Plan - v5.0 Hypothesis Generation + Enhanced RAG
 
-**Created:** 14. Oktober 2025  
-**Status:** 🎯 **READY TO START**  
+**Created:** 14. Oktober 2025
+**Status:** 🎯 **READY TO START**
 **Target Completion:** 3-4 Tage (24-32 Stunden)
 
 ---
@@ -13,7 +13,7 @@
 1. **v5.0 Hypothesis Generation** (~800 LOC, 2-3 Tage)
    - LLM-enhanced Query Understanding
    - Foundation für Structured Response System
-   
+
 2. **Enhanced RAG Features** (~200 LOC, 1-2 Tage)
    - Performance Optimierung (3-5x schneller)
    - Caching & Batch Operations
@@ -44,13 +44,13 @@ Features:
 
 Usage:
     from backend.services.hypothesis_service import HypothesisService
-    
+
     service = HypothesisService()
     hypothesis = service.generate_hypothesis(
         query="Bauantrag für Einfamilienhaus in Stuttgart",
         rag_context=rag_context  # Optional RAG results
     )
-    
+
     print(f"Type: {hypothesis.question_type}")
     print(f"Confidence: {hypothesis.confidence}")
     print(f"Intent: {hypothesis.primary_intent}")
@@ -80,11 +80,11 @@ logger = logging.getLogger(__name__)
 class HypothesisService:
     """
     Service for generating hypotheses from user queries using LLM.
-    
+
     Analyzes queries to create structured hypotheses that guide
     the response generation process.
     """
-    
+
     def __init__(
         self,
         ollama_client: Optional[VeritasOllamaClient] = None,
@@ -93,7 +93,7 @@ class HypothesisService:
     ):
         """
         Initialize hypothesis service.
-        
+
         Args:
             ollama_client: Ollama client instance (optional)
             model: LLM model name (default: llama2)
@@ -101,18 +101,18 @@ class HypothesisService:
         """
         self.ollama_client = ollama_client or VeritasOllamaClient()
         self.model = model
-        
+
         # Load prompt template
         if prompt_file is None:
             prompt_file = os.path.join(
-                os.path.dirname(__file__), 
+                os.path.dirname(__file__),
                 "../prompts/hypothesis_prompt.txt"
             )
-        
+
         self.prompt_template = self._load_prompt_template(prompt_file)
-        
+
         logger.info(f"HypothesisService initialized with model: {model}")
-    
+
     def _load_prompt_template(self, filepath: str) -> str:
         """Load hypothesis generation prompt template."""
         try:
@@ -121,7 +121,7 @@ class HypothesisService:
         except FileNotFoundError:
             logger.warning(f"Prompt file not found: {filepath}, using default")
             return self._get_default_prompt()
-    
+
     def _get_default_prompt(self) -> str:
         """Get default hypothesis prompt if file not found."""
         return """You are a query analysis expert. Analyze the user query and generate a structured hypothesis.
@@ -139,7 +139,7 @@ Output a JSON object with:
 Query: {query}
 
 Analysis:"""
-    
+
     def generate_hypothesis(
         self,
         query: str,
@@ -147,24 +147,24 @@ Analysis:"""
     ) -> Hypothesis:
         """
         Generate hypothesis from user query.
-        
+
         Args:
             query: User query string
             rag_context: Optional RAG search results for context
-        
+
         Returns:
             Hypothesis object
         """
         logger.info(f"Generating hypothesis for query: {query[:50]}...")
-        
+
         # Build prompt
         prompt = self._build_prompt(query, rag_context)
-        
+
         # Call LLM
         try:
             response = self._call_llm(prompt)
             hypothesis_data = self._parse_llm_response(response)
-            
+
             # Create Hypothesis object
             hypothesis = Hypothesis(
                 query=query,
@@ -182,43 +182,43 @@ Analysis:"""
                 ],
                 assumptions=hypothesis_data.get('assumptions', [])
             )
-            
+
             logger.info(f"Hypothesis generated: {hypothesis.question_type.value}, confidence: {hypothesis.confidence.value}")
             return hypothesis
-            
+
         except Exception as e:
             logger.error(f"Hypothesis generation failed: {e}")
             return self._create_fallback_hypothesis(query)
-    
+
     def _build_prompt(
-        self, 
-        query: str, 
+        self,
+        query: str,
         rag_context: Optional[Dict[str, Any]] = None
     ) -> str:
         """Build LLM prompt from query and context."""
         prompt = self.prompt_template.replace("{query}", query)
-        
+
         if rag_context:
             context_summary = self._summarize_rag_context(rag_context)
             prompt += f"\n\nAvailable Context:\n{context_summary}"
-        
+
         return prompt
-    
+
     def _summarize_rag_context(self, rag_context: Dict[str, Any]) -> str:
         """Summarize RAG context for prompt."""
         if not rag_context or 'results' not in rag_context:
             return "No context available"
-        
+
         results = rag_context['results'][:3]  # Top 3 results
         summary = []
-        
+
         for i, doc in enumerate(results, 1):
             title = doc.get('title', 'Unknown')
             excerpt = doc.get('excerpt', '')[:100]
             summary.append(f"{i}. {title}: {excerpt}...")
-        
+
         return "\n".join(summary)
-    
+
     def _call_llm(self, prompt: str) -> str:
         """Call LLM to generate hypothesis."""
         # Use Ollama client
@@ -228,9 +228,9 @@ Analysis:"""
             max_tokens=500,
             temperature=0.3  # Lower temperature for structured output
         )
-        
+
         return response.get('response', '')
-    
+
     def _parse_llm_response(self, response: str) -> Dict[str, Any]:
         """Parse LLM JSON response."""
         # Try to extract JSON from response
@@ -238,21 +238,21 @@ Analysis:"""
             # Find JSON block
             start = response.find('{')
             end = response.rfind('}') + 1
-            
+
             if start >= 0 and end > start:
                 json_str = response[start:end]
                 return json.loads(json_str)
             else:
                 raise ValueError("No JSON found in response")
-                
+
         except json.JSONDecodeError as e:
             logger.error(f"JSON parsing failed: {e}")
             raise ValueError(f"Invalid JSON response: {e}")
-    
+
     def _create_fallback_hypothesis(self, query: str) -> Hypothesis:
         """Create fallback hypothesis if LLM fails."""
         logger.warning("Creating fallback hypothesis")
-        
+
         return Hypothesis(
             query=query,
             question_type=QuestionType.FACT_RETRIEVAL,
@@ -323,7 +323,7 @@ class GapSeverity(Enum):
 class InformationGap:
     """
     Represents missing information needed to answer query.
-    
+
     Attributes:
         gap_type: Type of missing information
         severity: How critical is this gap
@@ -334,7 +334,7 @@ class InformationGap:
     severity: str
     suggested_query: str
     examples: List[str] = field(default_factory=list)
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
         return asdict(self)
@@ -344,13 +344,13 @@ class InformationGap:
 class Hypothesis:
     """
     Hypothesis about user query and required information.
-    
+
     Generated by analyzing the query with LLM to understand:
     - What type of question is being asked
     - What information is needed to answer
     - What information is missing
     - What assumptions are being made
-    
+
     Attributes:
         query: Original user query
         question_type: Type of question (fact, comparison, etc.)
@@ -375,7 +375,7 @@ class Hypothesis:
     expected_response_type: str = "text"
     metadata: Dict[str, Any] = field(default_factory=dict)
     timestamp: str = field(default_factory=lambda: datetime.utcnow().isoformat())
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for JSON serialization."""
         return {
@@ -391,14 +391,14 @@ class Hypothesis:
             'metadata': self.metadata,
             'timestamp': self.timestamp
         }
-    
+
     def has_critical_gaps(self) -> bool:
         """Check if hypothesis has critical information gaps."""
         return any(
-            gap.severity == GapSeverity.CRITICAL.value 
+            gap.severity == GapSeverity.CRITICAL.value
             for gap in self.information_gaps
         )
-    
+
     def get_gap_count(self, severity: str = None) -> int:
         """Get count of information gaps, optionally filtered by severity."""
         if severity is None:
@@ -458,17 +458,17 @@ async def batch_search(
 ) -> List[SearchResult]:
     """
     Execute multiple searches in parallel.
-    
+
     Args:
         queries: List of query strings
         search_type: Type of search (vector, graph, relational, hybrid)
         top_k: Results per query
-    
+
     Returns:
         List of SearchResult objects (one per query)
     """
     import asyncio
-    
+
     # Create tasks for parallel execution
     tasks = []
     for query in queries:
@@ -480,15 +480,15 @@ async def batch_search(
             task = asyncio.to_thread(self.graph_search, query, top_k=top_k)
         else:  # relational
             task = asyncio.to_thread(self.relational_search, query, top_k=top_k)
-        
+
         tasks.append(task)
-    
+
     # Execute in parallel
     results = await asyncio.gather(*tasks, return_exceptions=True)
-    
+
     # Filter out exceptions
     valid_results = [r for r in results if not isinstance(r, Exception)]
-    
+
     return valid_results
 ```
 
@@ -507,26 +507,26 @@ def expand_query(
 ) -> List[str]:
     """
     Expand query with synonyms or related terms.
-    
+
     Args:
         query: Original query
         expansion_type: Type of expansion (synonyms, related, semantic)
-    
+
     Returns:
         List of expanded queries
     """
     expanded = [query]  # Always include original
-    
+
     if expansion_type == "synonyms":
         # Add synonym variations
         synonyms = self._get_synonyms(query)
         expanded.extend(synonyms)
-    
+
     elif expansion_type == "related":
         # Add related terms
         related = self._get_related_terms(query)
         expanded.extend(related)
-    
+
     return expanded[:5]  # Limit to 5 queries
 ```
 
@@ -691,5 +691,5 @@ touch tests/test_rag_performance.py
 
 ---
 
-**Status:** Ready to start implementation  
+**Status:** Ready to start implementation
 **Next Action:** Begin with Task 1.1 (Hypothesis Service Core)

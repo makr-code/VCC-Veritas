@@ -10,7 +10,7 @@ import json
 import time
 import shutil
 from pathlib import Path
-from typing import Dict, List
+from typing import Any, Dict, List
 
 class VERITASExportPipelineFinal:
     """
@@ -191,6 +191,7 @@ CREATE TABLE IF NOT EXISTS file_hashes (
         """
         Kopiert Dateien mit korrekter Struktur
         """
+<<<<<<< Updated upstream
         print(f"\\n📋 Copying files with structure...")
         
         results = {
@@ -199,6 +200,12 @@ CREATE TABLE IF NOT EXISTS file_hashes (
             "total_size": 0
         }
         
+=======
+        print("\\n📋 Copying files with structure...")
+
+        results: Dict[str, Any] = {"copied": {}, "failed": [], "total_size": 0}
+
+>>>>>>> Stashed changes
         # Kategorie-Mappings
         category_dirs = {
             "python_files": "core",
@@ -266,6 +273,7 @@ CREATE TABLE IF NOT EXISTS file_hashes (
             print("❌ Enhanced License Protection not available")
             # Fallback: Einfach kopieren
             return self._fallback_copy_to_protected(copy_results)
+<<<<<<< Updated upstream
         
         results = {
             "protected": {},
@@ -273,6 +281,11 @@ CREATE TABLE IF NOT EXISTS file_hashes (
             "failed": []
         }
         
+=======
+
+        results: Dict[str, Any] = {"protected": {}, "verified": {}, "failed": []}
+
+>>>>>>> Stashed changes
         # Nur Python-Dateien schützen
         python_files = copy_results["copied"].get("python_files", [])
         
@@ -371,9 +384,15 @@ CREATE TABLE IF NOT EXISTS file_hashes (
         Fallback: Kopiert ohne Protection
         """
         print("⚠️ Fallback: Copying without Enhanced Protection")
+<<<<<<< Updated upstream
         
         results = {"protected": {}, "verified": {}, "failed": []}
         
+=======
+
+        results: Dict[str, Any] = {"protected": {}, "verified": {}, "failed": []}
+
+>>>>>>> Stashed changes
         for category, files in copy_results["copied"].items():
             if category == "python_files":
                 src_dir = self.export_root / "src" / "core"

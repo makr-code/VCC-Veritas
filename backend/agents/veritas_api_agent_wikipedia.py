@@ -860,9 +860,17 @@ class WikipediaAgent:
             str(request.max_results),
             str(request.include_content)
         ]
+<<<<<<< Updated upstream
         key_string = "|".join(key_parts)
         return hashlib.md5(key_string.encode()).hexdigest()
     
+=======
+
+        key_string = "|".join(key_parts)
+        # Use SHA-256 for cache keys to avoid MD5 (Bandit B324)
+        return hashlib.sha256(key_string.encode()).hexdigest()
+
+>>>>>>> Stashed changes
     def _update_stats(self, processing_time_ms: int, language: str):
         """Update Agent-Statistiken"""
         self._stats['queries_processed'] += 1

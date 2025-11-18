@@ -1029,9 +1029,17 @@ class AtmosphericFlowAgent:
             str(len(request.receptor_points)),
             request.flow_model.value
         ]
+<<<<<<< Updated upstream
         key_string = "|".join(key_parts)
         return hashlib.md5(key_string.encode()).hexdigest()
     
+=======
+
+        key_string = "|".join(key_parts)
+        # Use SHA-256 for cache keys to avoid MD5 (Bandit B324)
+        return hashlib.sha256(key_string.encode()).hexdigest()
+
+>>>>>>> Stashed changes
     def _update_stats(self, calculation_time: float, sources: int, receptors: int):
         """Statistiken aktualisieren"""
         self._stats['calculations_processed'] += 1

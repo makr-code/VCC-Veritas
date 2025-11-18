@@ -74,7 +74,7 @@ from config.hybrid_search_config import DEFAULT_CONFIG
 class QueryService:
     def __init__(self):
         self.config = DEFAULT_CONFIG
-        
+
     async def _process_hybrid(self, query: str):
         # Use config for hybrid search
         hybrid_result = self.rag_service.hybrid_search(
@@ -83,11 +83,11 @@ class QueryService:
             filters=self.config.filters,
             ranking_strategy=self.config.ranking_strategy
         )
-        
+
         # Apply re-ranking if enabled
         if self.config.reranking_config.enabled:
             hybrid_result = await self._apply_reranking(
-                hybrid_result, 
+                hybrid_result,
                 query,
                 batch_size=self.config.reranking_config.batch_size
             )
@@ -458,6 +458,6 @@ Bei Fragen oder Problemen:
 
 ---
 
-**Version:** 1.0.0  
-**Last Updated:** 2025-10-20  
+**Version:** 1.0.0
+**Last Updated:** 2025-10-20
 **Maintainer:** VERITAS Development Team

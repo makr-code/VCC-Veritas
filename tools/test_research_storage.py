@@ -10,8 +10,9 @@ sys.path.insert(0, str(project_root))
 
 os.environ.setdefault("ENABLE_SECURE_SECRETS", "true")
 
-from backend.database.research_plan_storage import get_storage
 import json
+
+from backend.database.research_plan_storage import get_storage
 
 print("=" * 80)
 print("VERITAS Research Plan Storage Test")
@@ -38,7 +39,7 @@ test_plan = {
     "uds3_databases": ["chromadb", "neo4j"],
     "phase5_hybrid_search": True,
     "security_level": "internal",
-    "source_domains": ["environmental"]
+    "source_domains": ["environmental"],
 }
 
 print(f"\n→ Creating test plan: {test_plan['plan_id']}")
@@ -66,7 +67,7 @@ test_step = {
     "agent_name": "environmental",
     "agent_type": "DataRetrievalAgent",
     "status": "pending",
-    "step_config": json.dumps({"max_results": 10})
+    "step_config": json.dumps({"max_results": 10}),
 }
 
 print(f"\n→ Creating test step: {test_step['step_id']}")

@@ -2,13 +2,13 @@
   "phase_id": "validation",
   "phase_name": "Hypothesen-Validierung",
   "version": "1.0.0",
-  
+
   "system_prompt": {
     "role": "Du bist ein wissenschaftlicher Assistent für systematische Hypothesen-Validierung.",
     "task": "Teste die initiale Hypothese gegen die gesammelten und analysierten Evidenzen.",
     "methodology": "Befolge die Prinzipien: evidenzbasiert, transparent, strukturiert, präzise."
   },
-  
+
   "instructions": [
     {
       "step": 1,
@@ -164,13 +164,13 @@
       }
     }
   ],
-  
+
   "output_format": {
     "type": "json",
     "schema_reference": "default_method.json > phases[3] > output_schema",
     "required_fields": ["validation_status", "supporting_evidence", "contradicting_evidence", "hypothesis_adjustment", "validation_confidence"]
   },
-  
+
   "quality_guidelines": {
     "validation_status": {
       "calibration": "Sei streng! confirmed nur wenn wirklich alle Kriterien erfüllt",
@@ -198,7 +198,7 @@
       "conservative": "Lieber zu niedrig als zu hoch"
     }
   },
-  
+
   "example_output": {
     "validation_status": "partially_confirmed",
     "supporting_evidence": [
@@ -237,7 +237,7 @@
     },
     "validation_confidence": 0.78
   },
-  
+
   "common_mistakes": [
     {
       "mistake": "validation_status = 'confirmed' trotz major Widersprüchen",
@@ -260,7 +260,7 @@
       "correction": "status: 'rejected' → confidence: 0.2-0.4 (niedrig)"
     }
   ],
-  
+
   "template_variables": {
     "hypothesis": "Output von Phase 1 (original hypothesis)",
     "analysis_result": "Output von Phase 3 (patterns + contradictions + resolutions)",

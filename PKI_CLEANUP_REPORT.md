@@ -1,7 +1,7 @@
 # VERITAS PKI Cleanup Report
 
-**Datum:** 14. Oktober 2025  
-**Status:** Bereinigung nach externer PKI-Service Integration  
+**Datum:** 14. Oktober 2025
+**Status:** Bereinigung nach externer PKI-Service Integration
 **Externer PKI-Service:** `C:\VCC\PKI`
 
 ---
@@ -134,10 +134,10 @@ class VeritasPKIClient:
             cert_path='C:/VCC/PKI/service_certificates/veritas_client.pem',
             key_path='C:/VCC/PKI/service_certificates/veritas_client_key.pem'
         )
-    
+
     def request_certificate(self, subject: dict) -> dict:
         return self.pki.request_certificate(subject)
-    
+
     def verify_certificate(self, cert_pem: str) -> bool:
         return self.pki.verify_certificate(cert_pem)
 ```
@@ -280,17 +280,17 @@ from backend.services.pki_client import VeritasPKIClient
 
 class TestPKIServiceIntegration:
     """Integration Tests mit externem PKI-Service"""
-    
+
     @pytest.fixture
     def pki_client(self):
         return VeritasPKIClient()
-    
+
     def test_request_certificate(self, pki_client):
         """Test certificate request from external PKI service"""
         subject = {'CN': 'test.veritas.local', 'O': 'VCC'}
         result = pki_client.request_certificate(subject)
         assert result['status'] == 'success'
-    
+
     def test_verify_certificate(self, pki_client):
         """Test certificate verification"""
         # Use real certificate from PKI service
@@ -409,11 +409,11 @@ logger = logging.getLogger(__name__)
 class VeritasPKIClient:
     """
     Client für VCC PKI-Service.
-    
+
     Stellt Verbindung zum externen PKI-Service her und
     bietet Certificate Management Funktionen.
     """
-    
+
     def __init__(
         self,
         base_url: str = 'https://localhost:8443',
@@ -422,7 +422,7 @@ class VeritasPKIClient:
     ):
         """
         Initialize PKI client.
-        
+
         Args:
             base_url: PKI service URL
             cert_path: Path to client certificate (optional)
@@ -433,25 +433,25 @@ class VeritasPKIClient:
             cert_path = 'C:/VCC/PKI/service_certificates/veritas_client.pem'
         if not key_path:
             key_path = 'C:/VCC/PKI/service_certificates/veritas_client_key.pem'
-        
+
         self.pki = PKIServiceClient(
             base_url=base_url,
             cert_path=cert_path,
             key_path=key_path
         )
-        
+
         logger.info(f"PKI Client initialized: {base_url}")
-    
+
     def request_certificate(self, subject: Dict[str, str]) -> Dict:
         """
         Request certificate from PKI service.
-        
+
         Args:
             subject: Certificate subject (CN, O, OU, etc.)
-        
+
         Returns:
             Certificate data (PEM format)
-        
+
         Example:
             >>> subject = {'CN': 'api.veritas.local', 'O': 'VCC'}
             >>> result = client.request_certificate(subject)
@@ -464,14 +464,14 @@ class VeritasPKIClient:
         except Exception as e:
             logger.error(f"Certificate request failed: {e}")
             raise
-    
+
     def verify_certificate(self, cert_pem: str) -> bool:
         """
         Verify certificate signature and validity.
-        
+
         Args:
             cert_pem: Certificate in PEM format
-        
+
         Returns:
             True if valid, False otherwise
         """
@@ -481,15 +481,15 @@ class VeritasPKIClient:
         except Exception as e:
             logger.error(f"Certificate verification failed: {e}")
             return False
-    
+
     def revoke_certificate(self, serial_number: str, reason: str = 'unspecified') -> bool:
         """
         Revoke certificate.
-        
+
         Args:
             serial_number: Certificate serial number (hex)
             reason: Revocation reason
-        
+
         Returns:
             True if revoked successfully
         """
@@ -500,11 +500,11 @@ class VeritasPKIClient:
         except Exception as e:
             logger.error(f"Certificate revocation failed: {e}")
             return False
-    
+
     def get_ca_certificate(self) -> str:
         """
         Get Root CA certificate (PEM format).
-        
+
         Returns:
             CA certificate PEM
         """
@@ -513,43 +513,43 @@ class VeritasPKIClient:
         except Exception as e:
             logger.error(f"Failed to get CA certificate: {e}")
             raise
-    
+
     def create_ssl_context(
         self,
         purpose: ssl.Purpose = ssl.Purpose.SERVER_AUTH
     ) -> ssl.SSLContext:
         """
         Create SSL context with PKI service certificates.
-        
+
         Args:
             purpose: SSL purpose (SERVER_AUTH or CLIENT_AUTH)
-        
+
         Returns:
             Configured SSLContext
-        
+
         Example:
             >>> client = VeritasPKIClient()
             >>> ssl_ctx = client.create_ssl_context()
             >>> # Use with HTTPS server
         """
         context = ssl.create_default_context(purpose)
-        
+
         # Load CA certificate from PKI service
         ca_cert = self.get_ca_certificate()
         ca_cert_path = Path('temp_ca.pem')
         ca_cert_path.write_text(ca_cert)
-        
+
         context.load_verify_locations(str(ca_cert_path))
-        
+
         # Load client certificate if available
         if Path(self.pki.cert_path).exists():
             context.load_cert_chain(
                 certfile=self.pki.cert_path,
                 keyfile=self.pki.key_path
             )
-        
+
         ca_cert_path.unlink()  # Clean up temp file
-        
+
         return context
 
 
@@ -560,10 +560,10 @@ _pki_client: Optional[VeritasPKIClient] = None
 def get_pki_client() -> VeritasPKIClient:
     """
     Get or create PKI client singleton.
-    
+
     Returns:
         VeritasPKIClient instance
-    
+
     Example:
         >>> from backend.services.pki_client import get_pki_client
         >>> pki = get_pki_client()
@@ -632,7 +632,7 @@ def test_pki_connection():
     print("=" * 60)
     print("PKI SERVICE INTEGRATION TEST")
     print("=" * 60)
-    
+
     try:
         print("\n[1/4] Connecting to PKI service...")
         pki = get_pki_client()
@@ -640,7 +640,7 @@ def test_pki_connection():
     except Exception as e:
         print(f"❌ Connection failed: {e}")
         return False
-    
+
     try:
         print("\n[2/4] Requesting CA certificate...")
         ca_cert = pki.get_ca_certificate()
@@ -648,7 +648,7 @@ def test_pki_connection():
     except Exception as e:
         print(f"❌ CA certificate retrieval failed: {e}")
         return False
-    
+
     try:
         print("\n[3/4] Requesting test certificate...")
         subject = {
@@ -661,7 +661,7 @@ def test_pki_connection():
     except Exception as e:
         print(f"❌ Certificate request failed: {e}")
         return False
-    
+
     try:
         print("\n[4/4] Creating SSL context...")
         ssl_ctx = pki.create_ssl_context()
@@ -669,7 +669,7 @@ def test_pki_connection():
     except Exception as e:
         print(f"❌ SSL context creation failed: {e}")
         return False
-    
+
     print("\n" + "=" * 60)
     print("✅ ALL TESTS PASSED")
     print("=" * 60)
@@ -695,7 +695,7 @@ python test_pki_integration.py
 ```markdown
 # PKI Migration Complete
 
-**Datum:** 14. Oktober 2025  
+**Datum:** 14. Oktober 2025
 **Status:** ✅ Abgeschlossen
 
 ## Übersicht
@@ -718,8 +718,8 @@ Migration von lokaler PKI-Implementierung zu externem PKI-Service.
 
 ## Externer PKI-Service
 
-**Pfad:** `C:\VCC\PKI`  
-**URL:** `https://localhost:8443`  
+**Pfad:** `C:\VCC\PKI`
+**URL:** `https://localhost:8443`
 **Service-Zertifikate:** `C:\VCC\PKI\service_certificates\veritas_*`
 
 ## Verwendung

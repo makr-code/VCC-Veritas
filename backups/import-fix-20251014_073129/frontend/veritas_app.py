@@ -2,14 +2,15 @@
 # -*- coding: utf-8 -*-
 """
 VERITAS Protected Module
-WARNING: This file contains embedded protection keys. 
+WARNING: This file contains embedded protection keys.
 Modification will be detected and may result in license violations.
 """
 
 # Unterdrücke UDS3 Module Warnings (v3.20.0)
 import warnings
-warnings.filterwarnings('ignore', message='.*module not available.*')
-warnings.filterwarnings('ignore', message='.*not available for PolyglotQuery.*')
+
+warnings.filterwarnings("ignore", message=".*module not available.*")
+warnings.filterwarnings("ignore", message=".*not available for PolyglotQuery.*")
 
 
 # -*- coding: utf-8 -*-
@@ -19,18 +20,19 @@ Reine HTTP/HTTPS-basierte Kommunikation mit dem Backend
 Keine direkten Datenbankzugriffe oder UDS3-Abhängigkeiten
 """
 
-import tkinter as tk
-from tkinter import ttk, scrolledtext, messagebox, filedialog
-import os
-import sys
 import json
 import logging
+import os
 import queue
+import sys
 import threading
-import requests
 import time
+import tkinter as tk
 from datetime import datetime
-from typing import Dict, List, Optional, Any
+from tkinter import filedialog, messagebox, scrolledtext, ttk
+from typing import Any, Dict, List, Optional
+
+import requests
 
 # Füge das Projekt-Root zum Python-Pfad hinzu
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -38,29 +40,46 @@ project_root = os.path.dirname(current_dir)  # Ein Verzeichnis höher als fronte
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-# Logger für dieses Modul definieren  
+# Logger für dieses Modul definieren
 logger = logging.getLogger(__name__)
 
 # Universal JSON Payload Library Import
 try:
     from shared.universal_json_payload import (
-        UniversalQueryRequest, UniversalQueryResponse,
-        RequestType, ResponseStatus, SystemComponent, QualityLevel,
-        create_request_id, create_session_id, validate_request_type
+        QualityLevel,
+        RequestType,
+        ResponseStatus,
+        SystemComponent,
+        UniversalQueryRequest,
+        UniversalQueryResponse,
+        create_request_id,
+        create_session_id,
+        validate_request_type,
     )
+
     PAYLOADS_AVAILABLE = True
     logger.info("✅ Universal JSON Payload Library geladen")
 except ImportError as e:
     logger.warning(f"⚠️ Universal JSON Payloads nicht verfügbar: {e}")
     PAYLOADS_AVAILABLE = False
 
-# VERITAS Core Engine Import  
+# VERITAS Core Engine Import
 try:
     from shared.core.veritas_core import (
-        VeritasCore, ThreadManager, SessionManager, BackendProcessor,
-        MessageType, QueueMessage, ChatMessage, StatusMessage, BackendResponse,
-        create_veritas_core, create_chat_message, create_status_message
+        BackendProcessor,
+        BackendResponse,
+        ChatMessage,
+        MessageType,
+        QueueMessage,
+        SessionManager,
+        StatusMessage,
+        ThreadManager,
+        VeritasCore,
+        create_chat_message,
+        create_status_message,
+        create_veritas_core,
     )
+
     CORE_AVAILABLE = True
     logger.info("✅ VERITAS Core Engine erfolgreich geladen")
 except ImportError as e:
@@ -71,6 +90,7 @@ except ImportError as e:
 try:
     from frontend.ui.veritas_ui_components import Tooltip
     from frontend.ui.veritas_ui_feedback_system import MessageFeedbackWidget
+
     UI_COMPONENTS_AVAILABLE = True
 except ImportError as e:
     logger.warning(f"⚠️ UI-Komponenten nicht verfügbar: {e}")
@@ -78,10 +98,11 @@ except ImportError as e:
 
 # UI-Module für Modularisierung importieren
 try:
-    from frontend.ui.veritas_ui_markdown import MarkdownRenderer, setup_markdown_tags
-    from frontend.ui.veritas_ui_source_links import SourceLinkHandler
     from frontend.ui.veritas_ui_chat_formatter import ChatDisplayFormatter, setup_chat_tags
     from frontend.ui.veritas_ui_dialogs import DialogManager
+    from frontend.ui.veritas_ui_markdown import MarkdownRenderer, setup_markdown_tags
+    from frontend.ui.veritas_ui_source_links import SourceLinkHandler
+
     UI_MODULES_AVAILABLE = True
     logger.info("✅ UI-Module erfolgreich geladen (Markdown, SourceLinks, ChatFormatter, Dialogs)")
 except ImportError as e:
@@ -92,6 +113,7 @@ except ImportError as e:
 try:
     from frontend.services.office_export import OfficeExportService
     from frontend.ui.veritas_ui_export_dialog import ExportDialog
+
     OFFICE_EXPORT_AVAILABLE = True
     logger.info("✅ Office Export Module geladen (Word/Excel)")
 except ImportError as e:
@@ -101,6 +123,7 @@ except ImportError as e:
 # Konfiguration
 try:
     from config import Config
+
     API_BASE_URL = Config().API_BASE_URL
 except ImportError:
     API_BASE_URL = "http://127.0.0.1:5000"  # Server läuft auf Port 5000
@@ -108,171 +131,244 @@ except ImportError:
 # Streaming Integration
 try:
     from backend.services.veritas_streaming_service import (
-        VeritasStreamingService, StreamingUIMixin, StreamingMessageType,
-        setup_streaming_chat_tags
+        StreamingMessageType,
+        StreamingUIMixin,
+        VeritasStreamingService,
+        setup_streaming_chat_tags,
     )
+
     STREAMING_AVAILABLE = True
     logger.info("✅ Streaming Service verfügbar")
 except ImportError as e:
     logger.warning(f"⚠️ Streaming Service nicht verfügbar: {e}")
     STREAMING_AVAILABLE = False
-    
+
     # Fallback Mixin
     class StreamingUIMixin:
-        def __init__(self): pass
-        def init_streaming_ui(self, parent): pass
-        def setup_streaming_integration(self, window_id, thread_manager): pass
-        def _handle_streaming_message(self, message): pass
+        def __init__(self):
+            pass
+
+        def init_streaming_ui(self, parent):
+            pass
+
+        def setup_streaming_integration(self, window_id, thread_manager):
+            pass
+
+        def _handle_streaming_message(self, message):
+            pass
+
 
 # Versionsinformationen
 __version__ = "3.15.0"
 __history__ = [
-    {"version": "3.15.0", "date": "2025-10-09", "changes": [
-        "🎉 MILESTONE: 15/15 Rich-Text Enhancement Features COMPLETE! 🏆",
-        "📊 Feature #2: Markdown-Tabellen-Support implementiert (~30 min)",
-        "   • Automatische Tabellen-Erkennung (| Header | Header |)",
-        "   • Parser für mehrzeilige Tabellen mit Separator-Detection",
-        "   • Box-Drawing-Characters für elegante Borders (┌─┬─┐)",
-        "   • Spalten-Breiten-Berechnung basierend auf Content",
-        "   • Monospace-Font (Courier New 9) für perfektes Alignment",
-        "   • Alternierende Row-Colors (weiß/grau) für Lesbarkeit",
-        "   • _parse_table() - 2D-Array-Parsing mit Separator-Skip",
-        "   • _render_table() - Header (bold) + Data-Rows + Borders",
-        "   • 4 neue Tkinter-Tags: table_header, table_cell, table_cell_alt, table_border",
-        "✨ 100% Feature-Roadmap abgeschlossen:",
-        "   • Feature #1: Collapsible Sections ✅",
-        "   • Feature #2: Tables ✅ (NEW)",
-        "   • Feature #3: Syntax-Highlighting ✅",
-        "   • Feature #4: Listen-Formatierung ✅",
-        "   • Feature #5: Scroll-to-Source ✅",
-        "   • Feature #6: Code Copy-Button ✅",
-        "   • Feature #7: Source-Hover ✅",
-        "   • Feature #10: Custom Icons ✅",
-        "   • Feature #11: Keyboard Shortcuts ✅",
-        "   • Feature #12: Confidence Badges ✅",
-        "   • Feature #13: Enhanced Icons ✅",
-        "   • Feature #14: Relative Timestamps ✅"
-    ]},
-    {"version": "3.14.0", "date": "2025-10-09", "changes": [
-        "✨ Quick Wins: Features #12, #13, #14 implementiert (~25 min)",
-        "🎯 Feature #12: Confidence-Score Visualisierung mit farbigen Badges",
-        "   • Grüne Badges für hohe Scores (≥80%)",
-        "   • Orange Badges für mittlere Scores (60-79%)",
-        "   • Rote Badges für niedrige Scores (<60%)",
-        "   • Background-Color Tags in Tkinter",
-        "📁 Feature #13: Erweiterte Source-Type Icons",
-        "   • 50+ neue Dateityp-Icons (csv, json, xml, sql)",
-        "   • Code-Dateien: 🐍 Python, 📜 JavaScript, ☕ Java, etc.",
-        "   • Media-Dateien: 🎬 Video, 🎵 Audio, 🖼️ Bilder",
-        "   • Archive-Formate: 📦 ZIP, RAR, TAR, etc.",
-        "🕐 Feature #14: Relative Timestamp-Formatierung",
-        "   • 'Heute 14:23', 'Gestern 10:15', 'Mo 09:30'",
-        "   • Automatische relative Zeitangaben (<7 Tage)",
-        "   • format_relative_timestamp() Utility-Funktion",
-        "   • Fallback auf Datum bei älteren Nachrichten"
-    ]},
-    {"version": "3.13.0", "date": "2025-10-09", "changes": [
-        "✨ Rich-Text Enhancement #1: Collapsible Sections implementiert",
-        "📦 Neue CollapsibleSection-Klasse in veritas_ui_components.py",
-        "🔽 Toggle-Funktionalität mit ▶/▼ Icons für Expand/Collapse",
-        "📚 Quellen-Section collapsible (initial eingeklappt)",
-        "🤖 Agent-Analysen-Section collapsible (initial eingeklappt)",
-        "💡 Vorschläge-Section collapsible (initial sichtbar)",
-        "🎯 Message-ID-basiertes State-Management für individuelle Sections",
-        "⚡ Optional: Smooth Expand/Collapse-Animation",
-        "🔧 Fallback auf alte Details-Toggle-Methode wenn Feature nicht verfügbar",
-        "🎨 Integration mit dynamischem Icon-System (Feature #10)",
-        "🖱️ Click-Handler für Header und Arrow-Icons",
-        "📝 Helper-Methode _insert_single_source() für modulare Quellen-Darstellung"
-    ]},
-    {"version": "3.12.0", "date": "2025-10-09", "changes": [
-        "✨ Rich-Text Enhancement #11: Keyboard Shortcuts implementiert",
-        "⌨️ Global Shortcuts: Ctrl+N (Neuer Chat), Ctrl+S (Speichern), Ctrl+O (Laden)",
-        "🗑️ Ctrl+K (Chat löschen), Ctrl+/ (Shortcuts anzeigen), Esc (Focus Input), F1 (Hilfe)",
-        "💡 Shortcuts-Hilfe-Dialog mit vollständiger Übersicht",
-        "🔧 Tooltips für alle Toolbar-Buttons mit Shortcuts",
-        "📋 Hamburger-Menü erweitert mit Shortcuts-Eintrag",
-        "✨ Rich-Text Enhancement #4: Liste-Formatierung implementiert",
-        "📝 Auto-Indentation für nested Lists (2 Spaces = 1 Level)",
-        "🔢 Nummerierte Listen (1., 2., 3., ...)",
-        "🔤 Alphabetische Listen (a., b., c. & A., B., C.)",
-        "🏛️ Römische Ziffern (i., ii., iii. & I., II., III.)",
-        "⚡ Dynamische Icon-Integration aus Feature #10"
-    ]},
-    {"version": "3.11.0", "date": "2025-10-09", "changes": [
-        "✨ Rich-Text Enhancement #10: Custom Icons System implementiert",
-        "🎨 Zentrale Icon-Verwaltung in veritas_ui_icons.py (300+ Zeilen)",
-        "📚 10+ Icon-Kategorien: Chat, Sources, Metadata, Agents, Actions, Status, Files, Navigation",
-        "🔧 Dynamische Icon-Auswahl basierend auf Kontext (Datei-Typ, Confidence-Score, etc.)",
-        "📖 Shortcut-Methoden für schnellen Zugriff (VeritasIcons.chat(), .source(), .file())",
-        "🎯 ChatDisplayFormatter verwendet jetzt dynamische Icons für Sections",
-        "📝 MarkdownRenderer unterstützt Custom Icons für Listen",
-        "⚡ Fallback-Icons wenn Icon-System nicht verfügbar"
-    ]},
-    {"version": "3.10.0", "date": "2025-10-09", "changes": [
-        "✨ Rich-Text Enhancement #5: Scroll-to-Source Animation implementiert",
-        "🎬 Smooth Scroll Animation mit Cubic Easing Funktion (500ms, 30 FPS)",
-        "💡 Flash-Highlight der Ziel-Zeile mit Fade-out-Effekt (Gelb → Weiß, 2s)",
-        "🎯 Click-Handler für Quellen-Links lösen jetzt Scroll-Animation aus",
-        "📍 Automatische Positionierung mit 3-Zeilen-Padding für Sichtbarkeit",
-        "⚡ Intelligente Erkennung ob Scroll nötig ist (Skip bei bereits sichtbar)",
-        "🛡️ Robuste Error-Handling für Edge-Cases",
-        "Erweitert: ChatDisplayFormatter.scroll_to_source() & highlight_line()"
-    ]},
-    {"version": "3.9.0", "date": "2025-10-09", "changes": [
-        "✨ Rich-Text Enhancement #3: Syntax-Highlighting mit Pygments implementiert",
-        "🎨 Code-Blöcke werden jetzt farblich hervorgehoben (Python, JS, SQL, JSON, etc.)",
-        "📦 Neues Modul: veritas_ui_syntax.py mit SyntaxHighlighter-Klasse",
-        "🔍 Automatische Sprach-Erkennung aus Code-Fences (```python)",
-        "🎨 VS Code Dark+ Theme inspiriertes Farbschema",
-        "⚡ Token-basiertes Rendering mit Pygments → Tkinter Tag Mapping",
-        "🛡️ Fallback auf Text-Lexer wenn Sprache unbekannt",
-        "Unterstützt: Python, JavaScript, TypeScript, SQL, JSON, Bash, Markdown u.v.m."
-    ]},
-    {"version": "3.8.0", "date": "2025-10-09", "changes": [
-        "✨ Rich-Text Enhancement #6: Copy-Button für Code implementiert",
-        "📋 Copy-Button erscheint automatisch neben Code-Blöcken",
-        "✓ Visual Feedback mit Checkmark-Animation (1.5s)",
-        "🎨 Hover-Effekt für bessere UX (#666 → #0066CC)",
-        "🛡️ Error Handling mit ✗ Icon",
-        "⚡ Automatische Integration in MarkdownRenderer",
-        "Nur für Code-Snippets > 3 Zeichen aktiviert"
-    ]},
-    {"version": "3.7.0", "date": "2025-10-09", "changes": [
-        "✨ Rich-Text Enhancement #7: Quellen-Hover-Preview implementiert",
-        "Hover-Tooltips zeigen Snippet-Vorschau, Confidence-Score, Metadaten",
-        "Async Backend-Integration für Snippet-Extraktion (POST /database/get_snippet)",
-        "Farbcodierte Confidence-Anzeige (Grün/Orange/Rot)",
-        "Automatische Tooltip-Bindung für alle Quellen (URLs, Dateien, DB)",
-        "Dark Theme Tooltips (#2c3e50) mit intelligenter Textkürzung",
-        "Erweiterte SourceTooltip-Klasse mit fetch_snippet Feature"
-    ]},
-    {"version": "3.6.0", "date": "2025-10-09", "changes": [
-        "UI-Komponenten in separate Module ausgelagert",
-        "Markdown-Rendering modularisiert (veritas_ui_markdown.py)",
-        "Dialog-Management zentralisiert (veritas_ui_dialogs.py)",
-        "Chat-Formatter ausgelagert (veritas_ui_chat_formatter.py)",
-        "Source-Link-Handler modularisiert (veritas_ui_source_links.py)",
-        "Code-Reduktion: ~970 Zeilen (-19.4%)",
-        "Verbesserte Wartbarkeit und Testbarkeit"
-    ]},
-    {"version": "3.5.0", "date": "2025-10-05", "changes": ["Alle UDS3-Abhängigkeiten entfernt", "Reine HTTP/HTTPS Backend-Kommunikation", "Frontend komplett unabhängig vom Backend-Typ"]},
-    {"version": "3.4.0", "date": "2025-08-21", "changes": ["OOP-Architektur implementiert", "Thread-Manager für Multi-Window-Support", "Queue-basierte Nachrichten-System", "Moderne GUI mit korrekter Architektur"]},
-    {"version": "3.2.0", "date": "2025-08-21", "changes": ["Moderne Chat GUI integriert", "Einheitliches Design System", "Kompakte Steuerung"]},
+    {
+        "version": "3.15.0",
+        "date": "2025-10-09",
+        "changes": [
+            "🎉 MILESTONE: 15/15 Rich-Text Enhancement Features COMPLETE! 🏆",
+            "📊 Feature #2: Markdown-Tabellen-Support implementiert (~30 min)",
+            "   • Automatische Tabellen-Erkennung (| Header | Header |)",
+            "   • Parser für mehrzeilige Tabellen mit Separator-Detection",
+            "   • Box-Drawing-Characters für elegante Borders (┌─┬─┐)",
+            "   • Spalten-Breiten-Berechnung basierend auf Content",
+            "   • Monospace-Font (Courier New 9) für perfektes Alignment",
+            "   • Alternierende Row-Colors (weiß/grau) für Lesbarkeit",
+            "   • _parse_table() - 2D-Array-Parsing mit Separator-Skip",
+            "   • _render_table() - Header (bold) + Data-Rows + Borders",
+            "   • 4 neue Tkinter-Tags: table_header, table_cell, table_cell_alt, table_border",
+            "✨ 100% Feature-Roadmap abgeschlossen:",
+            "   • Feature #1: Collapsible Sections ✅",
+            "   • Feature #2: Tables ✅ (NEW)",
+            "   • Feature #3: Syntax-Highlighting ✅",
+            "   • Feature #4: Listen-Formatierung ✅",
+            "   • Feature #5: Scroll-to-Source ✅",
+            "   • Feature #6: Code Copy-Button ✅",
+            "   • Feature #7: Source-Hover ✅",
+            "   • Feature #10: Custom Icons ✅",
+            "   • Feature #11: Keyboard Shortcuts ✅",
+            "   • Feature #12: Confidence Badges ✅",
+            "   • Feature #13: Enhanced Icons ✅",
+            "   • Feature #14: Relative Timestamps ✅",
+        ],
+    },
+    {
+        "version": "3.14.0",
+        "date": "2025-10-09",
+        "changes": [
+            "✨ Quick Wins: Features #12, #13, #14 implementiert (~25 min)",
+            "🎯 Feature #12: Confidence-Score Visualisierung mit farbigen Badges",
+            "   • Grüne Badges für hohe Scores (≥80%)",
+            "   • Orange Badges für mittlere Scores (60-79%)",
+            "   • Rote Badges für niedrige Scores (<60%)",
+            "   • Background-Color Tags in Tkinter",
+            "📁 Feature #13: Erweiterte Source-Type Icons",
+            "   • 50+ neue Dateityp-Icons (csv, json, xml, sql)",
+            "   • Code-Dateien: 🐍 Python, 📜 JavaScript, ☕ Java, etc.",
+            "   • Media-Dateien: 🎬 Video, 🎵 Audio, 🖼️ Bilder",
+            "   • Archive-Formate: 📦 ZIP, RAR, TAR, etc.",
+            "🕐 Feature #14: Relative Timestamp-Formatierung",
+            "   • 'Heute 14:23', 'Gestern 10:15', 'Mo 09:30'",
+            "   • Automatische relative Zeitangaben (<7 Tage)",
+            "   • format_relative_timestamp() Utility-Funktion",
+            "   • Fallback auf Datum bei älteren Nachrichten",
+        ],
+    },
+    {
+        "version": "3.13.0",
+        "date": "2025-10-09",
+        "changes": [
+            "✨ Rich-Text Enhancement #1: Collapsible Sections implementiert",
+            "📦 Neue CollapsibleSection-Klasse in veritas_ui_components.py",
+            "🔽 Toggle-Funktionalität mit ▶/▼ Icons für Expand/Collapse",
+            "📚 Quellen-Section collapsible (initial eingeklappt)",
+            "🤖 Agent-Analysen-Section collapsible (initial eingeklappt)",
+            "💡 Vorschläge-Section collapsible (initial sichtbar)",
+            "🎯 Message-ID-basiertes State-Management für individuelle Sections",
+            "⚡ Optional: Smooth Expand/Collapse-Animation",
+            "🔧 Fallback auf alte Details-Toggle-Methode wenn Feature nicht verfügbar",
+            "🎨 Integration mit dynamischem Icon-System (Feature #10)",
+            "🖱️ Click-Handler für Header und Arrow-Icons",
+            "📝 Helper-Methode _insert_single_source() für modulare Quellen-Darstellung",
+        ],
+    },
+    {
+        "version": "3.12.0",
+        "date": "2025-10-09",
+        "changes": [
+            "✨ Rich-Text Enhancement #11: Keyboard Shortcuts implementiert",
+            "⌨️ Global Shortcuts: Ctrl+N (Neuer Chat), Ctrl+S (Speichern), Ctrl+O (Laden)",
+            "🗑️ Ctrl+K (Chat löschen), Ctrl+/ (Shortcuts anzeigen), Esc (Focus Input), F1 (Hilfe)",
+            "💡 Shortcuts-Hilfe-Dialog mit vollständiger Übersicht",
+            "🔧 Tooltips für alle Toolbar-Buttons mit Shortcuts",
+            "📋 Hamburger-Menü erweitert mit Shortcuts-Eintrag",
+            "✨ Rich-Text Enhancement #4: Liste-Formatierung implementiert",
+            "📝 Auto-Indentation für nested Lists (2 Spaces = 1 Level)",
+            "🔢 Nummerierte Listen (1., 2., 3., ...)",
+            "🔤 Alphabetische Listen (a., b., c. & A., B., C.)",
+            "🏛️ Römische Ziffern (i., ii., iii. & I., II., III.)",
+            "⚡ Dynamische Icon-Integration aus Feature #10",
+        ],
+    },
+    {
+        "version": "3.11.0",
+        "date": "2025-10-09",
+        "changes": [
+            "✨ Rich-Text Enhancement #10: Custom Icons System implementiert",
+            "🎨 Zentrale Icon-Verwaltung in veritas_ui_icons.py (300+ Zeilen)",
+            "📚 10+ Icon-Kategorien: Chat, Sources, Metadata, Agents, Actions, Status, Files, Navigation",
+            "🔧 Dynamische Icon-Auswahl basierend auf Kontext (Datei-Typ, Confidence-Score, etc.)",
+            "📖 Shortcut-Methoden für schnellen Zugriff (VeritasIcons.chat(), .source(), .file())",
+            "🎯 ChatDisplayFormatter verwendet jetzt dynamische Icons für Sections",
+            "📝 MarkdownRenderer unterstützt Custom Icons für Listen",
+            "⚡ Fallback-Icons wenn Icon-System nicht verfügbar",
+        ],
+    },
+    {
+        "version": "3.10.0",
+        "date": "2025-10-09",
+        "changes": [
+            "✨ Rich-Text Enhancement #5: Scroll-to-Source Animation implementiert",
+            "🎬 Smooth Scroll Animation mit Cubic Easing Funktion (500ms, 30 FPS)",
+            "💡 Flash-Highlight der Ziel-Zeile mit Fade-out-Effekt (Gelb → Weiß, 2s)",
+            "🎯 Click-Handler für Quellen-Links lösen jetzt Scroll-Animation aus",
+            "📍 Automatische Positionierung mit 3-Zeilen-Padding für Sichtbarkeit",
+            "⚡ Intelligente Erkennung ob Scroll nötig ist (Skip bei bereits sichtbar)",
+            "🛡️ Robuste Error-Handling für Edge-Cases",
+            "Erweitert: ChatDisplayFormatter.scroll_to_source() & highlight_line()",
+        ],
+    },
+    {
+        "version": "3.9.0",
+        "date": "2025-10-09",
+        "changes": [
+            "✨ Rich-Text Enhancement #3: Syntax-Highlighting mit Pygments implementiert",
+            "🎨 Code-Blöcke werden jetzt farblich hervorgehoben (Python, JS, SQL, JSON, etc.)",
+            "📦 Neues Modul: veritas_ui_syntax.py mit SyntaxHighlighter-Klasse",
+            "🔍 Automatische Sprach-Erkennung aus Code-Fences (```python)",
+            "🎨 VS Code Dark+ Theme inspiriertes Farbschema",
+            "⚡ Token-basiertes Rendering mit Pygments → Tkinter Tag Mapping",
+            "🛡️ Fallback auf Text-Lexer wenn Sprache unbekannt",
+            "Unterstützt: Python, JavaScript, TypeScript, SQL, JSON, Bash, Markdown u.v.m.",
+        ],
+    },
+    {
+        "version": "3.8.0",
+        "date": "2025-10-09",
+        "changes": [
+            "✨ Rich-Text Enhancement #6: Copy-Button für Code implementiert",
+            "📋 Copy-Button erscheint automatisch neben Code-Blöcken",
+            "✓ Visual Feedback mit Checkmark-Animation (1.5s)",
+            "🎨 Hover-Effekt für bessere UX (#666 → #0066CC)",
+            "🛡️ Error Handling mit ✗ Icon",
+            "⚡ Automatische Integration in MarkdownRenderer",
+            "Nur für Code-Snippets > 3 Zeichen aktiviert",
+        ],
+    },
+    {
+        "version": "3.7.0",
+        "date": "2025-10-09",
+        "changes": [
+            "✨ Rich-Text Enhancement #7: Quellen-Hover-Preview implementiert",
+            "Hover-Tooltips zeigen Snippet-Vorschau, Confidence-Score, Metadaten",
+            "Async Backend-Integration für Snippet-Extraktion (POST /database/get_snippet)",
+            "Farbcodierte Confidence-Anzeige (Grün/Orange/Rot)",
+            "Automatische Tooltip-Bindung für alle Quellen (URLs, Dateien, DB)",
+            "Dark Theme Tooltips (#2c3e50) mit intelligenter Textkürzung",
+            "Erweiterte SourceTooltip-Klasse mit fetch_snippet Feature",
+        ],
+    },
+    {
+        "version": "3.6.0",
+        "date": "2025-10-09",
+        "changes": [
+            "UI-Komponenten in separate Module ausgelagert",
+            "Markdown-Rendering modularisiert (veritas_ui_markdown.py)",
+            "Dialog-Management zentralisiert (veritas_ui_dialogs.py)",
+            "Chat-Formatter ausgelagert (veritas_ui_chat_formatter.py)",
+            "Source-Link-Handler modularisiert (veritas_ui_source_links.py)",
+            "Code-Reduktion: ~970 Zeilen (-19.4%)",
+            "Verbesserte Wartbarkeit und Testbarkeit",
+        ],
+    },
+    {
+        "version": "3.5.0",
+        "date": "2025-10-05",
+        "changes": [
+            "Alle UDS3-Abhängigkeiten entfernt",
+            "Reine HTTP/HTTPS Backend-Kommunikation",
+            "Frontend komplett unabhängig vom Backend-Typ",
+        ],
+    },
+    {
+        "version": "3.4.0",
+        "date": "2025-08-21",
+        "changes": [
+            "OOP-Architektur implementiert",
+            "Thread-Manager für Multi-Window-Support",
+            "Queue-basierte Nachrichten-System",
+            "Moderne GUI mit korrekter Architektur",
+        ],
+    },
+    {
+        "version": "3.2.0",
+        "date": "2025-08-21",
+        "changes": ["Moderne Chat GUI integriert", "Einheitliches Design System", "Kompakte Steuerung"],
+    },
 ]
 
 # === OOP-ARCHITEKTUR: CORE ENGINE INTEGRATION ===
 
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
-from abc import ABC, abstractmethod
 
 # Fallback Implementierungen falls Core Engine nicht verfügbar
 if not CORE_AVAILABLE:
     logger.warning("⚠️ Verwende Fallback-Implementierung für Core Engine")
-    
+
     class MessageType(Enum):
         """Definiert verschiedene Message-Typen für Queue-Kommunikation"""
+
         CHAT_MESSAGE = "chat_message"
         STATUS_UPDATE = "status_update"
         WINDOW_CLOSE = "window_close"
@@ -284,6 +380,7 @@ if not CORE_AVAILABLE:
     @dataclass
     class QueueMessage:
         """Base class für Queue-Nachrichten"""
+
         msg_type: MessageType
         sender_id: str
         timestamp: float
@@ -292,45 +389,44 @@ if not CORE_AVAILABLE:
     @dataclass
     class ChatMessage(QueueMessage):
         """Spezielle Nachricht für Chat-Inhalte"""
+
         def __init__(self, sender_id: str, role: str, content: str, **kwargs):
             super().__init__(
                 msg_type=MessageType.CHAT_MESSAGE,
                 sender_id=sender_id,
                 timestamp=datetime.now().timestamp(),
-                data={
-                    'role': role,
-                    'content': content,
-                    'chat_id': kwargs.get('chat_id'),
-                    **kwargs
-                }
+                data={"role": role, "content": content, "chat_id": kwargs.get("chat_id"), **kwargs},
             )
 
     @dataclass
     class StatusMessage(QueueMessage):
         """Status-Updates zwischen Threads"""
+
         def __init__(self, sender_id: str, status: str, details: Optional[Dict] = None):
             super().__init__(
                 msg_type=MessageType.STATUS_UPDATE,
                 sender_id=sender_id,
                 timestamp=datetime.now().timestamp(),
-                data={'status': status, 'details': details or {}}
+                data={"status": status, "details": details or {}},
             )
+
 
 # === FALLBACK THREAD MANAGER ===
 
 if not CORE_AVAILABLE:
+
     class ThreadManager:
         """Fallback ThreadManager falls Core Engine nicht verfügbar"""
-        
+
         def __init__(self):
             self.threads: Dict[str, threading.Thread] = {}
             self.queues: Dict[str, queue.Queue] = {}
             self.main_queue = queue.Queue()
             self.shutdown_event = threading.Event()
             self._lock = threading.Lock()
-            
+
             logger.info("Fallback ThreadManager initialisiert")
-        
+
         def create_thread_queue(self, thread_id: str) -> queue.Queue:
             """Erstellt eine neue Queue für einen Thread"""
             with self._lock:
@@ -338,13 +434,13 @@ if not CORE_AVAILABLE:
                 self.queues[thread_id] = thread_queue
                 logger.info(f"Queue für Thread {thread_id} erstellt")
                 return thread_queue
-        
+
         def register_thread(self, thread_id: str, thread: threading.Thread):
             """Registriert einen neuen Thread"""
             with self._lock:
                 self.threads[thread_id] = thread
                 logger.info(f"Thread {thread_id} registriert")
-        
+
         def send_message(self, target_id: str, message: QueueMessage):
             """Sendet eine Nachricht an einen spezifischen Thread"""
             with self._lock:
@@ -353,7 +449,7 @@ if not CORE_AVAILABLE:
                     logger.debug(f"Message {message.msg_type} an {target_id} gesendet")
                 else:
                     logger.warning(f"Thread {target_id} nicht gefunden für Message {message.msg_type}")
-        
+
         def broadcast_message(self, message: QueueMessage, exclude: Optional[List[str]] = None):
             """Sendet eine Nachricht an alle Threads"""
             exclude = exclude or []
@@ -362,7 +458,7 @@ if not CORE_AVAILABLE:
                     if thread_id not in exclude:
                         thread_queue.put(message)
                 logger.debug(f"Broadcast {message.msg_type} an {len(self.queues) - len(exclude)} Threads")
-        
+
         def remove_thread(self, thread_id: str):
             """Entfernt einen Thread thread-sicher aus der Verwaltung"""
             try:
@@ -371,7 +467,7 @@ if not CORE_AVAILABLE:
                         thread = self.threads[thread_id]
                         del self.threads[thread_id]
                         logger.info(f"Thread {thread_id} entfernt")
-                    
+
                     if thread_id in self.queues:
                         try:
                             while not self.queues[thread_id].empty():
@@ -382,75 +478,77 @@ if not CORE_AVAILABLE:
                         logger.info(f"Queue für {thread_id} entfernt")
             except Exception as e:
                 logger.error(f"Fehler beim Entfernen von Thread {thread_id}: {e}")
-        
+
         def shutdown_all(self):
             """Beendet alle Threads sauber"""
             self.shutdown_event.set()
-            shutdown_msg = QueueMessage(
-                MessageType.THREAD_SHUTDOWN, 
-                "ThreadManager", 
-                datetime.now().timestamp(), 
-                {}
-            )
+            shutdown_msg = QueueMessage(MessageType.THREAD_SHUTDOWN, "ThreadManager", datetime.now().timestamp(), {})
             self.broadcast_message(shutdown_msg)
-            
+
             with self._lock:
                 for thread_id, thread in self.threads.items():
                     thread.join(timeout=2.0)
                     logger.info(f"Thread {thread_id} beendet")
-            
+
             logger.info("Alle Threads beendet")
-    
+
     class VeritasCore:
         """Fallback VERITAS Core falls Core Engine nicht verfügbar"""
+
         def __init__(self):
             self.thread_manager = ThreadManager()
             self.session_manager = None
             self.backend_processor = None
             logger.info("Fallback VeritasCore initialisiert")
-    
+
     def create_veritas_core() -> VeritasCore:
         """Erstellt eine Fallback Core Instance"""
         return VeritasCore()
+
 
 # === CORE ENGINE INITIALIZATION ===
 
 # Global Core Engine Instance
 veritas_core_instance: Optional[VeritasCore] = None
 
+
 def get_veritas_core() -> VeritasCore:
     """Singleton Pattern für VERITAS Core Engine"""
     global veritas_core_instance
-    
+
     if veritas_core_instance is None:
         if CORE_AVAILABLE:
             veritas_core_instance = create_veritas_core()
             logger.info("✅ VERITAS Core Engine initialisiert")
         else:
             logger.warning("⚠️ Core Engine nicht verfügbar - verwende lokale Implementierung")
-            
+
     return veritas_core_instance
+
 
 # Thread Manager aus Core Engine oder Fallback
 if CORE_AVAILABLE:
     # Verwende Core Engine ThreadManager
     def get_thread_manager() -> ThreadManager:
         return get_veritas_core().thread_manager
+
 else:
     # Verwende lokale Fallback-Implementierung
     _fallback_thread_manager: Optional[ThreadManager] = None
-    
+
     def get_thread_manager() -> ThreadManager:
         global _fallback_thread_manager
         if _fallback_thread_manager is None:
             _fallback_thread_manager = ThreadManager()
         return _fallback_thread_manager
 
+
 # === OOP-ARCHITEKTUR: CHAT WINDOW BASE CLASS ===
+
 
 class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
     """Abstrakte Basis-Klasse für alle Chat-Fenster"""
-    
+
     def __init__(self, window_id: str, thread_manager: ThreadManager, parent=None):
         # Basis-Initialisierung
         self.window_id = window_id
@@ -458,25 +556,25 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
         self.parent = parent
         self.chat_messages = []
         self.is_main_window = False
-        
+
         # Session-ID für API-Kommunikation
         self.session_id = f"session_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{window_id}"
         self.selected_llm = None  # Wird dynamisch vom Backend geladen
-        
+
         # Thread-spezifische Queue erstellen - Verwende direkte Queue-Referenz
         self.queue = thread_manager.create_thread_queue(window_id)
         self.message_queue = self.queue  # Alias für Kompatibilität
-        
+
         # GUI-Komponenten
         self.window = None
         self.chat_text = None
         self.input_text = None
         self.status_var = None
-        
+
         # Feedback-System
         self.feedback_widgets = {}  # message_id -> MessageFeedbackWidget
         self.last_assistant_message_id = None
-        
+
         # Streaming-Integration Setup
         if STREAMING_AVAILABLE:
             try:
@@ -487,30 +585,26 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
                 logger.info(f"✅ Streaming-Integration für {window_id} aktiviert")
             except Exception as e:
                 logger.warning(f"⚠️ Streaming-Integration fehlgeschlagen für {window_id}: {e}")
-        
+
         logger.info(f"ChatWindowBase {window_id} initialisiert")
-    
+
     @abstractmethod
     def create_gui(self):
         """Erstellt die GUI-Komponenten - muss von Subklassen implementiert werden"""
         pass
-    
+
     @abstractmethod
     def setup_bindings(self):
         """Richtet Event-Bindings ein - muss von Subklassen implementiert werden"""
         pass
-    
+
     def start_message_loop(self):
         """Startet die Message-Loop für diese Window"""
-        thread = threading.Thread(
-            target=self._message_loop,
-            daemon=True,
-            name=f"ChatWindow-{self.window_id}"
-        )
+        thread = threading.Thread(target=self._message_loop, daemon=True, name=f"ChatWindow-{self.window_id}")
         self.thread_manager.register_thread(self.window_id, thread)
         thread.start()
         logger.info(f"Message-Loop für {self.window_id} gestartet")
-    
+
     def _message_loop(self):
         """Interne Message-Loop - läuft in separatem Thread"""
         while not self.thread_manager.shutdown_event.is_set():
@@ -522,12 +616,16 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
                 continue
             except Exception as e:
                 logger.error(f"Fehler in Message-Loop {self.window_id}: {e}")
-    
+
     def _handle_message(self, message: QueueMessage):
         """Behandelt eingehende Nachrichten"""
         # Erst prüfen ob es Streaming-Message ist
-        if (STREAMING_AVAILABLE and hasattr(message, 'data') and 
-            isinstance(message.data, dict) and 'stream_type' in message.data):
+        if (
+            STREAMING_AVAILABLE
+            and hasattr(message, "data")
+            and isinstance(message.data, dict)
+            and "stream_type" in message.data
+        ):
             self._handle_streaming_message(message)
         elif message.msg_type == MessageType.CHAT_MESSAGE:
             self._handle_chat_message(message)
@@ -541,109 +639,111 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
             self._handle_shutdown()
         else:
             logger.debug(f"Unbehandelte Message: {message.msg_type} in {self.window_id}")
-    
+
     def _handle_chat_message(self, message: QueueMessage):
         """Behandelt Chat-Nachrichten"""
         chat_data = message.data
-        self.chat_messages.append({
-            'role': chat_data['role'],
-            'content': chat_data['content'],
-            'timestamp': datetime.fromtimestamp(message.timestamp).isoformat()
-        })
-        
+        self.chat_messages.append(
+            {
+                "role": chat_data["role"],
+                "content": chat_data["content"],
+                "timestamp": datetime.fromtimestamp(message.timestamp).isoformat(),
+            }
+        )
+
         # Auto-Save nach jeder User-Message
-        if chat_data['role'] == 'user':
+        if chat_data["role"] == "user":
             self._auto_save_conversation()
-        
+
         # GUI-Update in Main-Thread
         if self.window:
             self.window.after(0, self.update_chat_display)
-    
+
     def _handle_status_update(self, message: QueueMessage):
         """Behandelt Status-Updates thread-sicher"""
         try:
-            status = message.data.get('status', 'Unknown')
-            if self.status_var and self.window and hasattr(self.window, 'winfo_exists') and self.window.winfo_exists():
+            status = message.data.get("status", "Unknown")
+            if self.status_var and self.window and hasattr(self.window, "winfo_exists") and self.window.winfo_exists():
                 self.window.after(0, self._safe_update_status, status)
         except tk.TclError:
             logger.debug(f"Status-Update für {self.window_id} - Window bereits zerstört")
         except Exception as e:
             logger.error(f"Fehler bei Status-Update für {self.window_id}: {e}")
-    
+
     def _safe_update_status(self, status):
         """Sicheres Status-Update mit Widget-Existenz-Prüfung"""
         try:
-            if self.status_var and self.window and hasattr(self.window, 'winfo_exists') and self.window.winfo_exists():
+            if self.status_var and self.window and hasattr(self.window, "winfo_exists") and self.window.winfo_exists():
                 self.status_var.set(status)
         except tk.TclError:
             logger.debug(f"Status-Update für {self.window_id} - Widget bereits zerstört")
         except Exception as e:
             logger.debug(f"Fehler bei Status-Update: {e}")
-    
+
     def _handle_backend_response(self, message: QueueMessage):
         """Behandelt Backend-Antworten mit erweiterten RAG-Daten"""
         logger.info(f"🔔 _handle_backend_response aufgerufen für {self.window_id}")
         response_data = message.data
-        
+
         # Hole die Basis-Antwort
-        base_content = response_data.get('content', 'Keine Antwort')
+        base_content = response_data.get("content", "Keine Antwort")
         logger.debug(f"Base content length: {len(base_content)}")
-        
+
         # Erweitere mit zusätzlichen Informationen
         formatted_content = base_content
-        
+
         # Füge Quellen hinzu (wenn vorhanden und noch nicht im content)
-        sources = response_data.get('sources', [])
-        if sources and '📚' not in base_content:
+        sources = response_data.get("sources", [])
+        if sources and "📚" not in base_content:
             formatted_content += "\n\n📚 **Quellen:**"
             for i, source in enumerate(sources[:5], 1):  # Max 5 Quellen
-                title = source.get('title', f'Quelle {i}')
-                relevance = source.get('relevance', source.get('score', 0))
+                title = source.get("title", f"Quelle {i}")
+                relevance = source.get("relevance", source.get("score", 0))
                 if relevance > 0:
                     formatted_content += f"\n  {i}. {title} (Relevanz: {relevance:.0%})"
                 else:
                     formatted_content += f"\n  {i}. {title}"
-        
+
         # Füge Worker-Results Details hinzu (wenn vorhanden und noch nicht im content)
-        worker_results = response_data.get('worker_results', {})
-        if worker_results and '🤖' not in base_content and len(worker_results) > 0:
+        worker_results = response_data.get("worker_results", {})
+        if worker_results and "🤖" not in base_content and len(worker_results) > 0:
             formatted_content += f"\n\n🤖 **Verarbeitet von {len(worker_results)} Agenten:**"
             for agent_name, agent_data in list(worker_results.items())[:3]:  # Max 3 Agents
-                confidence = agent_data.get('confidence_score', 0)
-                processing_time = agent_data.get('processing_time', 0)
+                confidence = agent_data.get("confidence_score", 0)
+                processing_time = agent_data.get("processing_time", 0)
                 formatted_content += f"\n  • {agent_name}: {confidence:.0%} Confidence ({processing_time:.2f}s)"
-        
+
         # Erweiterte Assistant-Message mit RAG-Daten
         assistant_message = {
-            'role': 'assistant',
-            'content': formatted_content,
-            'timestamp': datetime.fromtimestamp(message.timestamp).isoformat(),
-            'sources': sources,
-            'worker_results': worker_results,
-            'metadata': response_data.get('metadata', {}),
-            'confidence_score': response_data.get('confidence_score', 0.0)
+            "role": "assistant",
+            "content": formatted_content,
+            "timestamp": datetime.fromtimestamp(message.timestamp).isoformat(),
+            "sources": sources,
+            "worker_results": worker_results,
+            "metadata": response_data.get("metadata", {}),
+            "confidence_score": response_data.get("confidence_score", 0.0),
         }
-        
+
         # ✨ v3.19.0: Füge sources_metadata hinzu (IEEE-Zitationen)
-        if 'sources_metadata' in response_data:
-            assistant_message['metadata']['sources_metadata'] = response_data['sources_metadata']
-        
+        if "sources_metadata" in response_data:
+            assistant_message["metadata"]["sources_metadata"] = response_data["sources_metadata"]
+
         # ✨ v3.19.0: Füge suggestions hinzu (Follow-up-Fragen)
-        if 'suggestions' in response_data:
-            assistant_message['metadata']['suggestions'] = response_data['suggestions']
-        
+        if "suggestions" in response_data:
+            assistant_message["metadata"]["suggestions"] = response_data["suggestions"]
+
         self.chat_messages.append(assistant_message)
         logger.info(f"📝 Assistant message zu chat_messages hinzugefügt. Total: {len(self.chat_messages)}")
-        
+
         # Auto-Save nach jeder Assistant-Antwort
         self._auto_save_conversation()
-        
+
         logger.info(f"📺 Aktualisiere Chat-Display via window.after()")
-        if self.window and hasattr(self.window, 'winfo_exists') and self.window.winfo_exists():
+        if self.window and hasattr(self.window, "winfo_exists") and self.window.winfo_exists():
             self.window.after(0, self._safe_update_chat_display)
             # Status mit Quellenanzahl und Confidence
             sources_count = len(sources)
-            confidence = response_data.get('confidence_score', 0.0)
+            confidence = response_data.get("confidence_score", 0.0)
             if sources_count > 0 and confidence > 0:
                 status_text = f"Bereit - {sources_count} Quellen, {confidence:.0%} Confidence"
             elif sources_count > 0:
@@ -656,74 +756,74 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
             logger.info(f"✅ Chat-Display-Update und Status-Update angefordert")
         else:
             logger.warning(f"⚠️ Window existiert nicht mehr für {self.window_id}")
-    
+
     def _handle_error_message(self, message: QueueMessage):
         """Behandelt Fehlernachrichten"""
         error_data = message.data
         error_message = {
-            'role': 'system',
-            'content': f"❌ {error_data.get('content', 'Unbekannter Fehler')}",
-            'timestamp': datetime.fromtimestamp(message.timestamp).isoformat()
+            "role": "system",
+            "content": f"❌ {error_data.get('content', 'Unbekannter Fehler')}",
+            "timestamp": datetime.fromtimestamp(message.timestamp).isoformat(),
         }
         self.chat_messages.append(error_message)
-        
-        if self.window and hasattr(self.window, 'winfo_exists') and self.window.winfo_exists():
+
+        if self.window and hasattr(self.window, "winfo_exists") and self.window.winfo_exists():
             self.window.after(0, self._safe_update_chat_display)
             self.window.after(0, self._safe_update_status, "Fehler")
-    
+
     def _on_suggestion_clicked(self, suggestion_text: str):
         """
         ✨ v3.19.0: Callback für klickbare Vorschläge
-        
+
         Args:
             suggestion_text: Der geklickte Vorschlagstext (z.B. "Welche Kosten fallen an?")
-        
+
         Verhalten:
             1. Füllt Query-Input mit Vorschlagstext
             2. Sendet Query automatisch ans Backend
             3. Fokussiert Chat (für sofortiges Feedback)
         """
         logger.info(f"[SUGGESTION-CLICK] User clicked suggestion: {suggestion_text[:60]}...")
-        
+
         try:
             # 1. Query-Input füllen
-            if hasattr(self, 'query_entry') and self.query_entry:
+            if hasattr(self, "query_entry") and self.query_entry:
                 self.query_entry.delete(0, tk.END)
                 self.query_entry.insert(0, suggestion_text)
                 logger.debug(f"[SUGGESTION] Query-Input gefüllt: {suggestion_text[:60]}...")
-            
+
             # 2. Auto-Send (simuliert Enter-Taste)
             # WICHTIG: Verwende after() um Race-Conditions zu vermeiden
             self.window.after(100, self._send_query_from_suggestion)
-            
+
             # 3. Fokus auf Chat (für visuelles Feedback)
-            if hasattr(self, 'chat_text') and self.chat_text:
+            if hasattr(self, "chat_text") and self.chat_text:
                 self.chat_text.see(tk.END)
-            
+
             logger.info(f"[SUGGESTION] Auto-Send initiiert für: {suggestion_text[:60]}...")
-            
+
         except Exception as e:
             logger.error(f"[SUGGESTION-CLICK] Fehler beim Verarbeiten: {e}")
             # Fallback: Zeige Fehlermeldung
-            if hasattr(self, 'status_var') and self.status_var:
+            if hasattr(self, "status_var") and self.status_var:
                 self.status_var.set(f"❌ Fehler beim Senden des Vorschlags")
-    
+
     def _send_query_from_suggestion(self):
         """
         ✨ v3.19.0: Sendet Query aus Suggestion-Click
-        
+
         WICHTIG: Separate Methode für after()-Callback (vermeidet Race-Conditions)
         """
         try:
             # Rufe existierende Send-Methode auf
-            if hasattr(self, 'send_query'):
+            if hasattr(self, "send_query"):
                 self.send_query()
                 logger.info("[SUGGESTION] Query erfolgreich gesendet")
             else:
                 logger.warning("[SUGGESTION] send_query() Methode nicht verfügbar")
         except Exception as e:
             logger.error(f"[SUGGESTION] Fehler beim Senden der Query: {e}")
-    
+
     def _handle_shutdown(self):
         """Behandelt Shutdown-Signal thread-sicher"""
         try:
@@ -732,220 +832,205 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
         except tk.TclError:
             # Widget bereits zerstört
             pass
-    
+
     def _safe_destroy(self):
         """Sicheres Zerstören des Windows"""
         try:
-            if hasattr(self, 'window') and self.window and hasattr(self.window, 'winfo_exists') and self.window.winfo_exists():
+            if hasattr(self, "window") and self.window and hasattr(self.window, "winfo_exists") and self.window.winfo_exists():
                 self.window.destroy()
         except tk.TclError:
             # Widget bereits zerstört
             logger.debug(f"Widget {self.window_id} bereits zerstört")
         except Exception as e:
             logger.debug(f"Fehler beim Zerstören von {self.window_id}: {e}")
-    
+
     def _auto_save_conversation(self):
         """Speichert Conversation automatisch"""
         try:
             if not self.chat_messages:
                 return
-            
+
             # Erstelle Conversations-Ordner falls nicht vorhanden
             import os
+
             conversations_dir = os.path.join(os.getcwd(), "conversations")
             os.makedirs(conversations_dir, exist_ok=True)
-            
+
             # Dateiname basierend auf Session-ID und Datum
             from datetime import datetime
+
             date_str = datetime.now().strftime("%Y%m%d")
             session_short = self.session_id[-8:] if self.session_id else "unknown"
             filename = f"chat_{date_str}_{session_short}.json"
             filepath = os.path.join(conversations_dir, filename)
-            
+
             # Speichere Chat-Messages
-            with open(filepath, 'w', encoding='utf-8') as f:
+            with open(filepath, "w", encoding="utf-8") as f:
                 json.dump(self.chat_messages, f, indent=2, ensure_ascii=False)
-            
+
             logger.debug(f"Conversation auto-gespeichert: {filename}")
-            
+
         except Exception as e:
             logger.debug(f"Auto-Save-Fehler für {self.window_id}: {e}")
-    
+
     def send_chat_message(self, content: str):
         """Sendet eine Chat-Nachricht"""
-        user_message = ChatMessage(
-            sender_id=self.window_id,
-            role='user',
-            content=content,
-            chat_id=self.window_id
-        )
-        
+        user_message = ChatMessage(sender_id=self.window_id, role="user", content=content, chat_id=self.window_id)
+
         # Nachricht zu lokalen Messages hinzufügen
         self._handle_chat_message(user_message)
-        
+
         # Status-Update senden
         status_msg = StatusMessage(self.window_id, "Sende Nachricht...")
         self._handle_status_update(status_msg)
-        
+
         # Backend-Anfrage in separatem Thread
-        threading.Thread(
-            target=self._send_to_backend,
-            args=(content,),
-            daemon=True
-        ).start()
-    
+        threading.Thread(target=self._send_to_backend, args=(content,), daemon=True).start()
+
     def _send_to_backend(self, message: str):
         """Sendet Nachricht an Backend (läuft in separatem Thread)"""
         try:
             # Primär: Backend-API verwenden (empfohlen)
             # Das Backend entscheidet, ob UDS3 oder andere Methoden verwendet werden
-            
+
             # Session erstellen falls nicht vorhanden
-            if not hasattr(self, 'session_id') or not self.session_id:
+            if not hasattr(self, "session_id") or not self.session_id:
                 if not self._create_api_session():
                     self._send_error_response("❌ Keine API-Session verfügbar")
                     return
-            
+
             # Bestimme Modus
             mode_key = "veritas"  # Standard
-            
-            if hasattr(self, 'current_question_mode') and self.current_question_mode:
-                mode_key = self.current_question_mode.get('key', 'veritas')
+
+            if hasattr(self, "current_question_mode") and self.current_question_mode:
+                mode_key = self.current_question_mode.get("key", "veritas")
                 logger.info(f"🔄 Verwende Modus: '{mode_key}'")
-            
+
             # Erstelle einfache Backend-konforme Request (Dict mit 'query' statt 'question')
             request_payload = {
                 "query": message,  # Backend erwartet 'query' nicht 'question'
                 "session_id": self.session_id,
-                "model": getattr(self, 'llm_var', tk.StringVar(value='llama3:latest')).get(),
-                "temperature": getattr(self, 'temperature_var', tk.DoubleVar(value=0.7)).get(),
-                "max_tokens": getattr(self, 'max_tokens_var', tk.IntVar(value=500)).get() if hasattr(self, 'max_tokens_var') else 500,
+                "model": getattr(self, "llm_var", tk.StringVar(value="llama3:latest")).get(),
+                "temperature": getattr(self, "temperature_var", tk.DoubleVar(value=0.7)).get(),
+                "max_tokens": getattr(self, "max_tokens_var", tk.IntVar(value=500)).get()
+                if hasattr(self, "max_tokens_var")
+                else 500,
                 "mode": mode_key,
-                "enable_streaming": False  # Non-Streaming Modus
+                "enable_streaming": False,  # Non-Streaming Modus
             }
-            
+
             # Sende an v2/query Endpoint
             logger.info(f"🚀 Sende Query an /v2/query (Modus: {mode_key})")
             logger.debug(f"Payload: {request_payload}")
-            
-            api_response = requests.post(
-                f"{API_BASE_URL}/v2/query",
-                json=request_payload,
-                timeout=60
-            )
-            
+
+            api_response = requests.post(f"{API_BASE_URL}/v2/query", json=request_payload, timeout=60)
+
             if api_response.status_code == 200:
                 response_data = api_response.json()
-                
+
                 # Backend gibt 'response_text' zurück
-                response_text = response_data.get('response_text', 'Keine Antwort erhalten.')
-                
+                response_text = response_data.get("response_text", "Keine Antwort erhalten.")
+
                 # Erweiterte Informationen hinzufügen
                 additional_info = []
-                
+
                 # Confidence Score
-                confidence_score = response_data.get('confidence_score', 0.0)
+                confidence_score = response_data.get("confidence_score", 0.0)
                 if confidence_score > 0:
                     additional_info.append(f"🎯 Confidence: {confidence_score:.1%}")
-                
+
                 # Quellen
-                sources = response_data.get('sources', [])
+                sources = response_data.get("sources", [])
                 if sources:
                     additional_info.append(f"📚 {len(sources)} Quellen")
-                
+
                 # Processing-Metadaten
-                metadata = response_data.get('processing_metadata', {})
-                processing_time = metadata.get('processing_time', 0)
+                metadata = response_data.get("processing_metadata", {})
+                processing_time = metadata.get("processing_time", 0)
                 if processing_time > 0:
                     additional_info.append(f"⚡ {processing_time:.2f}s")
-                
+
                 # Agent/Worker-Ergebnisse
-                worker_results = response_data.get('worker_results', {})
+                worker_results = response_data.get("worker_results", {})
                 if worker_results:
                     additional_info.append(f"🤖 {len(worker_results)} Agents")
-                
+
                 # Zusätzliche Infos anhängen
                 if additional_info:
                     response_text += f"\n\n💡 {' | '.join(additional_info)}"
-                
+
                 # Follow-up Vorschläge
-                suggestions = response_data.get('follow_up_suggestions', [])
+                suggestions = response_data.get("follow_up_suggestions", [])
                 if suggestions:
                     response_text += f"\n\n🔍 **Vorschläge:**\n" + "\n".join([f"• {s}" for s in suggestions[:3]])
-                
+
                 # Backend-Response-Message erstellen
                 response_msg = QueueMessage(
                     MessageType.BACKEND_RESPONSE,
                     "Backend API",
                     datetime.now().timestamp(),
                     {
-                        'content': response_text,
-                        'sources': sources,
-                        'confidence_score': confidence_score,
-                        'suggestions': suggestions,
-                        'worker_results': worker_results,
-                        'metadata': metadata,
-                        'session_id': response_data.get('session_id', self.session_id),
-                        'processing_time': processing_time
-                    }
+                        "content": response_text,
+                        "sources": sources,
+                        "confidence_score": confidence_score,
+                        "suggestions": suggestions,
+                        "worker_results": worker_results,
+                        "metadata": metadata,
+                        "session_id": response_data.get("session_id", self.session_id),
+                        "processing_time": processing_time,
+                    },
                 )
-                
+
                 # Response an korrekte Queue senden (ChatWindowBase.queue)
                 self.queue.put(response_msg)
                 logger.info(f"✅ Backend Response: {len(response_text)} Zeichen, Confidence: {confidence_score:.2%}")
-                
+
                 # Upload-Dateien nach erfolgreichem Senden zurücksetzen
-                if hasattr(self, 'uploaded_files'):
+                if hasattr(self, "uploaded_files"):
                     self._clear_all_attachments()
                 return
-                    
+
             else:
                 # HTTP-Fehler behandeln
                 error_msg = f"HTTP-Fehler {api_response.status_code}"
                 try:
                     error_data = api_response.json()
-                    if 'detail' in error_data:
+                    if "detail" in error_data:
                         error_msg = f"{error_msg}: {error_data['detail']}"
                 except:
                     pass
-                
+
                 self._send_error_response(f"❌ {error_msg}")
                 logger.error(f"Backend HTTP Fehler: {error_msg}")
                 return
-        
+
         except requests.exceptions.Timeout:
             error_msg = "⏱️ Timeout: Server antwortet nicht (30s)"
             logger.error(f"API Timeout: {error_msg}")
             self._send_error_response(error_msg)
-            
+
         except requests.exceptions.ConnectionError:
             error_msg = "🔌 Verbindungsfehler: Server nicht erreichbar"
             logger.error(f"API Connection Error: {error_msg}")
             self._send_error_response(error_msg)
-            
+
         except requests.exceptions.RequestException as e:
             error_msg = f"📡 Request-Fehler: {str(e)}"
             logger.error(f"API Request Error: {e}")
             self._send_error_response(error_msg)
-            
+
         except Exception as e:
             error_msg = f"💥 Unerwarteter Fehler: {str(e)}"
             logger.error(f"Backend-Fehler: {e}")
             self._send_error_response(error_msg)
-    
+
     def _create_api_session(self) -> bool:
         """Erstellt eine neue API-Session. Gibt True zurück wenn erfolgreich."""
         try:
-            payload = {
-                "user_id": f"veritas_user_{self.window_id}"
-            }
-            
-            response = requests.post(
-                f"{API_BASE_URL}/start_session",
-                json=payload,
-                timeout=10
-            )
-            
+            payload = {"user_id": f"veritas_user_{self.window_id}"}
+
+            response = requests.post(f"{API_BASE_URL}/start_session", json=payload, timeout=10)
+
             if response.status_code == 200:
                 data = response.json()
                 self.session_id = data.get("session_id")
@@ -954,70 +1039,58 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
             else:
                 logger.error(f"Session-Erstellung fehlgeschlagen: HTTP {response.status_code} - {response.text}")
                 return False
-                
+
         except requests.exceptions.RequestException as e:
             logger.error(f"Session-Erstellung - Verbindungsfehler: {e}")
             return False
         except Exception as e:
             logger.error(f"Session-Erstellung - Unerwarteter Fehler: {e}")
             return False
-    
+
     def _send_error_response(self, error_message: str):
         """Sendet eine Fehler-Nachricht an die eigene Queue"""
-        error_msg = QueueMessage(
-            MessageType.ERROR_MESSAGE,
-            "Backend",
-            datetime.now().timestamp(),
-            {'content': error_message}
-        )
+        error_msg = QueueMessage(MessageType.ERROR_MESSAGE, "Backend", datetime.now().timestamp(), {"content": error_message})
         self.queue.put(error_msg)
-    
+
     def _add_feedback_widget(self, message_id: str, message_data: Dict):
         """Fügt ein Feedback-Widget für eine Assistant-Nachricht hinzu"""
         try:
-            feedback_widget = MessageFeedbackWidget(
-                self.chat_text,
-                message_data,
-                save_callback=self._save_feedback
-            )
+            feedback_widget = MessageFeedbackWidget(self.chat_text, message_data, save_callback=self._save_feedback)
             feedback_widget.create_feedback_buttons()
             self.feedback_widgets[message_id] = feedback_widget
             self.last_assistant_message_id = message_id
             logger.debug(f"Feedback-Widget für {message_id} hinzugefügt")
         except Exception as e:
             logger.error(f"Fehler beim Hinzufügen des Feedback-Widgets: {e}")
-    
+
     def _save_feedback(self, message_id: str, feedback_data: Dict):
         """Speichert Feedback für eine Nachricht"""
         try:
             # Feedback in den Nachrichtenmetadaten speichern
             for message in self.chat_messages:
-                if message.get('id') == message_id:
-                    if 'metadata' not in message:
-                        message['metadata'] = {}
-                    if 'user_feedback' not in message['metadata']:
-                        message['metadata']['user_feedback'] = []
-                    
-                    feedback_entry = {
-                        **feedback_data,
-                        'timestamp': datetime.now().isoformat()
-                    }
-                    message['metadata']['user_feedback'].append(feedback_entry)
+                if message.get("id") == message_id:
+                    if "metadata" not in message:
+                        message["metadata"] = {}
+                    if "user_feedback" not in message["metadata"]:
+                        message["metadata"]["user_feedback"] = []
+
+                    feedback_entry = {**feedback_data, "timestamp": datetime.now().isoformat()}
+                    message["metadata"]["user_feedback"].append(feedback_entry)
                     logger.info(f"Feedback für {message_id} gespeichert: {feedback_data.get('rating', 'Kommentar')}")
                     break
         except Exception as e:
             logger.error(f"Fehler beim Speichern des Feedbacks: {e}")
-    
+
     def _repeat_last_question(self):
         """Wiederholt die letzte Benutzerfrage"""
         try:
             # Finde die letzte Benutzernachricht
             last_user_message = None
             for message in reversed(self.chat_messages):
-                if message.get('role') == 'user':
-                    last_user_message = message.get('content')
+                if message.get("role") == "user":
+                    last_user_message = message.get("content")
                     break
-            
+
             if last_user_message:
                 self.send_chat_message(last_user_message)
                 logger.info("Letzte Frage wiederholt")
@@ -1025,459 +1098,452 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
                 logger.warning("Keine vorherige Benutzerfrage gefunden")
         except Exception as e:
             logger.error(f"Fehler beim Wiederholen der Frage: {e}")
-    
+
     @abstractmethod
     def update_chat_display(self):
         """Aktualisiert die Chat-Anzeige - muss von Subklassen implementiert werden"""
         pass
-    
-    def transfer_to_window(self, target_window: 'ChatWindowBase'):
+
+    def transfer_to_window(self, target_window: "ChatWindowBase"):
         """Überträgt Chat-Inhalt zu einem anderen Fenster"""
         target_window.chat_messages.extend(self.chat_messages)
-        if target_window.window and hasattr(target_window.window, 'winfo_exists') and target_window.window.winfo_exists():
+        if target_window.window and hasattr(target_window.window, "winfo_exists") and target_window.window.winfo_exists():
             target_window.window.after(0, target_window._safe_update_chat_display)
         logger.info(f"Chat-Inhalt von {self.window_id} zu {target_window.window_id} übertragen")
-    
+
     def close_window(self):
         """Schließt das Fenster thread-sicher"""
         try:
             self.thread_manager.remove_thread(self.window_id)
-            if self.window and hasattr(self.window, 'winfo_exists') and self.window.winfo_exists():
+            if self.window and hasattr(self.window, "winfo_exists") and self.window.winfo_exists():
                 self.window.destroy()
             logger.info(f"ChatWindow {self.window_id} geschlossen")
         except tk.TclError:
             logger.debug(f"ChatWindow {self.window_id} bereits geschlossen")
         except Exception as e:
             logger.error(f"Fehler beim Schließen von {self.window_id}: {e}")
-    
+
     # === GEMEINSAME GUI-ERSTELLUNGSMETHODEN ===
-    
+
     def _create_chat_display(self, parent, height=20):
         """Erstellt die Chat-Anzeige (gemeinsam für alle Windows)"""
         self.chat_text = scrolledtext.ScrolledText(
             parent,
             wrap=tk.WORD,
             height=height,
-            font=('Segoe UI', 10),
-            bg='#ffffff',
-            fg='#333333',
-            selectbackground='#0078d4',
-            selectforeground='white'
+            font=("Segoe UI", 10),
+            bg="#ffffff",
+            fg="#333333",
+            selectbackground="#0078d4",
+            selectforeground="white",
         )
         self.chat_text.pack(fill=tk.BOTH, expand=True, pady=(0, 5))
         self.chat_text.config(state=tk.DISABLED)
-        
+
         # Text-Tags für moderne Formatierung
-        self.chat_text.tag_configure("user", foreground="#0066CC", font=('Segoe UI', 10, 'bold'))
-        self.chat_text.tag_configure("assistant", foreground="#1a1a1a", font=('Segoe UI', 10))
-        self.chat_text.tag_configure("assistant_main", foreground="#000000", font=('Segoe UI', 11))
-        self.chat_text.tag_configure("system", foreground="#666666", font=('Segoe UI', 9, 'italic'))
-        self.chat_text.tag_configure("timestamp", foreground="#999999", font=('Segoe UI', 8))
-        self.chat_text.tag_configure("source", foreground="#4a90e2", font=('Segoe UI', 9))
-        self.chat_text.tag_configure("agent", foreground="#e67e22", font=('Segoe UI', 9))
-        self.chat_text.tag_configure("metadata", foreground="#7f8c8d", font=('Segoe UI', 8, 'italic'))
-        self.chat_text.tag_configure("header", foreground="#2c3e50", font=('Segoe UI', 10, 'bold'))
-        self.chat_text.tag_configure("clickable", foreground="#0066CC", font=('Segoe UI', 9, 'underline'), underline=True)
-        self.chat_text.tag_configure("clickable_link", foreground="#0066CC", font=('Segoe UI', 9, 'underline'), underline=True)
-        self.chat_text.tag_configure("collapsed", foreground="#95a5a6", font=('Segoe UI', 9))
-        self.chat_text.tag_configure("confidence_high", foreground="#27ae60", font=('Segoe UI', 9, 'bold'))
-        self.chat_text.tag_configure("confidence_med", foreground="#f39c12", font=('Segoe UI', 9, 'bold'))
-        self.chat_text.tag_configure("confidence_low", foreground="#e74c3c", font=('Segoe UI', 9, 'bold'))
-        
+        self.chat_text.tag_configure("user", foreground="#0066CC", font=("Segoe UI", 10, "bold"))
+        self.chat_text.tag_configure("assistant", foreground="#1a1a1a", font=("Segoe UI", 10))
+        self.chat_text.tag_configure("assistant_main", foreground="#000000", font=("Segoe UI", 11))
+        self.chat_text.tag_configure("system", foreground="#666666", font=("Segoe UI", 9, "italic"))
+        self.chat_text.tag_configure("timestamp", foreground="#999999", font=("Segoe UI", 8))
+        self.chat_text.tag_configure("source", foreground="#4a90e2", font=("Segoe UI", 9))
+        self.chat_text.tag_configure("agent", foreground="#e67e22", font=("Segoe UI", 9))
+        self.chat_text.tag_configure("metadata", foreground="#7f8c8d", font=("Segoe UI", 8, "italic"))
+        self.chat_text.tag_configure("header", foreground="#2c3e50", font=("Segoe UI", 10, "bold"))
+        self.chat_text.tag_configure("clickable", foreground="#0066CC", font=("Segoe UI", 9, "underline"), underline=True)
+        self.chat_text.tag_configure("clickable_link", foreground="#0066CC", font=("Segoe UI", 9, "underline"), underline=True)
+        self.chat_text.tag_configure("collapsed", foreground="#95a5a6", font=("Segoe UI", 9))
+        self.chat_text.tag_configure("confidence_high", foreground="#27ae60", font=("Segoe UI", 9, "bold"))
+        self.chat_text.tag_configure("confidence_med", foreground="#f39c12", font=("Segoe UI", 9, "bold"))
+        self.chat_text.tag_configure("confidence_low", foreground="#e74c3c", font=("Segoe UI", 9, "bold"))
+
         # ✨ NEW: Sprechblasen-Design (Tag-basiert, KEIN Canvas)
         # User-Message Bubble (rechtsbündig)
-        self.chat_text.tag_configure("user_bubble", 
-                                     background='#E3F2FD',       # Hellblau
-                                     relief='solid', 
-                                     borderwidth=1,
-                                     lmargin1=150,               # Rechtsbündig (linker Margin)
-                                     lmargin2=150,               # Einzug für mehrzeiligen Text
-                                     rmargin=10,                 # Rechter Rand
-                                     spacing1=8,                 # Padding oben
-                                     spacing3=8,                 # Padding unten
-                                     font=('Segoe UI', 10))
-        
+        self.chat_text.tag_configure(
+            "user_bubble",
+            background="#E3F2FD",  # Hellblau
+            relief="solid",
+            borderwidth=1,
+            lmargin1=150,  # Rechtsbündig (linker Margin)
+            lmargin2=150,  # Einzug für mehrzeiligen Text
+            rmargin=10,  # Rechter Rand
+            spacing1=8,  # Padding oben
+            spacing3=8,  # Padding unten
+            font=("Segoe UI", 10),
+        )
+
         # User-Metadata (Attachments + Timestamp oberhalb Bubble)
-        self.chat_text.tag_configure("user_metadata", 
-                                     font=('Segoe UI', 8), 
-                                     foreground='#666',
-                                     lmargin1=150,               # Rechtsbündig wie Bubble
-                                     spacing3=2)                 # Kleiner Abstand zur Bubble
-        
+        self.chat_text.tag_configure(
+            "user_metadata", font=("Segoe UI", 8), foreground="#666", lmargin1=150, spacing3=2  # Rechtsbündig wie Bubble
+        )  # Kleiner Abstand zur Bubble
+
         # Assistant-Message Bubble (linksbündig)
-        self.chat_text.tag_configure("assistant_bubble", 
-                                     background='#F5F5F5',       # Hellgrau
-                                     relief='flat',              # Kein Rahmen für Assistant
-                                     lmargin1=10,                # Linksbündig
-                                     lmargin2=10,
-                                     rmargin=150,                # Rechter Margin (Platz für User-Bubbles)
-                                     spacing1=8,
-                                     spacing3=8,
-                                     font=('Segoe UI', 10))
-        
+        self.chat_text.tag_configure(
+            "assistant_bubble",
+            background="#F5F5F5",  # Hellgrau
+            relief="flat",  # Kein Rahmen für Assistant
+            lmargin1=10,  # Linksbündig
+            lmargin2=10,
+            rmargin=150,  # Rechter Margin (Platz für User-Bubbles)
+            spacing1=8,
+            spacing3=8,
+            font=("Segoe UI", 10),
+        )
+
         # Message-Separator
-        self.chat_text.tag_configure("message_separator", 
-                                     spacing1=10,                # Abstand zwischen Messages
-                                     spacing3=10)
-        
+        self.chat_text.tag_configure("message_separator", spacing1=10, spacing3=10)  # Abstand zwischen Messages
+
         # Attachment-Link (klickbar)
-        self.chat_text.tag_configure("attachment_link", 
-                                     font=('Segoe UI', 8), 
-                                     foreground='#0066CC', 
-                                     underline=True)
-        
+        self.chat_text.tag_configure("attachment_link", font=("Segoe UI", 8), foreground="#0066CC", underline=True)
+
         # Metriken-Compact (Inline horizontal)
-        self.chat_text.tag_configure("metrics_compact", 
-                                     font=('Segoe UI', 8), 
-                                     foreground='#666',
-                                     spacing1=2,
-                                     spacing3=5)
-        
+        self.chat_text.tag_configure("metrics_compact", font=("Segoe UI", 8), foreground="#666", spacing1=2, spacing3=5)
+
         # Processing-Placeholder (pulsierend)
-        self.chat_text.tag_configure("processing_placeholder", 
-                                     font=('Segoe UI', 10, 'italic'), 
-                                     foreground='#999')
-        
+        self.chat_text.tag_configure("processing_placeholder", font=("Segoe UI", 10, "italic"), foreground="#999")
+
         # Confidence-Badges mit Background-Colors
-        self.chat_text.tag_configure("confidence_badge_high", 
-                                     font=('Segoe UI', 8, 'bold'), 
-                                     foreground='#ffffff',
-                                     background='#27ae60')  # Grün
-        self.chat_text.tag_configure("confidence_badge_med", 
-                                     font=('Segoe UI', 8, 'bold'), 
-                                     foreground='#ffffff',
-                                     background='#f39c12')  # Orange
-        self.chat_text.tag_configure("confidence_badge_low", 
-                                     font=('Segoe UI', 8, 'bold'), 
-                                     foreground='#ffffff',
-                                     background='#e74c3c')  # Rot
-        
+        self.chat_text.tag_configure(
+            "confidence_badge_high", font=("Segoe UI", 8, "bold"), foreground="#ffffff", background="#27ae60"
+        )  # Grün
+        self.chat_text.tag_configure(
+            "confidence_badge_med", font=("Segoe UI", 8, "bold"), foreground="#ffffff", background="#f39c12"
+        )  # Orange
+        self.chat_text.tag_configure(
+            "confidence_badge_low", font=("Segoe UI", 8, "bold"), foreground="#ffffff", background="#e74c3c"
+        )  # Rot
+
         # Markdown-Tags
-        self.chat_text.tag_configure("md_bold", font=('Segoe UI', 10, 'bold'))
-        self.chat_text.tag_configure("md_italic", font=('Segoe UI', 10, 'italic'))
-        self.chat_text.tag_configure("md_code", font=('Consolas', 9), background="#f0f0f0", foreground="#c7254e")
-        self.chat_text.tag_configure("md_heading1", font=('Segoe UI', 14, 'bold'), foreground="#2c3e50")
-        self.chat_text.tag_configure("md_heading2", font=('Segoe UI', 12, 'bold'), foreground="#34495e")
-        self.chat_text.tag_configure("md_heading3", font=('Segoe UI', 11, 'bold'), foreground="#7f8c8d")
+        self.chat_text.tag_configure("md_bold", font=("Segoe UI", 10, "bold"))
+        self.chat_text.tag_configure("md_italic", font=("Segoe UI", 10, "italic"))
+        self.chat_text.tag_configure("md_code", font=("Consolas", 9), background="#f0f0f0", foreground="#c7254e")
+        self.chat_text.tag_configure("md_heading1", font=("Segoe UI", 14, "bold"), foreground="#2c3e50")
+        self.chat_text.tag_configure("md_heading2", font=("Segoe UI", 12, "bold"), foreground="#34495e")
+        self.chat_text.tag_configure("md_heading3", font=("Segoe UI", 11, "bold"), foreground="#7f8c8d")
         self.chat_text.tag_configure("md_list_item", foreground="#555555")
-        self.chat_text.tag_configure("md_quote", font=('Segoe UI', 10, 'italic'), foreground="#7f8c8d", lmargin1=20, lmargin2=20)
-        
+        self.chat_text.tag_configure(
+            "md_quote", font=("Segoe UI", 10, "italic"), foreground="#7f8c8d", lmargin1=20, lmargin2=20
+        )
+
         # Link-Styling (cursor wird über Bindings gesteuert, nicht tag_configure)
         self.chat_text.tag_configure("clickable_link", foreground="#0066CC", underline=True)
         # Cursor-Effekt über Events (tag_configure unterstützt KEIN cursor)
         self.chat_text.tag_bind("clickable_link", "<Enter>", lambda e: self.chat_text.config(cursor="hand2"))
         self.chat_text.tag_bind("clickable_link", "<Leave>", lambda e: self.chat_text.config(cursor=""))
-    
+
     def _create_input_area(self, parent, include_attachments=True):
         """Erstellt den Eingabebereich (gemeinsam für alle Windows)"""
         input_frame = ttk.Frame(parent)
         input_frame.pack(fill=tk.X, pady=(5, 0))
-        
+
         if include_attachments:
             # Datei-Anhang Bereich (über der Eingabe)
             attachment_frame = ttk.Frame(input_frame)
             attachment_frame.pack(fill=tk.X, pady=(0, 5))
-            
-            ttk.Button(attachment_frame, text="📎 Datei hinzufügen", 
-                      command=self._upload_file, width=20).pack(side=tk.LEFT)
-            
+
+            ttk.Button(attachment_frame, text="📎 Datei hinzufügen", command=self._upload_file, width=20).pack(side=tk.LEFT)
+
             # Bereich für angehängte Dateien
             self.attachments_display = ttk.Frame(attachment_frame)
             self.attachments_display.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(10, 0))
-        
+
         # Eingabe-Text
         self.input_text = tk.Text(
             input_frame,
             height=3,
             wrap=tk.WORD,
-            font=('Segoe UI', 10),
-            bg='#ffffff',
-            fg='#333333',
-            selectbackground='#0078d4',
-            selectforeground='white'
+            font=("Segoe UI", 10),
+            bg="#ffffff",
+            fg="#333333",
+            selectbackground="#0078d4",
+            selectforeground="white",
         )
         self.input_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 5))
-        
+
         # Send-Button
-        self.send_button = ttk.Button(
-            input_frame,
-            text="📤 Senden",
-            command=self._send_message,
-            width=12
-        )
+        self.send_button = ttk.Button(input_frame, text="📤 Senden", command=self._send_message, width=12)
         self.send_button.pack(side=tk.RIGHT, anchor=tk.N)
-        
+
         return input_frame
-    
+
     def _create_settings_bar(self, parent, compact=False):
         """Erstellt die unscheinbare Einstellungsleiste"""
         settings_frame = ttk.Frame(parent, relief=tk.FLAT)
         settings_frame.pack(fill=tk.X, pady=(3, 0))
-        
+
         # Frage-Modus Auswahl (vor LLM-Auswahl)
-        ttk.Label(settings_frame, text="📋", font=('Segoe UI', 8)).pack(side=tk.LEFT, padx=(0, 2))
-        
+        ttk.Label(settings_frame, text="📋", font=("Segoe UI", 8)).pack(side=tk.LEFT, padx=(0, 2))
+
         self.mode_var = tk.StringVar(value="veritas")
-        
+
         # Dynamisch Frage-Modi laden mit Fallback
         logger.info("🔄 Lade Frage-Modi für GUI...")
         try:
             available_question_methods = self.get_available_question_methods()
-            mode_values = [method['display'] for method in available_question_methods]
-            self.question_methods_data = {method['display']: method for method in available_question_methods}
+            mode_values = [method["display"] for method in available_question_methods]
+            self.question_methods_data = {method["display"]: method for method in available_question_methods}
             logger.info(f"📋 GUI: {len(mode_values)} Modi geladen: {mode_values}")
         except Exception as e:
             logger.error(f"❌ Fehler beim Laden der Modi: {e}")
             # Fallback-Modi
             available_question_methods = [
-                {'key': 'veritas', 'display': 'Standard RAG', 'endpoints': ['/ask'], 'description': 'Standard Retrieval-Augmented Generation'},
-                {'key': 'vpb', 'display': 'VPB Verwaltung', 'endpoints': ['/vpb/ask'], 'description': 'Verwaltungsprozess-Analyse'}
+                {
+                    "key": "veritas",
+                    "display": "Standard RAG",
+                    "endpoints": ["/ask"],
+                    "description": "Standard Retrieval-Augmented Generation",
+                },
+                {
+                    "key": "vpb",
+                    "display": "VPB Verwaltung",
+                    "endpoints": ["/vpb/ask"],
+                    "description": "Verwaltungsprozess-Analyse",
+                },
             ]
-            mode_values = [method['display'] for method in available_question_methods]
-            self.question_methods_data = {method['display']: method for method in available_question_methods}
-        
+            mode_values = [method["display"] for method in available_question_methods]
+            self.question_methods_data = {method["display"]: method for method in available_question_methods}
+
         self.mode_combo = ttk.Combobox(
-            settings_frame,
-            textvariable=self.mode_var,
-            values=mode_values,
-            state="readonly",
-            width=12,
-            font=('Segoe UI', 8)
+            settings_frame, textvariable=self.mode_var, values=mode_values, state="readonly", width=12, font=("Segoe UI", 8)
         )
         self.mode_combo.pack(side=tk.LEFT, padx=(0, 10))
-        self.mode_combo.bind('<<ComboboxSelected>>', self.on_mode_change)
-        
+        self.mode_combo.bind("<<ComboboxSelected>>", self.on_mode_change)
+
         # Setze Standard-Wert
         if mode_values:
             self.mode_combo.set(mode_values[0])
             # Setze aktuellen Modus für API-Anfragen
-            if hasattr(self, 'question_methods_data') and mode_values[0] in self.question_methods_data:
+            if hasattr(self, "question_methods_data") and mode_values[0] in self.question_methods_data:
                 self.current_question_mode = self.question_methods_data[mode_values[0]]
             logger.info(f"📋 Standard-Modus gesetzt: {mode_values[0]}")
         else:
             logger.warning("⚠️ Keine Modi verfügbar für Dropdown")
-        
+
         # LLM-Modell (dynamisch vom API abgerufen)
-        ttk.Label(settings_frame, text="🤖", font=('Segoe UI', 8)).pack(side=tk.LEFT)
-        
+        ttk.Label(settings_frame, text="🤖", font=("Segoe UI", 8)).pack(side=tk.LEFT)
+
         # Lade verfügbare Modelle vom API
         available_models = self._get_available_models()
         models = available_models if available_models else ["llama3.1:8b", "llama3.1:70b", "qwen2.5:7b", "mistral:7b"]
-        
+
         # Initialisiere StringVar mit erstem verfügbaren Modell
         default_model = models[0] if models else ""
         self.llm_var = tk.StringVar(value=default_model)
-        
+
         # Nutze NUR die vom Backend verfügbaren Modelle (keine Fake-Modelle mehr)
         self.llm_combo = ttk.Combobox(
-            settings_frame, 
-            textvariable=self.llm_var,
-            values=models,
-            width=12, 
-            state="readonly",
-            font=('Segoe UI', 8)
+            settings_frame, textvariable=self.llm_var, values=models, width=12, state="readonly", font=("Segoe UI", 8)
         )
         self.llm_combo.pack(side=tk.LEFT, padx=(3, 10))
-        
+
         # Log das gesetzte Default-Modell
         if default_model:
             logger.info(f"🎯 Default-Modell gesetzt: {default_model}")
-        
+
         # Event-Binding für automatisches Modell-Update
-        self.llm_combo.bind('<Button-1>', self._on_dropdown_click)
-        
+        self.llm_combo.bind("<Button-1>", self._on_dropdown_click)
+
         # Temperatur
-        temp_icon = ttk.Label(settings_frame, text="🌡️", font=('Segoe UI', 8))
+        temp_icon = ttk.Label(settings_frame, text="🌡️", font=("Segoe UI", 8))
         temp_icon.pack(side=tk.LEFT)
         if UI_COMPONENTS_AVAILABLE:
-            Tooltip(temp_icon, 
-                   "Temperature (0.0-1.0)\n"
-                   "Niedrig (0.0-0.3): Präzise, deterministische Antworten\n"
-                   "Medium (0.4-0.7): Ausgewogen, Standard für RAG\n"
-                   "Hoch (0.8-1.0): Kreativ, variabel\n\n"
-                   "💡 Empfehlung: 0.7 für Verwaltungsfragen")
-        
+            Tooltip(
+                temp_icon,
+                "Temperature (0.0-1.0)\n"
+                "Niedrig (0.0-0.3): Präzise, deterministische Antworten\n"
+                "Medium (0.4-0.7): Ausgewogen, Standard für RAG\n"
+                "Hoch (0.8-1.0): Kreativ, variabel\n\n"
+                "💡 Empfehlung: 0.7 für Verwaltungsfragen",
+            )
+
         self.temperature_var = tk.DoubleVar(value=0.7)
         self.temperature_scale = ttk.Scale(
-            settings_frame, 
-            from_=0.0, 
-            to=1.0, 
-            variable=self.temperature_var,
-            orient=tk.HORIZONTAL,
-            length=60
+            settings_frame, from_=0.0, to=1.0, variable=self.temperature_var, orient=tk.HORIZONTAL, length=60
         )
         self.temperature_scale.pack(side=tk.LEFT, padx=(3, 5))
-        self.temp_label = ttk.Label(settings_frame, text="0.7", font=('Segoe UI', 8))
+        self.temp_label = ttk.Label(settings_frame, text="0.7", font=("Segoe UI", 8))
         self.temp_label.pack(side=tk.LEFT, padx=(0, 10))
-        
+
         # Max Tokens
-        tokens_icon = ttk.Label(settings_frame, text="📝", font=('Segoe UI', 8))
+        tokens_icon = ttk.Label(settings_frame, text="📝", font=("Segoe UI", 8))
         tokens_icon.pack(side=tk.LEFT)
         if UI_COMPONENTS_AVAILABLE:
-            Tooltip(tokens_icon,
-                   "Max Tokens (100-2000)\n"
-                   "Länge der HAUPT-Antwort (ohne Struktur-Anhang)\n\n"
-                   "Kurz (100-800): Fakten, Paragraphen\n"
-                   "Standard (800-1500): Verwaltungsantworten ✅\n"
-                   "Ausführlich (1500-2000): Komplexe Rechtsfragen\n\n"
-                   "💡 Empfehlung: 1200 für Verwaltungsrecht\n"
-                   "ℹ️ Backend fügt +300 Tokens für Details/Nächste Schritte/Vorschläge hinzu\n"
-                   "⚠️ Mehr Tokens = längere Antwortzeit")
-        
+            Tooltip(
+                tokens_icon,
+                "Max Tokens (100-2000)\n"
+                "Länge der HAUPT-Antwort (ohne Struktur-Anhang)\n\n"
+                "Kurz (100-800): Fakten, Paragraphen\n"
+                "Standard (800-1500): Verwaltungsantworten ✅\n"
+                "Ausführlich (1500-2000): Komplexe Rechtsfragen\n\n"
+                "💡 Empfehlung: 1200 für Verwaltungsrecht\n"
+                "ℹ️ Backend fügt +300 Tokens für Details/Nächste Schritte/Vorschläge hinzu\n"
+                "⚠️ Mehr Tokens = längere Antwortzeit",
+            )
+
         self.max_tokens_var = tk.IntVar(value=1200)  # ✨ ERHÖHT von 500 auf 1200 für Verwaltungsrecht!
         self.max_tokens_spinbox = ttk.Spinbox(
-            settings_frame,
-            from_=100,
-            to=2000,
-            increment=100,
-            width=5,
-            textvariable=self.max_tokens_var,
-            font=('Segoe UI', 8)
+            settings_frame, from_=100, to=2000, increment=100, width=5, textvariable=self.max_tokens_var, font=("Segoe UI", 8)
         )
         self.max_tokens_spinbox.pack(side=tk.LEFT, padx=(3, 3))
-        self.tokens_label = ttk.Label(settings_frame, text="tok", font=('Segoe UI', 7))
+        self.tokens_label = ttk.Label(settings_frame, text="tok", font=("Segoe UI", 7))
         self.tokens_label.pack(side=tk.LEFT, padx=(0, 10))
-        
+
         # Token-Counter & Antwortlängen-Schätzung (neue Zeile)
         self.token_info_label = ttk.Label(
             settings_frame,
             text="� ~900 Wörter",  # ✨ ANGEPASST: 1200 Tokens × 0.75 = 900 Wörter
-            font=('Segoe UI', 7),
-            foreground='#0088CC'  # ✨ Blau für Standard-Verwaltungsrecht
+            font=("Segoe UI", 7),
+            foreground="#0088CC",  # ✨ Blau für Standard-Verwaltungsrecht
         )
         self.token_info_label.pack(side=tk.LEFT, padx=(5, 10))
         if UI_COMPONENTS_AVAILABLE:
-            Tooltip(self.token_info_label,
-                   "Geschätzte Antwortlänge\n\n"
-                   "Basierend auf max_tokens\n"
-                   "1 Token ≈ 0.75 Wörter (Deutsch)\n"
-                   "1 Token ≈ 4 Zeichen")
-        
+            Tooltip(
+                self.token_info_label,
+                "Geschätzte Antwortlänge\n\n"
+                "Basierend auf max_tokens\n"
+                "1 Token ≈ 0.75 Wörter (Deutsch)\n"
+                "1 Token ≈ 4 Zeichen",
+            )
+
         # Top-p (Nucleus Sampling)
-        topp_icon = ttk.Label(settings_frame, text="🎲", font=('Segoe UI', 8))
+        topp_icon = ttk.Label(settings_frame, text="🎲", font=("Segoe UI", 8))
         topp_icon.pack(side=tk.LEFT)
         if UI_COMPONENTS_AVAILABLE:
-            Tooltip(topp_icon,
-                   "Top-p / Nucleus Sampling (0.0-1.0)\n"
-                   "Steuert Vielfalt der Token-Auswahl\n\n"
-                   "Niedrig (0.5-0.7): Konservativ, fokussiert\n"
-                   "Standard (0.8-0.9): Ausgewogen\n"
-                   "Hoch (0.95-1.0): Maximal vielfältig\n\n"
-                   "💡 Empfehlung: 0.9 (Standard)\n"
-                   "ℹ️ Arbeitet mit Temperature zusammen\n\n"
-                   "📚 Mehr Infos: docs/LLM_PARAMETERS.md",
-                   link_text="📖 Hilfedokumentation öffnen",
-                   link_callback=lambda: self._open_help_docs("LLM_PARAMETERS"))
-        
+            Tooltip(
+                topp_icon,
+                "Top-p / Nucleus Sampling (0.0-1.0)\n"
+                "Steuert Vielfalt der Token-Auswahl\n\n"
+                "Niedrig (0.5-0.7): Konservativ, fokussiert\n"
+                "Standard (0.8-0.9): Ausgewogen\n"
+                "Hoch (0.95-1.0): Maximal vielfältig\n\n"
+                "💡 Empfehlung: 0.9 (Standard)\n"
+                "ℹ️ Arbeitet mit Temperature zusammen\n\n"
+                "📚 Mehr Infos: docs/LLM_PARAMETERS.md",
+                link_text="📖 Hilfedokumentation öffnen",
+                link_callback=lambda: self._open_help_docs("LLM_PARAMETERS"),
+            )
+
         self.top_p_var = tk.DoubleVar(value=0.9)
         self.top_p_scale = ttk.Scale(
-            settings_frame,
-            from_=0.0,
-            to=1.0,
-            variable=self.top_p_var,
-            orient=tk.HORIZONTAL,
-            length=60
+            settings_frame, from_=0.0, to=1.0, variable=self.top_p_var, orient=tk.HORIZONTAL, length=60
         )
         self.top_p_scale.pack(side=tk.LEFT, padx=(3, 5))
-        self.topp_label = ttk.Label(settings_frame, text="0.9", font=('Segoe UI', 8))
+        self.topp_label = ttk.Label(settings_frame, text="0.9", font=("Segoe UI", 8))
         self.topp_label.pack(side=tk.LEFT, padx=(0, 10))
-        
+
         # Antwortzeit-Prädiktion (neue Zeile, nur im Main Window)
         if not compact:
-            self.response_time_label = ttk.Label(
-                settings_frame,
-                text="⏱️ ~3-5s",
-                font=('Segoe UI', 7),
-                foreground='#666666'
-            )
+            self.response_time_label = ttk.Label(settings_frame, text="⏱️ ~3-5s", font=("Segoe UI", 7), foreground="#666666")
             self.response_time_label.pack(side=tk.LEFT, padx=(5, 10))
             if UI_COMPONENTS_AVAILABLE:
-                Tooltip(self.response_time_label,
-                       "Geschätzte Antwortzeit\n\n"
-                       "Basierend auf:\n"
-                       "• Max Tokens\n"
-                       "• LLM-Modell\n"
-                       "• RAG-Overhead\n\n"
-                       "⚠️ Tatsächliche Zeit kann variieren")
-        
+                Tooltip(
+                    self.response_time_label,
+                    "Geschätzte Antwortzeit\n\n"
+                    "Basierend auf:\n"
+                    "• Max Tokens\n"
+                    "• LLM-Modell\n"
+                    "• RAG-Overhead\n\n"
+                    "⚠️ Tatsächliche Zeit kann variieren",
+                )
+
         if not compact:
             # Suchtiefe (nur im Main Window)
-            search_icon = ttk.Label(settings_frame, text="🔍", font=('Segoe UI', 8))
+            search_icon = ttk.Label(settings_frame, text="🔍", font=("Segoe UI", 8))
             search_icon.pack(side=tk.LEFT)
             if UI_COMPONENTS_AVAILABLE:
-                Tooltip(search_icon,
-                       "RAG Suchtiefe (1-20)\n"
-                       "Anzahl der abzurufenden Dokumente\n\n"
-                       "Niedrig (1-3): Schnell, präzise\n"
-                       "Standard (5-10): Ausgewogen\n"
-                       "Hoch (10-20): Umfassend\n\n"
-                       "💡 Empfehlung: 5 für typische Fragen")
-            
+                Tooltip(
+                    search_icon,
+                    "RAG Suchtiefe (1-20)\n"
+                    "Anzahl der abzurufenden Dokumente\n\n"
+                    "Niedrig (1-3): Schnell, präzise\n"
+                    "Standard (5-10): Ausgewogen\n"
+                    "Hoch (10-20): Umfassend\n\n"
+                    "💡 Empfehlung: 5 für typische Fragen",
+                )
+
             self.search_depth_var = tk.IntVar(value=5)
-            ttk.Spinbox(settings_frame, from_=1, to=20, width=3, 
-                       textvariable=self.search_depth_var, font=('Segoe UI', 8)).pack(side=tk.LEFT, padx=(3, 0))
-        
+            ttk.Spinbox(
+                settings_frame, from_=1, to=20, width=3, textvariable=self.search_depth_var, font=("Segoe UI", 8)
+            ).pack(side=tk.LEFT, padx=(3, 0))
+
         # Callbacks für Echtzeit-Updates
         self.temperature_scale.configure(command=self._update_temperature_label)
         self.top_p_scale.configure(command=self._update_topp_label)
-        self.max_tokens_var.trace_add('write', self._update_tokens_label)
-        
+        self.max_tokens_var.trace_add("write", self._update_tokens_label)
+
         # LLM-Modell-Wechsel aktualisiert auch Antwortzeit
-        if hasattr(self, 'llm_var'):
-            self.llm_var.trace_add('write', lambda *args: self._update_response_time_estimate() if hasattr(self, '_update_response_time_estimate') else None)
-        
+        if hasattr(self, "llm_var"):
+            self.llm_var.trace_add(
+                "write",
+                lambda *args: self._update_response_time_estimate()
+                if hasattr(self, "_update_response_time_estimate")
+                else None,
+            )
+
         # Initiale Aktualisierung der Schätzungen
         self._update_tokens_label()
-        if hasattr(self, '_update_response_time_estimate'):
+        if hasattr(self, "_update_response_time_estimate"):
             self._update_response_time_estimate()
-        
+
         # Preset-Buttons (optional Feature)
         self._create_preset_buttons(parent)
-    
+
     def _create_preset_buttons(self, parent):
         """Erstellt Preset-Buttons für schnelle Parameter-Konfiguration"""
         preset_frame = ttk.Frame(parent)
         preset_frame.pack(fill=tk.X, padx=5, pady=3)
-        
+
         # Label
-        preset_label = ttk.Label(
-            preset_frame,
-            text="Presets:",
-            font=('Segoe UI', 8, 'bold'),
-            foreground='#555555'
-        )
+        preset_label = ttk.Label(preset_frame, text="Presets:", font=("Segoe UI", 8, "bold"), foreground="#555555")
         preset_label.pack(side=tk.LEFT, padx=(0, 8))
-        
+
         # Preset-Definitionen: (Label, Temp, Tokens, Top-p, Tooltip)
         # ✨ ANGEPASST FÜR VERWALTUNGSRECHT (höhere Token-Counts!)
         presets = [
-            ("⚖️ Rechtsauskunft", 0.3, 800, 0.7, 
-             "Präzise Rechtsauskunft\n\nOptimal für:\n• Gesetzestexte & Paragraphen\n• Konkrete Rechtsfragen\n• Behördliche Bescheide\n\nTemp: 0.3 | Tokens: 800 | Top-p: 0.7\n\n💡 Tipp: Für kurze, faktenbasierte Antworten"),
-            
-            ("📘 Standard", 0.6, 1200, 0.85,
-             "Standard-Verwaltungsantwort\n\nOptimal für:\n• Typische Verwaltungsfragen\n• Verfahrensabläufe\n• Antragsberatung\n\nTemp: 0.6 | Tokens: 1200 | Top-p: 0.85\n\n💡 Tipp: IDEAL für Verwaltungsrecht"),
-            
-            ("� Ausführlich", 0.5, 1800, 0.8,
-             "Ausführliche Rechtsanalyse\n\nOptimal für:\n• Komplexe Rechtsfragen\n• Mehrere Rechtsgebiete\n• Detaillierte Verfahrenserklärungen\n\nTemp: 0.5 | Tokens: 1800 | Top-p: 0.8\n\n💡 Tipp: Für umfassende Beratung"),
-            
-            ("🎨 Bürgerfreundlich", 0.7, 1000, 0.9,
-             "Bürgerfreundliche Formulierung\n\nOptimal für:\n• Verständliche Erklärungen\n• Umformulierung von Amtsdeutsch\n• Mehrere Beispiele\n\nTemp: 0.7 | Tokens: 1000 | Top-p: 0.9\n\n💡 Tipp: Für Bürgerkommunikation")
+            (
+                "⚖️ Rechtsauskunft",
+                0.3,
+                800,
+                0.7,
+                "Präzise Rechtsauskunft\n\nOptimal für:\n• Gesetzestexte & Paragraphen\n• Konkrete Rechtsfragen\n• Behördliche Bescheide\n\nTemp: 0.3 | Tokens: 800 | Top-p: 0.7\n\n💡 Tipp: Für kurze, faktenbasierte Antworten",
+            ),
+            (
+                "📘 Standard",
+                0.6,
+                1200,
+                0.85,
+                "Standard-Verwaltungsantwort\n\nOptimal für:\n• Typische Verwaltungsfragen\n• Verfahrensabläufe\n• Antragsberatung\n\nTemp: 0.6 | Tokens: 1200 | Top-p: 0.85\n\n💡 Tipp: IDEAL für Verwaltungsrecht",
+            ),
+            (
+                "� Ausführlich",
+                0.5,
+                1800,
+                0.8,
+                "Ausführliche Rechtsanalyse\n\nOptimal für:\n• Komplexe Rechtsfragen\n• Mehrere Rechtsgebiete\n• Detaillierte Verfahrenserklärungen\n\nTemp: 0.5 | Tokens: 1800 | Top-p: 0.8\n\n💡 Tipp: Für umfassende Beratung",
+            ),
+            (
+                "🎨 Bürgerfreundlich",
+                0.7,
+                1000,
+                0.9,
+                "Bürgerfreundliche Formulierung\n\nOptimal für:\n• Verständliche Erklärungen\n• Umformulierung von Amtsdeutsch\n• Mehrere Beispiele\n\nTemp: 0.7 | Tokens: 1000 | Top-p: 0.9\n\n💡 Tipp: Für Bürgerkommunikation",
+            ),
         ]
-        
+
         # Buttons erstellen
         for label, temp, tokens, topp, tooltip_text in presets:
             btn = ttk.Button(
                 preset_frame,
                 text=label,
                 command=lambda t=temp, tk=tokens, p=topp, l=label: self._apply_preset(t, tk, p, l),
-                width=14
+                width=14,
             )
             btn.pack(side=tk.LEFT, padx=2)
-            
+
             # Tooltip hinzufügen
             if UI_COMPONENTS_AVAILABLE:
                 Tooltip(btn, tooltip_text)
-    
+
     def _apply_preset(self, temperature, max_tokens, top_p, preset_name):
         """Wendet ein Parameter-Preset an"""
         try:
@@ -1485,44 +1551,39 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
             self.temperature_var.set(temperature)
             self.max_tokens_var.set(max_tokens)
             self.top_p_var.set(top_p)
-            
+
             # Labels aktualisieren
             self._update_temperature_label(temperature)
             self._update_topp_label(top_p)
             self._update_tokens_label()
-            
+
             # System-Message im Chat
             preset_msg = f"🎛️ Preset angewandt: {preset_name} (Temp={temperature}, Tokens={max_tokens}, Top-p={top_p})"
             self.add_system_message(preset_msg)
-            
+
             # Log
             logger.info(f"Preset angewandt: {preset_name} | T={temperature}, Tokens={max_tokens}, p={top_p}")
-            
+
         except Exception as e:
             logger.error(f"Fehler beim Anwenden des Presets '{preset_name}': {e}")
             self.add_system_message(f"❌ Fehler beim Anwenden des Presets: {e}")
-    
+
     def _create_status_bar(self, parent, show_uds3=True):
         """Erstellt die Status-Bar"""
         status_frame = ttk.Frame(parent)
         status_frame.pack(fill=tk.X, pady=(5, 0))
-        
+
         self.status_var = tk.StringVar()
         status_text = "Bereit - Hauptfenster" if self.is_main_window else f"Bereit - {self.window_id}"
         self.status_var.set(status_text)
-        
-        status_label = ttk.Label(
-            status_frame,
-            textvariable=self.status_var,
-            font=('Segoe UI', 8),
-            foreground='#666666'
-        )
+
+        status_label = ttk.Label(status_frame, textvariable=self.status_var, font=("Segoe UI", 8), foreground="#666666")
         status_label.pack(side=tk.LEFT)
-        
+
         # UDS3 ist im Frontend nicht mehr relevant - Backend verwaltet alle Datenoperationen
-    
+
     # === GEMEINSAME DATEI-MANAGEMENT METHODEN ===
-    
+
     def _upload_file(self):
         """Datei für Kontext hochladen"""
         filetypes = [
@@ -1530,218 +1591,208 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
             ("Word-Dokumente", "*.docx *.doc"),
             ("Text-Dateien", "*.txt"),
             ("Markdown-Dateien", "*.md"),
-            ("Alle Dateien", "*.*")
+            ("Alle Dateien", "*.*"),
         ]
-        
-        filename = filedialog.askopenfilename(
-            title="Datei für Kontext auswählen",
-            filetypes=filetypes
-        )
-        
+
+        filename = filedialog.askopenfilename(title="Datei für Kontext auswählen", filetypes=filetypes)
+
         if filename:
             try:
                 import os
+
                 file_name = os.path.basename(filename)
-                
-                if not hasattr(self, 'uploaded_files'):
+
+                if not hasattr(self, "uploaded_files"):
                     self.uploaded_files = []
                 self.uploaded_files.append(filename)
-                
+
                 # Datei-Button erstellen (nur wenn attachments_display existiert)
-                if hasattr(self, 'attachments_display'):
+                if hasattr(self, "attachments_display"):
                     self._add_attachment_button(file_name, filename)
-                
+
                 logger.info(f"Datei für Upload ausgewählt: {file_name}")
-                
+
             except Exception as e:
                 messagebox.showerror("Fehler", f"Datei konnte nicht gelesen werden: {e}")
                 logger.error(f"Datei-Upload Fehler: {e}")
-    
+
     def _add_attachment_button(self, file_name, file_path):
         """Fügt einen Button für eine angehängte Datei hinzu"""
         display_name = file_name if len(file_name) <= 20 else file_name[:17] + "..."
-        
+
         file_button = ttk.Button(
-            self.attachments_display,
-            text=f"📄 {display_name} ❌",
-            command=lambda: self._remove_attachment(file_path),
-            width=25
+            self.attachments_display, text=f"📄 {display_name} ❌", command=lambda: self._remove_attachment(file_path), width=25
         )
         file_button.pack(side=tk.LEFT, padx=(0, 5))
-        
-        if not hasattr(self, 'attachment_buttons'):
+
+        if not hasattr(self, "attachment_buttons"):
             self.attachment_buttons = {}
         self.attachment_buttons[file_path] = file_button
-    
+
     def _remove_attachment(self, file_path):
         """Entfernt eine angehängte Datei"""
         try:
-            if hasattr(self, 'uploaded_files') and file_path in self.uploaded_files:
+            if hasattr(self, "uploaded_files") and file_path in self.uploaded_files:
                 self.uploaded_files.remove(file_path)
-            
-            if hasattr(self, 'attachment_buttons') and file_path in self.attachment_buttons:
+
+            if hasattr(self, "attachment_buttons") and file_path in self.attachment_buttons:
                 self.attachment_buttons[file_path].destroy()
                 del self.attachment_buttons[file_path]
-            
+
             import os
+
             logger.info(f"Datei-Anhang entfernt: {os.path.basename(file_path)}")
-            
+
         except Exception as e:
             logger.error(f"Fehler beim Entfernen des Anhangs: {e}")
-    
+
     def _clear_all_attachments(self):
         """Entfernt alle Datei-Anhänge"""
         try:
-            if hasattr(self, 'uploaded_files'):
+            if hasattr(self, "uploaded_files"):
                 self.uploaded_files = []
-            
-            if hasattr(self, 'attachment_buttons'):
+
+            if hasattr(self, "attachment_buttons"):
                 for button in self.attachment_buttons.values():
                     button.destroy()
                 self.attachment_buttons = {}
-                
+
         except Exception as e:
             logger.error(f"Fehler beim Löschen aller Anhänge: {e}")
-    
+
     # === GEMEINSAME ACTION METHODEN ===
-    
+
     def _update_temperature_label(self, value):
         """Aktualisiert das Temperatur-Label"""
         try:
             temp_value = float(value)
-            if hasattr(self, 'temp_label'):
+            if hasattr(self, "temp_label"):
                 self.temp_label.config(text=f"{temp_value:.1f}")
         except Exception as e:
             logger.error(f"Fehler beim Aktualisieren des Temperatur-Labels: {e}")
-    
+
     def _update_topp_label(self, value):
         """Aktualisiert das Top-p-Label"""
         try:
             topp_value = float(value)
-            if hasattr(self, 'topp_label'):
+            if hasattr(self, "topp_label"):
                 self.topp_label.config(text=f"{topp_value:.2f}")
         except Exception as e:
             logger.error(f"Fehler beim Aktualisieren des Top-p-Labels: {e}")
-    
+
     def _update_tokens_label(self, *args):
         """Aktualisiert das Max-Tokens-Label und Token-Counter bei Spinbox-Änderung"""
         try:
             tokens = self.max_tokens_var.get()
-            
+
             # Token → Wörter (Deutsch: 1 Token ≈ 0.75 Wörter)
             estimated_words = int(tokens * 0.75)
-            
+
             # Token → Zeichen (Deutsch: 1 Token ≈ 4 Zeichen)
             estimated_chars = int(tokens * 4)
-            
+
             # Token-Counter aktualisieren
-            if hasattr(self, 'token_info_label'):
+            if hasattr(self, "token_info_label"):
                 # ✨ ANGEPASST FÜR VERWALTUNGSRECHT (höhere Schwellenwerte!)
                 # Verwaltungsrechtliche Antworten sind oft komplex und ausführlich
                 if tokens < 1000:
-                    color = '#00AA00'  # Grün: Kurz/Normal (100-999 Tokens)
-                    indicator = '💬'
+                    color = "#00AA00"  # Grün: Kurz/Normal (100-999 Tokens)
+                    indicator = "💬"
                 elif tokens < 1500:
-                    color = '#0088CC'  # Blau: Standard (1000-1499 Tokens) - IDEAL für Verwaltung
-                    indicator = '📘'
+                    color = "#0088CC"  # Blau: Standard (1000-1499 Tokens) - IDEAL für Verwaltung
+                    indicator = "📘"
                 elif tokens < 2000:
-                    color = '#FF8800'  # Orange: Ausführlich (1500-1999 Tokens)
-                    indicator = '📝'
+                    color = "#FF8800"  # Orange: Ausführlich (1500-1999 Tokens)
+                    indicator = "📝"
                 else:
-                    color = '#CC6600'  # Dunkelorange: Sehr ausführlich (2000+ Tokens)
-                    indicator = '📚'
-                
-                self.token_info_label.config(
-                    text=f"{indicator} ~{estimated_words} Wörter",
-                    foreground=color
-                )
-            
+                    color = "#CC6600"  # Dunkelorange: Sehr ausführlich (2000+ Tokens)
+                    indicator = "📚"
+
+                self.token_info_label.config(text=f"{indicator} ~{estimated_words} Wörter", foreground=color)
+
             # Auch Antwortzeit-Schätzung aktualisieren (falls vorhanden)
-            if hasattr(self, '_update_response_time_estimate'):
+            if hasattr(self, "_update_response_time_estimate"):
                 self._update_response_time_estimate()
-                
+
         except Exception as e:
             logger.error(f"Fehler beim Aktualisieren des Tokens-Labels: {e}")
-    
+
     def _estimate_response_time(self):
         """Schätzt die Antwortzeit basierend auf Token-Count und Modell"""
         try:
             # Benchmark-Daten (Tokens/Sekunde für verschiedene Modelle)
             MODEL_BENCHMARKS = {
-                'llama3:latest': 150,
-                'llama3.1:8b': 120,
-                'llama3.2:latest': 140,
-                'phi3:latest': 200,
-                'mixtral:latest': 80,
-                'codellama:latest': 130,
-                'gemma2:latest': 160,
-                'qwen2.5:latest': 145
+                "llama3:latest": 150,
+                "llama3.1:8b": 120,
+                "llama3.2:latest": 140,
+                "phi3:latest": 200,
+                "mixtral:latest": 80,
+                "codellama:latest": 130,
+                "gemma2:latest": 160,
+                "qwen2.5:latest": 145,
             }
-            
+
             max_tokens = self.max_tokens_var.get()
-            model = self.llm_var.get() if hasattr(self, 'llm_var') else 'llama3:latest'
-            
+            model = self.llm_var.get() if hasattr(self, "llm_var") else "llama3:latest"
+
             # Tokens/Sekunde für aktuelles Modell (Default: 120)
             tokens_per_second = MODEL_BENCHMARKS.get(model, 120)
-            
+
             # Base-Zeit (LLM-Generation)
             generation_time = max_tokens / tokens_per_second
-            
+
             # Overhead (RAG-Retrieval, Agent-Processing, etc.)
             overhead = 1.5  # Sekunden
-            
+
             # Gesamt-Zeit
             total_time = generation_time + overhead
-            
+
             # Range (±20% Unsicherheit)
             min_time = total_time * 0.8
             max_time = total_time * 1.2
-            
+
             return min_time, max_time
-            
+
         except Exception as e:
             logger.error(f"Fehler bei Antwortzeit-Schätzung: {e}")
             return 2.0, 6.0  # Fallback
-    
+
     def _update_response_time_estimate(self):
         """Aktualisiert die Antwortzeit-Schätzung im Label"""
         try:
-            if hasattr(self, 'response_time_label'):
+            if hasattr(self, "response_time_label"):
                 min_time, max_time = self._estimate_response_time()
-                
+
                 # Farbcodierung
                 avg_time = (min_time + max_time) / 2
                 if avg_time < 4:
-                    color = '#00AA00'  # Grün: Schnell
-                    indicator = '⚡'
+                    color = "#00AA00"  # Grün: Schnell
+                    indicator = "⚡"
                 elif avg_time < 8:
-                    color = '#FF8800'  # Orange: Mittel
-                    indicator = '⏱️'
+                    color = "#FF8800"  # Orange: Mittel
+                    indicator = "⏱️"
                 else:
-                    color = '#DD0000'  # Rot: Langsam
-                    indicator = '🐌'
-                
-                self.response_time_label.config(
-                    text=f"{indicator} ~{min_time:.0f}-{max_time:.0f}s",
-                    foreground=color
-                )
+                    color = "#DD0000"  # Rot: Langsam
+                    indicator = "🐌"
+
+                self.response_time_label.config(text=f"{indicator} ~{min_time:.0f}-{max_time:.0f}s", foreground=color)
         except Exception as e:
             logger.error(f"Fehler beim Aktualisieren der Antwortzeit-Schätzung: {e}")
-    
+
     def _open_help_docs(self, doc_name):
         """Öffnet Hilfedokumentation"""
         try:
-            import webbrowser
             import os
-            
+            import webbrowser
+
             # Pfad zur Dokumentation
-            docs_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'docs', f'{doc_name}.md')
-            
+            docs_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "docs", f"{doc_name}.md")
+
             if os.path.exists(docs_path):
                 # Öffne Markdown-Datei im Standard-Editor
-                if sys.platform == 'win32':
+                if sys.platform == "win32":
                     os.startfile(docs_path)
-                elif sys.platform == 'darwin':  # macOS
+                elif sys.platform == "darwin":  # macOS
                     os.system(f'open "{docs_path}"')
                 else:  # Linux
                     os.system(f'xdg-open "{docs_path}"')
@@ -1766,16 +1817,16 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
                     f"   Nucleus Sampling - Vielfalt der Wortwahl\n"
                     f"   • 0.5-0.7: Konservativ\n"
                     f"   • 0.8-0.9: Ausgewogen (Standard)\n"
-                    f"   • 0.95-1.0: Maximal vielfältig"
+                    f"   • 0.95-1.0: Maximal vielfältig",
                 )
         except Exception as e:
             logger.error(f"❌ Fehler beim Öffnen der Hilfedokumentation: {e}")
             messagebox.showerror("Fehler", f"Dokumentation konnte nicht geöffnet werden: {e}")
-    
+
     def _get_available_models(self):
         """Ruft verfügbare LLM-Modelle vom API ab"""
         # Prüfe zuerst ob parent App Capabilities hat
-        if self.parent and hasattr(self.parent, 'get_available_llm_models'):
+        if self.parent and hasattr(self.parent, "get_available_llm_models"):
             try:
                 logger.info(f"🔍 Versuche LLM-Modelle von Parent-App zu laden...")
                 models = self.parent.get_available_llm_models()
@@ -1791,18 +1842,18 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
                 logger.info("ℹ️ Kein Parent verfügbar - verwende API-Fallback")
             else:
                 logger.info("ℹ️ Parent hat keine get_available_llm_models Methode")
-        
+
         # Fallback: Direkter API-Call
         try:
             response = requests.get(f"{API_BASE_URL}/get_models", timeout=5)
             if response.status_code == 200:
                 data = response.json()
-                models = data.get('models', [])
+                models = data.get("models", [])
                 if models:
                     # Extrahiere nur die Modellnamen
-                    model_names = [model.get('name', 'unknown') for model in models]
+                    model_names = [model.get("name", "unknown") for model in models]
                     # Filter nur gültige Namen
-                    valid_models = [name for name in model_names if name != 'unknown']
+                    valid_models = [name for name in model_names if name != "unknown"]
                     if valid_models:
                         logger.info(f"✅ {len(valid_models)} LLM-Modelle vom API abgerufen")
                         return valid_models
@@ -1818,33 +1869,33 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
         except Exception as e:
             logger.error(f"❌ Fehler beim API-Aufruf für Modelle: {e}")
             return None
-    
+
     def _refresh_models(self):
         """Modelle neu laden und Combobox aktualisieren"""
         try:
             # Neue Modelle abrufen
             new_models = self._get_available_models()
-            
+
             if new_models:
                 # Combobox aktualisieren
-                self.llm_combo['values'] = new_models
-                
+                self.llm_combo["values"] = new_models
+
                 # Aktuelles Modell prüfen
                 current_model = self.llm_var.get()
                 if current_model not in new_models:
                     # Erstes verfügbares Modell auswählen wenn aktuelles nicht verfügbar
                     self.llm_var.set(new_models[0])
                     logger.info(f"🔄 Modell gewechselt zu: {new_models[0]}")
-                    
+
                 logger.info(f"🔄 Modelle erfolgreich aktualisiert: {len(new_models)} verfügbar")
             else:
                 # Bei Fehler auf Standard-Modelle zurückgreifen
                 fallback_models = ["gpt-3.5-turbo", "gpt-4", "claude-3"]
-                self.llm_combo['values'] = fallback_models
+                self.llm_combo["values"] = fallback_models
                 if not self.llm_var.get():
                     self.llm_var.set(fallback_models[0])
                 logger.warning("⚠️ Fallback auf Standard-Modelle")
-                
+
         except Exception as e:
             logger.error(f"❌ Fehler beim Aktualisieren der Modelle: {e}")
 
@@ -1852,14 +1903,12 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
         """Event-Handler für Dropdown-Klick - lädt Modelle automatisch neu"""
         try:
             # Nur beim ersten Klick aktualisieren oder wenn alt
-            if not hasattr(self, '_last_model_refresh') or \
-               (time.time() - self._last_model_refresh) > 30:  # 30 Sekunden Cache
-                
+            if not hasattr(self, "_last_model_refresh") or (time.time() - self._last_model_refresh) > 30:  # 30 Sekunden Cache
                 # Modelle im Hintergrund aktualisieren
                 if self.window:
                     self.window.after_idle(self._refresh_models)
                 self._last_model_refresh = time.time()
-                
+
         except Exception as e:
             logger.error(f"❌ Fehler beim Dropdown-Click: {e}")
         except requests.exceptions.RequestException as e:
@@ -1868,30 +1917,30 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
         except Exception as e:
             logger.error(f"❌ Fehler beim Abrufen der LLM-Modelle: {e}")
             return None
-    
+
     def _clear_chat(self):
         """Löscht den aktuellen Chat"""
         if messagebox.askyesno("Bestätigung", "Chat wirklich löschen?"):
             self.chat_messages = []
             self.chat_text.config(state=tk.NORMAL)
-            self.chat_text.delete('1.0', tk.END)
+            self.chat_text.delete("1.0", tk.END)
             self.chat_text.insert(tk.END, "🗑️ Chat geleert\n\n", "system")
             self.chat_text.config(state=tk.DISABLED)
-            
+
             # Alle Anhänge entfernen
             self._clear_all_attachments()
-            
+
             logger.info("Chat geleert")
-    
+
     def _copy_last_response(self):
         """Kopiert die letzte Antwort in die Zwischenablage"""
         if self.chat_messages:
             last_assistant_msg = None
             for msg in reversed(self.chat_messages):
-                if msg.get('role') == 'assistant':
-                    last_assistant_msg = msg.get('content')
+                if msg.get("role") == "assistant":
+                    last_assistant_msg = msg.get("content")
                     break
-            
+
             if last_assistant_msg:
                 self.window.clipboard_clear()
                 self.window.clipboard_append(last_assistant_msg)
@@ -1900,7 +1949,7 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
                 messagebox.showinfo("Info", "Keine Assistant-Antwort zum Kopieren vorhanden")
         else:
             messagebox.showinfo("Info", "Kein Chat vorhanden")
-    
+
     def get_available_question_methods(self):
         """Ruft verfügbare Frage-Modi vom API-Endpunkt ab"""
         logger.info("🔍 Lade verfügbare Frage-Modi vom API...")
@@ -1909,75 +1958,117 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
             logger.debug(f"API Response Status: {response.status_code}")
             if response.status_code == 200:
                 data = response.json()
-                modes = data.get('modes', {})
+                modes = data.get("modes", {})
                 available_modes = []
-                
+
                 logger.debug(f"Gefundene Modi: {list(modes.keys())}")
-                
+
                 for mode_key, mode_info in modes.items():
-                    status = mode_info.get('status')
+                    status = mode_info.get("status")
                     logger.debug(f"Modus {mode_key}: Status = {status}")
-                    if status == 'implemented':
+                    if status == "implemented":
                         # Erstelle benutzerfreundliche Anzeige
-                        display_name = mode_info.get('display_name', mode_key)
-                        description = mode_info.get('description', '')
-                        
+                        display_name = mode_info.get("display_name", mode_key)
+                        description = mode_info.get("description", "")
+
                         # Kürze die Beschreibung für das Dropdown
                         if len(description) > 50:
                             description = description[:47] + "..."
-                        
+
                         dropdown_text = f"{display_name}"
-                        available_modes.append({
-                            'key': mode_key.lower(),
-                            'display': dropdown_text,
-                            'endpoints': mode_info.get('endpoints', []),
-                            'description': description
-                        })
-                
+                        available_modes.append(
+                            {
+                                "key": mode_key.lower(),
+                                "display": dropdown_text,
+                                "endpoints": mode_info.get("endpoints", []),
+                                "description": description,
+                            }
+                        )
+
                 if available_modes:
                     logger.info(f"✅ {len(available_modes)} Frage-Modi verfügbar: {[m['key'] for m in available_modes]}")
                     return available_modes
                 else:
                     logger.warning("⚠️ Keine verfügbaren Modi vom API erhalten")
                     return [
-                        {'key': 'veritas', 'display': 'Standard RAG', 'endpoints': ['/ask'], 'description': 'Standard Retrieval-Augmented Generation'},
-                        {'key': 'vpb', 'display': 'VPB Verwaltung', 'endpoints': ['/vpb/ask'], 'description': 'Verwaltungsprozess-Analyse'}
+                        {
+                            "key": "veritas",
+                            "display": "Standard RAG",
+                            "endpoints": ["/ask"],
+                            "description": "Standard Retrieval-Augmented Generation",
+                        },
+                        {
+                            "key": "vpb",
+                            "display": "VPB Verwaltung",
+                            "endpoints": ["/vpb/ask"],
+                            "description": "Verwaltungsprozess-Analyse",
+                        },
                     ]
             else:
                 logger.error(f"❌ API-Fehler beim Abrufen der Modi: Status {response.status_code}")
                 return [
-                    {'key': 'veritas', 'display': 'Standard RAG', 'endpoints': ['/ask'], 'description': 'Standard Retrieval-Augmented Generation'},
-                    {'key': 'vpb', 'display': 'VPB Verwaltung', 'endpoints': ['/vpb/ask'], 'description': 'Verwaltungsprozess-Analyse'}
+                    {
+                        "key": "veritas",
+                        "display": "Standard RAG",
+                        "endpoints": ["/ask"],
+                        "description": "Standard Retrieval-Augmented Generation",
+                    },
+                    {
+                        "key": "vpb",
+                        "display": "VPB Verwaltung",
+                        "endpoints": ["/vpb/ask"],
+                        "description": "Verwaltungsprozess-Analyse",
+                    },
                 ]
         except requests.exceptions.RequestException as e:
             logger.error(f"❌ Verbindungsfehler beim Abrufen der Frage-Modi: {e}")
             return [
-                {'key': 'veritas', 'display': 'Standard RAG', 'endpoints': ['/ask'], 'description': 'Standard Retrieval-Augmented Generation'},
-                {'key': 'vpb', 'display': 'VPB Verwaltung', 'endpoints': ['/vpb/ask'], 'description': 'Verwaltungsprozess-Analyse'}
+                {
+                    "key": "veritas",
+                    "display": "Standard RAG",
+                    "endpoints": ["/ask"],
+                    "description": "Standard Retrieval-Augmented Generation",
+                },
+                {
+                    "key": "vpb",
+                    "display": "VPB Verwaltung",
+                    "endpoints": ["/vpb/ask"],
+                    "description": "Verwaltungsprozess-Analyse",
+                },
             ]
         except Exception as e:
             logger.error(f"❌ Unerwarteter Fehler beim Abrufen der Frage-Modi: {e}")
             return [
-                {'key': 'veritas', 'display': 'Standard RAG', 'endpoints': ['/ask'], 'description': 'Standard Retrieval-Augmented Generation'},
-                {'key': 'vpb', 'display': 'VPB Verwaltung', 'endpoints': ['/vpb/ask'], 'description': 'Verwaltungsprozess-Analyse'}
+                {
+                    "key": "veritas",
+                    "display": "Standard RAG",
+                    "endpoints": ["/ask"],
+                    "description": "Standard Retrieval-Augmented Generation",
+                },
+                {
+                    "key": "vpb",
+                    "display": "VPB Verwaltung",
+                    "endpoints": ["/vpb/ask"],
+                    "description": "Verwaltungsprozess-Analyse",
+                },
             ]
-    
+
     def on_mode_change(self, event=None):
         """Behandelt Modus-Änderung"""
         try:
             selected_display = self.mode_var.get()
-            
+
             # Finde den entsprechenden Modus in den geladenen Daten
-            if hasattr(self, 'question_methods_data') and selected_display in self.question_methods_data:
+            if hasattr(self, "question_methods_data") and selected_display in self.question_methods_data:
                 selected_method = self.question_methods_data[selected_display]
-                mode_key = selected_method['key']
-                description = selected_method['description']
-                
+                mode_key = selected_method["key"]
+                description = selected_method["description"]
+
                 # Speichere aktuellen Modus für API-Anfragen
                 self.current_question_mode = selected_method
-                
+
                 # System-Nachricht hinzufügen falls Chat-Text verfügbar
-                if hasattr(self, 'chat_text') and self.chat_text:
+                if hasattr(self, "chat_text") and self.chat_text:
                     self.chat_text.config(state=tk.NORMAL)
                     self.chat_text.insert(tk.END, f"🔄 Frage-Modus gewechselt zu: {selected_display}\n", "system")
                     if description:
@@ -1986,109 +2077,111 @@ class ChatWindowBase(ABC, StreamingUIMixin if STREAMING_AVAILABLE else object):
                         self.chat_text.insert(tk.END, "\n", "system")
                     self.chat_text.config(state=tk.DISABLED)
                     self.chat_text.see(tk.END)
-                
+
                 logger.info(f"Modus gewechselt zu: {mode_key} - {selected_display}")
             else:
                 logger.warning(f"Modus {selected_display} nicht in question_methods_data gefunden")
         except Exception as e:
             logger.error(f"Fehler beim Modus-Wechsel: {e}")
-    
+
     def _send_message(self):
         """Sendet eine Nachricht (gemeinsame Implementierung)"""
-        if hasattr(self, 'input_text') and self.input_text:
-            message = self.input_text.get('1.0', tk.END).strip()
+        if hasattr(self, "input_text") and self.input_text:
+            message = self.input_text.get("1.0", tk.END).strip()
             if message:
-                self.input_text.delete('1.0', tk.END)
+                self.input_text.delete("1.0", tk.END)
                 self.send_chat_message(message)
+
 
 # === OOP-ARCHITEKTUR: KONKRETE CHAT-WINDOW-IMPLEMENTIERUNGEN ===
 
+
 class MainChatWindow(ChatWindowBase):
     """Hauptfenster - läuft im Main-Thread"""
-    
+
     def __init__(self, thread_manager: ThreadManager, veritas_app=None):
         super().__init__("MainChat", thread_manager, parent=veritas_app)
         self.is_main_window = True
         self.veritas_app = veritas_app
-        
+
         # Initialisiere aktuellen Frage-Modus
-        self.current_question_mode = {'key': 'veritas', 'endpoints': ['/ask']}
+        self.current_question_mode = {"key": "veritas", "endpoints": ["/ask"]}
         self.question_methods_data = {}
-        
+
         self.create_gui()
         self.setup_bindings()
-        
+
         # WICHTIG: Starte Message-Loop für Queue-basierte Kommunikation
         self.start_message_loop()
-        
+
         logger.info("MainChatWindow erstellt")
-    
+
     def create_gui(self):
         """Erstellt das Hauptfenster GUI mit shared Methoden"""
         self.window = tk.Tk()
         self.window.title("💬 Veritas Chat - Hauptfenster")
         self.window.geometry("900x700")
         self.window.minsize(700, 500)
-        self.window.configure(bg='#f0f0f0')
-        
+        self.window.configure(bg="#f0f0f0")
+
         # Hauptframe
         main_frame = ttk.Frame(self.window)
         main_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
-        
+
         # Header mit Toolbar
         self._create_main_toolbar(main_frame)
-        
+
         # Chat-Anzeige (shared)
         self._create_chat_display(main_frame, height=25)
-        
+
         # UI-Module initialisieren (NACH Chat-Display-Erstellung)
         if UI_MODULES_AVAILABLE:
             self._init_ui_modules()
-        
+
         # Eingabebereich mit Anhängen (shared)
         self._create_input_area(main_frame, include_attachments=True)
-        
+
         # Einstellungen (shared)
         self._create_settings_bar(main_frame, compact=False)
-        
+
         # Status-Bar (shared)
         self._create_status_bar(main_frame, show_uds3=True)
-    
+
     def _init_ui_modules(self):
         """Initialisiert die ausgelagerten UI-Module"""
         try:
             # Markdown-Renderer
             self.markdown_renderer = MarkdownRenderer(self.chat_text)
-            
+
             # Source-Link-Handler
             self.source_link_handler = SourceLinkHandler(self.window, self.status_var)
-            
+
             # Chat-Display-Formatter (✨ v3.19.0: mit suggestion_click_callback)
             self.chat_formatter = ChatDisplayFormatter(
                 self.chat_text,
                 self.window,
                 markdown_renderer=self.markdown_renderer,
                 source_link_handler=self.source_link_handler,
-                suggestion_click_callback=self._on_suggestion_clicked  # ✨ NEW
+                suggestion_click_callback=self._on_suggestion_clicked,  # ✨ NEW
             )
-            
+
             # Dialog-Manager
             self.dialog_manager = DialogManager(
                 self.window,
                 chat_messages=self.chat_messages,
                 status_var=self.status_var,
-                update_chat_callback=lambda: self.chat_formatter.update_chat_display(self.chat_messages)
+                update_chat_callback=lambda: self.chat_formatter.update_chat_display(self.chat_messages),
             )
-            
+
             # Link-Callback setzen
             self.markdown_renderer.set_link_callback(self.source_link_handler.open_source_link)
-            
+
             # Tags konfigurieren
             setup_markdown_tags(self.chat_text)
             setup_chat_tags(self.chat_text)
-            
+
             logger.info("✅ UI-Module initialisiert (Markdown, SourceLinks, ChatFormatter, DialogManager)")
-            
+
         except Exception as e:
             logger.error(f"❌ Fehler beim Initialisieren der UI-Module: {e}")
             # Fallback auf alte Methoden
@@ -2096,93 +2189,76 @@ class MainChatWindow(ChatWindowBase):
             self.source_link_handler = None
             self.chat_formatter = None
             self.dialog_manager = None
-    
+
     def _create_main_toolbar(self, parent):
         """Erstellt die Hauptfenster-spezifische Toolbar"""
         header_frame = ttk.Frame(parent)
         header_frame.pack(fill=tk.X, pady=(0, 5))
-        
+
         # Hamburger-Menü (linksbündig)
-        self.hamburger_btn = ttk.Button(
-            header_frame,
-            text="☰",
-            command=self._show_menu,
-            width=3
-        )
+        self.hamburger_btn = ttk.Button(header_frame, text="☰", command=self._show_menu, width=3)
         self.hamburger_btn.pack(side=tk.LEFT)
         Tooltip(self.hamburger_btn, "Menü öffnen")
-        
+
         # Toolbar-Buttons (zentral)
         toolbar_frame = ttk.Frame(header_frame)
         toolbar_frame.pack(side=tk.LEFT, padx=(10, 0))
-        
-        clear_btn = ttk.Button(toolbar_frame, text="🗑️ Chat löschen", 
-                  command=self._clear_chat, width=13)
+
+        clear_btn = ttk.Button(toolbar_frame, text="🗑️ Chat löschen", command=self._clear_chat, width=13)
         clear_btn.pack(side=tk.LEFT, padx=(0, 5))
         Tooltip(clear_btn, "Chat löschen (Strg+K)")
-        
-        copy_btn = ttk.Button(toolbar_frame, text="📋 Kopieren", 
-                  command=self._copy_last_response, width=13)
+
+        copy_btn = ttk.Button(toolbar_frame, text="📋 Kopieren", command=self._copy_last_response, width=13)
         copy_btn.pack(side=tk.LEFT, padx=(0, 5))
         Tooltip(copy_btn, "Letzte Antwort kopieren")
-        
-        repeat_btn = ttk.Button(toolbar_frame, text="🔄 Wiederholen", 
-                  command=self._repeat_last_question, width=13)
+
+        repeat_btn = ttk.Button(toolbar_frame, text="🔄 Wiederholen", command=self._repeat_last_question, width=13)
         repeat_btn.pack(side=tk.LEFT)
         Tooltip(repeat_btn, "Letzte Frage wiederholen")
-        
+
         # VERITAS Info Button (rechtsbündig) - ohne Rahmen, große Schrift
         veritas_btn = tk.Label(
-            header_frame,
-            text="VERITAS",
-            font=('Segoe UI', 16, 'bold'),
-            foreground='#0066CC',
-            padx=10,
-            pady=5
+            header_frame, text="VERITAS", font=("Segoe UI", 16, "bold"), foreground="#0066CC", padx=10, pady=5
         )
         veritas_btn.pack(side=tk.RIGHT, padx=(5, 0))
-        veritas_btn.config(cursor='hand2')  # Cursor separat setzen
-        veritas_btn.bind('<Button-1>', lambda e: self._show_readme())
+        veritas_btn.config(cursor="hand2")  # Cursor separat setzen
+        veritas_btn.bind("<Button-1>", lambda e: self._show_readme())
         Tooltip(veritas_btn, "Hilfe anzeigen (F1)")
-        
+
         # Hover-Effekt für VERITAS Button
         def on_enter(e):
-            veritas_btn.config(foreground='#004499')
+            veritas_btn.config(foreground="#004499")
+
         def on_leave(e):
-            veritas_btn.config(foreground='#0066CC')
-        
-        veritas_btn.bind('<Enter>', on_enter)
-        veritas_btn.bind('<Leave>', on_leave)
-        
+            veritas_btn.config(foreground="#0066CC")
+
+        veritas_btn.bind("<Enter>", on_enter)
+        veritas_btn.bind("<Leave>", on_leave)
+
         # Neuer Chat Button (rechtsbündig)
-        new_chat_btn = ttk.Button(
-            header_frame,
-            text="➕ Neuer Chat",
-            command=self._create_child_window,
-            width=12
-        )
+        new_chat_btn = ttk.Button(header_frame, text="➕ Neuer Chat", command=self._create_child_window, width=12)
         new_chat_btn.pack(side=tk.RIGHT, padx=(5, 0))
         Tooltip(new_chat_btn, "Neuer Chat (Strg+N)")
-    
+
     def setup_bindings(self):
         """Richtet Event-Bindings ein"""
         # Input-Field Bindings
-        self.input_text.bind('<Control-Return>', lambda e: self._send_message())
-        self.input_text.bind('<Return>', self._on_return_key)
-        
+        self.input_text.bind("<Control-Return>", lambda e: self._send_message())
+        self.input_text.bind("<Return>", self._on_return_key)
+
         # ✨ Feature #11: Keyboard Shortcuts
         # Globale Shortcuts für Hauptfenster
-        self.window.bind('<Control-n>', lambda e: self._create_child_window())  # Neuer Chat
-        self.window.bind('<Control-s>', lambda e: self._save_chat())  # Chat speichern
-        self.window.bind('<Control-o>', lambda e: self._load_chat())  # Chat laden
-        self.window.bind('<Control-k>', lambda e: self._clear_chat())  # Chat löschen
-        self.window.bind('<Control-slash>', lambda e: self._show_shortcuts_help())  # Shortcuts anzeigen
-        self.window.bind('<Escape>', lambda e: self.input_text.focus_set())  # Focus zu Input
-        self.window.bind('<F1>', lambda e: self._show_readme())  # Hilfe
-        
+        self.window.bind("<Control-n>", lambda e: self._create_child_window())  # Neuer Chat
+        self.window.bind("<Control-s>", lambda e: self._save_chat())  # Chat speichern
+        self.window.bind("<Control-o>", lambda e: self._load_chat())  # Chat laden
+        self.window.bind("<Control-k>", lambda e: self._clear_chat())  # Chat löschen
+        self.window.bind("<Control-slash>", lambda e: self._show_shortcuts_help())  # Shortcuts anzeigen
+        self.window.bind("<Escape>", lambda e: self.input_text.focus_set())  # Focus zu Input
+        self.window.bind("<F1>", lambda e: self._show_readme())  # Hilfe
+
         # Window Close
         self.window.protocol("WM_DELETE_WINDOW", self._on_main_window_closing)
-    
+
     def _on_return_key(self, event):
         """Behandelt Return-Key"""
         if event.state & 0x1:  # Shift-Taste gedrückt
@@ -2190,21 +2266,21 @@ class MainChatWindow(ChatWindowBase):
         else:
             self._send_message()
             return "break"
-    
+
     def _send_message(self):
         """Sendet eine Nachricht"""
-        message = self.input_text.get('1.0', tk.END).strip()
+        message = self.input_text.get("1.0", tk.END).strip()
         if not message:
             return
-        
-        self.input_text.delete('1.0', tk.END)
+
+        self.input_text.delete("1.0", tk.END)
         self.send_chat_message(message)
-    
+
     def _create_child_window(self):
         """Erstellt ein neues Child-Chat-Fenster"""
         if self.veritas_app:
             self.veritas_app.create_child_chat_window()
-    
+
     def _show_menu(self):
         """Zeigt das Hamburger-Menü mit letzten Chats"""
         menu = tk.Menu(self.window, tearoff=0)
@@ -2212,51 +2288,48 @@ class MainChatWindow(ChatWindowBase):
         menu.add_separator()
         menu.add_command(label="💾 Chat speichern", command=self._save_chat)
         menu.add_command(label="📂 Chat laden", command=self._load_chat)
-        
+
         # Letzte Chats anzeigen
         recent_chats = self._get_recent_chats()
         if recent_chats:
             menu.add_separator()
             menu.add_command(label="📜 Letzte Chats:", state="disabled")  # Header
-            
+
             # Zeige maximal 5 Chats direkt im Menü
             for i, chat_info in enumerate(recent_chats[:5]):
-                chat_name = chat_info['name']
-                chat_path = chat_info['path']
+                chat_name = chat_info["name"]
+                chat_path = chat_info["path"]
                 # Kürze den Namen wenn nötig (max 30 Zeichen)
                 display_name = chat_name[:27] + "..." if len(chat_name) > 30 else chat_name
-                menu.add_command(
-                    label=f"  {display_name}",
-                    command=lambda path=chat_path: self._load_recent_chat(path)
-                )
-            
+                menu.add_command(label=f"  {display_name}", command=lambda path=chat_path: self._load_recent_chat(path))
+
             # Wenn mehr als 5 Chats vorhanden, zeige "Alle anzeigen" Option
             if len(recent_chats) > 5:
                 menu.add_command(label="  📋 Alle Chats anzeigen...", command=self._show_all_chats_dialog)
-        
+
         menu.add_separator()
         menu.add_command(label="⚙️ Einstellungen", command=self._show_settings)
         menu.add_command(label="⌨️ Keyboard Shortcuts", command=self._show_shortcuts_help)
         menu.add_command(label="ℹ️ Info", command=self._show_info)
-        
+
         try:
             x = self.hamburger_btn.winfo_rootx()
             y = self.hamburger_btn.winfo_rooty() + self.hamburger_btn.winfo_height()
             menu.tk_popup(x, y)
         except:
             menu.tk_popup(100, 100)
-    
+
     def _save_chat(self):
         """Speichert den aktuellen Chat (delegiert an DialogManager)"""
-        if hasattr(self, 'dialog_manager') and self.dialog_manager:
+        if hasattr(self, "dialog_manager") and self.dialog_manager:
             self.dialog_manager.save_chat(self.chat_messages)
         else:
             # Fallback: Alte Implementierung
             self._save_chat_legacy()
-    
+
     def _load_chat(self):
         """Lädt einen gespeicherten Chat (delegiert an DialogManager)"""
-        if hasattr(self, 'dialog_manager') and self.dialog_manager:
+        if hasattr(self, "dialog_manager") and self.dialog_manager:
             loaded = self.dialog_manager.load_chat()
             if loaded:
                 self.chat_messages = loaded
@@ -2264,20 +2337,20 @@ class MainChatWindow(ChatWindowBase):
         else:
             # Fallback: Alte Implementierung
             self._load_chat_legacy()
-    
+
     def _get_recent_chats(self):
         """Gibt Liste der letzten Chats zurück"""
         try:
             # Nutze Chat-Persistence-Service (v3.20.0)
-            if hasattr(self, 'chat_persistence') and self.chat_persistence:
+            if hasattr(self, "chat_persistence") and self.chat_persistence:
                 sessions = self.chat_persistence.list_all_sessions()
                 # Sortiere nach updated_at (neueste zuerst)
-                sessions.sort(key=lambda s: s.get('updated_at', ''), reverse=True)
+                sessions.sort(key=lambda s: s.get("updated_at", ""), reverse=True)
                 # Nimm die letzten 10
                 return sessions[:10]
-            elif hasattr(self, 'dialog_manager') and self.dialog_manager:
+            elif hasattr(self, "dialog_manager") and self.dialog_manager:
                 # Fallback: Alte DialogManager-Methode (falls vorhanden)
-                if hasattr(self.dialog_manager, 'get_recent_chats'):
+                if hasattr(self.dialog_manager, "get_recent_chats"):
                     return self.dialog_manager.get_recent_chats()
                 else:
                     return []
@@ -2287,11 +2360,11 @@ class MainChatWindow(ChatWindowBase):
         except Exception as e:
             logger.warning(f"Fehler beim Laden der letzten Chats: {e}")
             return []
-    
+
     def _load_recent_chat(self, chat_path):
         """Lädt einen spezifischen Chat aus dem Pfad"""
         try:
-            if hasattr(self, 'dialog_manager') and self.dialog_manager:
+            if hasattr(self, "dialog_manager") and self.dialog_manager:
                 loaded = self.dialog_manager.load_chat_from_path(chat_path)
                 if loaded:
                     self.chat_messages = loaded
@@ -2299,28 +2372,29 @@ class MainChatWindow(ChatWindowBase):
             else:
                 # Fallback: Datei direkt laden
                 import json
-                with open(chat_path, 'r', encoding='utf-8') as f:
+
+                with open(chat_path, "r", encoding="utf-8") as f:
                     data = json.load(f)
-                    self.chat_messages = data.get('messages', [])
+                    self.chat_messages = data.get("messages", [])
                     self.update_chat_display()
         except Exception as e:
             logger.error(f"Fehler beim Laden des Chats: {e}")
             messagebox.showerror("Fehler", f"Konnte Chat nicht laden:\n{e}")
-    
+
     def _show_all_chats_dialog(self):
         """Zeigt Dialog mit allen verfügbaren Chats (delegiert an DialogManager)"""
-        if hasattr(self, 'dialog_manager') and self.dialog_manager:
+        if hasattr(self, "dialog_manager") and self.dialog_manager:
             self.dialog_manager.show_all_chats_dialog()
         else:
             self._show_all_chats_dialog_legacy()
-    
+
     def _show_settings(self):
         """Zeigt Einstellungen-Dialog (delegiert an DialogManager)"""
-        if hasattr(self, 'dialog_manager') and self.dialog_manager:
+        if hasattr(self, "dialog_manager") and self.dialog_manager:
             self.dialog_manager.show_settings()
         else:
             messagebox.showinfo("Einstellungen", "Einstellungen werden in einem zukünftigen Update verfügbar sein")
-    
+
     def _show_shortcuts_help(self):
         """Zeigt Keyboard-Shortcuts-Hilfe (Feature #11)"""
         shortcuts_text = """⌨️ Keyboard Shortcuts
@@ -2342,14 +2416,14 @@ Nachrichten senden:
   Shift+Enter ⏎ Neue Zeile (ohne Senden)
 """
         messagebox.showinfo("Keyboard Shortcuts", shortcuts_text)
-    
+
     def _show_info(self):
         """Zeigt Info-Dialog (delegiert an DialogManager)"""
-        if hasattr(self, 'dialog_manager') and self.dialog_manager:
+        if hasattr(self, "dialog_manager") and self.dialog_manager:
             self.dialog_manager.show_info(__version__)
         else:
             info_text = f"""Veritas Chat v{__version__}
-        
+
 Moderne Chat-Anwendung mit:
 • Multi-Window-Unterstützung
 • RAG-Integration
@@ -2358,14 +2432,14 @@ Moderne Chat-Anwendung mit:
 
 © 2025 Veritas Team"""
         messagebox.showinfo("Info", info_text)
-    
+
     def _show_readme(self):
         """Zeigt die README.md Datei (delegiert an DialogManager)"""
-        if hasattr(self, 'dialog_manager') and self.dialog_manager:
+        if hasattr(self, "dialog_manager") and self.dialog_manager:
             self.dialog_manager.show_readme()
         else:
             self._show_readme_legacy()
-    
+
     def _on_main_window_closing(self):
         """Behandelt das Schließen des Hauptfensters thread-sicher"""
         try:
@@ -2375,14 +2449,14 @@ Moderne Chat-Anwendung mit:
                 self._safe_destroy()
         except Exception as e:
             logger.error(f"Fehler beim Schließen des Hauptfensters: {e}")
-    
+
     def update_chat_display(self):
         """Aktualisiert Chat-Anzeige (delegiert an ChatDisplayFormatter)"""
-        if hasattr(self, 'chat_formatter') and self.chat_formatter:
+        if hasattr(self, "chat_formatter") and self.chat_formatter:
             self.chat_formatter.update_chat_display(self.chat_messages)
         else:
             logger.warning("⚠️ ChatFormatter nicht verfügbar - UI-Module fehlen!")
-    
+
     def _safe_update_chat_display(self):
         """Sichere Chat-Display-Aktualisierung mit Widget-Existenz-Prüfung"""
         try:
@@ -2392,76 +2466,69 @@ Moderne Chat-Anwendung mit:
         except Exception as e:
             logger.debug(f"Fehler bei Chat-Display-Update: {e}")
 
+
 class ChildChatWindow(ChatWindowBase):
     """Child-Fenster - läuft in separatem Thread"""
-    
+
     def __init__(self, window_id: str, thread_manager: ThreadManager, veritas_app=None):
         super().__init__(window_id, thread_manager, parent=veritas_app)
         self.veritas_app = veritas_app
-        
+
         self.create_gui()
         self.setup_bindings()
         self.start_message_loop()
-        
+
         logger.info(f"ChildChatWindow {window_id} erstellt")
-    
+
     def create_gui(self):
         """Erstellt das Child-Fenster GUI mit shared Methoden"""
         self.window = tk.Toplevel()
         self.window.title(f"💬 Veritas Chat - {self.window_id}")
         self.window.geometry("800x600")
         self.window.minsize(600, 400)
-        self.window.configure(bg='#f0f0f0')
-        
+        self.window.configure(bg="#f0f0f0")
+
         # Hauptframe
         main_frame = ttk.Frame(self.window)
         main_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
-        
+
         # Header mit kompakter Toolbar
         self._create_child_toolbar(main_frame)
-        
+
         # Chat-Anzeige (shared)
         self._create_chat_display(main_frame, height=20)
-        
+
         # Eingabebereich ohne Anhänge (shared)
         self._create_input_area(main_frame, include_attachments=False)
-        
+
         # Kompakte Einstellungen (shared)
         self._create_settings_bar(main_frame, compact=True)
-        
+
         # Status-Bar ohne UDS3 (shared)
         self._create_status_bar(main_frame, show_uds3=False)
-    
+
     def _create_child_toolbar(self, parent):
         """Erstellt die Child-Fenster-spezifische Toolbar"""
         header_frame = ttk.Frame(parent)
         header_frame.pack(fill=tk.X, pady=(0, 5))
-        
+
         # Kompakte Toolbar (links)
         toolbar_frame = ttk.Frame(header_frame)
         toolbar_frame.pack(side=tk.LEFT)
-        
-        ttk.Button(toolbar_frame, text="🗑️", 
-                  command=self._clear_chat, width=3).pack(side=tk.LEFT)
-        ttk.Button(toolbar_frame, text="📎", 
-                  command=self._upload_file, width=3).pack(side=tk.LEFT, padx=(2, 0))
-        ttk.Button(toolbar_frame, text="📋", 
-                  command=self._copy_last_response, width=3).pack(side=tk.LEFT, padx=(2, 0))
-        
+
+        ttk.Button(toolbar_frame, text="🗑️", command=self._clear_chat, width=3).pack(side=tk.LEFT)
+        ttk.Button(toolbar_frame, text="📎", command=self._upload_file, width=3).pack(side=tk.LEFT, padx=(2, 0))
+        ttk.Button(toolbar_frame, text="📋", command=self._copy_last_response, width=3).pack(side=tk.LEFT, padx=(2, 0))
+
         # Close Button (rechts)
-        ttk.Button(
-            header_frame,
-            text="❌ Schließen",
-            command=self._on_window_closing,
-            width=12
-        ).pack(side=tk.RIGHT)
-    
+        ttk.Button(header_frame, text="❌ Schließen", command=self._on_window_closing, width=12).pack(side=tk.RIGHT)
+
     def setup_bindings(self):
         """Richtet Event-Bindings ein"""
-        self.input_text.bind('<Control-Return>', lambda e: self._send_message())
-        self.input_text.bind('<Return>', self._on_return_key)
+        self.input_text.bind("<Control-Return>", lambda e: self._send_message())
+        self.input_text.bind("<Return>", self._on_return_key)
         self.window.protocol("WM_DELETE_WINDOW", self._on_window_closing)
-    
+
     def _on_return_key(self, event):
         """Behandelt Return-Key"""
         if event.state & 0x1:  # Shift-Taste gedrückt
@@ -2469,16 +2536,16 @@ class ChildChatWindow(ChatWindowBase):
         else:
             self._send_message()
             return "break"
-    
+
     def _send_message(self):
         """Sendet eine Nachricht"""
-        message = self.input_text.get('1.0', tk.END).strip()
+        message = self.input_text.get("1.0", tk.END).strip()
         if not message:
             return
-        
-        self.input_text.delete('1.0', tk.END)
+
+        self.input_text.delete("1.0", tk.END)
         self.send_chat_message(message)
-    
+
     def _on_window_closing(self):
         """Behandelt das Schließen des Child-Fensters thread-sicher"""
         try:
@@ -2487,37 +2554,37 @@ class ChildChatWindow(ChatWindowBase):
                 self.veritas_app.remove_child_window(self.window_id)
         except Exception as e:
             logger.error(f"Fehler beim Schließen des Child-Fensters {self.window_id}: {e}")
-    
+
     def update_chat_display(self):
         """Aktualisiert Chat-Anzeige im Child-Fenster"""
-        if not self.window or not hasattr(self.window, 'winfo_exists') or not self.window.winfo_exists():
+        if not self.window or not hasattr(self.window, "winfo_exists") or not self.window.winfo_exists():
             return
-            
-        self.chat_text.config(state='normal')
-        self.chat_text.delete('1.0', tk.END)
-        
+
+        self.chat_text.config(state="normal")
+        self.chat_text.delete("1.0", tk.END)
+
         for msg in self.chat_messages:
-            role = msg.get('role', 'unknown')
-            content = msg.get('content', '')
-            timestamp = msg.get('timestamp', '')
-            tag = msg.get('tag', role)
-            
-            if role == 'system':
+            role = msg.get("role", "unknown")
+            content = msg.get("content", "")
+            timestamp = msg.get("timestamp", "")
+            tag = msg.get("tag", role)
+
+            if role == "system":
                 self.chat_text.insert(tk.END, f"[{timestamp}] ", "timestamp")
                 self.chat_text.insert(tk.END, f"{content}\n\n", "system")
-            elif role == 'user':
+            elif role == "user":
                 self.chat_text.insert(tk.END, f"[{timestamp}] Sie:\n", "user")
                 self.chat_text.insert(tk.END, f"{content}\n\n", "user")
-            elif role == 'assistant':
+            elif role == "assistant":
                 self.chat_text.insert(tk.END, f"[{timestamp}] Assistent:\n", tag)
                 self.chat_text.insert(tk.END, f"{content}\n\n", tag)
-            elif role == 'error':
+            elif role == "error":
                 self.chat_text.insert(tk.END, f"[{timestamp}] Fehler:\n", "system")
                 self.chat_text.insert(tk.END, f"{content}\n\n", "system")
-        
-        self.chat_text.config(state='disabled')
+
+        self.chat_text.config(state="disabled")
         self.chat_text.see(tk.END)
-    
+
     def _safe_update_chat_display(self):
         """Sichere Chat-Display-Aktualisierung mit Widget-Existenz-Prüfung"""
         try:
@@ -2527,22 +2594,24 @@ class ChildChatWindow(ChatWindowBase):
         except Exception as e:
             logger.debug(f"Fehler bei Chat-Display-Update: {e}")
 
+
 # === OOP-ARCHITEKTUR: HAUPTANWENDUNG MIT MULTI-WINDOW-MANAGEMENT ===
+
 
 class VeritasApp:
     """
     Hauptanwendung mit OOP-basiertem Multi-Window-Management
     Implementiert das moderne Design mit korrekter Thread-Architektur
     """
-    
+
     def __init__(self):
         # Globale App-Instanz setzen
         global _veritas_app_instance
         _veritas_app_instance = self
-        
+
         # Thread-Manager aus Core Engine oder Fallback verwenden
         self.thread_manager = get_thread_manager()
-        
+
         # Core Engine initialisieren falls verfügbar
         if CORE_AVAILABLE:
             self.veritas_core = get_veritas_core()
@@ -2550,21 +2619,21 @@ class VeritasApp:
         else:
             self.veritas_core = None
             logger.warning("⚠️ VERITAS Core Engine nicht verfügbar")
-        
+
         # Backend Capabilities
         self.capabilities: Dict[str, Any] = {}
         self._load_backend_capabilities()
-        
+
         # Window-Management
         self.main_window: Optional[MainChatWindow] = None
         self.child_windows: Dict[str, ChildChatWindow] = {}
-        
+
         # Shutdown-Flag um Doppelausführung zu verhindern
         self._shutdown_initiated = False
         self._window_counter = 0
-        
+
         logger.info(f"VeritasApp v{__version__} initialisiert")
-    
+
     def _load_backend_capabilities(self):
         """
         Lädt Backend-Capabilities vom /capabilities Endpoint
@@ -2573,66 +2642,66 @@ class VeritasApp:
         try:
             logger.info("🔍 Lade Backend Capabilities...")
             response = requests.get(f"{API_BASE_URL}/capabilities", timeout=10)
-            
+
             if response.status_code == 200:
                 self.capabilities = response.json()
-                
+
                 # Log wichtige Informationen
-                system_info = self.capabilities.get('system', {})
-                features = self.capabilities.get('features', {})
-                modes = self.capabilities.get('modes', {})
-                recommendations = self.capabilities.get('recommendations', [])
-                
+                system_info = self.capabilities.get("system", {})
+                features = self.capabilities.get("features", {})
+                modes = self.capabilities.get("modes", {})
+                recommendations = self.capabilities.get("recommendations", [])
+
                 logger.info(f"✅ Backend Capabilities geladen:")
                 logger.info(f"   Version: {system_info.get('version', 'unknown')}")
                 logger.info(f"   Environment: {system_info.get('environment', 'unknown')}")
-                
+
                 # Ollama Status
-                ollama = features.get('ollama', {})
-                if ollama.get('available'):
+                ollama = features.get("ollama", {})
+                if ollama.get("available"):
                     logger.info(f"   Ollama: {ollama.get('model_count', 0)} Modelle verfügbar")
                     logger.info(f"   Default Model: {ollama.get('default_model', 'unknown')}")
                 else:
                     logger.warning(f"   ⚠️ Ollama nicht verfügbar")
-                
+
                 # Pipeline Status
-                pipeline = features.get('intelligent_pipeline', {})
-                if pipeline.get('available'):
+                pipeline = features.get("intelligent_pipeline", {})
+                if pipeline.get("available"):
                     logger.info(f"   Pipeline: {len(pipeline.get('available_agents', []))} Agents")
                 else:
                     logger.warning(f"   ⚠️ Intelligent Pipeline nicht verfügbar")
-                
+
                 # UDS3 Status
-                uds3 = features.get('uds3', {})
-                if uds3.get('available'):
+                uds3 = features.get("uds3", {})
+                if uds3.get("available"):
                     logger.info(f"   UDS3: Multi-DB mit {len(uds3.get('databases', []))} DBs")
                 else:
                     logger.info(f"   UDS3: Nicht verfügbar (optional)")
-                
+
                 # Modi Status
-                optimal_modes = [k for k, v in modes.items() if v.get('optimal', False)]
+                optimal_modes = [k for k, v in modes.items() if v.get("optimal", False)]
                 logger.info(f"   Optimale Modi: {', '.join(optimal_modes)}")
-                
+
                 # Recommendations
                 for rec in recommendations:
-                    rec_type = rec.get('type', 'info')
-                    message = rec.get('message', '')
-                    if rec_type == 'warning':
+                    rec_type = rec.get("type", "info")
+                    message = rec.get("message", "")
+                    if rec_type == "warning":
                         logger.warning(f"   ⚠️ {message}")
-                    elif rec_type == 'error':
+                    elif rec_type == "error":
                         logger.error(f"   ❌ {message}")
-                    elif rec_type == 'success':
+                    elif rec_type == "success":
                         logger.info(f"   ✅ {message}")
                     else:
                         logger.info(f"   ℹ️ {message}")
-                
+
                 return True
-                
+
             else:
                 logger.error(f"❌ Capabilities-Fehler: Status {response.status_code}")
                 self.capabilities = self._get_fallback_capabilities()
                 return False
-                
+
         except requests.exceptions.RequestException as e:
             logger.error(f"❌ Verbindungsfehler bei Capabilities: {e}")
             self.capabilities = self._get_fallback_capabilities()
@@ -2641,95 +2710,88 @@ class VeritasApp:
             logger.error(f"❌ Unerwarteter Fehler bei Capabilities: {e}")
             self.capabilities = self._get_fallback_capabilities()
             return False
-    
+
     def _get_fallback_capabilities(self) -> Dict[str, Any]:
         """Fallback Capabilities wenn Backend nicht erreichbar"""
         return {
-            "system": {
-                "version": "unknown",
-                "environment": "offline",
-                "timestamp": datetime.now().isoformat()
-            },
+            "system": {"version": "unknown", "environment": "offline", "timestamp": datetime.now().isoformat()},
             "features": {
                 "ollama": {"available": False, "models": []},
                 "intelligent_pipeline": {"available": False},
                 "uds3": {"available": False},
-                "streaming": {"available": False}
+                "streaming": {"available": False},
             },
-            "modes": {
-                "veritas": {"available": False, "optimal": False},
-                "chat": {"available": False, "optimal": False}
-            },
+            "modes": {"veritas": {"available": False, "optimal": False}, "chat": {"available": False, "optimal": False}},
             "recommendations": [
                 {
                     "type": "error",
                     "message": "Backend nicht erreichbar",
-                    "action": "Starten Sie das Backend mit: python backend/api/veritas_api_backend.py"
+                    "action": "Starten Sie das Backend mit: python backend/api/veritas_api_backend.py",
                 }
-            ]
+            ],
         }
-    
+
     def is_feature_available(self, feature_path: str) -> bool:
         """
         Prüft ob ein Feature verfügbar ist
-        
+
         Args:
             feature_path: Pfad im Capabilities-Dict, z.B. 'features.ollama.available'
-        
+
         Returns:
             bool: True wenn Feature verfügbar
         """
-        parts = feature_path.split('.')
+        parts = feature_path.split(".")
         current = self.capabilities
-        
+
         for part in parts:
             if isinstance(current, dict) and part in current:
                 current = current[part]
             else:
                 return False
-        
+
         return bool(current)
-    
+
     def get_capability_value(self, path: str, default: Any = None) -> Any:
         """
         Holt einen Wert aus den Capabilities
-        
+
         Args:
             path: Pfad im Capabilities-Dict, z.B. 'features.ollama.models'
             default: Rückgabewert wenn Pfad nicht existiert
-        
+
         Returns:
             Der Wert am Pfad oder default
         """
-        parts = path.split('.')
+        parts = path.split(".")
         current = self.capabilities
-        
+
         for part in parts:
             if isinstance(current, dict) and part in current:
                 current = current[part]
             else:
                 return default
-        
+
         return current
-    
+
     def get_available_llm_models(self):
         """Ruft verfügbare LLM-Modelle aus den Capabilities ab"""
         # Prüfe zuerst Capabilities
         if self.capabilities:
-            models = self.get_capability_value('features.ollama.models', [])
+            models = self.get_capability_value("features.ollama.models", [])
             if models:
                 logger.info(f"✅ {len(models)} LLM-Modelle aus Capabilities geladen")
                 return models
-        
+
         # Fallback: API-Call (für Rückwärtskompatibilität)
         try:
             response = requests.get(f"{API_BASE_URL}/get_models", timeout=10)
             if response.status_code == 200:
                 data = response.json()
-                models = data.get('models', [])
+                models = data.get("models", [])
                 if models:
                     # Extrahiere nur die Modellnamen
-                    model_names = [model.get('name', 'unknown') for model in models]
+                    model_names = [model.get("name", "unknown") for model in models]
                     logger.info(f"✅ {len(model_names)} LLM-Modelle vom API abgerufen")
                     return model_names
                 else:
@@ -2748,109 +2810,119 @@ class VeritasApp:
     def get_available_question_methods(self):
         """Ruft verfügbare Frage-Modi aus den Capabilities ab"""
         logger.info("🔍 Lade verfügbare Frage-Modi...")
-        
+
         # Prüfe zuerst Capabilities
         if self.capabilities:
-            modes = self.get_capability_value('modes', {})
-            endpoints_info = self.get_capability_value('endpoints', {})
-            
+            modes = self.get_capability_value("modes", {})
+            endpoints_info = self.get_capability_value("endpoints", {})
+
             if modes:
                 available_modes = []
-                
+
                 # Erstelle Modi-Liste aus Capabilities
                 for mode_key, mode_info in modes.items():
-                    if mode_info.get('available', False):
+                    if mode_info.get("available", False):
                         # Bestimme ob Modus optimal ist
-                        optimal = mode_info.get('optimal', False)
+                        optimal = mode_info.get("optimal", False)
                         status_text = "✅ Optimal" if optimal else "⚠️ Eingeschränkt"
-                        
+
                         # Finde zugehörige Endpoints
                         mode_endpoints = []
                         for endpoint_key, endpoint_info in endpoints_info.items():
                             if mode_key in endpoint_key.lower() or endpoint_key.lower() in mode_key.lower():
-                                if endpoint_info.get('available', False):
-                                    mode_endpoints.append(endpoint_info.get('path', ''))
-                        
+                                if endpoint_info.get("available", False):
+                                    mode_endpoints.append(endpoint_info.get("path", ""))
+
                         # Fallback Endpoint
                         if not mode_endpoints:
-                            mode_endpoints = ['/v2/query']
-                        
+                            mode_endpoints = ["/v2/query"]
+
                         # Beschreibung erstellen
-                        requires = mode_info.get('requires', [])
+                        requires = mode_info.get("requires", [])
                         description = f"{status_text} - Benötigt: {', '.join(requires)}"
-                        
+
                         display_name = mode_key.upper()
-                        
-                        available_modes.append({
-                            'key': mode_key.lower(),
-                            'display': display_name,
-                            'endpoints': mode_endpoints,
-                            'description': description,
-                            'optimal': optimal
-                        })
-                
+
+                        available_modes.append(
+                            {
+                                "key": mode_key.lower(),
+                                "display": display_name,
+                                "endpoints": mode_endpoints,
+                                "description": description,
+                                "optimal": optimal,
+                            }
+                        )
+
                 if available_modes:
                     # Sortiere: Optimale Modi zuerst
-                    available_modes.sort(key=lambda m: (not m.get('optimal', False), m['key']))
+                    available_modes.sort(key=lambda m: (not m.get("optimal", False), m["key"]))
                     logger.info(f"✅ {len(available_modes)} Frage-Modi aus Capabilities: {[m['key'] for m in available_modes]}")
                     return available_modes
-        
+
         # Fallback: API-Call (für Rückwärtskompatibilität)
         try:
             response = requests.get(f"{API_BASE_URL}/modes", timeout=10)
             if response.status_code == 200:
                 data = response.json()
-                modes = data.get('modes', {})
+                modes = data.get("modes", {})
                 available_modes = []
-                
+
                 for mode_key, mode_info in modes.items():
-                    status = mode_info.get('status')
-                    if status == 'implemented':
-                        display_name = mode_info.get('display_name', mode_key)
-                        description = mode_info.get('description', '')
-                        
+                    status = mode_info.get("status")
+                    if status == "implemented":
+                        display_name = mode_info.get("display_name", mode_key)
+                        description = mode_info.get("description", "")
+
                         if len(description) > 50:
                             description = description[:47] + "..."
-                        
-                        available_modes.append({
-                            'key': mode_key.lower(),
-                            'display': display_name,
-                            'endpoints': mode_info.get('endpoints', []),
-                            'description': description
-                        })
-                
+
+                        available_modes.append(
+                            {
+                                "key": mode_key.lower(),
+                                "display": display_name,
+                                "endpoints": mode_info.get("endpoints", []),
+                                "description": description,
+                            }
+                        )
+
                 if available_modes:
                     logger.info(f"✅ {len(available_modes)} Frage-Modi vom API")
                     return available_modes
         except Exception as e:
             logger.debug(f"Fallback API-Call fehlgeschlagen: {e}")
-        
+
         # Final Fallback
         logger.warning("⚠️ Verwende Standard-Modi (Fallback)")
         return [
-            {'key': 'veritas', 'display': 'VERITAS', 'endpoints': ['/v2/query'], 'description': 'Standard RAG', 'optimal': True},
-            {'key': 'chat', 'display': 'CHAT', 'endpoints': ['/v2/query'], 'description': 'Chat-Modus', 'optimal': True}
+            {
+                "key": "veritas",
+                "display": "VERITAS",
+                "endpoints": ["/v2/query"],
+                "description": "Standard RAG",
+                "optimal": True,
+            },
+            {"key": "chat", "display": "CHAT", "endpoints": ["/v2/query"], "description": "Chat-Modus", "optimal": True},
         ]
-    
+
     def create_main_window(self):
         """Erstellt das Hauptfenster"""
         if self.main_window:
             logger.warning("Hauptfenster bereits vorhanden")
             return
-        
+
         self.main_window = MainChatWindow(self.thread_manager, self)
         logger.info("Hauptfenster erstellt")
-    
+
     def create_child_chat_window(self):
         """Erstellt ein neues Child-Chat-Fenster"""
         self._window_counter += 1
         window_id = f"Chat-{self._window_counter:03d}"
-        
+
         child_window = ChildChatWindow(window_id, self.thread_manager, self)
         self.child_windows[window_id] = child_window
-        
+
         logger.info(f"Child-Fenster {window_id} erstellt - Gesamt: {len(self.child_windows)}")
-    
+
     def handle_main_window_closing(self):
         """
         Behandelt das Schließen des Hauptfensters
@@ -2860,33 +2932,34 @@ class VeritasApp:
         if self.child_windows:
             # Wähle das erste Child-Fenster für automatische Übernahme
             child_id, child_window = next(iter(self.child_windows.items()))
-            
+
             # Inhalt automatisch übernehmen (technisch bedingt)
             if child_window.chat_messages and self.main_window:
                 child_window.transfer_to_window(self.main_window)
                 logger.info(f"Chat-Inhalt von {child_id} automatisch ins Hauptfenster übernommen")
-                
+
                 # Status aktualisieren
-                self.main_window.status_var.set(f"Chat von {child_id} übernommen - {len(self.child_windows)-1} weitere Fenster")
-            
+                self.main_window.status_var.set(
+                    f"Chat von {child_id} übernommen - {len(self.child_windows)-1} weitere Fenster"
+                )
+
             # Child-Window schließen
             self._close_child_window(child_id)
-        
+
         else:
             # Keine Child-Fenster - Anwendung beenden
             self._shutdown_application()
-    
+
     def handle_child_window_closing(self, child_window: ChildChatWindow):
         """Behandelt das Schließen eines Child-Fensters"""
         window_id = child_window.window_id
-        
+
         if child_window.chat_messages:
             # Frage, ob Inhalt ins Hauptfenster übernommen werden soll
             result = messagebox.askyesnocancel(
-                "Chat übernehmen?",
-                f"Möchten Sie den Chat '{window_id}' ins Hauptfenster übernehmen?"
+                "Chat übernehmen?", f"Möchten Sie den Chat '{window_id}' ins Hauptfenster übernehmen?"
             )
-            
+
             if result is True:  # Ja - Übernehmen
                 if self.main_window:
                     child_window.transfer_to_window(self.main_window)
@@ -2895,39 +2968,39 @@ class VeritasApp:
             elif result is None:  # Abbrechen
                 return  # Schließen abbrechen
             # Bei "Nein" wird ohne Übernahme geschlossen
-        
+
         # Child-Window schließen
         self._close_child_window(window_id)
-    
+
     def _close_child_window(self, window_id: str):
         """Schließt ein Child-Fenster sauber"""
         if window_id in self.child_windows:
             child_window = self.child_windows[window_id]
             child_window.close_window()
             del self.child_windows[window_id]
-            
+
             logger.info(f"Child-Fenster {window_id} geschlossen - Verbleibend: {len(self.child_windows)}")
-            
+
             # Status im Hauptfenster aktualisieren
             if self.main_window:
                 self.main_window.status_var.set(f"Bereit - {len(self.child_windows)} Child-Fenster")
-    
+
     def _shutdown_application(self):
         """Beendet die Anwendung sauber"""
         if self._shutdown_initiated:
             logger.debug("Shutdown bereits initiiert, überspringe...")
             return
-            
+
         self._shutdown_initiated = True
         logger.info("Beende Anwendung...")
-        
+
         # Alle Child-Fenster schließen
         for window_id in list(self.child_windows.keys()):
             self._close_child_window(window_id)
-        
+
         # Thread-Manager herunterfahren
         self.thread_manager.shutdown_all()
-        
+
         # Hauptfenster schließen
         if self.main_window and self.main_window.window:
             try:
@@ -2936,140 +3009,146 @@ class VeritasApp:
             except tk.TclError:
                 # Widget bereits zerstört
                 pass
-        
+
         logger.info("Anwendung beendet")
-    
+
     def _load_last_conversation(self):
         """Lädt automatisch die letzte Conversation beim Start"""
         try:
             recent_chats = self.main_window._get_recent_chats()
             if recent_chats:
                 latest_chat = recent_chats[0]  # Neueste Chat (nach mtime sortiert)
-                chat_path = latest_chat['path']
-                chat_name = latest_chat['name']
-                
+                chat_path = latest_chat["path"]
+                chat_name = latest_chat["name"]
+
                 # Prüfe ob die Datei nicht älter als 7 Tage ist
                 import time
-                age_days = (time.time() - latest_chat['mtime']) / (24 * 60 * 60)
-                
+
+                age_days = (time.time() - latest_chat["mtime"]) / (24 * 60 * 60)
+
                 if age_days <= 7:  # Nur Chats der letzten Woche automatisch laden
                     try:
-                        with open(chat_path, 'r', encoding='utf-8') as f:
+                        with open(chat_path, "r", encoding="utf-8") as f:
                             chat_messages = json.load(f)
-                        
+
                         # Validiere Chat-Format
                         if isinstance(chat_messages, list) and len(chat_messages) > 0:
                             self.main_window.chat_messages = chat_messages
-                            
+
                             # Status-Update
                             import os
+
                             filename = os.path.basename(chat_path)
                             logger.info(f"Letzte Conversation automatisch geladen: {chat_name} ({filename})")
-                            
+
                             # Session-ID aus Chat extrahieren falls vorhanden
                             for msg in chat_messages:
-                                if isinstance(msg, dict) and msg.get('session_id'):
-                                    self.main_window.session_id = msg['session_id']
+                                if isinstance(msg, dict) and msg.get("session_id"):
+                                    self.main_window.session_id = msg["session_id"]
                                     break
-                            
+
                             return True
-                            
+
                     except Exception as e:
                         logger.warning(f"Fehler beim Laden der letzten Conversation: {e}")
                 else:
                     logger.info(f"Letzte Conversation ist {age_days:.1f} Tage alt - überspringe automatisches Laden")
-            
+
         except Exception as e:
             logger.debug(f"Keine automatische Conversation-Wiederherstellung möglich: {e}")
-        
+
         return False
-    
+
     def run(self):
         """Startet die Anwendung"""
         try:
             # Hauptfenster erstellen
             self.create_main_window()
-            
+
             # Versuche letzte Conversation zu laden
             self._load_last_conversation()
-            
+
             # Willkommensnachricht (nur wenn keine Conversation geladen wurde)
             if not self.main_window.chat_messages:
                 welcome_message = {
-                    'role': 'system',
-                    'content': f'Willkommen bei Veritas v{__version__}! 🚀\n'
-                              f'Backend-API: {API_BASE_URL}\n'
-                              f'Drücken Sie "➕ Neuer Chat" um weitere Fenster zu öffnen.',
-                    'timestamp': datetime.now().isoformat()
+                    "role": "system",
+                    "content": f"Willkommen bei Veritas v{__version__}! 🚀\n"
+                    f"Backend-API: {API_BASE_URL}\n"
+                    f'Drücken Sie "➕ Neuer Chat" um weitere Fenster zu öffnen.',
+                    "timestamp": datetime.now().isoformat(),
                 }
                 self.main_window.chat_messages.append(welcome_message)
-            
+
             self.main_window.update_chat_display()
-            
+
             # Main-Loop starten
             logger.info("Starte Tkinter Main-Loop...")
             self.main_window.window.mainloop()
-            
+
         except Exception as e:
             logger.error(f"Fehler in der Hauptschleife: {e}")
             import traceback
+
             traceback.print_exc()  # Vollständigen Traceback ausgeben
             messagebox.showerror("Kritischer Fehler", f"Anwendung muss beendet werden:\n{e}")
         finally:
             self._shutdown_application()
 
+
 # Globaler App-Referenz für Fenster-Management
 _veritas_app_instance = None
+
 
 def get_veritas_app():
     """Gibt die globale VeritasApp-Instanz zurück."""
     global _veritas_app_instance
     return _veritas_app_instance
 
+
 class ModernVeritasApp:
     """
     Moderne Veritas App mit integrierter Chat-GUI und UDS3 v3.0 Support
     """
-    
+
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("💬 Veritas Chat - Moderne GUI")
         self.root.geometry("900x700")
         self.root.minsize(700, 500)
-        
+
         # Globale App-Instanz setzen
         global _veritas_app_instance
         _veritas_app_instance = self
-        
+
         # Initialisierung
         self._init_directories()
         self._init_gui_state()
         self._init_threading()
         self._init_chat_persistence()  # ✨ NEU: Chat-Persistierung
-        
+
         # GUI Setup
         self.setup_styles()
         self.create_layout()
         self.setup_bindings()
-        
+
         # Startup
         self.load_last_chat()
         self.update_recent_chats_dropdown()
         self.check_api_status()
-        
+
         # ✨ NEU: Session-Restore-Dialog anzeigen
         self._show_session_restore_dialog()
-        
+
         logger.info(f"Moderne Veritas App v{__version__} initialisiert")
-    
+
     def _init_directories(self):
         """Initialisiert Verzeichnisse"""
         self.chats_dir = os.path.join("data", "chats")
         if not os.path.exists(self.chats_dir):
             os.makedirs(self.chats_dir)
-        
+
         self.last_chat_file = os.path.join(self.chats_dir, ".last_chat")
-    
+
     def _init_gui_state(self):
         """Initialisiert GUI-Status"""
         self.current_chat_id = None
@@ -3081,27 +3160,29 @@ class ModernVeritasApp:
         self.context_files = []
         self.api_connected = False
         self.session_id = None  # API Session ID
-        
+
         # ✨ NEU: Chat-Persistierung
         from uuid import uuid4
+
         self.current_session_id = str(uuid4())  # Eindeutige Session-ID
-        
+
         # Backend Capabilities
         self.capabilities: Dict[str, Any] = {}
-        
+
         # Quality-Enhanced Chat Integration
         self.quality_formatter = None
         self.quality_enabled = True
         self._init_quality_enhancement()
-    
+
     def _init_threading(self):
         """Initialisiert Thread-Kommunikation"""
         self.ui_queue = queue.Queue()
         self.chat_windows_lock = threading.Lock()
         self._setup_queue_processing()
-    
+
     def _setup_queue_processing(self):
         """Richtet Queue-Verarbeitung ein"""
+
         def process_queue():
             try:
                 while True:
@@ -3113,104 +3194,103 @@ class ModernVeritasApp:
                         break
             except Exception as e:
                 logger.error(f"Fehler beim Verarbeiten der UI-Queue: {e}")
-            
+
             self.root.after(100, process_queue)
-        
+
         self.root.after(100, process_queue)
-    
+
     def _handle_queue_task(self, task):
         """Behandelt Queue-Tasks"""
-        task_type = task.get('type')
-        
-        if task_type == 'send_message':
+        task_type = task.get("type")
+
+        if task_type == "send_message":
             self._handle_send_message_task(task)
-        elif task_type == 'receive_response':
+        elif task_type == "receive_response":
             self._handle_receive_response_task(task)
-        elif task_type == 'update_status':
+        elif task_type == "update_status":
             self._handle_update_status_task(task)
         else:
             logger.warning(f"Unbekannter Queue-Task-Typ: {task_type}")
-    
+
     def _init_quality_enhancement(self):
         """Initialisiert Quality-Enhanced-Features"""
         try:
             from quality_enhanced_chat_formatter import QualityEnhancedResponseFormatter
+
             self.quality_formatter = QualityEnhancedResponseFormatter()
             logger.info("✅ Quality-Enhanced Chat Formatter geladen")
         except ImportError as e:
             logger.warning(f"Quality-Enhanced Features nicht verfügbar: {e}")
             self.quality_formatter = None
             self.quality_enabled = False
-    
+
     def _init_chat_persistence(self):
         """Initialisiert Chat-Persistierung Service"""
         try:
             from backend.services.chat_persistence_service import ChatPersistenceService
             from shared.chat_schema import ChatSession
-            
+
             self.chat_persistence = ChatPersistenceService()
-            self.chat_session = ChatSession(
-                session_id=self.current_session_id,
-                llm_model=self.selected_llm or "llama3.1:8b"
-            )
-            
+            self.chat_session = ChatSession(session_id=self.current_session_id, llm_model=self.selected_llm or "llama3.1:8b")
+
             logger.info(f"✅ Chat-Persistierung initialisiert (Session: {self.current_session_id[:8]}...)")
-            
+
             # Auto-Backup beim Start (falls nötig)
             self.chat_persistence.auto_backup_if_needed()
-            
+
         except Exception as e:
             logger.error(f"❌ Chat-Persistierung konnte nicht initialisiert werden: {e}")
             self.chat_persistence = None
             self.chat_session = None
-    
+
     def _show_session_restore_dialog(self):
         """Zeigt Session-Restore-Dialog beim Start"""
         try:
             # Prüfe ob Chat-Persistence verfügbar
-            if not hasattr(self, 'chat_persistence') or not self.chat_persistence:
+            if not hasattr(self, "chat_persistence") or not self.chat_persistence:
                 logger.info("Chat-Persistence nicht verfügbar, überspringe Session-Restore")
                 return
-            
+
             # Lade Settings
-            import os
             import json
+            import os
+
             settings_file = os.path.join("data", "session_restore_settings.json")
             auto_restore = False
-            
+
             if os.path.exists(settings_file):
                 try:
-                    with open(settings_file, 'r') as f:
+                    with open(settings_file, "r") as f:
                         settings = json.load(f)
-                        auto_restore = settings.get('auto_restore', False)
+                        auto_restore = settings.get("auto_restore", False)
                 except:
                     pass
-            
+
             # Auto-Restore: Lade letzte Session ohne Dialog
             if auto_restore:
-                sessions = self.chat_persistence.list_chat_sessions(limit=1, sort_by='updated_at', reverse=True)
+                sessions = self.chat_persistence.list_chat_sessions(limit=1, sort_by="updated_at", reverse=True)
                 if sessions:
-                    session_id = sessions[0]['session_id']
+                    session_id = sessions[0]["session_id"]
                     self._restore_session(session_id)
                     logger.info(f"✅ Auto-Restore: Session {session_id[:8]}... wiederhergestellt")
                     return
-            
+
             # Zeige Dialog
             from frontend.ui.veritas_ui_session_dialog import show_session_restore_dialog
-            
+
             # Dialog nach kurzem Delay anzeigen (damit GUI vollständig geladen ist)
             self.root.after(500, lambda: self._show_restore_dialog_delayed())
-            
+
         except Exception as e:
             logger.error(f"Fehler beim Anzeigen des Session-Restore-Dialogs: {e}")
-    
+
     def _show_restore_dialog_delayed(self):
         """Zeigt Session-Restore-Dialog (delayed)"""
         try:
             from frontend.ui.veritas_ui_session_dialog import show_session_restore_dialog
-            
+
             session_id = show_session_restore_dialog(self.root, self.chat_persistence)
-            
+
             if session_id:
                 # Session wiederherstellen
                 self._restore_session(session_id)
@@ -3218,389 +3298,359 @@ class ModernVeritasApp:
             else:
                 # Neuen Chat starten (bereits geschehen)
                 logger.info("🆕 Neuer Chat gestartet")
-                
+
         except Exception as e:
             logger.error(f"Fehler im Session-Restore-Dialog: {e}")
-    
+
     def _restore_session(self, session_id: str):
         """Stellt eine Session wieder her"""
         try:
             # Lade Session
             loaded_session = self.chat_persistence.load_chat_session(session_id)
-            
+
             if not loaded_session:
                 messagebox.showerror("Fehler", f"Session konnte nicht geladen werden: {session_id[:8]}...")
                 return
-            
+
             # Ersetze aktuelle Session
             self.chat_session = loaded_session
             self.current_session_id = loaded_session.session_id
-            
+
             # Konvertiere Messages zu chat_messages Format
             self.chat_messages = []
             for msg in loaded_session.messages:
-                self.chat_messages.append({
-                    'role': msg.role,
-                    'content': msg.content,
-                    'timestamp': msg.timestamp.strftime('%H:%M:%S'),
-                    'metadata': msg.metadata
-                })
-            
+                self.chat_messages.append(
+                    {
+                        "role": msg.role,
+                        "content": msg.content,
+                        "timestamp": msg.timestamp.strftime("%H:%M:%S"),
+                        "metadata": msg.metadata,
+                    }
+                )
+
             # Update Display
             self.update_chat_display()
             self.update_message_count()
-            
+
             # Status-Update
             self.status_var.set(f"Session wiederhergestellt: {loaded_session.title}")
-            
+
             logger.info(f"✅ Session wiederhergestellt: {loaded_session.title} ({len(loaded_session.messages)} Nachrichten)")
-            
+
         except Exception as e:
             logger.error(f"Fehler beim Wiederherstellen der Session: {e}")
             messagebox.showerror("Fehler", f"Session-Wiederherstellung fehlgeschlagen:\n{e}")
-    
+
     def _open_session_manager(self):
         """Öffnet Session-Manager-Fenster"""
         try:
             from frontend.ui.veritas_ui_session_manager import show_session_manager
-            
+
             # Öffne Session-Manager mit Callback
-            show_session_manager(
-                self.root,
-                self.chat_persistence,
-                on_session_opened=self._restore_session
-            )
-            
+            show_session_manager(self.root, self.chat_persistence, on_session_opened=self._restore_session)
+
             logger.info("Session-Manager geöffnet")
-            
+
         except Exception as e:
             logger.error(f"Fehler beim Öffnen des Session-Managers: {e}")
             messagebox.showerror("Fehler", f"Session-Manager konnte nicht geöffnet werden:\n{e}")
 
-    
     def setup_styles(self):
         """Konfiguriert moderne Styles"""
         self.style = ttk.Style()
-        self.style.theme_use('clam')
-        
+        self.style.theme_use("clam")
+
         # Farbschema mit Quality-Enhancement
         self.colors = {
-            'primary': '#2E86AB',
-            'success': '#28A745',
-            'warning': '#F18F01',
-            'danger': '#C73E1D',
-            'secondary': '#6C757D',
-            'light': '#F8F9FA',
-            'dark': '#343A40',
-            'chat_bg': '#FFFFFF',
-            'input_bg': '#F7F7F7',
+            "primary": "#2E86AB",
+            "success": "#28A745",
+            "warning": "#F18F01",
+            "danger": "#C73E1D",
+            "secondary": "#6C757D",
+            "light": "#F8F9FA",
+            "dark": "#343A40",
+            "chat_bg": "#FFFFFF",
+            "input_bg": "#F7F7F7",
             # Quality-Enhancement Farben
-            'quality_high': '#4CAF50',
-            'quality_medium': '#FF9800',
-            'quality_low': '#F44336',
-            'quality_bg': '#F8FFF8',
-            'sources_bg': '#F0F8FF',
-            'suggestions_bg': '#FFFAF0'
+            "quality_high": "#4CAF50",
+            "quality_medium": "#FF9800",
+            "quality_low": "#F44336",
+            "quality_bg": "#F8FFF8",
+            "sources_bg": "#F0F8FF",
+            "suggestions_bg": "#FFFAF0",
         }
-        
+
         # Custom Styles
-        self.style.configure('Header.TLabel', font=('Segoe UI', 12, 'bold'))
-        self.style.configure('Status.TLabel', font=('Segoe UI', 9))
-        self.style.configure('Chat.TFrame', relief='flat', borderwidth=1)
-        self.style.configure('Control.TFrame', relief='ridge', borderwidth=1)
-        self.style.configure('Compact.TCombobox', font=('Segoe UI', 8))
-        self.style.configure('Compact.TLabel', font=('Segoe UI', 8))
-    
+        self.style.configure("Header.TLabel", font=("Segoe UI", 12, "bold"))
+        self.style.configure("Status.TLabel", font=("Segoe UI", 9))
+        self.style.configure("Chat.TFrame", relief="flat", borderwidth=1)
+        self.style.configure("Control.TFrame", relief="ridge", borderwidth=1)
+        self.style.configure("Compact.TCombobox", font=("Segoe UI", 8))
+        self.style.configure("Compact.TLabel", font=("Segoe UI", 8))
+
     def create_layout(self):
         """Erstellt das Haupt-Layout"""
         self.create_compact_header()
         self.create_chat_area()
         self.create_input_area()
         self.create_status_bar()
-    
+
     def create_compact_header(self):
         """Erstellt kompakten Header"""
         header_frame = ttk.Frame(self.root)
         header_frame.pack(fill=tk.X, padx=5, pady=2)
-        
+
         # Linke Seite: Menü
         left_section = ttk.Frame(header_frame)
         left_section.pack(side=tk.LEFT)
-        
-        self.menu_button = ttk.Button(left_section, text="☰", width=3,
-                                     command=self.show_hamburger_menu)
+
+        self.menu_button = ttk.Button(left_section, text="☰", width=3, command=self.show_hamburger_menu)
         self.menu_button.pack(side=tk.LEFT, padx=(0, 5))
-        
+
         # Mittlere Sektion: Chat-Steuerung
         middle_section = ttk.Frame(header_frame)
         middle_section.pack(side=tk.LEFT, padx=8)
-        
-        ttk.Button(middle_section, text="➕ Neu", command=self.new_chat, 
-                  width=8).pack(side=tk.LEFT, padx=1)
-        
+
+        ttk.Button(middle_section, text="➕ Neu", command=self.new_chat, width=8).pack(side=tk.LEFT, padx=1)
+
         self.recent_chats_var = tk.StringVar(value="Kürzliche Chats")
         self.recent_chats_combo = ttk.Combobox(
-            middle_section,
-            textvariable=self.recent_chats_var,
-            state="readonly",
-            width=14,
-            font=('Segoe UI', 9)
+            middle_section, textvariable=self.recent_chats_var, state="readonly", width=14, font=("Segoe UI", 9)
         )
         self.recent_chats_combo.pack(side=tk.LEFT, padx=1)
-        self.recent_chats_combo.bind('<<ComboboxSelected>>', self.on_recent_chat_selected)
-        
+        self.recent_chats_combo.bind("<<ComboboxSelected>>", self.on_recent_chat_selected)
+
         # Rechte Seite: Status und UDS3-Info
         right_section = ttk.Frame(header_frame)
         right_section.pack(side=tk.RIGHT)
-        
+
         # UDS3 Status
         uds3_status = "🔥 UDS3" if self.is_uds3_available() else "⚙️ Standard"
-        self.uds3_label = ttk.Label(right_section, text=uds3_status, 
-                                   style='Compact.TLabel',
-                                   foreground=self.colors['success'] if self.is_uds3_available() else self.colors['secondary'])
+        self.uds3_label = ttk.Label(
+            right_section,
+            text=uds3_status,
+            style="Compact.TLabel",
+            foreground=self.colors["success"] if self.is_uds3_available() else self.colors["secondary"],
+        )
         self.uds3_label.pack(side=tk.RIGHT, padx=5)
-        
+
         # Nachrichten-Zähler
-        self.message_count_label = ttk.Label(right_section, text="0", 
-                                            style='Compact.TLabel',
-                                            foreground=self.colors['secondary'])
+        self.message_count_label = ttk.Label(
+            right_section, text="0", style="Compact.TLabel", foreground=self.colors["secondary"]
+        )
         self.message_count_label.pack(side=tk.RIGHT, padx=5)
-        
+
         # API-Status
-        self.api_status_label = ttk.Label(right_section, text="🔴", 
-                                         style='Compact.TLabel')
+        self.api_status_label = ttk.Label(right_section, text="🔴", style="Compact.TLabel")
         self.api_status_label.pack(side=tk.RIGHT, padx=2)
-    
+
     def create_chat_area(self):
         """Erstellt Chat-Bereich"""
         chat_container = ttk.Frame(self.root)
         chat_container.pack(fill=tk.BOTH, expand=True, padx=5, pady=2)
-        
+
         # Chat-Display
         self.chat_text = scrolledtext.ScrolledText(
             chat_container,
             wrap=tk.WORD,
-            font=('Segoe UI', 10),
-            bg=self.colors['chat_bg'],
-            relief='flat',
+            font=("Segoe UI", 10),
+            bg=self.colors["chat_bg"],
+            relief="flat",
             borderwidth=1,
-            state='disabled'
+            state="disabled",
         )
         self.chat_text.pack(fill=tk.BOTH, expand=True)
-        
+
         # Chat-Tags für Styling
         self.setup_chat_tags()
-    
+
     def setup_chat_tags(self):
         """Konfiguriert Chat-Text-Tags mit Quality-Enhancement-Support"""
-        self.chat_text.tag_configure("user", foreground="#0066CC", font=('Segoe UI', 10, 'bold'))
-        self.chat_text.tag_configure("assistant", foreground="#006600", font=('Segoe UI', 10))
-        self.chat_text.tag_configure("system", foreground="#666666", font=('Segoe UI', 9, 'italic'))
-        self.chat_text.tag_configure("timestamp", foreground="#999999", font=('Segoe UI', 8))
-        self.chat_text.tag_configure("error", foreground="#CC0000", font=('Segoe UI', 10, 'bold'))
-        self.chat_text.tag_configure("uds3", foreground="#FF6600", font=('Segoe UI', 9, 'bold'))
-        
+        self.chat_text.tag_configure("user", foreground="#0066CC", font=("Segoe UI", 10, "bold"))
+        self.chat_text.tag_configure("assistant", foreground="#006600", font=("Segoe UI", 10))
+        self.chat_text.tag_configure("system", foreground="#666666", font=("Segoe UI", 9, "italic"))
+        self.chat_text.tag_configure("timestamp", foreground="#999999", font=("Segoe UI", 8))
+        self.chat_text.tag_configure("error", foreground="#CC0000", font=("Segoe UI", 10, "bold"))
+        self.chat_text.tag_configure("uds3", foreground="#FF6600", font=("Segoe UI", 9, "bold"))
+
         # Quality-Enhancement-Tags
-        self.chat_text.tag_configure("quality", 
-                                   foreground="#4CAF50", 
-                                   font=('Segoe UI', 9, 'italic'),
-                                   background="#F8FFF8")
-        self.chat_text.tag_configure("sources", 
-                                   foreground="#2196F3", 
-                                   font=('Segoe UI', 9),
-                                   background="#F0F8FF")
-        self.chat_text.tag_configure("suggestions", 
-                                   foreground="#FF9800", 
-                                   font=('Segoe UI', 9, 'italic'),
-                                   background="#FFFAF0")
-    
+        self.chat_text.tag_configure("quality", foreground="#4CAF50", font=("Segoe UI", 9, "italic"), background="#F8FFF8")
+        self.chat_text.tag_configure("sources", foreground="#2196F3", font=("Segoe UI", 9), background="#F0F8FF")
+        self.chat_text.tag_configure("suggestions", foreground="#FF9800", font=("Segoe UI", 9, "italic"), background="#FFFAF0")
+
     def create_input_area(self):
         """Erstellt Eingabe-Bereich"""
         input_container = ttk.Frame(self.root)
         input_container.pack(fill=tk.X, padx=5, pady=2)
-        
+
         # Kontext-Zeile
         top_row = ttk.Frame(input_container)
         top_row.pack(fill=tk.X, pady=(0, 2))
-        
-        self.add_doc_button = ttk.Button(top_row, text="📎 Dokument hinzufügen", 
-                                        command=self.add_document, width=20)
+
+        self.add_doc_button = ttk.Button(top_row, text="📎 Dokument hinzufügen", command=self.add_document, width=20)
         self.add_doc_button.pack(side=tk.LEFT)
-        
+
         # UDS3 Security Button
         if self.is_uds3_available():
-            self.classify_button = ttk.Button(top_row, text="🔒 Klassifizieren", 
-                                            command=self.classify_document, width=15)
+            self.classify_button = ttk.Button(top_row, text="🔒 Klassifizieren", command=self.classify_document, width=15)
             self.classify_button.pack(side=tk.LEFT, padx=(5, 0))
-        
+
         self.context_files_frame = ttk.Frame(top_row)
         self.context_files_frame.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(5, 0))
-        
+
         # Haupt-Eingabe
         input_frame = ttk.Frame(input_container)
         input_frame.pack(fill=tk.X)
-        
+
         self.input_text = tk.Text(
             input_frame,
             height=3,
             wrap=tk.WORD,
-            font=('Segoe UI', 10),
-            bg=self.colors['input_bg'],
-            relief='solid',
-            borderwidth=1
+            font=("Segoe UI", 10),
+            bg=self.colors["input_bg"],
+            relief="solid",
+            borderwidth=1,
         )
         self.input_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 2))
-        
+
         send_frame = ttk.Frame(input_frame)
         send_frame.pack(side=tk.RIGHT, fill=tk.Y)
-        
-        self.send_button = ttk.Button(send_frame, text="📤\nSenden", 
-                                     command=self.send_message, width=10)
+
+        self.send_button = ttk.Button(send_frame, text="📤\nSenden", command=self.send_message, width=10)
         self.send_button.pack(fill=tk.BOTH, expand=True)
-        
+
         # Steuerung-Zeile
         bottom_row = ttk.Frame(input_container)
         bottom_row.pack(fill=tk.X, pady=(2, 0))
-        
+
         # Frage-Modus Auswahl
-        ttk.Label(bottom_row, text="📋", style='Compact.TLabel').pack(side=tk.LEFT, padx=(0, 2))
-        
+        ttk.Label(bottom_row, text="📋", style="Compact.TLabel").pack(side=tk.LEFT, padx=(0, 2))
+
         self.mode_var = tk.StringVar(value="veritas")
         # Dynamisch Frage-Modi laden
         logger.info("🔄 Lade Frage-Modi für GUI...")
         available_question_methods = self.get_available_question_methods()
-        mode_values = [method['display'] for method in available_question_methods]
-        self.question_methods_data = {method['display']: method for method in available_question_methods}
-        
+        mode_values = [method["display"] for method in available_question_methods]
+        self.question_methods_data = {method["display"]: method for method in available_question_methods}
+
         logger.info(f"📋 GUI: {len(mode_values)} Modi geladen: {mode_values}")
-        
+
         self.mode_combo = ttk.Combobox(
-            bottom_row,
-            textvariable=self.mode_var,
-            values=mode_values,
-            state="readonly",
-            width=15,
-            font=('Segoe UI', 8)
+            bottom_row, textvariable=self.mode_var, values=mode_values, state="readonly", width=15, font=("Segoe UI", 8)
         )
         self.mode_combo.pack(side=tk.LEFT, padx=(0, 5))
-        self.mode_combo.bind('<<ComboboxSelected>>', self.on_mode_change)
-        
+        self.mode_combo.bind("<<ComboboxSelected>>", self.on_mode_change)
+
         # Setze Standard-Wert
         if mode_values:
             self.mode_combo.set(mode_values[0])
             logger.info(f"📋 Standard-Modus gesetzt: {mode_values[0]}")
         else:
             logger.warning("⚠️ Keine Modi verfügbar für Dropdown")
-        
+
         # LLM-Auswahl
-        ttk.Label(bottom_row, text="🤖", style='Compact.TLabel').pack(side=tk.LEFT, padx=(5, 2))
-        
+        ttk.Label(bottom_row, text="🤖", style="Compact.TLabel").pack(side=tk.LEFT, padx=(5, 2))
+
         # Dynamisch LLM-Modelle laden
         available_models = self.get_available_llm_models()
-        
+
         # Validiere selected_llm und setze Default wenn nötig
         if not self.selected_llm or self.selected_llm not in available_models:
             if available_models:
                 self.selected_llm = available_models[0]
                 logger.info(f"🎯 Default-Modell gesetzt: {self.selected_llm}")
-        
+
         self.llm_var = tk.StringVar(value=self.selected_llm)
-        
+
         self.llm_combo = ttk.Combobox(
-            bottom_row, 
-            textvariable=self.llm_var,
-            values=available_models,
-            state="readonly",
-            width=15,
-            font=('Segoe UI', 8)
+            bottom_row, textvariable=self.llm_var, values=available_models, state="readonly", width=15, font=("Segoe UI", 8)
         )
         self.llm_combo.pack(side=tk.LEFT)
-        self.llm_combo.bind('<<ComboboxSelected>>', self.on_llm_change)
-        
+        self.llm_combo.bind("<<ComboboxSelected>>", self.on_llm_change)
+
         # Eingabe-Bindings
-        self.input_text.bind('<Control-Return>', lambda e: self.send_message())
-        self.input_text.bind('<KeyPress>', self.on_typing)
-    
+        self.input_text.bind("<Control-Return>", lambda e: self.send_message())
+        self.input_text.bind("<KeyPress>", self.on_typing)
+
     def create_status_bar(self):
         """Erstellt Status-Bar"""
         status_frame = ttk.Frame(self.root)
         status_frame.pack(fill=tk.X, side=tk.BOTTOM, padx=5, pady=1)
-        
+
         # Verbindungsstatus
-        self.connection_status = ttk.Label(status_frame, text="🔴 Nicht verbunden",
-                                         style='Compact.TLabel', foreground=self.colors['secondary'])
+        self.connection_status = ttk.Label(
+            status_frame, text="🔴 Nicht verbunden", style="Compact.TLabel", foreground=self.colors["secondary"]
+        )
         self.connection_status.pack(side=tk.LEFT)
-        
+
         # API-Status für Anfragen
-        self.api_status_label = ttk.Label(status_frame, text="⚪",
-                                        style='Compact.TLabel')
+        self.api_status_label = ttk.Label(status_frame, text="⚪", style="Compact.TLabel")
         self.api_status_label.pack(side=tk.LEFT, padx=(5, 0))
-        
+
         # Status-Variable für Text-Updates
         self.status_var = tk.StringVar()
         self.status_var.set("Bereit")
-        
+
         # Chat-Info
-        self.chat_info_label = ttk.Label(status_frame, textvariable=self.status_var,
-                                       style='Compact.TLabel', foreground=self.colors['secondary'])
+        self.chat_info_label = ttk.Label(
+            status_frame, textvariable=self.status_var, style="Compact.TLabel", foreground=self.colors["secondary"]
+        )
         self.chat_info_label.pack(side=tk.LEFT, padx=15)
-        
+
         # Auto-Speicher
-        self.auto_save_label = ttk.Label(status_frame, text="💾 Auto-Speichern", 
-                                        style='Compact.TLabel', 
-                                        foreground=self.colors['secondary'])
+        self.auto_save_label = ttk.Label(
+            status_frame, text="💾 Auto-Speichern", style="Compact.TLabel", foreground=self.colors["secondary"]
+        )
         self.auto_save_label.pack(side=tk.RIGHT, padx=5)
-        
+
         # Quality-Enhancement Status
         if self.quality_enabled:
             quality_text = "⚡ Quality-Enhanced" if self.quality_formatter else "⚡ Quality (Error)"
-            quality_color = self.colors['success'] if self.quality_formatter else self.colors['danger']
-            self.quality_status_label = ttk.Label(status_frame, text=quality_text,
-                                                 style='Compact.TLabel',
-                                                 foreground=quality_color)
+            quality_color = self.colors["success"] if self.quality_formatter else self.colors["danger"]
+            self.quality_status_label = ttk.Label(
+                status_frame, text=quality_text, style="Compact.TLabel", foreground=quality_color
+            )
             self.quality_status_label.pack(side=tk.RIGHT, padx=5)
-        
+
         # Version mit UDS3 Status
         version_text = f"v{__version__}"
         if self.is_uds3_available():
             version_text += " | UDS3"
-        
-        version_label = ttk.Label(status_frame, text=version_text, 
-                                 style='Compact.TLabel', 
-                                 foreground=self.colors['secondary'])
+
+        version_label = ttk.Label(status_frame, text=version_text, style="Compact.TLabel", foreground=self.colors["secondary"])
         version_label.pack(side=tk.RIGHT, padx=5)
-    
+
     def setup_bindings(self):
         """Setup Event-Bindings"""
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
-        
+
         # Keyboard shortcuts
-        self.root.bind('<Control-n>', lambda e: self.new_chat())
-        self.root.bind('<Control-o>', lambda e: self.load_chat())
-        self.root.bind('<Control-s>', lambda e: self.save_chat())
-        self.root.bind('<F5>', lambda e: self.check_api_status())
-    
+        self.root.bind("<Control-n>", lambda e: self.new_chat())
+        self.root.bind("<Control-o>", lambda e: self.load_chat())
+        self.root.bind("<Control-s>", lambda e: self.save_chat())
+        self.root.bind("<F5>", lambda e: self.check_api_status())
+
     def show_hamburger_menu(self):
         """Zeigt Hamburger-Menü"""
         try:
             menu = tk.Menu(self.root, tearoff=0)
-            
+
             # Chat-Funktionen
             menu.add_command(label="➕ Neuer Chat", command=self.new_chat)
             menu.add_command(label="📁 Chat öffnen", command=self.load_chat)
             menu.add_command(label="💾 Chat speichern", command=self.save_chat)
             menu.add_command(label="📋 Chat exportieren", command=self.export_chat)
-            
+
             # ✨ NEU: Session-Verwaltung
             try:
-                if hasattr(self, 'chat_persistence') and self.chat_persistence:
+                if hasattr(self, "chat_persistence") and self.chat_persistence:
                     menu.add_separator()
                     menu.add_command(label="📁 Sessions verwalten", command=self._open_session_manager)
             except Exception as e:
                 logger.warning(f"Session-Manager Menü übersprungen: {e}")
-            
+
             menu.add_separator()
-            
+
             # UDS3 Funktionen
             try:
                 if self.is_uds3_available():
@@ -3611,44 +3661,44 @@ class ModernVeritasApp:
                     menu.add_separator()
             except Exception as e:
                 logger.warning(f"UDS3-Menü-Einträge übersprungen: {e}")
-            
+
             # Einstellungen
             try:
                 auto_save_text = "❌ Auto-Speichern" if self.auto_save_enabled else "✅ Auto-Speichern"
                 menu.add_command(label=auto_save_text, command=self.toggle_auto_save)
             except Exception as e:
                 logger.warning(f"Auto-Save Menü übersprungen: {e}")
-            
+
             # Quality-Enhancement Toggle
             try:
-                if hasattr(self, 'quality_formatter'):
+                if hasattr(self, "quality_formatter"):
                     quality_text = "❌ Quality-Enhancement" if self.quality_enabled else "✅ Quality-Enhancement"
                     menu.add_command(label=quality_text, command=self.toggle_quality_enhancement)
             except Exception as e:
                 logger.warning(f"Quality-Enhancement Menü übersprungen: {e}")
-            
+
             try:
                 menu.add_command(label="⚙️ Einstellungen", command=self.open_settings)
                 menu.add_command(label="🔧 API-Verbindung prüfen", command=self.check_api_status)
             except Exception as e:
                 logger.warning(f"Einstellungen-Menü übersprungen: {e}")
-            
+
             menu.add_separator()
-            
+
             # IMMI-Karte
             try:
                 menu.add_command(label="🗺️ IMMI-Karte öffnen", command=self.open_immi_map)
                 menu.add_separator()
             except Exception as e:
                 logger.warning(f"IMMI-Karte Menü übersprungen: {e}")
-            
+
             # Info & Hilfe
             menu.add_command(label="ℹ️ Über Veritas", command=self.show_about)
             menu.add_command(label="❓ Hilfe", command=self.show_help)
-            
+
             menu.add_separator()
             menu.add_command(label="❌ Beenden", command=self.on_closing)
-            
+
             # Menu anzeigen
             try:
                 x = self.menu_button.winfo_rootx()
@@ -3662,133 +3712,128 @@ class ModernVeritasApp:
         except Exception as e:
             logger.error(f"Fehler in show_hamburger_menu: {e}")
             messagebox.showerror("Fehler", f"Hamburger-Menü konnte nicht erstellt werden:\n{e}")
-    
+
     def new_chat(self):
         """Startet neuen Chat"""
-        if self.chat_messages and messagebox.askyesno("Neuer Chat", 
-                                                     "Aktuellen Chat verwerfen und neu starten?"):
+        if self.chat_messages and messagebox.askyesno("Neuer Chat", "Aktuellen Chat verwerfen und neu starten?"):
             self.chat_messages = []
             self.current_chat_id = None
             self.current_chat_file = None
-            
+
             self.update_chat_display()
             self.update_title("Neuer Chat")
             self.update_message_count()
-            
+
             self.add_system_message("🆕 Neuer Chat gestartet")
-    
+
     def load_chat(self):
         """Lädt Chat aus Datei"""
         filepath = filedialog.askopenfilename(
             title="Chat-Datei öffnen",
             initialdir=self.chats_dir,
-            filetypes=[("JSON-Dateien", "*.json"), ("Alle Dateien", "*.*")]
+            filetypes=[("JSON-Dateien", "*.json"), ("Alle Dateien", "*.*")],
         )
-        
+
         if filepath:
             self.load_chat_file(filepath)
-    
+
     def load_chat_file(self, filepath):
         """Lädt spezifischen Chat"""
         try:
-            with open(filepath, 'r', encoding='utf-8') as f:
+            with open(filepath, "r", encoding="utf-8") as f:
                 data = json.load(f)
-            
-            self.chat_messages = data.get('messages', [])
+
+            self.chat_messages = data.get("messages", [])
             self.current_chat_file = filepath
-            self.current_chat_id = data.get('chat_id', os.path.basename(filepath))
-            
-            title = data.get('title', 'Unbenannter Chat')
+            self.current_chat_id = data.get("chat_id", os.path.basename(filepath))
+
+            title = data.get("title", "Unbenannter Chat")
             self.update_title(title)
             self.update_chat_display()
             self.update_message_count()
-            
+
             self.update_recent_chats_dropdown()
-            
+
             self.add_system_message(f"📁 Chat geladen: {os.path.basename(filepath)}")
-            
+
         except Exception as e:
             messagebox.showerror("Fehler", f"Konnte Chat nicht laden:\n{e}")
-    
+
     def save_chat(self):
         """Speichert aktuellen Chat"""
         if not self.chat_messages:
             messagebox.showinfo("Info", "Keine Nachrichten zum Speichern")
             return
-        
+
         if not self.current_chat_file:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"chat_{timestamp}.json"
             self.current_chat_file = os.path.join(self.chats_dir, filename)
-        
+
         try:
             chat_data = {
-                'chat_id': self.current_chat_id or f"chat_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
-                'title': self.root.title().replace('💬 ', '').replace(' - Veritas Chat', ''),
-                'messages': self.chat_messages,
-                'created_at': datetime.now().isoformat(),
-                'llm_model': self.selected_llm,
-                'uds3_available': self.is_uds3_available()
+                "chat_id": self.current_chat_id or f"chat_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+                "title": self.root.title().replace("💬 ", "").replace(" - Veritas Chat", ""),
+                "messages": self.chat_messages,
+                "created_at": datetime.now().isoformat(),
+                "llm_model": self.selected_llm,
+                "uds3_available": self.is_uds3_available(),
             }
-            
-            with open(self.current_chat_file, 'w', encoding='utf-8') as f:
+
+            with open(self.current_chat_file, "w", encoding="utf-8") as f:
                 json.dump(chat_data, f, ensure_ascii=False, indent=2)
-            
+
             self.update_recent_chats_dropdown()
             self.add_system_message(f"💾 Chat gespeichert: {os.path.basename(self.current_chat_file)}")
-            
+
         except Exception as e:
             messagebox.showerror("Fehler", f"Konnte Chat nicht speichern:\n{e}")
-    
+
     def export_chat(self):
         """Exportiert Chat als Office-Dokument (Word/Excel) oder Textdatei"""
         if not self.chat_messages:
             messagebox.showinfo("Info", "Keine Nachrichten zum Exportieren")
             return
-        
+
         # Prüfe ob Office Export verfügbar ist
         if OFFICE_EXPORT_AVAILABLE:
             try:
                 # Zeige Export-Dialog (Word/Excel mit Optionen)
                 dialog = ExportDialog(self.root, self.chat_messages)
                 result = dialog.show()
-                
+
                 if result:
                     # Export durchführen
                     export_service = OfficeExportService()
-                    format_type = result.get('format', 'docx')
-                    period = result.get('period', 'all')
-                    include_metadata = result.get('include_metadata', True)
-                    include_sources = result.get('include_sources', True)
-                    custom_filename = result.get('filename')
-                    
+                    format_type = result.get("format", "docx")
+                    period = result.get("period", "all")
+                    include_metadata = result.get("include_metadata", True)
+                    include_sources = result.get("include_sources", True)
+                    custom_filename = result.get("filename")
+
                     try:
-                        if format_type == 'docx':
+                        if format_type == "docx":
                             filepath = export_service.export_to_word(
                                 messages=self.chat_messages,
                                 filename=custom_filename,
                                 period=period,
                                 include_metadata=include_metadata,
-                                include_sources=include_sources
+                                include_sources=include_sources,
                             )
                         else:  # xlsx
                             filepath = export_service.export_to_excel(
-                                messages=self.chat_messages,
-                                filename=custom_filename,
-                                period=period
+                                messages=self.chat_messages, filename=custom_filename, period=period
                             )
-                        
+
                         messagebox.showinfo(
-                            "Export erfolgreich", 
-                            f"Chat exportiert nach:\n{filepath}\n\n"
-                            f"Format: {format_type.upper()}\n"
-                            f"Zeitraum: {period}"
+                            "Export erfolgreich",
+                            f"Chat exportiert nach:\n{filepath}\n\n" f"Format: {format_type.upper()}\n" f"Zeitraum: {period}",
                         )
-                        
+
                     except Exception as e:
                         logger.error(f"Export-Fehler: {e}")
                         messagebox.showerror("Export-Fehler", f"Konnte nicht exportieren:\n{e}")
-                        
+
             except Exception as e:
                 logger.error(f"Dialog-Fehler: {e}")
                 # Fallback zu Text-Export
@@ -3796,334 +3841,309 @@ class ModernVeritasApp:
         else:
             # Fallback: Text-Export
             self._export_chat_as_text()
-    
+
     def _export_chat_as_text(self):
         """Fallback: Exportiert Chat als einfache Textdatei"""
         filepath = filedialog.asksaveasfilename(
-            title="Chat exportieren",
-            defaultextension=".txt",
-            filetypes=[("Textdateien", "*.txt"), ("Alle Dateien", "*.*")]
+            title="Chat exportieren", defaultextension=".txt", filetypes=[("Textdateien", "*.txt"), ("Alle Dateien", "*.*")]
         )
-        
+
         if filepath:
             try:
-                with open(filepath, 'w', encoding='utf-8') as f:
+                with open(filepath, "w", encoding="utf-8") as f:
                     f.write(f"Veritas Chat Export v{__version__}\n")
                     f.write(f"========================================\n\n")
                     f.write(f"Exportiert am: {datetime.now().strftime('%d.%m.%Y %H:%M:%S')}\n")
                     f.write(f"LLM-Modell: {self.selected_llm}\n")
                     f.write(f"UDS3 v3.0: {'Verfügbar' if self.is_uds3_available() else 'Nicht verfügbar'}\n\n")
-                    
+
                     for msg in self.chat_messages:
-                        role = msg.get('role', 'unknown').title()
-                        content = msg.get('content', '')
-                        timestamp = msg.get('timestamp', '')
-                        
+                        role = msg.get("role", "unknown").title()
+                        content = msg.get("content", "")
+                        timestamp = msg.get("timestamp", "")
+
                         f.write(f"[{timestamp}] {role}:\n")
                         f.write(f"{content}\n\n")
                         f.write("-" * 50 + "\n\n")
-                
+
                 messagebox.showinfo("Export", f"Chat exportiert nach:\n{filepath}")
-                
+
             except Exception as e:
                 messagebox.showerror("Fehler", f"Konnte Chat nicht exportieren:\n{e}")
-    
+
     def send_message(self):
         """Sendet Nachricht"""
-        message = self.input_text.get('1.0', tk.END).strip()
+        message = self.input_text.get("1.0", tk.END).strip()
         if not message:
             return
-        
+
         # Nachricht zur Chat-Historie hinzufügen
         user_message = {
-            'role': 'user',
-            'content': message,
-            'timestamp': datetime.now().strftime('%H:%M:%S'),
-            'mode': self.selected_mode,
-            'llm': self.selected_llm
+            "role": "user",
+            "content": message,
+            "timestamp": datetime.now().strftime("%H:%M:%S"),
+            "mode": self.selected_mode,
+            "llm": self.selected_llm,
         }
         self.chat_messages.append(user_message)
-        
+
         # ✨ NEU: Nachricht zur Chat-Session hinzufügen
-        if hasattr(self, 'chat_session') and self.chat_session:
+        if hasattr(self, "chat_session") and self.chat_session:
             self.chat_session.add_message(
-                role='user',
-                content=message,
-                metadata={
-                    'mode': self.selected_mode,
-                    'llm': self.selected_llm
-                }
+                role="user", content=message, metadata={"mode": self.selected_mode, "llm": self.selected_llm}
             )
             # Auto-Save
-            if hasattr(self, 'chat_persistence') and self.chat_persistence:
+            if hasattr(self, "chat_persistence") and self.chat_persistence:
                 self.chat_persistence.save_chat_session(self.chat_session)
-        
+
         # Eingabe leeren
-        self.input_text.delete('1.0', tk.END)
-        
+        self.input_text.delete("1.0", tk.END)
+
         # Chat-Display aktualisieren
         self.update_chat_display()
         self.update_message_count()
-        
+
         # Auto-Speichern (legacy)
         if self.auto_save_enabled:
             self.auto_save_chat()
-        
+
         # API-Anfrage über Queue
-        task = {
-            'type': 'send_message',
-            'message': message,
-            'mode': self.selected_mode,
-            'llm': self.selected_llm
-        }
+        task = {"type": "send_message", "message": message, "mode": self.selected_mode, "llm": self.selected_llm}
         self.ui_queue.put(task)
-    
+
     def _handle_send_message_task(self, task):
         """Behandelt Nachricht-Senden-Task"""
         try:
             self.api_status_label.config(text="🔄")
-            
+
             # UDS3 Integration - erweiterte Verarbeitung
-            if self.is_uds3_available() and task['mode'] == 'classify':
+            if self.is_uds3_available() and task["mode"] == "classify":
                 self._handle_uds3_classification(task)
             else:
                 self._send_to_api(task)
-                
+
         except Exception as e:
             self.add_error_message(f"Fehler beim Senden: {e}")
-    
+
     def _handle_uds3_classification(self, task):
         """Behandelt UDS3-Klassifizierung"""
         try:
-            message = task['message']
-            
+            message = task["message"]
+
             # Sicherheitsklassifizierung
             if self.security_manager:
                 security_result = self.security_manager.classify_administrative_document(message, {})
-                
+
                 # Qualitätsbewertung
-                quality_result = self.quality_manager.assess_content_quality(message, 'text') if self.quality_manager else None
-                
+                quality_result = self.quality_manager.assess_content_quality(message, "text") if self.quality_manager else None
+
                 # Ergebnis formatieren
                 response = f"🔒 UDS3 Sicherheitsklassifizierung:\n"
                 response += f"• Sicherheitsstufe: {security_result.get('security_level', 'UNBEKANNT')}\n"
                 response += f"• Administrative Klassifizierung: {security_result.get('admin_classification', 'UNBEKANNT')}\n"
                 response += f"• Begründung: {security_result.get('reasoning', 'Keine Begründung')}\n"
-                
+
                 if quality_result:
                     response += f"\n📊 Qualitätsbewertung:\n"
                     response += f"• Qualitätsstufe: {quality_result.get('quality_level', 'UNBEKANNT')}\n"
                     response += f"• Score: {quality_result.get('score', 0):.2f}\n"
                     response += f"• Details: {quality_result.get('reasoning', 'Keine Details')}\n"
-                
+
                 # Moderne Queue-basierte Response-Behandlung
-                if hasattr(self, 'main_window') and self.main_window:
+                if hasattr(self, "main_window") and self.main_window:
                     # UDS3 Response-Daten strukturieren
                     uds3_response = {
-                        'content': response,
-                        'sources': [],
-                        'rag_metadata': {
-                            'security_classification': security_result,
-                            'quality_assessment': quality_result,
-                            'uds3_processed': True
+                        "content": response,
+                        "sources": [],
+                        "rag_metadata": {
+                            "security_classification": security_result,
+                            "quality_assessment": quality_result,
+                            "uds3_processed": True,
                         },
-                        'citations_info': {},
-                        'turn_id': f"uds3_{int(time.time())}"
+                        "citations_info": {},
+                        "turn_id": f"uds3_{int(time.time())}",
                     }
-                    
+
                     # Queue-Message senden
-                    queue_message = QueueMessage(
-                        sender_id="UDS3",
-                        message_type="backend_response",
-                        data=uds3_response
-                    )
-                    
+                    queue_message = QueueMessage(sender_id="UDS3", message_type="backend_response", data=uds3_response)
+
                     self.main_window.queue.put(queue_message)
                     logger.info(f"UDS3-Response an Hauptfenster-Queue gesendet")
                 else:
                     # Fallback für alte Architektur
-                    if self.root and hasattr(self.root, 'winfo_exists') and self.root.winfo_exists():
+                    if self.root and hasattr(self.root, "winfo_exists") and self.root.winfo_exists():
                         self.root.after(500, lambda: self.receive_api_response(response, "uds3"))
             else:
                 self.add_error_message("UDS3 SecurityManager nicht verfügbar")
-                
+
         except Exception as e:
             self.add_error_message(f"UDS3 Klassifizierungsfehler: {e}")
-    
+
     def _send_to_api(self, task):
         """Sendet Nachricht an API - Echte Implementierung"""
         try:
-            message = task['message']
-            mode = task.get('mode', 'veritas')
-            llm = task.get('llm', 'llama3.1:8b')
-            
+            message = task["message"]
+            mode = task.get("mode", "veritas")
+            llm = task.get("llm", "llama3.1:8b")
+
             # API-Session erstellen falls nicht vorhanden
-            if not hasattr(self, 'session_id') or not self.session_id:
+            if not hasattr(self, "session_id") or not self.session_id:
                 if not self._create_api_session():
                     self.add_error_message("Fehler: Keine API-Session verfügbar")
                     return
-            
+
             # Endpoint basierend auf gewähltem Modus bestimmen
             endpoint = "/ask"  # Standard
-            
+
             # Prüfe aktuellen Modus
-            if hasattr(self, 'current_question_mode') and self.current_question_mode:
-                mode_key = self.current_question_mode.get('key', 'veritas')
-                endpoints = self.current_question_mode.get('endpoints', ['/ask'])
-                
+            if hasattr(self, "current_question_mode") and self.current_question_mode:
+                mode_key = self.current_question_mode.get("key", "veritas")
+                endpoints = self.current_question_mode.get("endpoints", ["/ask"])
+
                 if endpoints:
                     endpoint = endpoints[0]  # Verwende ersten verfügbaren Endpoint
-                    
+
                 logger.info(f"Verwende Modus: {mode_key}, Endpoint: {endpoint}")
-            
+
             # API-Payload entsprechend dem FastAPI Schema
             payload = {
                 "question": message,
                 "session_id": self.session_id,
-                "temperature": self.temperature_var.get() if hasattr(self, 'temperature_var') else 0.7,
-                "max_tokens": self.max_tokens_var.get() if hasattr(self, 'max_tokens_var') else 500,
-                "top_p": self.top_p_var.get() if hasattr(self, 'top_p_var') else 0.9,
+                "temperature": self.temperature_var.get() if hasattr(self, "temperature_var") else 0.7,
+                "max_tokens": self.max_tokens_var.get() if hasattr(self, "max_tokens_var") else 500,
+                "top_p": self.top_p_var.get() if hasattr(self, "top_p_var") else 0.9,
                 "model": llm,
-                "collection": None  # Optional: spezifische Collection
+                "collection": None,  # Optional: spezifische Collection
             }
-            
+
             # 🆕 CHAT-HISTORY INTEGRATION: Sende aktuelle Session-History
-            if hasattr(self, 'chat_session') and self.chat_session and hasattr(self.chat_session, 'messages'):
+            if hasattr(self, "chat_session") and self.chat_session and hasattr(self.chat_session, "messages"):
                 try:
                     # Extrahiere letzte 10 Messages für Context
-                    recent_messages = self.chat_session.messages[-10:] if len(self.chat_session.messages) > 10 else self.chat_session.messages
-                    
+                    recent_messages = (
+                        self.chat_session.messages[-10:]
+                        if len(self.chat_session.messages) > 10
+                        else self.chat_session.messages
+                    )
+
                     # Konvertiere zu API-Format
-                    chat_history = [
-                        {
-                            'role': msg.role,
-                            'content': msg.content
-                        }
-                        for msg in recent_messages
-                    ]
-                    
+                    chat_history = [{"role": msg.role, "content": msg.content} for msg in recent_messages]
+
                     # Füge zur Payload hinzu (nur für /ask Endpoint)
                     if endpoint == "/ask" and len(chat_history) > 0:
                         payload["chat_history"] = chat_history
                         logger.info(f"📝 Chat-History hinzugefügt: {len(chat_history)} Messages")
                 except Exception as e:
                     logger.warning(f"⚠️ Chat-History-Integration fehlgeschlagen: {e}")
-            
+
             # Spezielle Payload-Anpassungen für verschiedene Modi
             if endpoint == "/vpb/ask":
                 payload = {
                     "question": message,
                     "analysis_depth": "standard",
                     "include_suggestions": True,
-                    "session_id": self.session_id
+                    "session_id": self.session_id,
                 }
             elif endpoint in ["/covina/ask", "/covina/search"]:
                 payload["quality_level"] = "high"
                 payload["enhancement_mode"] = "full"
-            
+
             # Status-Update
             self.api_status_label.config(text="📤")
             self.status_var.set("Sende Nachricht an API...")
-            
+
             # API-Anfrage senden
             logger.info(f"Sende API-Anfrage an {API_BASE_URL}{endpoint}")
             logger.debug(f"Payload: {json.dumps(payload, indent=2)}")
-            
+
             api_response = requests.post(
                 f"{API_BASE_URL}{endpoint}",
                 json=payload,
                 timeout=60,  # Erhöhtes Timeout für komplexe Anfragen
-                headers={
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                }
+                headers={"Content-Type": "application/json", "Accept": "application/json"},
             )
-            
+
             if api_response.status_code == 200:
                 response_data = api_response.json()
                 logger.info(f"API-Response erfolgreich: {api_response.status_code}")
                 logger.debug(f"Response: {json.dumps(response_data, indent=2)}")
-                
+
                 # Antwort verarbeiten
                 if endpoint == "/vpb/ask":
                     # VPB-spezifische Response
-                    answer = response_data.get('answer', 'Keine Antwort erhalten.')
-                    sources = response_data.get('sources', [])
-                    process_found = response_data.get('process_found', False)
-                    suggestions = response_data.get('suggestions', [])
-                    
+                    answer = response_data.get("answer", "Keine Antwort erhalten.")
+                    sources = response_data.get("sources", [])
+                    process_found = response_data.get("process_found", False)
+                    suggestions = response_data.get("suggestions", [])
+
                     # VPB-Antwort formatieren
                     formatted_response = f"🏛️ **VPB-Analyse:**\n\n{answer}"
                     if process_found:
                         formatted_response += f"\n\n✅ **Prozess gefunden**"
                     if suggestions:
                         formatted_response += f"\n\n💡 **Vorschläge:**\n" + "\n".join([f"• {s}" for s in suggestions])
-                    
+
                     final_answer = formatted_response
                 else:
                     # Standard RAG Response
-                    answer = response_data.get('answer', 'Keine Antwort erhalten.')
-                    enhanced_answer = response_data.get('enhanced_answer')
-                    quality_summary = response_data.get('quality_summary')
-                    sources = response_data.get('sources', [])
-                    suggestions = response_data.get('suggestions', [])
-                    confidence_score = response_data.get('confidence_score', 0.0)
-                    
+                    answer = response_data.get("answer", "Keine Antwort erhalten.")
+                    enhanced_answer = response_data.get("enhanced_answer")
+                    quality_summary = response_data.get("quality_summary")
+                    sources = response_data.get("sources", [])
+                    suggestions = response_data.get("suggestions", [])
+                    confidence_score = response_data.get("confidence_score", 0.0)
+
                     # Enhanced Answer verwenden falls verfügbar
                     final_answer = enhanced_answer if enhanced_answer else answer
-                    
+
                     # Quality Summary hinzufügen falls verfügbar
                     if quality_summary:
                         final_answer += f"\n\n📊 **Qualitätsbewertung:** {quality_summary}"
-                
+
                 # Sources formatieren
                 sources_text = ""
                 if sources:
                     sources_text = "\n\n� **Quellen:**\n"
                     for i, source in enumerate(sources[:3], 1):  # Max 3 Quellen anzeigen
-                        title = source.get('title', source.get('metadata', {}).get('title', f'Quelle {i}'))
+                        title = source.get("title", source.get("metadata", {}).get("title", f"Quelle {i}"))
                         sources_text += f"{i}. {title[:80]}...\n"
-                
+
                 # Status zurücksetzen
                 self.api_status_label.config(text="✅")
                 self.status_var.set("Antwort erhalten")
-                
+
                 # Moderne Queue-basierte Response-Behandlung für Hauptfenster
-                if hasattr(self, 'main_window') and self.main_window:
+                if hasattr(self, "main_window") and self.main_window:
                     # Response-Daten für Queue-Message strukturieren
                     backend_response = {
-                        'content': final_answer + sources_text,
-                        'sources': sources,
-                        'rag_metadata': response_data.get('rag_metadata', {}),
-                        'citations_info': response_data.get('citations_info', {}),
-                        'turn_id': response_data.get('turn_id'),
-                        'confidence_score': confidence_score,
-                        'quality_summary': quality_summary,
+                        "content": final_answer + sources_text,
+                        "sources": sources,
+                        "rag_metadata": response_data.get("rag_metadata", {}),
+                        "citations_info": response_data.get("citations_info", {}),
+                        "turn_id": response_data.get("turn_id"),
+                        "confidence_score": confidence_score,
+                        "quality_summary": quality_summary,
                         # ✨ NEU: Metadata für Raw-Response Debug-View
-                        'metadata': {
-                            'model': payload.get('model', 'unknown'),
-                            'temperature': payload.get('temperature', 'N/A'),
-                            'max_tokens': payload.get('max_tokens', 'N/A'),
-                            'top_p': payload.get('top_p', 'N/A'),
-                            'duration': response_data.get('rag_metadata', {}).get('duration', 'N/A'),
-                            'raw_content': response_data.get('answer', final_answer)  # Ungefilterte LLM-Antwort
-                        }
+                        "metadata": {
+                            "model": payload.get("model", "unknown"),
+                            "temperature": payload.get("temperature", "N/A"),
+                            "max_tokens": payload.get("max_tokens", "N/A"),
+                            "top_p": payload.get("top_p", "N/A"),
+                            "duration": response_data.get("rag_metadata", {}).get("duration", "N/A"),
+                            "raw_content": response_data.get("answer", final_answer),  # Ungefilterte LLM-Antwort
+                        },
                     }
-                    
+
                     # Queue-Message senden an Hauptfenster
-                    queue_message = QueueMessage(
-                        sender_id="API",
-                        message_type="backend_response",
-                        data=backend_response
-                    )
-                    
+                    queue_message = QueueMessage(sender_id="API", message_type="backend_response", data=backend_response)
+
                     self.main_window.queue.put(queue_message)
                     logger.info(f"Backend-Response an Hauptfenster-Queue gesendet: {len(final_answer)} Zeichen")
                 else:
                     # Fallback für alte Architektur
-                    if self.root and hasattr(self.root, 'winfo_exists') and self.root.winfo_exists():
+                    if self.root and hasattr(self.root, "winfo_exists") and self.root.winfo_exists():
                         self.root.after(500, lambda: self.receive_api_response(final_answer + sources_text))
-                
+
             else:
                 # HTTP-Fehler behandeln
                 logger.error(f"API HTTP-Fehler: {api_response.status_code}")
@@ -4132,108 +4152,106 @@ class ModernVeritasApp:
                     error_msg = error_data.get("detail", f"HTTP {api_response.status_code}")
                 except:
                     error_msg = f"API Fehler: HTTP {api_response.status_code}"
-                
+
                 self.api_status_label.config(text="❌")
                 self.add_error_message(f"API-Fehler: {error_msg}")
-                
+
         except requests.exceptions.Timeout:
             logger.error("API-Timeout")
             self.api_status_label.config(text="⏱️")
             self.add_error_message("Timeout: API-Anfrage dauerte zu lange")
-            
+
         except requests.exceptions.ConnectionError:
             logger.error("API-Verbindungsfehler")
             self.api_status_label.config(text="🔌")
             self.add_error_message("Verbindungsfehler: API-Server nicht erreichbar")
-            
+
         except requests.exceptions.RequestException as e:
             logger.error(f"API-Netzwerkfehler: {e}")
             self.api_status_label.config(text="🌐")
             self.add_error_message(f"Netzwerkfehler: {e}")
-            
+
         except Exception as e:
             logger.error(f"Unerwarteter API-Fehler: {e}")
             self.api_status_label.config(text="💥")
             self.add_error_message(f"Unerwarteter Fehler: {e}")
-    
+
     def receive_api_response(self, response, tag="assistant"):
         """Empfängt API-Antwort mit Quality-Enhancement"""
         try:
             # Basis-Message erstellen
             assistant_message = {
-                'role': 'assistant',
-                'content': response,
-                'timestamp': datetime.now().strftime('%H:%M:%S'),
-                'tag': tag
+                "role": "assistant",
+                "content": response,
+                "timestamp": datetime.now().strftime("%H:%M:%S"),
+                "tag": tag,
             }
-            
+
             # Quality Enhancement anwenden falls verfügbar
             if self.quality_enabled and self.quality_formatter and isinstance(response, dict):
                 try:
                     # Response ist bereits ein Dict von der API (mit Quality-Daten)
                     enhanced_response = self.quality_formatter.format_enhanced_response(response)
-                    
+
                     # Enhanced Answer verwenden falls verfügbar
-                    if enhanced_response.get('enhanced_answer'):
-                        assistant_message['content'] = enhanced_response['enhanced_answer']
-                    
+                    if enhanced_response.get("enhanced_answer"):
+                        assistant_message["content"] = enhanced_response["enhanced_answer"]
+
                     # Quality-Informationen hinzufügen
-                    assistant_message.update({
-                        'quality_info': enhanced_response.get('quality_summary', ''),
-                        'enhanced_sources': enhanced_response.get('enhanced_sources', []),
-                        'citations': enhanced_response.get('citations', []),
-                        'display_suggestions': enhanced_response.get('display_suggestions', []),
-                        'confidence_score': response.get('confidence_score', 0.0),
-                        'processing_info': enhanced_response.get('processing_info', '')
-                    })
-                    
+                    assistant_message.update(
+                        {
+                            "quality_info": enhanced_response.get("quality_summary", ""),
+                            "enhanced_sources": enhanced_response.get("enhanced_sources", []),
+                            "citations": enhanced_response.get("citations", []),
+                            "display_suggestions": enhanced_response.get("display_suggestions", []),
+                            "confidence_score": response.get("confidence_score", 0.0),
+                            "processing_info": enhanced_response.get("processing_info", ""),
+                        }
+                    )
+
                     logger.info("✅ Quality Enhancement für Response angewendet")
-                    
+
                 except Exception as quality_error:
                     logger.warning(f"Quality Enhancement fehlgeschlagen: {quality_error}")
                     # Fallback zu Standard-Response
-            
+
             # Message zur History hinzufügen
             self.chat_messages.append(assistant_message)
-            
+
             # ✨ NEU: Nachricht zur Chat-Session hinzufügen
-            if hasattr(self, 'chat_session') and self.chat_session:
-                content = assistant_message['content']
+            if hasattr(self, "chat_session") and self.chat_session:
+                content = assistant_message["content"]
                 if isinstance(content, dict):
-                    content = content.get('answer', str(content))
-                
+                    content = content.get("answer", str(content))
+
                 metadata = {
-                    'tag': tag,
-                    'confidence_score': assistant_message.get('confidence_score', 0.0),
-                    'quality_info': assistant_message.get('quality_info', ''),
-                    'sources': assistant_message.get('enhanced_sources', [])
+                    "tag": tag,
+                    "confidence_score": assistant_message.get("confidence_score", 0.0),
+                    "quality_info": assistant_message.get("quality_info", ""),
+                    "sources": assistant_message.get("enhanced_sources", []),
                 }
-                
-                self.chat_session.add_message(
-                    role='assistant',
-                    content=content,
-                    metadata=metadata
-                )
-                
+
+                self.chat_session.add_message(role="assistant", content=content, metadata=metadata)
+
                 # Auto-Save
-                if hasattr(self, 'chat_persistence') and self.chat_persistence:
+                if hasattr(self, "chat_persistence") and self.chat_persistence:
                     success = self.chat_persistence.save_chat_session(self.chat_session)
                     if success:
                         logger.debug(f"💾 Chat-Session auto-saved: {self.chat_session.session_id[:8]}...")
-            
+
             # Display updaten
             self.update_chat_display()
             self.update_message_count()
             self.api_status_label.config(text="🟢")
-            
+
             # Auto-Save (legacy)
             if self.auto_save_enabled:
                 self.auto_save_chat()
-                
+
         except Exception as e:
             logger.error(f"Fehler beim Verarbeiten der API-Response: {e}")
             self.add_error_message(f"Response-Verarbeitung fehlgeschlagen: {e}")
-    
+
     def add_document(self):
         """Fügt Dokument hinzu"""
         filepath = filedialog.askopenfilename(
@@ -4244,127 +4262,125 @@ class ModernVeritasApp:
                 ("Word-Dateien", "*.docx"),
                 ("Textdateien", "*.txt"),
                 ("Markdown-Dateien", "*.md"),
-                ("Alle Dateien", "*.*")
-            ]
+                ("Alle Dateien", "*.*"),
+            ],
         )
-        
+
         if filepath:
             doc_name = os.path.basename(filepath)
-            current_text = self.input_text.get('1.0', tk.END).strip()
-            
+            current_text = self.input_text.get("1.0", tk.END).strip()
+
             if current_text:
                 new_text = f"{current_text}\n\n📎 Angehängtes Dokument: {doc_name}"
             else:
                 new_text = f"📎 Bitte analysiere das angehängte Dokument: {doc_name}"
-            
-            self.input_text.delete('1.0', tk.END)
-            self.input_text.insert('1.0', new_text)
-            
+
+            self.input_text.delete("1.0", tk.END)
+            self.input_text.insert("1.0", new_text)
+
             self.add_system_message(f"📎 Dokument hinzugefügt: {doc_name}")
-            
+
             # UDS3 Integration - automatische Klassifizierung
             if self.is_uds3_available():
                 self._auto_classify_document(filepath)
-    
+
     def _auto_classify_document(self, filepath):
         """Automatische Dokumentklassifizierung mit UDS3"""
         try:
             # Datei-Inhalt lesen (vereinfacht)
-            with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+            with open(filepath, "r", encoding="utf-8", errors="ignore") as f:
                 content = f.read()[:1000]  # Erste 1000 Zeichen
-            
+
             if self.security_manager:
-                result = self.security_manager.classify_administrative_document(content, {
-                    'filename': os.path.basename(filepath),
-                    'filepath': filepath
-                })
-                
+                result = self.security_manager.classify_administrative_document(
+                    content, {"filename": os.path.basename(filepath), "filepath": filepath}
+                )
+
                 self.add_system_message(
                     f"🔒 Auto-Klassifizierung: {result.get('security_level', 'UNBEKANNT')} | "
                     f"{result.get('admin_classification', 'UNBEKANNT')}"
                 )
         except Exception as e:
             logger.error(f"Auto-Klassifizierung fehlgeschlagen: {e}")
-    
+
     def classify_document(self):
         """Klassifiziert aktuellen Text mit UDS3"""
         if not self.is_uds3_available():
             messagebox.showinfo("UDS3", "UDS3 v3.0 nicht verfügbar")
             return
-        
-        text = self.input_text.get('1.0', tk.END).strip()
+
+        text = self.input_text.get("1.0", tk.END).strip()
         if not text:
             messagebox.showinfo("Klassifizierung", "Bitte geben Sie Text ein")
             return
-        
+
         # Modus auf classify setzen und Nachricht senden
         self.mode_var.set("classify")
         self.send_message()
-    
+
     def assess_quality(self):
         """Bewertet Qualität mit UDS3"""
         if not self.is_uds3_available():
             messagebox.showinfo("UDS3", "UDS3 v3.0 nicht verfügbar")
             return
-        
-        text = self.input_text.get('1.0', tk.END).strip()
+
+        text = self.input_text.get("1.0", tk.END).strip()
         if not text:
             messagebox.showinfo("Qualitätsbewertung", "Bitte geben Sie Text ein")
             return
-        
+
         try:
-            result = self.quality_manager.assess_content_quality(text, 'text')
-            
-            messagebox.showinfo("Qualitätsbewertung", 
-                              f"Qualitätsstufe: {result.get('quality_level', 'UNBEKANNT')}\n"
-                              f"Score: {result.get('score', 0):.2f}\n"
-                              f"Details: {result.get('reasoning', 'Keine Details')}")
+            result = self.quality_manager.assess_content_quality(text, "text")
+
+            messagebox.showinfo(
+                "Qualitätsbewertung",
+                f"Qualitätsstufe: {result.get('quality_level', 'UNBEKANNT')}\n"
+                f"Score: {result.get('score', 0):.2f}\n"
+                f"Details: {result.get('reasoning', 'Keine Details')}",
+            )
         except Exception as e:
             messagebox.showerror("Fehler", f"Qualitätsbewertung fehlgeschlagen:\n{e}")
-    
+
     def batch_process(self):
         """Öffnet Batch-Processing Dialog"""
         if not self.is_uds3_available():
             messagebox.showinfo("UDS3", "UDS3 v3.0 nicht verfügbar")
             return
-        
-        messagebox.showinfo("Batch Processing", 
-                          "Batch-Verarbeitung über ThreadCoordinator-Pipeline\n"
-                          "Diese Funktion wird in einem separaten Dialog implementiert.")
-    
+
+        messagebox.showinfo(
+            "Batch Processing",
+            "Batch-Verarbeitung über ThreadCoordinator-Pipeline\n"
+            "Diese Funktion wird in einem separaten Dialog implementiert.",
+        )
+
     def on_llm_change(self, event=None):
         """Behandelt LLM-Änderung"""
         self.selected_llm = self.llm_var.get()
         self.add_system_message(f"🤖 LLM gewechselt zu: {self.selected_llm}")
-    
+
     def on_mode_change(self, event=None):
         """Behandelt Modus-Änderung"""
         selected_display = self.mode_var.get()
-        
+
         # Finde den entsprechenden Modus in den geladenen Daten
-        if hasattr(self, 'question_methods_data') and selected_display in self.question_methods_data:
+        if hasattr(self, "question_methods_data") and selected_display in self.question_methods_data:
             selected_method = self.question_methods_data[selected_display]
-            mode_key = selected_method['key']
-            description = selected_method['description']
-            
+            mode_key = selected_method["key"]
+            description = selected_method["description"]
+
             self.add_system_message(f"🔄 Frage-Modus gewechselt zu: {selected_display}")
             if description:
                 self.add_system_message(f"ℹ️ {description}")
-                
+
             # Speichere aktuellen Modus für API-Anfragen
             self.current_question_mode = selected_method
             logger.info(f"Modus gewechselt zu: {mode_key} - {selected_display}")
         else:
             # Fallback für alte Modi
-            mode_names = {
-                'ask': 'Fragen',
-                'agent': 'Agent-Modus', 
-                'edit': 'Bearbeitung',
-                'classify': 'UDS3 Klassifizierung'
-            }
+            mode_names = {"ask": "Fragen", "agent": "Agent-Modus", "edit": "Bearbeitung", "classify": "UDS3 Klassifizierung"}
             self.add_system_message(f"🔄 Modus gewechselt zu: {mode_names.get(selected_display, selected_display)}")
-            self.current_question_mode = {'key': selected_display, 'endpoints': ['/ask']}
-    
+            self.current_question_mode = {"key": selected_display, "endpoints": ["/ask"]}
+
     def on_recent_chat_selected(self, event=None):
         """Behandelt Auswahl kürzlicher Chat"""
         selected = self.recent_chats_var.get()
@@ -4374,18 +4390,18 @@ class ModernVeritasApp:
                 full_path = os.path.join(self.chats_dir, filepath)
                 if os.path.exists(full_path):
                     self.load_chat_file(full_path)
-            
+
             self.recent_chats_var.set("Kürzliche Chats")
-    
+
     def update_recent_chats_dropdown(self):
         """Aktualisiert kürzliche Chats Dropdown"""
         try:
             if not os.path.exists(self.chats_dir):
                 return
-            
+
             chat_files = []
             for filename in os.listdir(self.chats_dir):
-                if filename.endswith('.json') and not filename.startswith('.'):
+                if filename.endswith(".json") and not filename.startswith("."):
                     filepath = os.path.join(self.chats_dir, filename)
                     try:
                         title = self.get_chat_title_from_file(filepath) or "Unbenannt"
@@ -4393,42 +4409,42 @@ class ModernVeritasApp:
                         chat_files.append((title, filename, mtime))
                     except:
                         continue
-            
+
             if chat_files:
                 chat_files.sort(key=lambda x: x[2], reverse=True)
-                
+
                 dropdown_values = ["Kürzliche Chats"]
                 for title, filename, _ in chat_files[:8]:
                     display_title = title if len(title) <= 20 else title[:17] + "..."
                     dropdown_values.append(f"{display_title} - {filename}")
-                
-                self.recent_chats_combo['values'] = dropdown_values
-                
+
+                self.recent_chats_combo["values"] = dropdown_values
+
         except Exception as e:
             logger.error(f"Fehler beim Aktualisieren der kürzlichen Chats: {e}")
-    
+
     def get_chat_title_from_file(self, filepath):
         """Extrahiert Chat-Titel aus Datei"""
         try:
-            with open(filepath, 'r', encoding='utf-8') as f:
+            with open(filepath, "r", encoding="utf-8") as f:
                 data = json.load(f)
-                return data.get('title', '')
+                return data.get("title", "")
         except:
-            return ''
-    
+            return ""
+
     def on_typing(self, event=None):
         """Behandelt Tippen-Events"""
         pass
-    
+
     def toggle_auto_save(self):
         """Schaltet Auto-Speichern um"""
         self.auto_save_enabled = not self.auto_save_enabled
         status_text = "💾 Auto-Speichern" if self.auto_save_enabled else "💾 Aus"
         self.auto_save_label.config(text=status_text)
-        
+
         message = "✅ Auto-Speichern aktiviert" if self.auto_save_enabled else "❌ Auto-Speichern deaktiviert"
         self.add_system_message(message)
-    
+
     def auto_save_chat(self):
         """Speichert Chat automatisch"""
         if self.auto_save_enabled and self.chat_messages:
@@ -4436,7 +4452,7 @@ class ModernVeritasApp:
                 self.save_chat()
             except:
                 pass
-    
+
     def _load_backend_capabilities(self):
         """
         Lädt Backend-Capabilities vom /capabilities Endpoint
@@ -4445,97 +4461,96 @@ class ModernVeritasApp:
         try:
             logger.info("🔍 Lade Backend Capabilities...")
             response = requests.get(f"{API_BASE_URL}/capabilities", timeout=10)
-            
+
             if response.status_code == 200:
                 self.capabilities = response.json()
-                
+
                 # Log wichtige Informationen
-                system_info = self.capabilities.get('system', {})
-                features = self.capabilities.get('features', {})
-                
+                system_info = self.capabilities.get("system", {})
+                features = self.capabilities.get("features", {})
+
                 logger.info(f"✅ Backend Capabilities geladen:")
                 logger.info(f"   Version: {system_info.get('version', 'unknown')}")
-                
+
                 # Ollama Status
-                ollama = features.get('ollama', {})
-                if ollama.get('available'):
+                ollama = features.get("ollama", {})
+                if ollama.get("available"):
                     logger.info(f"   Ollama: {ollama.get('model_count', 0)} Modelle verfügbar")
-                
+
                 return True
-                
+
             else:
                 logger.error(f"❌ Capabilities-Fehler: Status {response.status_code}")
                 self.capabilities = {}
                 return False
-                
+
         except Exception as e:
             logger.error(f"❌ Fehler bei Capabilities: {e}")
             self.capabilities = {}
             return False
-    
+
     def is_feature_available(self, feature_path: str) -> bool:
         """
         Prüft ob ein Feature verfügbar ist
-        
+
         Args:
             feature_path: Pfad im Capabilities-Dict, z.B. 'features.ollama.available'
-        
+
         Returns:
             bool: True wenn Feature verfügbar
         """
-        parts = feature_path.split('.')
+        parts = feature_path.split(".")
         current = self.capabilities
-        
+
         for part in parts:
             if isinstance(current, dict) and part in current:
                 current = current[part]
             else:
                 return False
-        
+
         return bool(current)
-    
+
     def get_capability_value(self, path: str, default: Any = None) -> Any:
         """
         Holt einen Wert aus den Capabilities
-        
+
         Args:
             path: Pfad im Capabilities-Dict, z.B. 'features.ollama.models'
             default: Rückgabewert wenn Pfad nicht existiert
-        
+
         Returns:
             Der Wert am Pfad oder default
         """
-        parts = path.split('.')
+        parts = path.split(".")
         current = self.capabilities
-        
+
         for part in parts:
             if isinstance(current, dict) and part in current:
                 current = current[part]
             else:
                 return default
-        
+
         return current
 
-    
     def check_api_status(self):
         """Prüft API-Status und erstellt Session"""
         try:
             # Lade Capabilities zuerst
             if not self.capabilities:
                 self._load_backend_capabilities()
-            
+
             # Versuche zuerst POST Health-Check
             health_data = {"level": "basic", "include_metrics": False}
             response = requests.post(f"{API_BASE_URL}/health", json=health_data, timeout=3)
-            
+
             if response.status_code != 200:
                 # Fallback auf GET
                 response = requests.get(f"{API_BASE_URL}/health", timeout=5)
-            
+
             if response.status_code == 200:
                 self.connection_status.config(text="🟢 Verbunden")
                 self.api_connected = True
-                
+
                 # Session erstellen falls nicht vorhanden
                 if not self.session_id:
                     if self._create_api_session():
@@ -4544,12 +4559,12 @@ class ModernVeritasApp:
                         self.status_var.set("API verbunden - Session-Fehler")
                 else:
                     self.status_var.set("API verbunden")
-                
+
                 # UDS3 Status hinzufügen
                 if self.is_uds3_available():
                     current_status = self.status_var.get()
                     self.status_var.set(f"{current_status} | UDS3 v3.0")
-                    
+
             else:
                 self.connection_status.config(text="🔴 Fehler")
                 self.api_connected = False
@@ -4558,31 +4573,31 @@ class ModernVeritasApp:
             self.connection_status.config(text="🔴 Nicht verbunden")
             self.api_connected = False
             self.status_var.set("Nicht verbunden")
-    
+
     def get_available_llm_models(self):
         """Ruft verfügbare LLM-Modelle aus den Capabilities ab"""
         # Prüfe zuerst Capabilities
         if self.capabilities:
-            models = self.get_capability_value('features.ollama.models', [])
+            models = self.get_capability_value("features.ollama.models", [])
             if models:
                 logger.info(f"✅ {len(models)} LLM-Modelle aus Capabilities geladen")
                 return models
-        
+
         # Fallback: API-Call (für Rückwärtskompatibilität)
         try:
             response = requests.get(f"{API_BASE_URL}/get_models", timeout=10)
             if response.status_code == 200:
                 data = response.json()
-                models_data = data.get('models', [])
-                
+                models_data = data.get("models", [])
+
                 if models_data:
                     # Extrahiere Model-Namen aus der API-Response
                     model_names = []
                     for model in models_data:
-                        model_name = model.get('name', 'unknown')
-                        if model_name != 'unknown':
+                        model_name = model.get("name", "unknown")
+                        if model_name != "unknown":
                             model_names.append(model_name)
-                    
+
                     if model_names:
                         logger.info(f"✅ {len(model_names)} LLM-Modelle vom API abgerufen")
                         return model_names
@@ -4601,20 +4616,14 @@ class ModernVeritasApp:
         except Exception as e:
             logger.error(f"❌ Unerwarteter Fehler beim Abrufen der LLM-Modelle: {e}")
             return ["llama3:latest", "mistral:latest", "codellama:latest"]
-    
+
     def _create_api_session(self) -> bool:
         """Erstellt eine neue API-Session für ModernVeritasApp."""
         try:
-            payload = {
-                "user_id": f"veritas_modern_app_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-            }
-            
-            response = requests.post(
-                f"{API_BASE_URL}/start_session",
-                json=payload,
-                timeout=10
-            )
-            
+            payload = {"user_id": f"veritas_modern_app_{datetime.now().strftime('%Y%m%d_%H%M%S')}"}
+
+            response = requests.post(f"{API_BASE_URL}/start_session", json=payload, timeout=10)
+
             if response.status_code == 200:
                 data = response.json()
                 self.session_id = data.get("session_id")
@@ -4623,54 +4632,54 @@ class ModernVeritasApp:
             else:
                 logger.error(f"Session-Erstellung fehlgeschlagen: HTTP {response.status_code} - {response.text}")
                 return False
-                
+
         except requests.exceptions.RequestException as e:
             logger.error(f"Netzwerkfehler bei Session-Erstellung: {e}")
             return False
         except Exception as e:
             logger.error(f"Fehler bei Session-Erstellung: {e}")
             return False
-    
+
     def load_last_chat(self):
         """Lädt letzten Chat"""
         try:
             if os.path.exists(self.last_chat_file):
-                with open(self.last_chat_file, 'r', encoding='utf-8') as f:
+                with open(self.last_chat_file, "r", encoding="utf-8") as f:
                     filepath = f.read().strip()
                 if filepath and os.path.exists(filepath):
                     self.load_chat_file(filepath)
         except:
             pass
-    
+
     def update_chat_display(self):
         """Aktualisiert Chat-Anzeige mit Quality-Enhancement-Features"""
-        self.chat_text.config(state='normal')
-        self.chat_text.delete('1.0', tk.END)
-        
+        self.chat_text.config(state="normal")
+        self.chat_text.delete("1.0", tk.END)
+
         for msg in self.chat_messages:
-            role = msg.get('role', 'unknown')
-            content = msg.get('content', '')
-            timestamp = msg.get('timestamp', '')
-            tag = msg.get('tag', role)
-            
-            if role == 'system':
+            role = msg.get("role", "unknown")
+            content = msg.get("content", "")
+            timestamp = msg.get("timestamp", "")
+            tag = msg.get("tag", role)
+
+            if role == "system":
                 self.chat_text.insert(tk.END, f"[{timestamp}] ", "timestamp")
                 self.chat_text.insert(tk.END, f"{content}\n\n", "system")
-                
-            elif role == 'user':
+
+            elif role == "user":
                 self.chat_text.insert(tk.END, f"[{timestamp}] Sie:\n", "user")
                 self.chat_text.insert(tk.END, f"{content}\n\n", "user")
-                
-            elif role == 'assistant':
+
+            elif role == "assistant":
                 self.chat_text.insert(tk.END, f"[{timestamp}] Assistent:\n", tag)
                 self.chat_text.insert(tk.END, f"{content}\n", tag)
-                
+
                 # Quality-Informationen anzeigen falls verfügbar
-                if self.quality_enabled and msg.get('quality_info'):
-                    quality_info = msg.get('quality_info', '')
-                    processing_info = msg.get('processing_info', '')
-                    confidence_score = msg.get('confidence_score', 0.0)
-                    
+                if self.quality_enabled and msg.get("quality_info"):
+                    quality_info = msg.get("quality_info", "")
+                    processing_info = msg.get("processing_info", "")
+                    confidence_score = msg.get("confidence_score", 0.0)
+
                     self.chat_text.insert(tk.END, "\n📊 Quality-Info:\n", "quality")
                     if quality_info:
                         self.chat_text.insert(tk.END, f"{quality_info}\n", "quality")
@@ -4678,67 +4687,59 @@ class ModernVeritasApp:
                         self.chat_text.insert(tk.END, f"{processing_info}\n", "quality")
                     if confidence_score > 0:
                         self.chat_text.insert(tk.END, f"🎯 Vertrauen: {confidence_score:.1%}\n", "quality")
-                
+
                 # Enhanced Sources anzeigen
-                enhanced_sources = msg.get('enhanced_sources', [])
+                enhanced_sources = msg.get("enhanced_sources", [])
                 if enhanced_sources:
                     self.chat_text.insert(tk.END, "\n📚 Quellen:\n", "sources")
                     for i, source in enumerate(enhanced_sources[:3], 1):  # Max 3 Quellen anzeigen
-                        quality_indicator = source.get('quality_indicator', '📄')
-                        title = source.get('title', f'Quelle {i}')
-                        quality_level = source.get('quality_level', '')
-                        
+                        quality_indicator = source.get("quality_indicator", "📄")
+                        title = source.get("title", f"Quelle {i}")
+                        quality_level = source.get("quality_level", "")
+
                         source_text = f"{quality_indicator} {title}"
                         if quality_level:
                             source_text += f" ({quality_level})"
-                        
+
                         self.chat_text.insert(tk.END, f"   {source_text}\n", "sources")
-                
+
                 # Display-Suggestions anzeigen
-                suggestions = msg.get('display_suggestions', [])
+                suggestions = msg.get("display_suggestions", [])
                 if suggestions:
                     self.chat_text.insert(tk.END, "\n💡 Verbesserungsvorschläge:\n", "suggestions")
                     for suggestion in suggestions[:2]:  # Max 2 Suggestions
                         self.chat_text.insert(tk.END, f"   • {suggestion}\n", "suggestions")
-                
+
                 self.chat_text.insert(tk.END, "\n", "assistant")
-                
-            elif role == 'error':
+
+            elif role == "error":
                 self.chat_text.insert(tk.END, f"[{timestamp}] Fehler:\n", "error")
                 self.chat_text.insert(tk.END, f"{content}\n\n", "error")
-        
-        self.chat_text.config(state='disabled')
+
+        self.chat_text.config(state="disabled")
         self.chat_text.see(tk.END)
-    
+
     def update_title(self, title):
         """Aktualisiert Fenstertitel"""
         self.root.title(f"💬 {title} - Veritas Chat")
-    
+
     def update_message_count(self):
         """Aktualisiert Nachrichten-Zähler"""
-        count = len([msg for msg in self.chat_messages if msg.get('role') in ['user', 'assistant']])
+        count = len([msg for msg in self.chat_messages if msg.get("role") in ["user", "assistant"]])
         self.message_count_label.config(text=str(count))
-    
+
     def add_system_message(self, message):
         """Fügt System-Nachricht hinzu"""
-        system_msg = {
-            'role': 'system',
-            'content': message,
-            'timestamp': datetime.now().strftime('%H:%M:%S')
-        }
+        system_msg = {"role": "system", "content": message, "timestamp": datetime.now().strftime("%H:%M:%S")}
         self.chat_messages.append(system_msg)
         self.update_chat_display()
-    
+
     def add_error_message(self, message):
         """Fügt Fehler-Nachricht hinzu"""
-        error_msg = {
-            'role': 'error',
-            'content': message,
-            'timestamp': datetime.now().strftime('%H:%M:%S')
-        }
+        error_msg = {"role": "error", "content": message, "timestamp": datetime.now().strftime("%H:%M:%S")}
         self.chat_messages.append(error_msg)
         self.update_chat_display()
-    
+
     def _load_last_conversation_gui(self):
         """Lädt automatisch die letzte Conversation für die GUI"""
         try:
@@ -4746,130 +4747,132 @@ class ModernVeritasApp:
             recent_chats = self._get_recent_chats_gui()
             if recent_chats:
                 latest_chat = recent_chats[0]  # Neueste Chat
-                chat_path = latest_chat['path']
-                chat_name = latest_chat['name']
-                
+                chat_path = latest_chat["path"]
+                chat_name = latest_chat["name"]
+
                 # Prüfe Alter der Datei
                 import time
-                age_days = (time.time() - latest_chat['mtime']) / (24 * 60 * 60)
-                
+
+                age_days = (time.time() - latest_chat["mtime"]) / (24 * 60 * 60)
+
                 if age_days <= 7:  # Nur Chats der letzten Woche
                     try:
-                        with open(chat_path, 'r', encoding='utf-8') as f:
+                        with open(chat_path, "r", encoding="utf-8") as f:
                             chat_messages = json.load(f)
-                        
+
                         if isinstance(chat_messages, list) and len(chat_messages) > 0:
                             self.chat_messages = chat_messages
                             self._conversation_loaded = True
-                            
+
                             # Status-Update
                             import os
+
                             filename = os.path.basename(chat_path)
                             self.status_var.set(f"Letzte Conversation geladen: {filename}")
                             logger.info(f"Letzte Conversation automatisch geladen: {chat_name}")
-                            
+
                             # Session-ID extrahieren
                             for msg in chat_messages:
-                                if isinstance(msg, dict) and msg.get('session_id'):
-                                    self.session_id = msg['session_id']
+                                if isinstance(msg, dict) and msg.get("session_id"):
+                                    self.session_id = msg["session_id"]
                                     break
-                            
+
                             # Chat-Display aktualisieren
                             self.update_chat_display()
                             return True
-                            
+
                     except Exception as e:
                         logger.warning(f"Fehler beim Laden der GUI-Conversation: {e}")
-                        
+
         except Exception as e:
             logger.debug(f"Keine GUI-Conversation-Wiederherstellung möglich: {e}")
-        
+
         return False
-    
+
     def _get_recent_chats_gui(self):
         """GUI-Version von _get_recent_chats"""
         try:
             import glob
             import os
             from pathlib import Path
-            
+
             # Erweiterte Suchpfade für GUI
             search_paths = [
                 os.path.expanduser("~/Documents/*.json"),
-                os.path.expanduser("~/Desktop/*.json"), 
+                os.path.expanduser("~/Desktop/*.json"),
                 os.path.join(os.getcwd(), "*.json"),
                 os.path.join(os.getcwd(), "chats", "*.json"),
                 os.path.join(os.getcwd(), "conversations", "*.json"),
             ]
-            
+
             chat_files = []
             for pattern in search_paths:
                 chat_files.extend(glob.glob(pattern))
-            
+
             unique_files = list(set(chat_files))
             recent_chats = []
-            
+
             for file_path in unique_files:
                 try:
-                    with open(file_path, 'r', encoding='utf-8') as f:
+                    with open(file_path, "r", encoding="utf-8") as f:
                         data = json.load(f)
-                    
+
                     if isinstance(data, list) and len(data) > 0:
                         first_item = data[0]
-                        if isinstance(first_item, dict) and 'role' in first_item and 'content' in first_item:
+                        if isinstance(first_item, dict) and "role" in first_item and "content" in first_item:
                             chat_name = Path(file_path).stem
-                            
+
                             for msg in data:
-                                if msg.get('role') == 'user':
-                                    content = msg.get('content', '').strip()
+                                if msg.get("role") == "user":
+                                    content = msg.get("content", "").strip()
                                     if content:
                                         chat_name = content[:50] + ("..." if len(content) > 50 else "")
                                         break
-                            
-                            recent_chats.append({
-                                'name': chat_name,
-                                'path': file_path,
-                                'mtime': os.path.getmtime(file_path)
-                            })
+
+                            recent_chats.append({"name": chat_name, "path": file_path, "mtime": os.path.getmtime(file_path)})
                 except:
                     continue
-            
-            recent_chats.sort(key=lambda x: x['mtime'], reverse=True)
+
+            recent_chats.sort(key=lambda x: x["mtime"], reverse=True)
             return recent_chats
-            
+
         except Exception as e:
             logger.debug(f"Fehler bei _get_recent_chats_gui: {e}")
             return []
-    
+
     def open_settings(self):
         """Öffnet Einstellungen"""
         messagebox.showinfo("Einstellungen", "Einstellungen-Dialog wird implementiert")
-    
+
     def show_about(self):
         """Zeigt Über-Dialog mit UDS3 und Quality-Enhancement Status"""
         uds3_info = ""
         if self.is_uds3_available():
-            uds3_info = "\n\n🔥 UDS3 v3.0 Core Features:\n" \
-                       "• OptimizedUnifiedDatabaseStrategy\n" \
-                       "• Administrative Dokument-Klassifizierung\n" \
-                       "• Security Level Management\n" \
-                       "• Quality Assessment & Batch Processing"
+            uds3_info = (
+                "\n\n🔥 UDS3 v3.0 Core Features:\n"
+                "• OptimizedUnifiedDatabaseStrategy\n"
+                "• Administrative Dokument-Klassifizierung\n"
+                "• Security Level Management\n"
+                "• Quality Assessment & Batch Processing"
+            )
         else:
             uds3_info = "\n\n⚙️ Standard-Modus (UDS3 v3.0 nicht verfügbar)"
-        
+
         quality_info = ""
         if self.quality_enabled and self.quality_formatter:
-            quality_info = "\n\n⚡ Quality-Enhanced RAG Features:\n" \
-                          "• Quality-aware Chunk Ranking\n" \
-                          "• Confidence Scoring\n" \
-                          "• Source Quality Indicators\n" \
-                          "• Enhanced Citations\n" \
-                          "• Multiple Relevance Strategies"
-        elif hasattr(self, 'quality_formatter'):
+            quality_info = (
+                "\n\n⚡ Quality-Enhanced RAG Features:\n"
+                "• Quality-aware Chunk Ranking\n"
+                "• Confidence Scoring\n"
+                "• Source Quality Indicators\n"
+                "• Enhanced Citations\n"
+                "• Multiple Relevance Strategies"
+            )
+        elif hasattr(self, "quality_formatter"):
             quality_info = "\n\n❌ Quality-Enhancement (deaktiviert)"
         else:
             quality_info = "\n\n⚠️ Quality-Enhancement (nicht verfügbar)"
-        
+
         about_text = f"""Veritas Modern Chat GUI v{__version__}
 
 Ein modernes Chat-Interface für das Veritas RAG System mit UDS3 v3.0 und Quality-Enhancement Integration.
@@ -4883,27 +4886,27 @@ Features:
 • Queue-basierte Thread-Kommunikation{uds3_info}{quality_info}"""
 
         messagebox.showinfo("Über Veritas", about_text)
-    
+
     def open_immi_map(self):
         """Öffnet IMMI-Karte in separatem Fenster"""
         try:
             # Import des Map-Widgets
             from frontend.ui.veritas_ui_map_widget import IMMIMapWidget
-            
+
             # Neues Fenster erstellen
             map_window = tk.Toplevel(self.root)
             map_window.title("🗺️ IMMI-Karte - BImSchG & WKA Geodaten")
             map_window.geometry("1400x800")
-            
+
             # Backend-URL ermitteln (Standard localhost:5000)
             backend_url = "http://localhost:5000"
-            
+
             # Map-Widget erstellen
             map_widget = IMMIMapWidget(map_window, backend_url=backend_url)
             map_widget.pack(fill="both", expand=True)
-            
+
             logger.info("✅ IMMI-Karte geöffnet")
-            
+
         except ImportError as e:
             logger.error(f"❌ Map-Widget nicht gefunden: {e}")
             messagebox.showerror(
@@ -4912,12 +4915,12 @@ Features:
                 "Fehlende Module:\n"
                 "- tkintermapview\n"
                 "- veritas_ui_map_widget\n\n"
-                "Installieren Sie: pip install tkintermapview"
+                "Installieren Sie: pip install tkintermapview",
             )
         except Exception as e:
             logger.error(f"❌ Fehler beim Öffnen der IMMI-Karte: {e}")
             messagebox.showerror("Fehler", f"IMMI-Karte konnte nicht geöffnet werden:\n\n{e}")
-    
+
     def show_help(self):
         """Zeigt Hilfe"""
         help_text = """Veritas Chat - Hilfe
@@ -4941,7 +4944,7 @@ UDS3 v3.0 Features:
 • 🔥 Optimierte Datenbank-Operationen"""
 
         messagebox.showinfo("Hilfe", help_text)
-    
+
     def on_closing(self):
         """Behandelt Schließen der Anwendung"""
         if self.auto_save_enabled and self.chat_messages:
@@ -4949,108 +4952,104 @@ UDS3 v3.0 Features:
                 self.save_chat()
             except:
                 pass
-        
+
         # Letzten Chat speichern
         if self.current_chat_file:
             try:
-                with open(self.last_chat_file, 'w', encoding='utf-8') as f:
+                with open(self.last_chat_file, "w", encoding="utf-8") as f:
                     f.write(self.current_chat_file)
             except:
                 pass
-        
+
         self.root.destroy()
-    
+
     # --- Backend Communication Methods ---
     # Frontend kommuniziert ausschließlich über HTTP/HTTPS mit dem Backend
     # Keine direkten Datenbankzugriffe oder UDS3-Abhängigkeiten
-    
+
     def is_uds3_available(self):
         """UDS3 ist im Frontend nicht verfügbar - Backend entscheidet über Datenbankzugriffe"""
         return False
-    
+
     def get_uds3_strategy(self):
         """Keine UDS3 Strategy im Frontend - Backend verwaltet alle Datenbankoperationen"""
         return None
-    
+
     def get_security_manager(self):
         """Gibt Security Manager zurück"""
-        return getattr(self, 'security_manager', None)
-    
+        return getattr(self, "security_manager", None)
+
     def get_quality_manager(self):
         """Gibt Quality Manager zurück"""
-        return getattr(self, 'quality_manager', None)
-    
+        return getattr(self, "quality_manager", None)
+
     def toggle_quality_enhancement(self):
         """Schaltet Quality-Enhancement um"""
-        if hasattr(self, 'quality_formatter') and self.quality_formatter:
+        if hasattr(self, "quality_formatter") and self.quality_formatter:
             self.quality_enabled = not self.quality_enabled
-            
+
             # Status-Label updaten
-            if hasattr(self, 'quality_status_label'):
+            if hasattr(self, "quality_status_label"):
                 if self.quality_enabled:
-                    self.quality_status_label.config(
-                        text="⚡ Quality-Enhanced",
-                        foreground=self.colors['success']
-                    )
+                    self.quality_status_label.config(text="⚡ Quality-Enhanced", foreground=self.colors["success"])
                 else:
-                    self.quality_status_label.config(
-                        text="⚡ Quality (Off)",
-                        foreground=self.colors['secondary']
-                    )
-            
+                    self.quality_status_label.config(text="⚡ Quality (Off)", foreground=self.colors["secondary"])
+
             # Status-Nachricht
             status_msg = "aktiviert" if self.quality_enabled else "deaktiviert"
             self.add_system_message(f"⚡ Quality-Enhancement {status_msg}")
-            
+
             logger.info(f"Quality-Enhancement {'aktiviert' if self.quality_enabled else 'deaktiviert'}")
         else:
             self.add_error_message("Quality-Enhancement nicht verfügbar")
-    
+
     def toggle_auto_save(self):
         """Schaltet Auto-Speichern um"""
         self.auto_save_enabled = not self.auto_save_enabled
         status_msg = "aktiviert" if self.auto_save_enabled else "deaktiviert"
         self.add_system_message(f"💾 Auto-Speichern {status_msg}")
-    
+
     def run(self):
         """Startet die GUI"""
         # Versuche letzte Conversation zu laden
         self._load_last_conversation_gui()
-        
+
         # Willkommensnachricht (nur wenn keine Conversation geladen wurde)
-        if not hasattr(self, '_conversation_loaded') or not self._conversation_loaded:
+        if not hasattr(self, "_conversation_loaded") or not self._conversation_loaded:
             welcome_msg = "🌟 Veritas Modern Chat GUI gestartet"
             if self.is_uds3_available():
                 welcome_msg += " mit UDS3 v3.0 Core"
             welcome_msg += " - Bereit für Gespräche!"
-            
+
             self.add_system_message(welcome_msg)
-        
+
         # API-Status prüfen (alle 30 Sekunden statt jede Sekunde)
-        if self.root and hasattr(self.root, 'winfo_exists') and self.root.winfo_exists():
+        if self.root and hasattr(self.root, "winfo_exists") and self.root.winfo_exists():
             self.root.after(30000, self.check_api_status)
-        
+
         # GUI starten
         self.root.mainloop()
 
+
 # === HAUPTAUSFÜHRUNG MIT OOP-ARCHITEKTUR ===
+
 
 def main():
     """Hauptfunktion mit OOP-basierter Multi-Window-Architektur"""
     import argparse
-    
+
     parser = argparse.ArgumentParser(description="Veritas App - OOP Multi-Window-Chat mit UDS3 v3.0")
-    parser.add_argument('--verbose', action='store_true', help='Debug-Logging aktivieren')
-    parser.add_argument('--version', action='store_true', help='Versionsinformation anzeigen')
-    parser.add_argument('--help-architecture', action='store_true', help='Architektur-Information anzeigen')
+    parser.add_argument("--verbose", action="store_true", help="Debug-Logging aktivieren")
+    parser.add_argument("--version", action="store_true", help="Versionsinformation anzeigen")
+    parser.add_argument("--help-architecture", action="store_true", help="Architektur-Information anzeigen")
     args = parser.parse_args()
-    
+
     if args.version:
         print(f"Veritas App v{__version__}")
         print("OOP Multi-Window-Chat mit Queue-basierter Thread-Kommunikation")
         print(f"UDS3 v3.0 Integration: {'✅ Verfügbar' if UDS3_AVAILABLE else '❌ Nicht verfügbar'}")
         return
-    
+
     if args.help_architecture:
         print(f"Veritas App v{__version__} - Architektur-Übersicht")
         print("=" * 60)
@@ -5074,37 +5073,35 @@ def main():
         print("  • Chat-Transfer beim Schließen möglich")
         print("  • Hauptfenster übernimmt Child-Inhalt vor dem Beenden")
         return
-    
+
     # Logging konfigurieren
     log_level = logging.DEBUG if args.verbose else logging.INFO
     logging.basicConfig(
         level=log_level,
-        format='%(asctime)s - %(levelname)s [%(name)s] - %(message)s',
-        handlers=[
-            logging.FileHandler('veritas_app.log', encoding='utf-8'),
-            logging.StreamHandler()
-        ]
+        format="%(asctime)s - %(levelname)s [%(name)s] - %(message)s",
+        handlers=[logging.FileHandler("veritas_app.log", encoding="utf-8"), logging.StreamHandler()],
     )
-    
+
     logger.info("=" * 60)
     logger.info(f"🚀 STARTE VERITAS APP v{__version__}")
     logger.info("=" * 60)
     logger.info(f"🌐 Backend-API: {API_BASE_URL}")
     logger.info(f"🏗️ OOP-Architektur: Multi-Window mit Queue-Threading")
     logger.info("=" * 60)
-    
+
     try:
         # Neue OOP-basierte App starten
         app = VeritasApp()
         app.run()
-        
+
     except KeyboardInterrupt:
         logger.info("👋 Anwendung durch Benutzer beendet")
     except Exception as e:
         logger.critical(f"💥 Kritischer Fehler: {e}")
         messagebox.showerror("Startfehler", f"Anwendung konnte nicht gestartet werden:\n{e}")
-    
+
     logger.info("🏁 Veritas App beendet")
+
 
 # Test und Hauptausführung
 if __name__ == "__main__":
@@ -5112,7 +5109,7 @@ if __name__ == "__main__":
 
 """
 VERITAS Protected Module
-WARNING: This file contains embedded protection keys. 
+WARNING: This file contains embedded protection keys.
 Modification will be detected and may result in license violations.
 """
 

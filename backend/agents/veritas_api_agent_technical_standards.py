@@ -498,6 +498,7 @@ class TechnicalStandardsAgent:
         self._compliance_cache: Dict[str, ComplianceAssessment] = {}
         
         # Performance tracking
+<<<<<<< Updated upstream
         self._stats = {
             'queries_processed': 0,
             'standards_found': 0,
@@ -508,6 +509,18 @@ class TechnicalStandardsAgent:
             'avg_processing_time_ms': 0,
             'total_processing_time_ms': 0,
             'organizations_queried': set()
+=======
+        self._stats: Dict[str, Any] = {
+            "queries_processed": 0,
+            "standards_found": 0,
+            "compliance_assessments": 0,
+            "api_calls_made": 0,
+            "cache_hits": 0,
+            "errors": 0,
+            "avg_processing_time_ms": 0,
+            "total_processing_time_ms": 0,
+            "organizations_queried": set(),
+>>>>>>> Stashed changes
         }
         
         self.logger.info(f"✅ Technical Standards Agent initialized with {len(self.config.enabled_organizations)} organizations")
@@ -1031,9 +1044,17 @@ class TechnicalStandardsAgent:
             request.category.value if request.category else "",
             str(request.max_results)
         ]
+<<<<<<< Updated upstream
         key_string = "|".join(key_parts)
         return hashlib.md5(key_string.encode()).hexdigest()
     
+=======
+
+        key_string = "|".join(key_parts)
+        # Use SHA-256 for cache keys instead of MD5 (Bandit B324)
+        return hashlib.sha256(key_string.encode()).hexdigest()
+
+>>>>>>> Stashed changes
     def _update_stats(self, processing_time: int, standards_found: int):
         """Statistiken aktualisieren"""
         self._stats['queries_processed'] += 1

@@ -42,15 +42,15 @@ async def veritas_chat_query(query_data: Dict[str, Any]):
     Nutzt jetzt die echte Intelligent Pipeline!
     """
     start_time = time.time()
-    
+
     try:
         query_text = query_data.get('query', '')
         if not query_text:
             raise HTTPException(status_code=400, detail="Query ist erforderlich")
-        
+
         session_id = query_data.get('session_id', str(uuid.uuid4()))
         enable_streaming = query_data.get('enable_streaming', False)
-        
+
         # PRODUKTIV: Nutze Intelligent Pipeline statt Mock
         if INTELLIGENT_PIPELINE_AVAILABLE and intelligent_pipeline:
             # Erstelle Pipeline Request
@@ -64,11 +64,11 @@ async def veritas_chat_query(query_data: Dict[str, Any]):
                 max_parallel_agents=5,
                 timeout=60
             )
-            
+
             # Pipeline ausführen
             pipeline_response = await intelligent_pipeline.process_intelligent_query(pipeline_request)
             processing_time = time.time() - start_time
-            
+
             # Response im erwarteten Format
             return {
                 'response_text': pipeline_response.response_text,
@@ -92,7 +92,7 @@ async def veritas_chat_query(query_data: Dict[str, Any]):
             # FALLBACK: Mock-Daten (wenn Pipeline nicht verfügbar)
             logger.warning("⚠️ Intelligent Pipeline nicht verfügbar - nutze Mock-Daten")
             return _generate_mock_response(query_text, session_id)
-            
+
     except Exception as e:
         logger.error(f"❌ Fehler bei Query: {e}")
         return _generate_error_response(str(e))
@@ -122,7 +122,7 @@ def _generate_mock_response(query_text: str, session_id: str):
 ```python
 def _send_to_backend(self, message: str):
     # ... bestehender Code ...
-    
+
     # Erstelle Request für Intelligent Pipeline
     request_payload = {
         "query": message,
@@ -131,7 +131,7 @@ def _send_to_backend(self, message: str):
         "enable_intermediate_results": False,
         "enable_llm_thinking": False  # oder True für LLM Commentary
     }
-    
+
     # Sende an Intelligent Pipeline Endpoint
     logger.info(f"🧠 Sende Query an /v2/intelligent/query")
     api_response = requests.post(
@@ -139,7 +139,7 @@ def _send_to_backend(self, message: str):
         json=request_payload,
         timeout=60
     )
-    
+
     # Response-Format ist kompatibel!
     # answer, confidence_score, sources, agent_results, etc.
 ```

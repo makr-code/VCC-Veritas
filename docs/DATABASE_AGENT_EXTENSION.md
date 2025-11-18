@@ -33,7 +33,7 @@ Die `DatabaseAgentTestServerExtension` ist eine **generische, wiederverwendbare 
 ```python
 class DatabaseAgentTestServerExtension:
     """Generische Extension für DatabaseAgent"""
-    
+
     def __init__(self, config: Optional[TestServerConfig] = None)
     async def close(self)
 ```
@@ -78,7 +78,7 @@ class QueryResult:
     error: Optional[str] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
     timestamp: str = field(default_factory=lambda: datetime.now().isoformat())
-    
+
     @property
     def has_data(self) -> bool
 
@@ -93,10 +93,10 @@ class ComplianceResult:
     recommendations: List[str]
     details: Dict[str, Any]
     timestamp: str
-    
+
     @property
     def is_compliant(self) -> bool
-    
+
     @property
     def requires_action(self) -> bool
 ```
@@ -265,7 +265,7 @@ if compliance.requires_action:
     print("⚠️ Maßnahmen erforderlich!")
     for issue in compliance.issues:
         print(f"  - [{issue['severity']}] {issue['message']}")
-    
+
     for rec in compliance.recommendations:
         print(f"  💡 {rec}")
 ```
@@ -328,12 +328,12 @@ class MySpecializedDatabaseAgent(DatabaseAgentTestServerExtension):
     """
     Spezialisierter Agent für XYZ-Domäne
     """
-    
+
     def __init__(self, config: Optional[TestServerConfig] = None):
         super().__init__(config)
         # Zusätzliche Initialisierung
         self.domain_config = load_domain_config()
-    
+
     async def my_domain_specific_query(
         self,
         param1: str,
@@ -348,19 +348,19 @@ class MySpecializedDatabaseAgent(DatabaseAgentTestServerExtension):
             filters={"custom_field": param1},
             limit=param2
         )
-        
+
         # Füge spezifische Verarbeitung hinzu
         if result.success and result.data:
             processed_data = self._process_domain_data(result.data)
             result.data = processed_data
-        
+
         return result
-    
+
     def _process_domain_data(self, data: List[Dict]) -> List[Dict]:
         """Private Hilfsmethode für Domain-Logik"""
         # Custom processing...
         return data
-    
+
     async def analyze_domain_compliance(
         self,
         entity_id: str
@@ -370,10 +370,10 @@ class MySpecializedDatabaseAgent(DatabaseAgentTestServerExtension):
         """
         # Basis-Analyse durchführen
         base_result = await self.analyze_compliance(entity_id)
-        
+
         # Domänen-spezifische Regeln hinzufügen
         # ...
-        
+
         return base_result
 ```
 
@@ -384,14 +384,14 @@ class MySpecializedDatabaseAgent(DatabaseAgentTestServerExtension):
    async def query_entity(self, entity_type, filters, limit):
        # Pre-processing
        filters = self._enhance_filters(filters)
-       
+
        # Basis-Implementierung aufrufen
        result = await super().query_entity(entity_type, filters, limit)
-       
+
        # Post-processing
        if result.success:
            result.data = self._transform_data(result.data)
-       
+
        return result
    ```
 
@@ -423,7 +423,7 @@ from backend.agents.database_agent_testserver_extension import (
 
 async def main():
     agent = DatabaseAgentTestServerExtension()
-    
+
     try:
         # Generic Query
         result = await agent.query_entity(
@@ -431,12 +431,12 @@ async def main():
             filters={"status": "genehmigt"},
             limit=10
         )
-        
+
         if result.success:
             print(f"Gefunden: {result.metadata['count']} Verfahren")
             for v in result.data:
                 print(f"  - {v['verfahren_id']}: {v['verfahrensart']}")
-    
+
     finally:
         await agent.close()
 ```
@@ -446,30 +446,30 @@ async def main():
 ```python
 async def check_anlage_compliance():
     agent = DatabaseAgentTestServerExtension()
-    
+
     try:
         compliance = await agent.analyze_compliance(
             "10650200000",
             "4001"
         )
-        
+
         print(f"📊 Compliance-Report")
         print(f"Status: {compliance.status.value}")
         print(f"Score: {compliance.score:.1%}")
-        
+
         if compliance.requires_action:
             print("\n⚠️ ACHTUNG: Maßnahmen erforderlich!")
-            
+
             print("\n🔴 Issues:")
             for issue in compliance.issues:
                 severity = issue['severity'].upper()
                 message = issue['message']
                 print(f"  [{severity}] {message}")
-            
+
             print("\n💡 Empfehlungen:")
             for rec in compliance.recommendations:
                 print(f"  - {rec}")
-    
+
     finally:
         await agent.close()
 ```
@@ -479,17 +479,17 @@ async def check_anlage_compliance():
 ```python
 async def get_comprehensive_data(bst_nr, anl_nr):
     agent = DatabaseAgentTestServerExtension()
-    
+
     try:
         # Vollständige Entity-Daten
         result = await agent.get_complete_entity(bst_nr, anl_nr)
-        
+
         if not result.success:
             print(f"Fehler: {result.error}")
             return
-        
+
         anlage = result.data
-        
+
         # Zugriff auf alle Relationen
         print(f"📍 Anlage: {anlage.anlage.bst_name}")
         print(f"\n📊 Daten:")
@@ -500,14 +500,14 @@ async def get_comprehensive_data(bst_nr, anl_nr):
         print(f"  Wartungen: {len(anlage.wartungen)}")
         print(f"  Messreihen: {len(anlage.messreihen)}")
         print(f"  Compliance: {len(anlage.compliance_historie)}")
-        
+
         # Statistik
         stats = anlage.statistik
         print(f"\n📈 Statistik:")
         print(f"  Überschreitungen: {stats['messungen_ueberschreitungen']}")
         print(f"  Offene Mängel: {stats['maengel_offen']}")
         print(f"  Geplante Wartungen: {stats['wartungen_geplant']}")
-    
+
     finally:
         await agent.close()
 ```
@@ -517,22 +517,22 @@ async def get_comprehensive_data(bst_nr, anl_nr):
 ```python
 async def get_critical_data():
     agent = DatabaseAgentTestServerExtension()
-    
+
     try:
         # Kritische Messreihen
         result = await agent.custom_query(
             "/messreihen/kritische",
             {"limit": 10}
         )
-        
+
         if result.success:
             messreihen = result.data['messreihen']
             print(f"🔴 {len(messreihen)} kritische Messreihen:")
-            
+
             for mr in messreihen:
                 print(f"  - {mr['messart']}: {mr['ueberschreitungen_anzahl']} Überschreitungen")
                 print(f"    Trend: {mr['trend']}, Bewertung: {mr['bewertung']}")
-    
+
     finally:
         await agent.close()
 ```
@@ -597,7 +597,7 @@ python test_database_agent_extension.py
 
 ---
 
-**Status**: ✅ Production-Ready  
-**Version**: 1.0  
-**Autor**: VERITAS Team  
+**Status**: ✅ Production-Ready
+**Version**: 1.0
+**Autor**: VERITAS Team
 **Datum**: 18. Oktober 2025

@@ -99,7 +99,7 @@ logger.info(f"📩 STREAM_COMPLETE: final_result keys={list(final_result.keys())
    ```bash
    python start_frontend.py
    ```
-   
+
 2. **Query senden**:
    ```
    "Was sind die wichtigsten Bauvorschriften in Stuttgart?"
@@ -112,7 +112,7 @@ logger.info(f"📩 STREAM_COMPLETE: final_result keys={list(final_result.keys())
 
 ## Lessons Learned
 
-1. **Namenskonventionen beachten**: 
+1. **Namenskonventionen beachten**:
    - Backend sendet verschiedene Formate (`response_text`, `answer`)
    - Frontend erwartet spezifische Keys (`content`)
    - → Einheitliche Dokumentation wichtig!

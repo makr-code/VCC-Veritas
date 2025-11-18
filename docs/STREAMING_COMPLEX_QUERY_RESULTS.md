@@ -1,8 +1,8 @@
 # STREAMING TEST - COMPLEX QUERY RESULTS 🔥
 
-**Query:** "Bauantrag für Einfamilienhaus in Stuttgart - welche Unterlagen werden benötigt?"  
-**Session:** 29bbee3f-b998-4543-887e-51c9d7aeb2f6  
-**Complexity:** STANDARD (höher als vorher!)  
+**Query:** "Bauantrag für Einfamilienhaus in Stuttgart - welche Unterlagen werden benötigt?"
+**Session:** 29bbee3f-b998-4543-887e-51c9d7aeb2f6
+**Complexity:** STANDARD (höher als vorher!)
 **Domain:** BUILDING (spezialisiert!)
 
 ---
@@ -33,8 +33,8 @@
    - Sources: DIN-Normen, Bauordnung, Technische Richtlinien
    - **Domain-spezifischer Agent aktiviert!**
 
-**Average Confidence:** 82.5%  
-**Total Agents:** 4 (vs 3 vorher)  
+**Average Confidence:** 82.5%
+**Total Agents:** 4 (vs 3 vorher)
 **Processing Time:** ~7 seconds
 
 ---
@@ -128,7 +128,7 @@ Progress | Stage              | Message
 
 ### Response Structure:
 ```markdown
-**Antwort auf Ihre Frage**: Bauantrag für Einfamilienhaus in Stuttgart - 
+**Antwort auf Ihre Frage**: Bauantrag für Einfamilienhaus in Stuttgart -
 welche Unterlagen werden benötigt?
 
 **Zusammenfassung der Analyse** (Building, Standard):
@@ -140,7 +140,7 @@ welche Unterlagen werden benötigt?
 
 **Nächste Schritte**: Basierend auf der Analyse empfehlen wir Ihnen...
 
-**Hinweis**: Diese Antwort wurde durch 4 spezialisierte Agenten erstellt 
+**Hinweis**: Diese Antwort wurde durch 4 spezialisierte Agenten erstellt
 und mit einem durchschnittlichen Vertrauenswert von 82% bewertet.
 ```
 
@@ -205,6 +205,6 @@ und mit einem durchschnittlichen Vertrauenswert von 82% bewertet.
 
 ---
 
-**Timestamp:** 14. Oktober 2025, 08:44 Uhr  
-**Session:** 29bbee3f-b998-4543-887e-51c9d7aeb2f6  
+**Timestamp:** 14. Oktober 2025, 08:44 Uhr
+**Session:** 29bbee3f-b998-4543-887e-51c9d7aeb2f6
 **Result:** ✅ **SPECTACULAR SUCCESS!** 🚀

@@ -1,6 +1,6 @@
 # 🔍 Diagnose: "Antwort auf die Frage..." Problem
 
-**Datum:** 10. Oktober 2025  
+**Datum:** 10. Oktober 2025
 **Problem:** KI antwortet mit generischem "Antwort auf die Frage 'Zeige mit Windkraftanlagen...'" Text
 
 ---
@@ -116,7 +116,7 @@ def get_available_llm_models(self):
     """Lädt verfügbare LLM-Modelle"""
     # ALT:
     return ["llama3.1:8b", "llama3.1:70b", ...]
-    
+
     # NEU:
     return ["llama3:latest", "phi3:latest", "gpt-oss:latest"]
 ```
@@ -341,6 +341,6 @@ ollama pull llama3.1:8b
 
 ---
 
-**Erstellt:** 10. Oktober 2025  
-**Status:** Diagnose abgeschlossen  
+**Erstellt:** 10. Oktober 2025
+**Status:** Diagnose abgeschlossen
 **Nächster Schritt:** llama3.1:8b installieren

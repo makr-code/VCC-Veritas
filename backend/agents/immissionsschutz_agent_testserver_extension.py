@@ -23,8 +23,14 @@ from typing import Dict, List, Optional, Any, Tuple
 from dataclasses import dataclass, field
 from enum import Enum
 from statistics import mean, stdev
+<<<<<<< Updated upstream
+=======
+from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING
+>>>>>>> Stashed changes
 
-try:
+# Import heavy/runtime classes only when available; keep type-only imports
+# under TYPE_CHECKING to avoid redefinition warnings during static analysis.
+if TYPE_CHECKING:
     from .database_agent_testserver_extension import (
         DatabaseAgentTestServerExtension,
         EntityType,
@@ -33,6 +39,7 @@ try:
         ComplianceStatus
     )
     from .test_server_client import TestServerConfig
+<<<<<<< Updated upstream
 except ImportError:
     from database_agent_testserver_extension import (
         DatabaseAgentTestServerExtension,
@@ -42,6 +49,23 @@ except ImportError:
         ComplianceStatus
     )
     from test_server_client import TestServerConfig
+=======
+else:
+    try:
+        # Runtime minimal imports needed for operation
+        from .database_agent_testserver_extension import DatabaseAgentTestServerExtension
+        from .test_server_client import TestServerConfig
+    except Exception:
+        try:
+            from database_agent_testserver_extension import DatabaseAgentTestServerExtension
+            from test_server_client import TestServerConfig
+        except Exception:
+            # Provide lightweight fallbacks so module can be imported in restricted
+            # analysis environments. These are only used if the real modules are
+            # not available at runtime.
+            DatabaseAgentTestServerExtension = object  # type: ignore
+            TestServerConfig = object  # type: ignore
+>>>>>>> Stashed changes
 
 
 # ============================================================================
@@ -377,9 +401,23 @@ class ImmissionsschutzAgentTestServerExtension(DatabaseAgentTestServerExtension)
         grenzwert_config = self.grenzwerte_luft[messart]
         
         # Verwende Jahresmittel als Standard
+<<<<<<< Updated upstream
         grenzwert = grenzwert_config.get('jahresmittel', grenzwert_config.get('tagesmittel', 0.0))
         grenzwert_typ = grenzwert_config.get('typ', GrenzwertTyp.LUFT_JAHRESMITTEL)
         
+=======
+        from typing import cast
+
+        # Ensure numeric types for safe comparisons
+        grenzwert_raw = grenzwert_config.get("jahresmittel", grenzwert_config.get("tagesmittel", 0.0))
+        if isinstance(grenzwert_raw, (int, float, str)):
+            grenzwert = float(grenzwert_raw)
+        else:
+            grenzwert = 0.0
+
+        grenzwert_typ = cast(GrenzwertTyp, grenzwert_config.get("typ", GrenzwertTyp.LUFT_JAHRESMITTEL))
+
+>>>>>>> Stashed changes
         # Statistik berechnen
         mittelwert = mean(werte)
         maximum = max(werte)
@@ -428,7 +466,12 @@ class ImmissionsschutzAgentTestServerExtension(DatabaseAgentTestServerExtension)
         """Prüft Lärmmesswerte gegen Richtwerte"""
         # Vereinfachte Implementierung - nimmt Wohngebiet als Standard
         grenzwert_config = self.grenzwerte_laerm.get("Wohngebiet", {})
-        grenzwert = grenzwert_config.get("tag", 55.0)
+        # Coerce to numeric for static typing
+        grenzwert_raw = grenzwert_config.get("tag", 55.0)
+        if isinstance(grenzwert_raw, (int, float, str)):
+            grenzwert = float(grenzwert_raw)
+        else:
+            grenzwert = 55.0
         grenzwert_typ = GrenzwertTyp.LAERM_TAG
         
         mittelwert = mean(werte)
@@ -813,8 +856,13 @@ class ImmissionsschutzAgentTestServerExtension(DatabaseAgentTestServerExtension)
         self.logger.info(f"Risiko-Analyse für {bst_nr}/{anl_nr}")
         
         risiko_score = 0.0
+<<<<<<< Updated upstream
         risiko_faktoren = []
         
+=======
+        risiko_faktoren: List[Dict[str, Any]] = []
+
+>>>>>>> Stashed changes
         # Compliance-Score (invertiert - niedrig = hohes Risiko)
         compliance = await self.analyze_compliance(bst_nr, anl_nr)
         compliance_risk = 1.0 - compliance.score
@@ -846,8 +894,13 @@ class ImmissionsschutzAgentTestServerExtension(DatabaseAgentTestServerExtension)
         # Trends
         # Vereinfachte Version - nur die 3 häufigsten Messarten prüfen
         messungen = await self.query_messungen(bst_nr=bst_nr, anl_nr=anl_nr, limit=1000)
+<<<<<<< Updated upstream
         messarten = {}
         
+=======
+        messarten: Dict[str, int] = {}
+
+>>>>>>> Stashed changes
         for m in messungen:
             art = m.get('messart', 'Unbekannt')
             messarten[art] = messarten.get(art, 0) + 1

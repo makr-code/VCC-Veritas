@@ -1,8 +1,8 @@
 # API v3 Phase 2 - Domain Endpoints ✅ COMPLETE
 
-**Status**: ✅ Erfolgreich abgeschlossen  
-**Datum**: 18. Oktober 2025  
-**Phase**: 2 von 4 (Domain Endpoints)  
+**Status**: ✅ Erfolgreich abgeschlossen
+**Datum**: 18. Oktober 2025
+**Phase**: 2 von 4 (Domain Endpoints)
 **Endpoints implementiert**: 12 Domain-Endpoints (4 Router × 3 Endpoints)
 
 ---
@@ -26,7 +26,7 @@ Phase 2 implementiert **Domain-spezifische Endpoints** für spezialisierte VERIT
 
 ### 1. VPB Router (Verwaltungsprozessbearbeitung)
 
-**Prefix**: `/api/v3/vpb`  
+**Prefix**: `/api/v3/vpb`
 **Zweck**: Bundesverwaltungsgericht-Entscheide und VPB-Dokumente
 
 #### Endpoints:
@@ -77,7 +77,7 @@ class VPBQueryResponse(BaseModel):
 
 ### 2. COVINA Router (COVID-19 Datenanalyse)
 
-**Prefix**: `/api/v3/covina`  
+**Prefix**: `/api/v3/covina`
 **Zweck**: COVID-19 Statistiken und Reports
 
 #### Endpoints:
@@ -127,7 +127,7 @@ class COVINAQueryResponse(BaseModel):
 
 ### 3. PKI Router (Public Key Infrastructure)
 
-**Prefix**: `/api/v3/pki`  
+**Prefix**: `/api/v3/pki`
 **Zweck**: Zertifikatsverwaltung und PKI-Queries
 
 #### Endpoints:
@@ -178,7 +178,7 @@ class PKIValidationResponse(BaseModel):
 
 ### 4. IMMI Router (Immissionsschutz)
 
-**Prefix**: `/api/v3/immi`  
+**Prefix**: `/api/v3/immi`
 **Zweck**: BImSchG-Vorschriften und WKA-Geodaten
 
 #### Endpoints:
@@ -243,7 +243,7 @@ from .service_integration import (
 async def domain_query(query_req: DomainQueryRequest, request: Request):
     # 1. Get Intelligent Pipeline
     pipeline = get_intelligent_pipeline(request)
-    
+
     # 2. Execute query with domain-specific mode
     result = await execute_intelligent_query(
         pipeline=pipeline,
@@ -252,7 +252,7 @@ async def domain_query(query_req: DomainQueryRequest, request: Request):
         mode="domain_mode",  # vpb, covina, pki, immi
         enable_commentary=False
     )
-    
+
     # 3. Format domain-specific response
     return DomainQueryResponse(
         content=result["content"],
@@ -658,7 +658,7 @@ Invoke-RestMethod -Uri "http://localhost:5000/api/v3/immi/geodata?type=wka&limit
 
 ---
 
-**Erstellt**: 18. Oktober 2025  
-**Version**: API v3.0.0  
-**Status**: Phase 2 ✅ Complete  
+**Erstellt**: 18. Oktober 2025
+**Version**: API v3.0.0
+**Status**: Phase 2 ✅ Complete
 **Autor**: VERITAS API v3 Team

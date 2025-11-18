@@ -24,15 +24,15 @@ Date: 12. Oktober 2025import json
 
 """import sys
 
-import os
-
-import asynciofrom pathlib import Path
-
 import json
+import logging  # Python-Pfad sicherstellen
+import os
+import pathlib
+from pathlib import Path, PathREPO_ROOT, .parent.parent.absolute, =, __file__
 
-import logging# Python-Pfad sicherstellen
-
-from pathlib import PathREPO_ROOT = Path(__file__).parent.parent.absolute()
+import asynciofrom
+import import
+import Path
 
 if str(REPO_ROOT) not in sys.path:
 
@@ -60,15 +60,15 @@ async def test_supervisor_mode_detection():)
 
     print("TEST 1: Supervisor Mode Detection")    """Test der Supervisor-Integration"""
 
-    print("="*60)    
+    print("="*60)
 
         print("=" * 80)
 
-    from backend.orchestration.unified_orchestrator_v7 import UnifiedOrchestratorV7    print("SUPERVISOR-INTEGRATION TEST")
+    from backend.orchestration.unified_orchestrator_v7 import "SUPERVISOR-INTEGRATION, TEST", UnifiedOrchestratorV7, print
 
         print("=" * 80)
 
-    orchestrator = UnifiedOrchestratorV7(    
+    orchestrator = UnifiedOrchestratorV7(
 
         config_dir="config",    # Pipeline initialisieren
 
@@ -76,19 +76,19 @@ async def test_supervisor_mode_detection():)
 
         ollama_client=None,    pipeline = await get_intelligent_pipeline()
 
-        uds3_strategy=None,    
+        uds3_strategy=None,
 
         agent_orchestrator=None,    # Test-Query
 
         enable_streaming=False    test_query = "Wie ist die Luftqualität in München und welche Behörden sind für Umweltschutz zuständig?"
 
-    )    
+    )
 
         print(f"\n📝 Test-Query: {test_query}")
 
     # Check if supervisor is enabled    print()
 
-    is_enabled = orchestrator._is_supervisor_enabled()    
+    is_enabled = orchestrator._is_supervisor_enabled()
 
         # ========================================================================
 
@@ -96,7 +96,7 @@ async def test_supervisor_mode_detection():)
 
     print(f"✅ Supervisor initialization pending: {orchestrator._supervisor_initialization_pending}")    # ========================================================================
 
-        
+
 
     # Load and verify config    print("=" * 80)
 
@@ -104,7 +104,7 @@ async def test_supervisor_mode_detection():)
 
     with open(method_config_path, 'r', encoding='utf-8') as f:    print("=" * 80)
 
-        method_config = json.load(f)    
+        method_config = json.load(f)
 
         request_standard = IntelligentPipelineRequest(
 
@@ -120,13 +120,13 @@ async def test_supervisor_mode_detection():)
 
     print("\n📋 Phases in config:")    )
 
-    for phase in method_config.get('phases', []):    
+    for phase in method_config.get('phases', []):
 
         phase_id = phase.get('phase_id')    print("\n⏱️ Starte Standard-Pipeline...")
 
         phase_num = phase.get('phase_number')    response_standard = await pipeline.process_intelligent_query(request_standard)
 
-        executor = phase.get('execution', {}).get('executor', 'llm')    
+        executor = phase.get('execution', {}).get('executor', 'llm')
 
         print(f"   {phase_num:>4} | {phase_id:30} | executor={executor}")    print(f"\n✅ Standard-Pipeline abgeschlossen")
 
@@ -138,7 +138,7 @@ async def test_supervisor_mode_detection():)
 
         print(f"   - Response Preview: {response_standard.response_text[:200]}...")
 
-    print("\n✅ TEST 1 PASSED: Supervisor mode is enabled")    
+    print("\n✅ TEST 1 PASSED: Supervisor mode is enabled")
 
     # ========================================================================
 
@@ -146,7 +146,7 @@ async def test_supervisor_mode_detection():)
 
 async def test_input_mapping():    # ========================================================================
 
-    """Test 2: Test _map_inputs functionality"""    
+    """Test 2: Test _map_inputs functionality"""
 
     print("\n" + "="*60)    print("\n" + "=" * 80)
 
@@ -154,29 +154,39 @@ async def test_input_mapping():    # ===========================================
 
     print("="*60)    print("=" * 80)
 
-        
 
-    from backend.orchestration.unified_orchestrator_v7 import UnifiedOrchestratorV7    request_supervisor = IntelligentPipelineRequest(
 
-    from backend.services.scientific_phase_executor import PhaseExecutionContext, PhaseResult        query_id="test_supervisor_001",
+    from backend.orchestration.unified_orchestrator_v7 import (  # 🆕 SUPERVISOR-MODUS; Schneller für Test
+        IntelligentPipelineRequest,
+        PhaseExecutionContext,
+        PhaseResult,
+        UnifiedOrchestratorV7,
+        "citizen"},
+        "München",
+        "user_type":,
+        =,
+        backend.services.scientific_phase_executor,
+        config_dir="config",
+        enable_llm_commentary=False,
+        enable_supervisor=True,
+        from,
+        import,
+        method_id="default_method",
+        ollama_client=None,
+        orchestrator,
+        query_id="test_supervisor_001",
+        query_text=test_query,
+        request_supervisor,
+        user_context={"location":,
+    )
 
-            query_text=test_query,
-
-    orchestrator = UnifiedOrchestratorV7(        user_context={"location": "München", "user_type": "citizen"},
-
-        config_dir="config",        enable_supervisor=True,  # 🆕 SUPERVISOR-MODUS
-
-        method_id="default_method",        enable_llm_commentary=False  # Schneller für Test
-
-        ollama_client=None,    )
-
-        uds3_strategy=None    
+        uds3_strategy=None
 
     )    print("\n⏱️ Starte Supervisor-Pipeline...")
 
         response_supervisor = await pipeline.process_intelligent_query(request_supervisor)
 
-    # Mock context with previous phases    
+    # Mock context with previous phases
 
     context = PhaseExecutionContext(    print(f"\n✅ Supervisor-Pipeline abgeschlossen")
 
@@ -188,7 +198,7 @@ async def test_input_mapping():    # ===========================================
 
             "hypothesis": {    print(f"   - Response Preview: {response_supervisor.response_text[:200]}...")
 
-                "hypothesis": "Carport bis 30m² ist verfahrensfrei",    
+                "hypothesis": "Carport bis 30m² ist verfahrensfrei",
 
                 "missing_information": ["solar radiation data", "cost estimate", "local building regulations"],    # ========================================================================
 
@@ -196,7 +206,7 @@ async def test_input_mapping():    # ===========================================
 
             }    # ========================================================================
 
-        },    
+        },
 
         metadata={"user_context": {"location": "München"}}    print("\n" + "=" * 80)
 
@@ -204,7 +214,7 @@ async def test_input_mapping():    # ===========================================
 
         print("=" * 80)
 
-    # Test input mapping    
+    # Test input mapping
 
     input_mapping = {    print(f"\n📊 METRIKEN:")
 
@@ -216,7 +226,7 @@ async def test_input_mapping():    # ===========================================
 
         "rag_results": "rag_results",    print(f"      Δ: {response_supervisor.confidence_score - response_standard.confidence_score:+.2f}")
 
-        "user_context": "metadata.user_context"    
+        "user_context": "metadata.user_context"
 
     }    print(f"\n   Processing Time:")
 
@@ -226,7 +236,7 @@ async def test_input_mapping():    # ===========================================
 
         print(f"      Δ: {response_supervisor.total_processing_time - response_standard.total_processing_time:+.2f}s")
 
-    print("\n📊 Mapped Inputs:")    
+    print("\n📊 Mapped Inputs:")
 
     for key, value in mapped.items():    print(f"\n   Agents Used:")
 
@@ -234,7 +244,7 @@ async def test_input_mapping():    # ===========================================
 
         print(f"      Supervisor: {len(response_supervisor.agent_results)}")
 
-    # Verify mappings    
+    # Verify mappings
 
     assert mapped["query"] == "Brauche ich Baugenehmigung für Carport?", "Query should be mapped"    print(f"\n   Response Length:")
 
@@ -242,7 +252,7 @@ async def test_input_mapping():    # ===========================================
 
     assert "solar radiation data" in mapped["missing_information"], "Should contain 'solar radiation data'"    print(f"      Supervisor: {len(response_supervisor.response_text)} chars")
 
-    assert mapped["hypothesis"] == "Carport bis 30m² ist verfahrensfrei", "Hypothesis should be mapped"    
+    assert mapped["hypothesis"] == "Carport bis 30m² ist verfahrensfrei", "Hypothesis should be mapped"
 
     assert mapped["user_context"]["location"] == "München", "User context should be mapped"    # ========================================================================
 
@@ -250,7 +260,7 @@ async def test_input_mapping():    # ===========================================
 
     print("\n✅ TEST 2 PASSED: Input mapping works correctly")    # ========================================================================
 
-    
+
 
     print("\n" + "=" * 80)
 
@@ -260,17 +270,18 @@ async def test_complexity_inference():    print("STANDARD-MODUS ANTWORT:")
 
     print("\n" + "="*60)    print(response_standard.response_text)
 
-    print("TEST 3: Complexity Inference")    
+    print("TEST 3: Complexity Inference")
 
     print("="*60)    print("\n" + "=" * 80)
 
         print("SUPERVISOR-MODUS ANTWORT:")
 
-    from backend.orchestration.unified_orchestrator_v7 import UnifiedOrchestratorV7    print("=" * 80)
+    from backend.orchestration.unified_orchestrator_v7 import *
+    from backend.orchestration.unified_orchestrator_v7 import UnifiedOrchestratorV7, 80, "=", print
 
         print(response_supervisor.response_text)
 
-    orchestrator = UnifiedOrchestratorV7(    
+    orchestrator = UnifiedOrchestratorV7(
 
         config_dir="config",    # ========================================================================
 
@@ -278,7 +289,7 @@ async def test_complexity_inference():    print("STANDARD-MODUS ANTWORT:")
 
     )    # ========================================================================
 
-        
+
 
     # Test cases    print("\n" + "=" * 80)
 
@@ -286,7 +297,7 @@ async def test_complexity_inference():    print("STANDARD-MODUS ANTWORT:")
 
         ([], "simple"),    print("=" * 80)
 
-        (["one item"], "simple"),    
+        (["one item"], "simple"),
 
         (["item1", "item2"], "standard"),    stats = pipeline.stats
 
@@ -300,7 +311,7 @@ async def test_complexity_inference():    print("STANDARD-MODUS ANTWORT:")
 
         print(f"   Orchestrator Usage: {stats.get('orchestrator_usage', 0)}")
 
-    print("\n📊 Complexity Inference Test:")    
+    print("\n📊 Complexity Inference Test:")
 
     for missing_info, expected in test_cases:    print("\n✅ TEST ABGESCHLOSSEN!")
 
@@ -312,7 +323,7 @@ async def test_complexity_inference():    print("STANDARD-MODUS ANTWORT:")
 
         assert result == expected, f"Expected {expected}, got {result}"    asyncio.run(test_supervisor_integration())
 
-    
+
     print("\n✅ TEST 3 PASSED: Complexity inference works correctly")
 
 
@@ -321,9 +332,9 @@ async def test_phase_execution_flow():
     print("\n" + "="*60)
     print("TEST 4: Phase Execution Flow (Mock Mode)")
     print("="*60)
-    
+
     from backend.orchestration.unified_orchestrator_v7 import UnifiedOrchestratorV7
-    
+
     # Note: This test runs in mock mode (no real Ollama/UDS3)
     orchestrator = UnifiedOrchestratorV7(
         config_dir="config",
@@ -333,37 +344,37 @@ async def test_phase_execution_flow():
         agent_orchestrator=None,  # Mock mode
         enable_streaming=False
     )
-    
+
     print("\n🔧 Orchestrator initialized (mock mode)")
     print(f"   Supervisor enabled: {orchestrator._is_supervisor_enabled()}")
     print(f"   Method ID: {orchestrator.method_id}")
-    
+
     # Load method config
     method_config_path = Path("config/scientific_methods/default_method.json")
     with open(method_config_path, 'r', encoding='utf-8') as f:
         method_config = json.load(f)
-    
+
     phases = method_config.get("phases", [])
     supervisor_enabled = method_config.get("supervisor_enabled", False)
-    
+
     print(f"\n📋 Phase Execution Plan:")
     print(f"   Total phases in config: {len(phases)}")
     print(f"   Supervisor enabled: {supervisor_enabled}")
-    
+
     # Count phases by executor type
     executor_counts = {}
     for phase in phases:
         executor = phase.get("execution", {}).get("executor", "llm")
         executor_counts[executor] = executor_counts.get(executor, 0) + 1
-    
+
     print(f"\n📊 Phase Distribution:")
     for executor, count in executor_counts.items():
         print(f"   {executor:20} = {count} phases")
-    
+
     expected_executors = ["llm", "supervisor", "agent_coordinator"]
     for executor in expected_executors:
         assert executor in executor_counts, f"Expected executor '{executor}' not found"
-    
+
     print("\n✅ TEST 4 PASSED: Phase execution flow is configured correctly")
 
 
@@ -372,56 +383,56 @@ async def test_json_config_validity():
     print("\n" + "="*60)
     print("TEST 5: JSON Config Validity")
     print("="*60)
-    
+
     method_config_path = Path("config/scientific_methods/default_method.json")
-    
+
     with open(method_config_path, 'r', encoding='utf-8') as f:
         config = json.load(f)
-    
+
     print("\n📋 Config Validation:")
-    
+
     # Check version
     assert config.get("version") == "2.0.0", "Version should be 2.0.0"
     print(f"   ✅ Version: {config.get('version')}")
-    
+
     # Check supervisor_enabled
     assert config.get("supervisor_enabled") == True, "supervisor_enabled should be True"
     print(f"   ✅ Supervisor enabled: {config.get('supervisor_enabled')}")
-    
+
     # Check phases
     phases = config.get("phases", [])
     assert len(phases) >= 8, "Should have at least 8 phases (6 original + 3 supervisor)"
     print(f"   ✅ Total phases: {len(phases)}")
-    
+
     # Check supervisor phases
     phase_ids = [p.get("phase_id") for p in phases]
     supervisor_phases = ["supervisor_agent_selection", "agent_execution", "agent_result_synthesis"]
-    
+
     for supervisor_phase in supervisor_phases:
         assert supervisor_phase in phase_ids, f"Missing supervisor phase: {supervisor_phase}"
         print(f"   ✅ Supervisor phase present: {supervisor_phase}")
-    
+
     # Check orchestration_config
     orch_config = config.get("orchestration_config", {})
     assert orch_config.get("execution_mode") == "sequential_with_supervisor", "Wrong execution mode"
     print(f"   ✅ Execution mode: {orch_config.get('execution_mode')}")
-    
+
     # Check conditional_phases
     conditional = orch_config.get("phase_execution", {}).get("conditional_phases", [])
     for supervisor_phase in supervisor_phases:
         assert supervisor_phase in conditional, f"Supervisor phase {supervisor_phase} should be conditional"
     print(f"   ✅ Conditional phases: {len(conditional)} phases")
-    
+
     # Check version history
     version_history = config.get("version_history", [])
     assert len(version_history) >= 2, "Should have at least 2 version history entries"
     print(f"   ✅ Version history entries: {len(version_history)}")
-    
+
     latest_version = version_history[0]
     assert latest_version.get("version") == "2.0.0", "Latest version should be 2.0.0"
     assert "Supervisor Integration" in latest_version.get("changes", ""), "Changes should mention Supervisor"
     print(f"   ✅ Latest version: {latest_version.get('version')}")
-    
+
     print("\n✅ TEST 5 PASSED: JSON config is valid")
 
 
@@ -433,7 +444,7 @@ async def main():
     print("\nTesting Supervisor Integration in UnifiedOrchestratorV7")
     print("Author: VERITAS v7.0 Development")
     print("Date: 12. Oktober 2025, 04:00 Uhr")
-    
+
     try:
         # Run tests
         await test_supervisor_mode_detection()
@@ -441,7 +452,7 @@ async def main():
         await test_complexity_inference()
         await test_phase_execution_flow()
         await test_json_config_validity()
-        
+
         print("\n" + "="*80)
         print("✅ ALL TESTS PASSED (5/5)")
         print("="*80)
@@ -450,7 +461,7 @@ async def main():
         print("   1. Test with real Ollama client")
         print("   2. Test with real agent orchestrator")
         print("   3. Run E2E test with construction query")
-        
+
     except Exception as e:
         print("\n" + "="*80)
         print(f"❌ TEST FAILED: {e}")

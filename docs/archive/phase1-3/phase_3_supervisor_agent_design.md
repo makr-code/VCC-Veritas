@@ -1,8 +1,8 @@
 # Phase 3: Supervisor-Agent Pattern - Design Dokument
 
-**Version:** 1.0  
-**Status:** Design Phase  
-**Datum:** 06.10.2025  
+**Version:** 1.0
+**Status:** Design Phase
+**Datum:** 06.10.2025
 **Inspiriert von:** AWS Agents for Bedrock Multi-Agent Collaboration, Azure Semantic Kernel Planner
 
 ---
@@ -129,7 +129,7 @@ Du bist ein Query-Decomposer für ein deutsches Verwaltungs-KI-System.
 async def decompose_query(self, query_text: str, user_context: Dict[str, Any]) -> List[SubQuery]:
     """
     Zerlegt komplexe Query in Subqueries
-    
+
     Workflow:
     1. LLM-basierte Analyse der Query-Komplexität
     2. Identifikation logisch unabhängiger Teilfragen
@@ -146,10 +146,10 @@ async def decompose_query(self, query_text: str, user_context: Dict[str, Any]) -
         model="llama3.2:3b",
         format="json"
     )
-    
+
     # Parse JSON
     subqueries_data = json.loads(llm_response)
-    
+
     # Validierung & Dependency-Check
     subqueries = []
     for idx, sq_data in enumerate(subqueries_data):
@@ -166,13 +166,13 @@ async def decompose_query(self, query_text: str, user_context: Dict[str, Any]) -
             }
         )
         subqueries.append(subquery)
-    
+
     # Dependency-Validierung (keine zyklischen Dependencies)
     if not self._validate_dependency_graph(subqueries):
         logger.warning("⚠️ Zyklische Dependencies erkannt - Fallback auf flache Liste")
         for sq in subqueries:
             sq.dependencies = []
-    
+
     return subqueries
 ```
 
@@ -231,7 +231,7 @@ AgentSelection(
 async def select_agents(self, subquery: SubQuery, rag_context: Dict[str, Any]) -> AgentSelection:
     """
     Wählt optimale Agents für Subquery
-    
+
     Matching-Strategien:
     1. Exact Capability Match (Score: 1.0)
     2. Partial Match (Score: 0.5-0.9)
@@ -239,14 +239,14 @@ async def select_agents(self, subquery: SubQuery, rag_context: Dict[str, Any]) -
     4. Fallback to General Agent (Score: 0.2)
     """
     matches: List[AgentAssignment] = []
-    
+
     # 1. Capability-basiertes Matching
     for agent_type, capabilities in AGENT_CAPABILITY_MAP.items():
         match_score = self._calculate_capability_overlap(
             subquery.required_capabilities,
             capabilities
         )
-        
+
         if match_score > 0.5:
             matches.append(AgentAssignment(
                 agent_type=agent_type,
@@ -254,7 +254,7 @@ async def select_agents(self, subquery: SubQuery, rag_context: Dict[str, Any]) -
                 matching_capabilities=list(set(subquery.required_capabilities) & set(capabilities)),
                 reason=f"Capability Match Score: {match_score:.2f}"
             ))
-    
+
     # 2. RAG-Context-Boosting
     if rag_context:
         rag_documents = rag_context.get("documents", [])
@@ -265,14 +265,14 @@ async def select_agents(self, subquery: SubQuery, rag_context: Dict[str, Any]) -
                     if match.agent_type == "environmental":
                         match.confidence_score = min(1.0, match.confidence_score + 0.2)
                         match.reason += " + RAG-Context-Boost"
-    
+
     # 3. Sortierung nach Confidence
     matches.sort(key=lambda m: m.confidence_score, reverse=True)
-    
+
     # 4. Top-Agent + Fallbacks
     selected = matches[:1] if matches else []
     fallbacks = matches[1:3] if len(matches) > 1 else []
-    
+
     return AgentSelection(
         subquery_id=subquery.id,
         selected_agents=selected,
@@ -321,11 +321,11 @@ SynthesizedResult(
     Die Luftqualität in München ist aktuell gut. Die Messwerte zeigen:
     - PM10: 25 µg/m³
     - NO2: 18 µg/m³
-    
+
     Zuständige Behörden für Umweltschutz in München:
     1. Referat für Gesundheit und Umwelt (Kontakt: ...)
     2. Bayerisches Landesamt für Umwelt (Kontakt: ...)
-    
+
     Quelle: Bayerisches Landesamt für Umwelt
     """,
     confidence_score=0.92,
@@ -357,43 +357,43 @@ SynthesizedResult(
 
 **Algorithmus:**
 ```python
-async def synthesize_results(self, 
+async def synthesize_results(self,
                              agent_results: List[AgentResult],
                              original_query: str) -> SynthesizedResult:
     """
     Aggregiert Agent-Ergebnisse zu kohärenter Antwort
-    
+
     Workflow:
     1. Konflikt-Detektion zwischen Agent-Antworten
     2. Deduplizierung redundanter Informationen
     3. LLM-basierte Narrative-Generierung
     4. Confidence-Scoring der finalen Antwort
     """
-    
+
     # 1. Konflikt-Detektion
     conflicts = self._detect_contradictions(agent_results)
     if conflicts:
         logger.warning(f"⚠️ {len(conflicts)} Konflikte erkannt - starte Auflösung")
         agent_results = self._resolve_conflicts(agent_results, conflicts)
-    
+
     # 2. Deduplizierung
     deduplicated = self._deduplicate_information(agent_results)
-    
+
     # 3. LLM Synthesis
     synthesis_prompt = SYNTHESIS_PROMPT.format(
         original_query=original_query,
         agent_results=json.dumps([r.to_dict() for r in deduplicated], indent=2)
     )
-    
+
     synthesized_text = await self.ollama_client.generate(
         prompt=synthesis_prompt,
         model="llama3.2:3b",
         temperature=0.3  # Niedriger für faktische Genauigkeit
     )
-    
+
     # 4. Confidence-Berechnung
     avg_confidence = sum(r.confidence_score for r in deduplicated) / len(deduplicated)
-    
+
     return SynthesizedResult(
         response_text=synthesized_text,
         confidence_score=avg_confidence,
@@ -489,10 +489,10 @@ class SynthesizedResult:
    ```python
    def test_simple_query_no_decomposition():
        # "Wer ist zuständig für X?" → 1 Subquery
-       
+
    def test_complex_query_with_dependencies():
        # "Vergleiche X und Y" → 2 Subqueries mit Dependencies
-       
+
    def test_multi_domain_query():
        # Environmental + Legal + Financial → 3 Domains
    ```
@@ -501,10 +501,10 @@ class SynthesizedResult:
    ```python
    def test_exact_capability_match():
        # Subquery mit "air_quality" → Environmental Agent
-       
+
    def test_partial_capability_match():
        # Subquery mit "environmental_data" → 2 Candidates
-       
+
    def test_rag_context_boosting():
        # RAG liefert "environmental" docs → Boost Env Agent
    ```
@@ -513,10 +513,10 @@ class SynthesizedResult:
    ```python
    def test_conflict_detection():
        # Agent A sagt "gut", Agent B sagt "schlecht"
-       
+
    def test_deduplication():
        # 2 Agents liefern identische Fakten
-       
+
    def test_llm_synthesis():
        # Multi-Agent-Ergebnisse → Kohärente Narrative
    ```
@@ -526,20 +526,20 @@ class SynthesizedResult:
 ```python
 async def test_supervisor_end_to_end():
     supervisor = SupervisorAgent(ollama_client, agent_registry)
-    
+
     query = "Wie ist die Luftqualität in München und welche Behörden sind zuständig?"
-    
+
     # Decomposition
     subqueries = await supervisor.decompose_query(query, {})
     assert len(subqueries) == 2
-    
+
     # Selection
     agent_plan = await supervisor.create_agent_plan(subqueries, {})
     assert "environmental" in [a.agent_type for a in agent_plan.assignments]
-    
+
     # Orchestration (Mock)
     mock_results = [...]
-    
+
     # Synthesis
     final = await supervisor.synthesize_results(mock_results, query)
     assert final.confidence_score > 0.7

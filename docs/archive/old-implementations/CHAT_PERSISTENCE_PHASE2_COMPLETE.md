@@ -1,7 +1,7 @@
 # Chat-Persistence Phase 2 COMPLETE ✅
 
-**Version:** v3.20.0  
-**Datum:** 12. Oktober 2025, 15:15 Uhr  
+**Version:** v3.20.0
+**Datum:** 12. Oktober 2025, 15:15 Uhr
 **Status:** ✅ PHASE 2 ABGESCHLOSSEN (Session-Restore UI)
 
 ---
@@ -351,7 +351,7 @@ frontend/
    - Automatische Anzeige beim Start
    - Auto-Restore-Option
    - Liste der letzten 10 Sessions
-   
+
 2. ✅ **Session-Manager-UI**
    - Vollständige Verwaltung
    - Suche/Filter/Sortierung
@@ -377,8 +377,8 @@ frontend/
 3. ✅ **Session-Manager-UI** - veritas_ui_session_manager.py
 4. ✅ **UI-Tests** - test_chat_persistence_ui.py
 
-**Geschätzte Zeit:** 1-2h  
-**Tatsächliche Zeit:** ~1.5h  
+**Geschätzte Zeit:** 1-2h
+**Tatsächliche Zeit:** ~1.5h
 **Effort:** ✅ On Target
 
 ---
@@ -420,6 +420,6 @@ frontend/
 
 ---
 
-**Erstellt:** 12. Oktober 2025, 15:15 Uhr  
-**Autor:** GitHub Copilot  
+**Erstellt:** 12. Oktober 2025, 15:15 Uhr
+**Autor:** GitHub Copilot
 **Review:** VERITAS Team

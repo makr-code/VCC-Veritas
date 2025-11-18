@@ -871,9 +871,15 @@ class ImmissionsschutzOrchestrator:
             
             # Step 3 & 4: Trends + Messreihen (parallel)
             # Finde häufigste Messarten für Trend-Analyse
+<<<<<<< Updated upstream
             messarten_count = {}
             for m in (messungen or []):
                 art = m.get('messart', 'Unbekannt')
+=======
+            messarten_count: Dict[str, int] = {}
+            for m in messungen or []:
+                art = m.get("messart", "Unbekannt")
+>>>>>>> Stashed changes
                 messarten_count[art] = messarten_count.get(art, 0) + 1
             
             top_messarten = sorted(messarten_count.items(), key=lambda x: x[1], reverse=True)[:3]

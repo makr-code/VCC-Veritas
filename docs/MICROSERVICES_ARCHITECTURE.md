@@ -1,7 +1,7 @@
 # VERITAS Microservices Architecture
 
-**Version:** 4.0.0  
-**Datum:** 19. Oktober 2025  
+**Version:** 4.0.0
+**Datum:** 19. Oktober 2025
 **Prinzip:** Klare Trennung der Verantwortlichkeiten (Separation of Concerns)
 
 ---
@@ -96,10 +96,10 @@ VERITAS folgt einer **strikten Microservices-Architektur** mit klarer Verantwort
 
 class DatabaseManager:
     """Manager für Database-Konfigurationen"""
-    
+
     def _load_default_config(self):
         """Lade Standard-Konfiguration mit ECHTEN Credentials"""
-        
+
         self.databases = [
             # Vector Database - ChromaDB (Remote)
             DatabaseConnection(
@@ -112,7 +112,7 @@ class DatabaseManager:
                     'similarity_threshold': 0.3
                 }
             ),
-            
+
             # Graph Database - Neo4j (Remote)
             DatabaseConnection(
                 db_type=DatabaseType.GRAPH,
@@ -126,7 +126,7 @@ class DatabaseManager:
                     'uri': os.getenv('NEO4J_URI', 'neo4j://192.168.178.94:7687')
                 }
             ),
-            
+
             # Relational Database - PostgreSQL (Remote)
             DatabaseConnection(
                 db_type=DatabaseType.RELATIONAL,
@@ -137,7 +137,7 @@ class DatabaseManager:
                 password=os.getenv('POSTGRES_PASSWORD', 'postgres'),
                 database=os.getenv('POSTGRES_DB', 'vcc_relational_prod')
             ),
-            
+
             # Document Database - CouchDB (Remote)
             DatabaseConnection(
                 db_type=DatabaseType.FILE,
@@ -215,23 +215,23 @@ class DatabaseManager:
         # Die zentrale config.py enthält die ECHTEN DB-Credentials
         self.db_config = DBConfigManager()
         self.logger.info("📋 Zentrale Database-Konfiguration geladen")
-        
+
         # Merge: VERITAS sagt "enabled", Config liefert Credentials
         backend_dict = self._merge_config_with_request(backend_dict)
-    
+
     def _merge_config_with_request(self, backend_dict: Dict) -> Dict:
         """
         Merge Request (welche Backends aktiviert) mit zentraler Config (echte Credentials).
-        
+
         Input:  {"vector": {"enabled": True}, "graph": {"enabled": True}}
         Config: {host: "192.168.178.94", port: 7687, username: "neo4j", ...}
         Output: {"vector": {"enabled": True, "host": "...", "port": ..., ...}}
         """
         merged = {}
-        
+
         for db_conn in self.db_config.databases:
             db_type_str = db_conn.db_type.value  # 'vector', 'graph', ...
-            
+
             # Prüfe ob VERITAS diesen Backend-Typ angefordert hat
             requested = backend_dict.get(db_type_str, {})
             if isinstance(requested, dict) and requested.get('enabled', False):
@@ -241,7 +241,7 @@ class DatabaseManager:
                     f"✅ {db_type_str.upper()}: {db_conn.backend.value} "
                     f"@ {db_conn.host}:{db_conn.port}"
                 )
-        
+
         return merged
 ```
 
@@ -274,7 +274,7 @@ graph_conf = backend_dict.get('graph')
 if graph_conf and graph_conf.get('enabled'):
     from uds3.database.database_api_neo4j import Neo4jGraphBackend
     conf = {k: v for k, v in graph_conf.items() if k != 'enabled'}
-    # conf enthält jetzt: {host: "192.168.178.94", port: 7687, 
+    # conf enthält jetzt: {host: "192.168.178.94", port: 7687,
     #                      username: "neo4j", password: "v3f3b1d7", ...}
     self._backend_factories['graph'] = (Neo4jGraphBackend, conf)
 ```
@@ -291,13 +291,13 @@ class Neo4jGraphBackend(GraphDatabaseBackend):
         super().__init__(config)
         cfg = config or {}
         settings = cfg.get('settings') or {}
-        
+
         # Config enthält jetzt die ECHTEN Credentials aus config.py
         self.uri = cfg.get('uri') or settings.get('uri') or 'neo4j://localhost:7687'
         self.user = cfg.get('user') or cfg.get('username') or 'neo4j'
         self.password = cfg.get('password') or ''
         self.database_name = cfg.get('database') or settings.get('db_name')
-    
+
     def connect(self) -> bool:
         """Connect mit echten Credentials"""
         self._driver = GraphDatabase.driver(
@@ -349,7 +349,7 @@ from .config import DatabaseManager as DBConfigManager
 def __init__(self, backend_dict, ...):
     # ✅ Zentrale Config laden
     self.db_config = DBConfigManager()
-    
+
     # ✅ Merge mit Request
     backend_dict = self._merge_config_with_request(backend_dict)
 ```
@@ -656,6 +656,6 @@ def __init__(self, backend_dict, ...):
 
 ---
 
-**Dokumentiert:** 19. Oktober 2025  
-**Version:** 4.0.0  
+**Dokumentiert:** 19. Oktober 2025
+**Version:** 4.0.0
 **Status:** Production Ready ✅

@@ -1,8 +1,8 @@
 # ChromaDB Collection Management - API Documentation
 
-**Letzte Aktualisierung:** 12. Oktober 2025, 22:00 Uhr  
-**Version:** UDS3 v1.4.0  
-**ChromaDB API:** v2 (UUID-based)  
+**Letzte Aktualisierung:** 12. Oktober 2025, 22:00 Uhr
+**Version:** UDS3 v1.4.0
+**ChromaDB API:** v2 (UUID-based)
 **Deployment:** Remote HTTP Only (keine lokale ChromaDB Installation)
 
 ---
@@ -24,7 +24,7 @@ Diese Methoden sind speziell für **ChromaDB v2 API** optimiert und unterstütze
 
 ### 1. `get_collection_id(name: str) -> Optional[str]`
 
-**Beschreibung:**  
+**Beschreibung:**
 Ermittelt die Collection UUID aus dem Collection-Namen. Essentiell für ChromaDB v2 API Operationen, die Collection UUIDs statt Namen erwarten.
 
 **Parameter:**
@@ -91,13 +91,13 @@ GET /api/v2/tenants/{tenant}/databases/{database}/collections/{name}
 
 ### 2. `get_all_collections() -> List[Dict[str, Any]]`
 
-**Beschreibung:**  
+**Beschreibung:**
 Ruft alle verfügbaren Collections mit vollständigen Details ab. Erweiterte Version von `list_collections()` mit zusätzlichen Metadaten.
 
-**Parameter:**  
+**Parameter:**
 Keine
 
-**Return:**  
+**Return:**
 Liste von Dicts mit folgenden Feldern:
 - `id` (str): Collection UUID (v2 API)
 - `name` (str): Collection Name
@@ -308,20 +308,20 @@ def health_check_collections(backend):
     """Check all collections and report status"""
     try:
         collections = backend.get_all_collections()
-        
+
         print(f"✅ ChromaDB Health Check:")
         print(f"   Total Collections: {len(collections)}")
-        
+
         for col in collections:
             # Get collection UUID
             col_id = backend.get_collection_id(col['name'])
-            
+
             # Verify UUID matches
             if col_id == col['id']:
                 print(f"   ✅ {col['name']}: OK (UUID: {col_id[:8]}...)")
             else:
                 print(f"   ⚠️ {col['name']}: UUID Mismatch!")
-        
+
         return True
     except Exception as e:
         print(f"❌ Health Check Failed: {e}")
@@ -433,6 +433,6 @@ Für Fragen oder Feature Requests: VERITAS v7.0 Team
 
 ---
 
-**Letzte Aktualisierung:** 12. Oktober 2025, 21:50 Uhr  
-**Status:** ✅ Production Ready  
+**Letzte Aktualisierung:** 12. Oktober 2025, 21:50 Uhr
+**Status:** ✅ Production Ready
 **Tests:** 4/4 PASSED

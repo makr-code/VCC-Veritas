@@ -34,11 +34,11 @@ if os.getenv('VERITAS_ENABLE_HYBRID_SEARCH', 'false').lower() == 'true':
     # Initialize components
     uds3_adapter = get_uds3_adapter()
     bm25 = SparseRetriever()
-    
+
     # Load & index your corpus
     corpus = load_your_corpus()  # Your existing corpus loading
     await bm25.index_documents(corpus)
-    
+
     # Create Hybrid Retriever
     global hybrid_retriever
     hybrid_retriever = HybridRetriever(
@@ -162,7 +162,7 @@ python tests/ground_truth_dataset.py
 
 ### Issue 1: Latency >500ms
 
-**Cause:** Query Expansion enabled  
+**Cause:** Query Expansion enabled
 **Solution:**
 ```powershell
 $env:VERITAS_ENABLE_QUERY_EXPANSION="false"
@@ -171,7 +171,7 @@ $env:VERITAS_ENABLE_QUERY_EXPANSION="false"
 
 ### Issue 2: No Results
 
-**Cause:** Corpus not indexed  
+**Cause:** Corpus not indexed
 **Solution:**
 ```python
 # In backend initialization
@@ -181,15 +181,15 @@ await bm25.index_documents(corpus)
 
 ### Issue 3: Dense Score always 0.0
 
-**Cause:** Vector DB empty (expected!)  
-**Solution:** 
+**Cause:** Vector DB empty (expected!)
+**Solution:**
 - Week 2-3: Populate Vector DB via UDS3
 - For now: This is expected behavior
 - System works correctly in BM25-only mode
 
 ### Issue 4: Import Errors
 
-**Cause:** Python path issues  
+**Cause:** Python path issues
 **Solution:**
 ```python
 import sys

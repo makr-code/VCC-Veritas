@@ -1,7 +1,7 @@
 # 🔄 PHASE A: PIVOTPUNKT - Worker Implementation Status
 
-**Datum**: 16. Oktober 2025  
-**Status**: Import-Fixes COMPLETE, Implementation-Gap DISCOVERED  
+**Datum**: 16. Oktober 2025
+**Status**: Import-Fixes COMPLETE, Implementation-Gap DISCOVERED
 **Kritische Entscheidung erforderlich**: Strategie-Wechsel
 
 ---
@@ -24,8 +24,8 @@
 
 ### Fehler-Meldung:
 ```
-Can't instantiate abstract class BuildingPermitWorker without 
-an implementation for abstract methods 'execute_step', 
+Can't instantiate abstract class BuildingPermitWorker without
+an implementation for abstract methods 'execute_step',
 'get_agent_type', 'get_capabilities'
 ```
 
@@ -80,10 +80,10 @@ class BuildingPermitWorker(ExternalAPIWorker):
             "confidence": 0.7,
             "source": "mock"
         }
-    
+
     def get_agent_type(self):
         return "building_permit"
-    
+
     def get_capabilities(self):
         return ["building_permit", "construction", "legal"]
 ```
@@ -116,19 +116,19 @@ class BuildingPermitWorker(ExternalAPIWorker):
             step['parameters']['query'],
             categories=["BauGB", "BauO", "DIN-Normen"]
         )
-        
+
         # 2. UDS3: Baugenehmigungen in der Nähe
         location = self._extract_location(step['parameters']['query'])
         nearby_permits = self.uds3_adapter.query_by_location(
             location, radius=5000, type="building_permit"
         )
-        
+
         # 3. LLM: Analyse und Synthese
         analysis = self.ollama_client.generate(
             prompt=self._build_analysis_prompt(rag_results, nearby_permits),
             model="llama3.1:8b"
         )
-        
+
         return {
             "status": "success",
             "data": analysis,
@@ -154,7 +154,7 @@ class BuildingPermitWorker(ExternalAPIWorker):
 
 ### **Option C: HYBRID - Nutze vorhandene 6 Agents JETZT** (1 Tag)
 
-**Ansatz**: 
+**Ansatz**:
 1. Integriere die 6 funktionierenden Agents **sofort**
 2. Erstelle Mock-Wrapper für die 12 Skeleton-Workers
 3. Implementiere Skeleton-Workers schrittweise später
@@ -170,7 +170,7 @@ class WorkerRegistry:
         self._register_worker("WikipediaAgent", ...)       # ✅ FUNKTIONIERT
         self._register_worker("AtmosphericFlowAgent", ...) # ✅ FUNKTIONIERT
         self._register_worker("DatabaseAgent", ...)        # ✅ FUNKTIONIERT
-        
+
         # SKELETON WORKERS (MOCK-FALLBACK)
         # Werden übersprungen oder mit generischer Logik registriert
 ```
@@ -187,7 +187,7 @@ class WorkerRegistry:
 - ⚠️ Nur 6 statt 18 Workers initial
 - ⚠️ Domain-Coverage limitiert
 
-**Aufwand**: 
+**Aufwand**:
 - Phase 1: 8 Stunden (Registry + Integration)
 - Phase 2: 192-384 Stunden (verteilt über Wochen)
 
@@ -204,7 +204,7 @@ class WorkerRegistry:
 
 ### Revised Timeline:
 
-**HEUTE (Tag 1)**: 
+**HEUTE (Tag 1)**:
 - ✅ Import-Fixes DONE
 - ⏳ Registry mit 6 Agents (8h)
 
@@ -248,7 +248,7 @@ class WorkerRegistry:
 3. **MORGEN**: Test & Demo
 4. **DANN**: Entscheidung für Phase A2
 
-**Sind Sie einverstanden mit Option C (Hybrid)?** 
+**Sind Sie einverstanden mit Option C (Hybrid)?**
 
 - **JA** → Ich erstelle Registry mit 6 Agents (1 Stunde)
 - **NEIN, Option A** → Mock-Implementation für alle 12 (2-3 Tage)

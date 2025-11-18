@@ -287,8 +287,13 @@ class ContextWindowManager:
         Returns:
             Liste empfohlener Modelle (sortiert nach Eignung)
         """
+<<<<<<< Updated upstream
         recommendations = []
         
+=======
+        recommendations: List[str] = []
+
+>>>>>>> Stashed changes
         # Einfache Queries (1-3) → Small Models
         if complexity_score <= 3:
             recommendations.extend(["phi3", "gemma3"])
@@ -306,7 +311,7 @@ class ContextWindowManager:
             recommendations.extend(["llama3.1:70b", "mixtral"])
         
         # Filtere nach Context-Window
-        suitable = []
+        suitable: List[str] = []
         for model_name in recommendations:
             spec = self.get_model_spec(model_name)
             if spec.safe_max_output >= token_budget:
@@ -337,8 +342,15 @@ if __name__ == "__main__":
     # Test 2: Token-Budget-Anpassung
     print("\n\n💰 TOKEN-BUDGET-ANPASSUNG")
     print("─" * 80)
+<<<<<<< Updated upstream
     
     test_cases = [
+=======
+
+    from typing import Any as _Any
+
+    test_cases: List[Dict[str, _Any]] = [
+>>>>>>> Stashed changes
         {
             "model": "phi3",
             "requested": 2000,

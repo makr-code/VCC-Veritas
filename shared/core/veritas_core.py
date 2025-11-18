@@ -184,9 +184,10 @@ class ThreadManager:
     def __init__(self):
         self.threads: Dict[str, threading.Thread] = {}
         self.queues: Dict[str, queue.Queue] = {}
-        self.main_queue = queue.Queue()
+        self.main_queue: queue.Queue = queue.Queue()
         self.shutdown_event = threading.Event()
         self._lock = threading.Lock()
+<<<<<<< Updated upstream
         self._stats = {
             'messages_sent': 0,
             'threads_created': 0,
@@ -194,12 +195,16 @@ class ThreadManager:
             'start_time': datetime.now()
         }
         
+=======
+        self._stats: Dict[str, Any] = {"messages_sent": 0, "threads_created": 0, "errors": 0, "start_time": datetime.now()}
+
+>>>>>>> Stashed changes
         logger.info("ThreadManager initialisiert")
     
     def create_thread_queue(self, thread_id: str) -> queue.Queue:
         """Erstellt eine neue Queue für einen Thread"""
         with self._lock:
-            thread_queue = queue.Queue()
+            thread_queue: queue.Queue = queue.Queue()
             self.queues[thread_id] = thread_queue
             self._stats['threads_created'] += 1
             logger.info(f"Queue für Thread {thread_id} erstellt")
@@ -314,6 +319,7 @@ class SessionManager:
     def __init__(self):
         self._sessions: Dict[str, Dict] = {}
         self._lock = threading.Lock()
+<<<<<<< Updated upstream
         self._health_stats = {
             'successful_requests': 0,
             'failed_requests': 0,
@@ -321,6 +327,15 @@ class SessionManager:
             'active_sessions': 0
         }
         
+=======
+        self._health_stats: Dict[str, int] = {
+            "successful_requests": 0,
+            "failed_requests": 0,
+            "total_sessions": 0,
+            "active_sessions": 0,
+        }
+
+>>>>>>> Stashed changes
     def create_session(self, user_id: str, **kwargs) -> Optional[str]:
         """Erstellt eine neue API-Session"""
         try:
@@ -338,8 +353,13 @@ class SessionManager:
             
             if response.status_code == 200:
                 data = response.json()
+<<<<<<< Updated upstream
                 session_id = data.get("session_id")
                 
+=======
+                session_id: Optional[str] = data.get("session_id")
+
+>>>>>>> Stashed changes
                 with self._lock:
                     self._sessions[session_id] = {
                         'user_id': user_id,

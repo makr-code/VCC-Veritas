@@ -1,7 +1,7 @@
 # VERITAS v7.0 - Quick Start Guide (Real Systems)
 
-**Version:** v7.0 Phase 4 Complete  
-**Date:** 13. Oktober 2025  
+**Version:** v7.0 Phase 4 Complete
+**Date:** 13. Oktober 2025
 **Status:** ✅ Ready for Real Testing
 
 ---
@@ -83,19 +83,19 @@ async def test():
     # Initialize
     ollama = VeritasOllamaClient(base_url="http://localhost:11434")
     await ollama.initialize()
-    
+
     orchestrator = UnifiedOrchestratorV7(
         ollama_client=ollama,
         uds3_strategy=None  # Auto-init
     )
-    
+
     # Process query
     async for event in orchestrator.process_query_stream(
         query="Brauche ich Baugenehmigung für Carport in BW?"
     ):
         if event.type == "final_result":
             print(f"Answer: {event.data['final_answer']['main_answer']}")
-    
+
     await ollama.close()
 
 asyncio.run(test())

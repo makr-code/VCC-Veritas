@@ -1,6 +1,6 @@
 """
 VERITAS Protected Module
-WARNING: This file contains embedded protection keys. 
+WARNING: This file contains embedded protection keys.
 Modification will be detected and may result in license violations.
 """
 
@@ -24,12 +24,13 @@ import tkinter as tk
 class Tooltip:
     """
     Erweiterte Tooltip-Klasse für GUI-Elemente
-    
+
     Features:
     - Einfache Textanzeige
     - Optional: Klickbarer Link mit Callback
     - Multi-line Support
     """
+
     def __init__(self, widget, text, link_text=None, link_callback=None):
         """
         Args:
@@ -58,23 +59,15 @@ class Tooltip:
         self.tipwindow = tw = tk.Toplevel(self.widget)
         tw.wm_overrideredirect(True)
         tw.wm_geometry(f"+{x}+{y}")
-        
+
         # Frame für Tooltip-Inhalt
         frame = tk.Frame(tw, relief="solid", borderwidth=1, bg="#FFFFDD")
         frame.pack()
-        
+
         # Haupttext
-        label = tk.Label(
-            frame, 
-            text=self.text, 
-            justify=tk.LEFT,
-            bg="#FFFFDD",
-            padx=8, 
-            pady=5,
-            font=('Segoe UI', 9)
-        )
+        label = tk.Label(frame, text=self.text, justify=tk.LEFT, bg="#FFFFDD", padx=8, pady=5, font=("Segoe UI", 9))
         label.pack()
-        
+
         # Optional: Klickbarer Link
         if self.link_text and self.link_callback:
             link_label = tk.Label(
@@ -83,9 +76,9 @@ class Tooltip:
                 fg="#0066CC",
                 bg="#FFFFDD",
                 cursor="hand2",
-                font=('Segoe UI', 9, 'underline'),
+                font=("Segoe UI", 9, "underline"),
                 padx=8,
-                pady=3
+                pady=3,
             )
             link_label.pack()
             link_label.bind("<Button-1>", lambda e: self._on_link_click())
@@ -111,13 +104,13 @@ class Tooltip:
 class CollapsibleSection:
     """
     Wiederverwendbare Collapsible Section für Text-Widgets
-    
+
     Ermöglicht Expand/Collapse von Sections mit:
     - Toggle-Icons (▶/▼)
     - Click-Handler
     - State-Management
     - Optional: Animation
-    
+
     Usage:
         section = CollapsibleSection(
             text_widget=chat_text,
@@ -128,7 +121,7 @@ class CollapsibleSection:
         )
         section.insert_content(lambda: insert_sources_here())
     """
-    
+
     def __init__(
         self,
         text_widget: tk.Text,
@@ -136,7 +129,7 @@ class CollapsibleSection:
         title: str,
         initially_collapsed: bool = False,
         parent_window: tk.Tk = None,
-        animate: bool = True
+        animate: bool = True,
     ):
         """
         Args:
@@ -153,12 +146,12 @@ class CollapsibleSection:
         self.is_collapsed = initially_collapsed
         self.parent_window = parent_window
         self.animate = animate
-        
+
         # Tags für diese Section
         self.header_tag = f"collapsible_header_{section_id}"
         self.content_tag = f"collapsible_content_{section_id}"
         self.arrow_tag = f"collapsible_arrow_{section_id}"
-        
+
         # Positions-Tracker
         self.header_start = None
         self.header_end = None
@@ -166,127 +159,127 @@ class CollapsibleSection:
         self.content_end = None
         self.arrow_start = None
         self.arrow_end = None
-        
+
         # Animation State
         self._animation_in_progress = False
-    
+
     def insert_header(self):
         """Fügt Section-Header mit Toggle-Button ein"""
         # Arrow Icon (▶ collapsed, ▼ expanded)
         arrow = "▶" if self.is_collapsed else "▼"
-        
+
         self.arrow_start = self.text_widget.index(tk.END)
         self.text_widget.insert(tk.END, f"{arrow} ", self.arrow_tag)
         self.arrow_end = self.text_widget.index(tk.END)
-        
+
         # Title
         self.header_start = self.text_widget.index(tk.END)
         self.text_widget.insert(tk.END, self.title, self.header_tag)
         self.header_end = self.text_widget.index(tk.END)
-        
+
         self.text_widget.insert(tk.END, "\n")
-        
+
         # Click-Handler für Toggle
         self.text_widget.tag_bind(self.header_tag, "<Button-1>", self._toggle)
         self.text_widget.tag_bind(self.arrow_tag, "<Button-1>", self._toggle)
-        
+
         # Styling
-        self.text_widget.tag_configure(self.header_tag, foreground="#0066CC", font=('Segoe UI', 10, 'bold'))
+        self.text_widget.tag_configure(self.header_tag, foreground="#0066CC", font=("Segoe UI", 10, "bold"))
         self.text_widget.tag_configure(self.arrow_tag, foreground="#0066CC")
-        
+
         # Cursor über Events für beide Tags
         self.text_widget.tag_bind(self.header_tag, "<Enter>", lambda e: self.text_widget.config(cursor="hand2"))
         self.text_widget.tag_bind(self.header_tag, "<Leave>", lambda e: self.text_widget.config(cursor=""))
         self.text_widget.tag_bind(self.arrow_tag, "<Enter>", lambda e: self.text_widget.config(cursor="hand2"))
         self.text_widget.tag_bind(self.arrow_tag, "<Leave>", lambda e: self.text_widget.config(cursor=""))
-    
+
     def insert_content(self, content_callback):
         """
         Fügt Section-Content ein
-        
+
         Args:
             content_callback: Callable das den Content einfügt
         """
         self.content_start = self.text_widget.index(tk.END)
-        
+
         # Content-Callback ausführen
         content_callback()
-        
+
         self.content_end = self.text_widget.index(tk.END)
-        
+
         # Content-Tag hinzufügen
         self.text_widget.tag_add(self.content_tag, self.content_start, self.content_end)
-        
+
         # Initial State setzen
         if self.is_collapsed:
             self.text_widget.tag_configure(self.content_tag, elide=True)
         else:
             self.text_widget.tag_configure(self.content_tag, elide=False)
-    
+
     def _toggle(self, event=None):
         """Toggle expand/collapse State"""
         if self._animation_in_progress:
             return "break"
-        
+
         if self.is_collapsed:
             self._expand()
         else:
             self._collapse()
-        
+
         return "break"
-    
+
     def _expand(self):
         """Expandiert die Section (optional mit Animation)"""
         if self.animate and self.parent_window:
             self._animated_expand()
         else:
             self._instant_expand()
-    
+
     def _collapse(self):
         """Collapsed die Section (optional mit Animation)"""
         if self.animate and self.parent_window:
             self._animated_collapse()
         else:
             self._instant_collapse()
-    
+
     def _instant_expand(self):
         """Instant Expand ohne Animation"""
         self.is_collapsed = False
         self._update_arrow("▼")
         self.text_widget.tag_configure(self.content_tag, elide=False)
-    
+
     def _instant_collapse(self):
         """Instant Collapse ohne Animation"""
         self.is_collapsed = True
         self._update_arrow("▶")
         self.text_widget.tag_configure(self.content_tag, elide=True)
-    
+
     def _animated_expand(self):
         """Expandiert mit smooth Animation"""
         self._animation_in_progress = True
         self.is_collapsed = False
         self._update_arrow("▼")
-        
+
         # Sofort einblenden (Animation könnte hier komplexer sein)
         self.text_widget.tag_configure(self.content_tag, elide=False)
-        
+
         # Scroll zu Content
         if self.parent_window:
             self.parent_window.after(50, lambda: self.text_widget.see(self.content_start))
-        
+
         self._animation_in_progress = False
-    
+
     def _animated_collapse(self):
         """Collapsed mit smooth Animation"""
         self._animation_in_progress = True
         self.is_collapsed = True
         self._update_arrow("▶")
-        
+
         # Sofort verstecken
         self.text_widget.tag_configure(self.content_tag, elide=True)
-        
+
         self._animation_in_progress = False
-    
+
     def _update_arrow(self, new_arrow: str):
         """Aktualisiert Arrow Icon"""
         try:

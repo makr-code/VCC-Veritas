@@ -28,12 +28,13 @@ Relevance Score Guidelines:
 """
 
 from dataclasses import dataclass
-from typing import List, Dict
+from typing import Dict, List
 
 
 @dataclass
 class GroundTruthTestCase:
     """Labeled test case for evaluation."""
+
     query: str
     expected_doc_ids: List[str]
     relevance_scores: Dict[str, float]
@@ -49,7 +50,6 @@ GROUND_TRUTH_DATASET = [
     # ========================================================================
     # CATEGORY: Legal Queries
     # ========================================================================
-    
     GroundTruthTestCase(
         query="§ 242 BGB Treu und Glauben",
         expected_doc_ids=[
@@ -66,9 +66,8 @@ GROUND_TRUTH_DATASET = [
             "baurecht_overview": 0.4,  # Somewhat relevant
         },
         category="legal",
-        description="Exact legal paragraph lookup with context"
+        description="Exact legal paragraph lookup with context",
     ),
-    
     GroundTruthTestCase(
         query="Baurecht BGB VOB Vorschriften",
         expected_doc_ids=[
@@ -85,13 +84,11 @@ GROUND_TRUTH_DATASET = [
             "bauordnung_grundlagen": 0.7,
         },
         category="legal",
-        description="Multi-keyword legal query spanning BGB and VOB"
+        description="Multi-keyword legal query spanning BGB and VOB",
     ),
-    
     # ========================================================================
     # CATEGORY: Technical Norms
     # ========================================================================
-    
     GroundTruthTestCase(
         query="DIN 18040-1 Barrierefreies Bauen",
         expected_doc_ids=[
@@ -108,9 +105,8 @@ GROUND_TRUTH_DATASET = [
             "bauordnung_barrierefreiheit": 0.6,
         },
         category="technical",
-        description="Exact DIN norm lookup"
+        description="Exact DIN norm lookup",
     ),
-    
     GroundTruthTestCase(
         query="Barrierefreiheit öffentliche Gebäude Normen",
         expected_doc_ids=[
@@ -127,13 +123,11 @@ GROUND_TRUTH_DATASET = [
             "din_18024_accessibility": 0.5,  # Outdated but related
         },
         category="technical",
-        description="Semantic technical query without exact norm number"
+        description="Semantic technical query without exact norm number",
     ),
-    
     # ========================================================================
     # CATEGORY: Environmental Law
     # ========================================================================
-    
     GroundTruthTestCase(
         query="Umweltverträglichkeitsprüfung UVPG",
         expected_doc_ids=[
@@ -150,13 +144,11 @@ GROUND_TRUTH_DATASET = [
             "baugenehmigung_uvp": 0.6,
         },
         category="environmental",
-        description="Environmental law with acronym UVP/UVPG"
+        description="Environmental law with acronym UVP/UVPG",
     ),
-    
     # ========================================================================
     # CATEGORY: Multi-Topic Queries
     # ========================================================================
-    
     GroundTruthTestCase(
         query="Nachhaltiges barrierefreies Bauen mit Umweltverträglichkeitsprüfung",
         expected_doc_ids=[
@@ -175,9 +167,8 @@ GROUND_TRUTH_DATASET = [
             "umweltrecht_grundlagen": 0.6,  # UVP context
         },
         category="multi_topic",
-        description="Complex query spanning sustainability, accessibility, environment"
+        description="Complex query spanning sustainability, accessibility, environment",
     ),
-    
     GroundTruthTestCase(
         query="Wie baue ich ein energieeffizientes Haus nach aktuellen Normen?",
         expected_doc_ids=[
@@ -196,13 +187,11 @@ GROUND_TRUTH_DATASET = [
             "bauordnung_grundlagen": 0.5,
         },
         category="multi_topic",
-        description="Natural language question, energy + norms"
+        description="Natural language question, energy + norms",
     ),
-    
     # ========================================================================
     # ADD MORE TEST CASES HERE
     # ========================================================================
-    
     # TODO: Add 15-20 more test cases covering:
     # - Edge cases (very short queries, very long queries)
     # - Specialized legal terms
@@ -210,7 +199,6 @@ GROUND_TRUTH_DATASET = [
     # - Multi-word phrases
     # - Questions vs keywords
     # - Ambiguous queries
-    
 ]
 
 
@@ -218,56 +206,42 @@ GROUND_TRUTH_DATASET = [
 # VALIDATION FUNCTIONS
 # ============================================================================
 
+
 def validate_dataset(dataset: List[GroundTruthTestCase]) -> List[str]:
     """Validate ground-truth dataset.
-    
+
     Checks:
         - Relevance scores between 0.0 and 1.0
         - All expected_doc_ids have relevance scores
         - Relevance scores sorted in descending order
         - At least one doc with score >= 0.8
-    
+
     Returns:
         List of validation errors (empty if valid)
     """
     errors = []
-    
+
     for i, test_case in enumerate(dataset):
         # Check relevance scores range
         for doc_id, score in test_case.relevance_scores.items():
             if not 0.0 <= score <= 1.0:
-                errors.append(
-                    f"Test case {i} ('{test_case.query}'): "
-                    f"Invalid relevance score {score} for {doc_id}"
-                )
-        
+                errors.append(f"Test case {i} ('{test_case.query}'): " f"Invalid relevance score {score} for {doc_id}")
+
         # Check all expected docs have scores
         missing_scores = set(test_case.expected_doc_ids) - set(test_case.relevance_scores.keys())
         if missing_scores:
-            errors.append(
-                f"Test case {i} ('{test_case.query}'): "
-                f"Missing relevance scores for: {missing_scores}"
-            )
-        
+            errors.append(f"Test case {i} ('{test_case.query}'): " f"Missing relevance scores for: {missing_scores}")
+
         # Check at least one highly relevant doc
         max_score = max(test_case.relevance_scores.values()) if test_case.relevance_scores else 0.0
         if max_score < 0.8:
-            errors.append(
-                f"Test case {i} ('{test_case.query}'): "
-                f"No highly relevant docs (max score {max_score:.2f})"
-            )
-        
+            errors.append(f"Test case {i} ('{test_case.query}'): " f"No highly relevant docs (max score {max_score:.2f})")
+
         # Check relevance scores are sorted
-        expected_scores = [
-            test_case.relevance_scores.get(doc_id, 0.0)
-            for doc_id in test_case.expected_doc_ids
-        ]
+        expected_scores = [test_case.relevance_scores.get(doc_id, 0.0) for doc_id in test_case.expected_doc_ids]
         if expected_scores != sorted(expected_scores, reverse=True):
-            errors.append(
-                f"Test case {i} ('{test_case.query}'): "
-                f"Expected docs not sorted by relevance"
-            )
-    
+            errors.append(f"Test case {i} ('{test_case.query}'): " f"Expected docs not sorted by relevance")
+
     return errors
 
 
@@ -276,20 +250,18 @@ def get_dataset_stats(dataset: List[GroundTruthTestCase]) -> Dict[str, any]:
     categories = {}
     total_docs = 0
     avg_relevance = []
-    
+
     for test_case in dataset:
         # Category distribution
         categories[test_case.category] = categories.get(test_case.category, 0) + 1
-        
+
         # Document counts
         total_docs += len(test_case.expected_doc_ids)
-        
+
         # Average relevance
         if test_case.relevance_scores:
-            avg_relevance.append(
-                sum(test_case.relevance_scores.values()) / len(test_case.relevance_scores)
-            )
-    
+            avg_relevance.append(sum(test_case.relevance_scores.values()) / len(test_case.relevance_scores))
+
     return {
         "total_queries": len(dataset),
         "categories": categories,
@@ -304,10 +276,10 @@ def get_dataset_stats(dataset: List[GroundTruthTestCase]) -> Dict[str, any]:
 
 if __name__ == "__main__":
     print("=== Ground-Truth Dataset Validation ===\n")
-    
+
     # Validate dataset
     errors = validate_dataset(GROUND_TRUTH_DATASET)
-    
+
     if errors:
         print("❌ Validation errors found:")
         for error in errors:
@@ -315,7 +287,7 @@ if __name__ == "__main__":
         print()
     else:
         print("✅ Dataset validation passed!\n")
-    
+
     # Show statistics
     stats = get_dataset_stats(GROUND_TRUTH_DATASET)
     print("📊 Dataset Statistics:")
@@ -324,7 +296,7 @@ if __name__ == "__main__":
     print(f"   Avg docs per query: {stats['avg_docs_per_query']:.1f}")
     print(f"   Avg relevance score: {stats['avg_relevance_score']:.2f}")
     print()
-    
+
     # Show sample
     print("📝 Sample test case:")
     sample = GROUND_TRUTH_DATASET[0]
@@ -333,7 +305,7 @@ if __name__ == "__main__":
     print(f"   Expected docs: {len(sample.expected_doc_ids)}")
     print(f"   Top relevance: {max(sample.relevance_scores.values()):.2f}")
     print()
-    
+
     print("⚠️  NEXT STEPS:")
     print("   1. Replace TODO doc IDs with real document IDs from your corpus")
     print("   2. Add 15-20 more test cases for comprehensive coverage")

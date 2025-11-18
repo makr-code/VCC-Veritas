@@ -1,8 +1,8 @@
 # 📋 PHASE 2: FULL IMPLEMENTATION - DETAILLIERTE ROADMAP
 
-**Projekt**: VERITAS Agent System - Vollständige Implementierung  
-**Zeitrahmen**: 6 Monate (26 Wochen)  
-**Start**: Q4 2025  
+**Projekt**: VERITAS Agent System - Vollständige Implementierung
+**Zeitrahmen**: 6 Monate (26 Wochen)
+**Start**: Q4 2025
 **Ziel**: Implementierung aller 25+ dokumentierten Workers, 50+ APIs, Advanced NLP
 
 ---
@@ -268,24 +268,24 @@ Transformation von der aktuellen **8-Agent-Pipeline** zum vollständig dokumenti
 ```python
 class PreprocessorAgent:
     """Query-Normalisierung und Intent-Erkennung"""
-    
+
     async def process(self, query: str) -> PreprocessedQuery:
         # 1. Entity Recognition
         entities = self._extract_entities(query)
         # Orte, Personen, Organisationen, Datumsangaben
-        
+
         # 2. Intent Classification
         intent = self._classify_intent(query)
         # informational, transactional, navigational
-        
+
         # 3. Domain Detection
         domain = self._detect_domain(query)
         # building, environmental, traffic, financial, social
-        
+
         # 4. Query Normalization
         normalized = self._normalize(query)
         # Rechtschreibung, Synonyme, Stopwords
-        
+
         return PreprocessedQuery(
             original=query,
             normalized=normalized,
@@ -316,23 +316,23 @@ class PreprocessorAgent:
 ```python
 class PostprocessorAgent:
     """Result-Aggregation und Conflict-Resolution"""
-    
+
     async def process(self, agent_results: Dict) -> AggregatedResult:
         # 1. Weighted Voting
         weights = self._calculate_weights(agent_results)
-        
+
         # 2. Conflict Resolution
         conflicts = self._detect_conflicts(agent_results)
         resolved = self._resolve_conflicts(conflicts, weights)
-        
+
         # 3. Source Deduplication
         unique_sources = self._deduplicate_sources(agent_results)
-        
+
         # 4. Confidence Scoring
         overall_confidence = self._aggregate_confidence(
             agent_results, weights
         )
-        
+
         return AggregatedResult(
             content=resolved,
             sources=unique_sources,
@@ -350,24 +350,24 @@ class PostprocessorAgent:
 ```python
 class QualityAssessor:
     """Automatische Qualitätsbewertung"""
-    
+
     async def assess(self, result: AggregatedResult) -> QualityScore:
         # 1. Completeness Score
         completeness = self._assess_completeness(result)
         # Wurden alle Aspekte der Frage beantwortet?
-        
+
         # 2. Accuracy Score
         accuracy = self._assess_accuracy(result)
         # Sind die Fakten korrekt? (Cross-check Sources)
-        
+
         # 3. Relevance Score
         relevance = self._assess_relevance(result)
         # Passt die Antwort zur Frage?
-        
+
         # 4. Consistency Score
         consistency = self._assess_consistency(result)
         # Widersprechen sich Teile der Antwort?
-        
+
         return QualityScore(
             overall=(completeness + accuracy + relevance + consistency) / 4,
             completeness=completeness,
@@ -407,24 +407,24 @@ class QualityAssessor:
 # Base Classes
 class BaseWorker(ABC):
     """Abstract base for all workers"""
-    
+
     def __init__(self, worker_id: str, capabilities: List[str]):
         self.worker_id = worker_id
         self.capabilities = capabilities
         self.performance_stats = PerformanceTracker()
-    
+
     @abstractmethod
     async def execute(self, query: str, context: dict) -> WorkerResult:
         """Execute worker-specific logic"""
         pass
-    
+
     async def health_check(self) -> bool:
         """Health check for monitoring"""
         pass
 
 class DomainWorker(BaseWorker):
     """Base for domain-specific workers"""
-    
+
     def __init__(self, domain: str, rag_focus: List[str], external_apis: List[str]):
         super().__init__(f"{domain}_worker", capabilities=[domain])
         self.domain = domain
@@ -432,19 +432,19 @@ class DomainWorker(BaseWorker):
         self.external_apis = external_apis
         self.rag_service = RAGContextService()
         self.api_clients = {}
-    
+
     async def execute(self, query: str, context: dict) -> WorkerResult:
         # 1. RAG Retrieval
         rag_results = await self.rag_service.retrieve(
             query, focus_areas=self.rag_focus
         )
-        
+
         # 2. External API Calls
         api_results = await self._call_external_apis(query)
-        
+
         # 3. Combine & Synthesize
         combined = self._synthesize(rag_results, api_results, query)
-        
+
         return WorkerResult(
             worker_id=self.worker_id,
             content=combined,
@@ -461,26 +461,26 @@ class DomainWorker(BaseWorker):
 ```python
 class BuildingPermitWorker(DomainWorker):
     """Spezialisiert auf Baugenehmigungen"""
-    
+
     def __init__(self):
         super().__init__(
             domain="construction_building_permit",
             rag_focus=["baurecht", "baugenehmigung", "bauordnung"],
             external_apis=["xplanung", "bauaufsicht_api"]
         )
-    
+
     async def execute(self, query: str, context: dict) -> WorkerResult:
         # 1. RAG: Baurecht-Dokumente
         legal_docs = await self.rag_service.retrieve(
             query, categories=["BauGB", "BauO", "DIN-Normen"]
         )
-        
+
         # 2. API: XPlanung Bebauungspläne
         if self.api_clients.get('xplanung'):
             building_plans = await self.api_clients['xplanung'].get_plans(
                 location=context.get('location')
             )
-        
+
         # 3. Synthesize
         return self._create_building_permit_guidance(
             query, legal_docs, building_plans
@@ -568,39 +568,39 @@ class ZoningAnalysisWorker(DomainWorker):
 ```python
 class ExternalAPIClient(ABC):
     """Base class for all external API clients"""
-    
+
     def __init__(self, api_key: str = None, base_url: str = None):
         self.api_key = api_key
         self.base_url = base_url
         self.rate_limiter = RateLimiter(requests_per_minute=60)
         self.cache = APICache(ttl_seconds=3600)
         self.metrics = APIMetrics()
-    
+
     @abstractmethod
     async def query(self, params: dict) -> dict:
         """API-specific query implementation"""
         pass
-    
+
     async def _make_request(self, endpoint: str, params: dict):
         # 1. Rate Limiting
         await self.rate_limiter.wait_if_needed()
-        
+
         # 2. Cache Check
         cache_key = self._cache_key(endpoint, params)
         if cached := await self.cache.get(cache_key):
             self.metrics.record_hit('cache_hit')
             return cached
-        
+
         # 3. API Call
         try:
             response = await self._http_request(endpoint, params)
             self.metrics.record_hit('api_success')
-            
+
             # 4. Cache Result
             await self.cache.set(cache_key, response)
-            
+
             return response
-        
+
         except Exception as e:
             self.metrics.record_hit('api_error')
             logger.error(f"API Error: {e}")
@@ -623,41 +623,41 @@ class ExternalAPIClient(ABC):
 ```python
 class WorkerOrchestrator:
     """Koordiniert Multi-Worker Execution"""
-    
+
     def __init__(self):
         self.dependency_graph = DependencyGraph()
         self.execution_planner = ExecutionPlanner()
         self.conflict_resolver = ConflictResolver()
         self.timeout_manager = TimeoutManager()
-    
+
     async def orchestrate(self, query: str, selected_workers: List[str]):
         # 1. Build Dependency Graph
         plan = self.execution_planner.create_plan(selected_workers)
-        
+
         # 2. Execute in Waves (parallel within wave)
         results = {}
         for wave in plan.waves:
             wave_tasks = [
-                worker.execute(query, results) 
+                worker.execute(query, results)
                 for worker in wave
             ]
-            
+
             # Execute with timeout
             wave_results = await asyncio.wait_for(
                 asyncio.gather(*wave_tasks, return_exceptions=True),
                 timeout=plan.wave_timeout
             )
-            
+
             # Handle errors
             for worker, result in zip(wave, wave_results):
                 if isinstance(result, Exception):
                     logger.error(f"Worker {worker.worker_id} failed: {result}")
                     continue
                 results[worker.worker_id] = result
-        
+
         # 3. Resolve Conflicts
         resolved = await self.conflict_resolver.resolve(results)
-        
+
         return resolved
 ```
 

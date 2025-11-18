@@ -1,7 +1,7 @@
 # Database Agent - Quick Start Guide
 
-**Version:** 1.0.0  
-**Date:** 10. Oktober 2025  
+**Version:** 1.0.0
+**Date:** 10. Oktober 2025
 **Status:** Production Ready ✅
 
 ---
@@ -97,9 +97,9 @@ for user in response.results:
 request = DatabaseQueryRequest(
     query_id="ex2",
     sql_query="""
-        SELECT category, COUNT(*) as count 
-        FROM documents 
-        GROUP BY category 
+        SELECT category, COUNT(*) as count
+        FROM documents
+        GROUP BY category
         ORDER BY count DESC
     """,
     database_path="./data/documents.db"
@@ -392,20 +392,20 @@ config = DatabaseConfig(
     max_results=1000,                 # Max rows returned (1-10000)
     default_timeout_seconds=30,       # Query timeout (1-300s)
     max_query_length=10000,           # Max SQL chars
-    
+
     # Security
     read_only_mode=True,              # Always True (enforced)
     enable_write_operations=False,    # Always False (enforced)
-    
+
     # Connection Pool (future)
     max_connections=10,
     connection_timeout_seconds=60,
-    
+
     # Performance
     enable_query_cache=True,          # Enable result caching
     cache_ttl_seconds=300,            # Cache TTL (5min default)
     max_cache_size=100,               # Max cached queries
-    
+
     # Logging
     log_all_queries=True,             # Log all queries
     log_blocked_queries=True,         # Log blocked attempts
@@ -573,7 +573,7 @@ sqlite3.OperationalError: database is locked
 
 ---
 
-**Author:** VERITAS Agent System  
-**Version:** 1.0.0  
-**Date:** 10. Oktober 2025  
+**Author:** VERITAS Agent System
+**Version:** 1.0.0
+**Date:** 10. Oktober 2025
 **Status:** Production Ready ✅

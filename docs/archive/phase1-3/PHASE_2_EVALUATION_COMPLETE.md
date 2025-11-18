@@ -1,8 +1,8 @@
 # Phase 2 Complete: RAG Evaluation Framework
 
-**Status:** ✅ **COMPLETE**  
-**Datum:** 28.09.2025  
-**Komponenten:** Golden Dataset + RAG Evaluator  
+**Status:** ✅ **COMPLETE**
+**Datum:** 28.09.2025
+**Komponenten:** Golden Dataset + RAG Evaluator
 
 ---
 
@@ -160,36 +160,36 @@ class EvaluationSummary:
 class RAGEvaluator:
     def load_golden_dataset(self, json_path: str) -> List[Dict]:
         """Lädt Golden Dataset JSON."""
-    
-    async def run_evaluation(self, 
+
+    async def run_evaluation(self,
                            test_cases: List[Dict],
                            save_path: Optional[str] = None) -> EvaluationSummary:
         """Führt vollständige Evaluation aus."""
-    
+
     async def _evaluate_test_case(self, test_case: Dict) -> EvaluationResult:
         """Evaluiert einzelnen Test-Case."""
-    
-    def _evaluate_retrieval(self, 
+
+    def _evaluate_retrieval(self,
                           retrieved_docs: List[Dict],
                           expected_docs: List[str]) -> RetrievalMetrics:
         """Berechnet Precision@K, Recall@K, MRR."""
-    
+
     async def _evaluate_context(self,
                                context: str,
                                expected: Dict) -> ContextMetrics:
         """Bewertet Context-Qualität."""
-    
+
     async def _evaluate_answer(self,
                               answer: str,
                               context: str,
                               expected: Dict) -> AnswerMetrics:
         """Erkennt Hallucinations, prüft Faithfulness."""
-    
-    def save_report(self, results: List[EvaluationResult], 
-                   summary: EvaluationSummary, 
+
+    def save_report(self, results: List[EvaluationResult],
+                   summary: EvaluationSummary,
                    output_path: str):
         """Speichert JSON-Report."""
-    
+
     def print_summary(self, summary: EvaluationSummary):
         """Gibt Console-Summary aus."""
 ```
@@ -513,5 +513,5 @@ Nach Integration mit realer Pipeline erwarten wir:
 
 ---
 
-**Status:** ✅ **PHASE 2 COMPLETE**  
+**Status:** ✅ **PHASE 2 COMPLETE**
 **Bereit für:** Baseline-Metriken-Etablierung + Phase 3 Start

@@ -1,11 +1,11 @@
 # KRITISCHE ÄNDERUNG: UDS3 als harte Anforderung
 
-**Datum:** 5. Oktober 2025, 21:00 Uhr  
+**Datum:** 5. Oktober 2025, 21:00 Uhr
 **Status:** 🔴 BREAKING CHANGE - Keine Mock-Daten mehr!
 
 ## Zusammenfassung
 
-**VORHER:** System fiel auf Mock-Daten zurück wenn UDS3 fehlte → LLM halluzinierte Antworten  
+**VORHER:** System fiel auf Mock-Daten zurück wenn UDS3 fehlte → LLM halluzinierte Antworten
 **NACHHER:** System startet NICHT ohne funktionierendes UDS3 → Klare Fehlermeldungen
 
 ## Geänderte Dateien
@@ -19,7 +19,7 @@
 def _build_fallback_context(...) -> Dict[str, Any]:
     """Erstellt deterministische Mock-Daten für Offline-Betrieb."""
     # 50+ Zeilen Mock-Daten-Generierung
-    
+
 # GELÖSCHT:
 import random  # Nicht mehr benötigt
 ```
@@ -34,7 +34,7 @@ def __init__(
     fallback_seed: int = 42,
 ) -> None:
     """Initialisiert RAGContextService - UDS3 ist ERFORDERLICH!
-    
+
     Raises:
         RuntimeError: Wenn uds3_strategy nicht verfügbar ist
     """
@@ -44,7 +44,7 @@ def __init__(
             "UDS3 Strategy ist None - System kann nicht ohne RAG-Backend arbeiten.\n"
             "Bitte stellen Sie sicher, dass UDS3 korrekt initialisiert ist."
         )
-    
+
     self.uds3_strategy = uds3_strategy
     self._rag_available = True  # Immer True, da UDS3 erforderlich ist
 ```
@@ -70,12 +70,12 @@ return fallback
 try:
     raw_result = await self._run_unified_query(...)
     normalized = self._normalize_result(raw_result, opts)
-    
+
     logger.info(
         f"✅ RAG-Kontext erstellt: {len(normalized.get('documents', []))} Dokumente"
     )
     return normalized
-    
+
 except Exception as e:
     logger.error(f"❌ UDS3 Query fehlgeschlagen: {e}", exc_info=True)
     raise RuntimeError(
@@ -152,11 +152,11 @@ async def lifespan(app: FastAPI):
     streaming_initialized = initialize_streaming_system()
     uds3_initialized = initialize_uds3_system()
     pipeline_initialized = await initialize_intelligent_pipeline()
-    
+
     logger.info(f"📊 System Status:")
     logger.info(f"   - UDS3 Strategy: {'✅ OK' if uds3_initialized else '❌ FEHLER'}")
     logger.info(f"   - Pipeline: {'✅ OK' if pipeline_initialized else '❌ FEHLER'}")
-    
+
     yield  # Server läuft TROTZDEM!
 ```
 
@@ -165,7 +165,7 @@ async def lifespan(app: FastAPI):
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """App Lifespan Management
-    
+
     Raises:
         RuntimeError: Wenn kritische Systeme nicht verfügbar sind
     """
@@ -176,26 +176,26 @@ async def lifespan(app: FastAPI):
             "❌ KRITISCHER FEHLER: UDS3 System konnte nicht initialisiert werden!\n"
             "Das Backend kann nicht ohne UDS3-Backend arbeiten."
         )
-    
+
     # Intelligent Pipeline initialisieren - ERFORDERLICH!
     pipeline_initialized = await initialize_intelligent_pipeline()
     if not pipeline_initialized:
         raise RuntimeError(
             "❌ KRITISCHER FEHLER: Intelligent Pipeline konnte nicht initialisiert werden!"
         )
-    
+
     # Ollama-Check
     if not ollama_client:
         raise RuntimeError(
             "❌ KRITISCHER FEHLER: Ollama Client nicht verfügbar!"
         )
-    
+
     logger.info(f"📊 System Status:")
     logger.info(f"   ✅ UDS3 Strategy: OK (ERFORDERLICH)")
     logger.info(f"   ✅ Intelligent Pipeline: OK (ERFORDERLICH)")
     logger.info(f"   ✅ Ollama Client: OK (ERFORDERLICH)")
     logger.info(f"🎉 Backend erfolgreich gestartet - KEIN Mock-Modus!")
-    
+
     yield  # Server läuft NUR wenn alles OK!
 ```
 
@@ -365,6 +365,6 @@ git checkout HEAD~1 backend/api/veritas_api_backend.py
 
 ---
 
-**Status:** ✅ Bereit für Production mit echten Daten  
-**Risiko:** 🔴 HIGH - Breaking Change, erfordert UDS3 + Ollama  
+**Status:** ✅ Bereit für Production mit echten Daten
+**Risiko:** 🔴 HIGH - Breaking Change, erfordert UDS3 + Ollama
 **Nutzen:** 🟢 HIGH - Keine Halluzinationen mehr, nur echte Daten

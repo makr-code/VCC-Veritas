@@ -1,7 +1,7 @@
 # VERITAS - Offene Implementierungen Report 📋
 
-**Datum:** 14. Oktober 2025  
-**Basis:** Analyse von `docs/TODO.md`, `docs/TODO_EXECUTIVE_SUMMARY.md`, `docs/IMPLEMENTATION_GAP_ANALYSIS_TODO.md`  
+**Datum:** 14. Oktober 2025
+**Basis:** Analyse von `docs/TODO.md`, `docs/TODO_EXECUTIVE_SUMMARY.md`, `docs/IMPLEMENTATION_GAP_ANALYSIS_TODO.md`
 **Status:** Basierend auf PKI-Cleanup (14.10.2025) - Aktuelle Priorisierung
 
 ---
@@ -660,6 +660,6 @@ curl http://localhost:5000/health
 
 ---
 
-**Version:** 1.0  
-**Erstellt:** 14. Oktober 2025, 07:30 Uhr  
+**Version:** 1.0
+**Erstellt:** 14. Oktober 2025, 07:30 Uhr
 **Basis:** PKI Cleanup abgeschlossen, Import-Fixes sind Critical Path

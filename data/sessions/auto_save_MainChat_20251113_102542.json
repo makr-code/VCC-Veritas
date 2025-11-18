@@ -1,0 +1,45 @@
+{
+  "metadata": {
+    "session_id": "session_74810bdf12ad",
+    "window_id": "MainChat",
+    "created_at": "2025-11-13T10:25:42.237728",
+    "message_count": 5,
+    "llm_model": "llama3:latest",
+    "settings": {
+      "temperature": 0.7,
+      "max_tokens": 1200,
+      "top_p": 0.9
+    }
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "Willkommen bei Veritas v3.15.0! 🚀\nBackend-API: http://127.0.0.1:5000/api\nDrücken Sie \"➕ Neuer Chat\" um weitere Fenster zu öffnen.",
+      "timestamp": "2025-11-13T06:33:30.566010"
+    },
+    {
+      "role": "user",
+      "content": "test",
+      "timestamp": "2025-11-13T06:36:45.306232"
+    },
+    {
+      "role": "error",
+      "content": "⏱️ Timeout nach 60s",
+      "timestamp": "2025-11-13T06:37:45.330708",
+      "original_query": "test",
+      "error_type": "api_error",
+      "retryable": true
+    },
+    {
+      "role": "user",
+      "content": "test",
+      "timestamp": "2025-11-13T06:52:59.841348"
+    },
+    {
+      "role": "user",
+      "content": "test",
+      "timestamp": "2025-11-13T10:25:25.521567"
+    }
+  ],
+  "version": "1.0"
+}

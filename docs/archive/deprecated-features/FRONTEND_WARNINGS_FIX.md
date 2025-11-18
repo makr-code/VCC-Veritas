@@ -1,7 +1,7 @@
 # 🔧 Frontend Warnings & DialogManager Fix
 
-**Last Updated:** 12. Oktober 2025, 17:30 Uhr  
-**Version:** v3.20.0  
+**Last Updated:** 12. Oktober 2025, 17:30 Uhr
+**Version:** v3.20.0
 **Status:** ✅ FIXED
 
 ---

@@ -1,8 +1,8 @@
 # VERITAS Hybrid Search - Developer Guide
 
-**Version:** 1.0.0  
-**Last Updated:** 2025-10-20  
-**Status:** Production Ready  
+**Version:** 1.0.0
+**Last Updated:** 2025-10-20
+**Status:** Production Ready
 
 Umfassender Entwickler-Guide für das Hybrid Search System mit Multi-Database Retrieval und LLM-basiertem Re-Ranking.
 
@@ -77,12 +77,12 @@ Umfassender Entwickler-Guide für das Hybrid Search System mit Multi-Database Re
 
 ### Key Features
 
-✅ **Multi-Database Retrieval**: Vector (ChromaDB) + Graph (Neo4j) + Relational (PostgreSQL)  
-✅ **Flexible Fusion**: RRF, Weighted Average, Borda Count  
-✅ **LLM Re-Ranking**: Semantic quality assessment with llama3.1:8b  
-✅ **Configurable Weights**: Adjust Vector/Graph/Relational ratios  
-✅ **Graceful Degradation**: Fallbacks for database/LLM failures  
-✅ **Production Ready**: Comprehensive testing, monitoring, error handling  
+✅ **Multi-Database Retrieval**: Vector (ChromaDB) + Graph (Neo4j) + Relational (PostgreSQL)
+✅ **Flexible Fusion**: RRF, Weighted Average, Borda Count
+✅ **LLM Re-Ranking**: Semantic quality assessment with llama3.1:8b
+✅ **Configurable Weights**: Adjust Vector/Graph/Relational ratios
+✅ **Graceful Degradation**: Fallbacks for database/LLM failures
+✅ **Production Ready**: Comprehensive testing, monitoring, error handling
 
 ---
 
@@ -111,13 +111,13 @@ class RAGService:
     ) -> HybridSearchResult:
         """
         Execute hybrid search across all databases.
-        
+
         Args:
             query: User query string
             weights: Vector/Graph/Relational weights (must sum to 1.0)
             filters: max_results, min_relevance, date filters
             ranking_strategy: RRF, WEIGHTED, or BORDA
-        
+
         Returns:
             HybridSearchResult with ranked documents
         """
@@ -165,13 +165,13 @@ class RerankerService:
     ) -> List[RerankingResult]:
         """
         Re-rank documents using LLM scoring.
-        
+
         Args:
             query: Original user query
             documents: List of documents to rerank
             batch_size: Documents per LLM batch call
             scoring_mode: RELEVANCE_ONLY, INFORMATIVENESS_ONLY, COMBINED
-        
+
         Returns:
             List of RerankingResult with updated scores
         """
@@ -224,11 +224,11 @@ class QueryService:
     ) -> UnifiedResponse:
         """
         Process hybrid search query with optional re-ranking.
-        
+
         Args:
             query: User query string
             enable_reranking: Whether to apply LLM re-ranking
-        
+
         Returns:
             UnifiedResponse with IEEE citations
         """
@@ -746,10 +746,10 @@ logger.info(f"Re-ranking: {response.metadata.get('reranking_enabled', False)}")
 async def test_hybrid_search():
     rag_service = MockRAGService()
     reranker_service = MockRerankerService()
-    
+
     query_service = QueryService(rag_service, reranker_service)
     response = await query_service.process_query("test", mode="hybrid")
-    
+
     assert response.answer is not None
     assert len(response.sources) > 0
 
@@ -761,7 +761,7 @@ async def test_hybrid_search_e2e():
         "Bauantrag Anforderungen",
         mode="hybrid"
     )
-    
+
     assert response.answer is not None
 ```
 
@@ -907,16 +907,16 @@ async def process_query(
 ) -> UnifiedResponse:
     """
     Process user query with specified mode.
-    
+
     Args:
         query: User query string
         mode: Query mode ('rag', 'hybrid', 'streaming', 'agent', 'ask')
         enable_reranking: Whether to apply LLM re-ranking (hybrid mode only)
         **kwargs: Additional mode-specific parameters
-    
+
     Returns:
         UnifiedResponse with answer, sources, and metadata
-    
+
     Raises:
         ValueError: If mode is invalid
         RuntimeError: If RAGService/RerankerService unavailable
@@ -934,16 +934,16 @@ async def hybrid_search(
 ) -> HybridSearchResult:
     """
     Execute hybrid search across all databases.
-    
+
     Args:
         query: User query string
         weights: Vector/Graph/Relational weights (must sum to 1.0)
         filters: Search filters (max_results, min_relevance, etc.)
         ranking_strategy: Fusion strategy (RRF, WEIGHTED, BORDA)
-    
+
     Returns:
         HybridSearchResult with ranked documents
-    
+
     Raises:
         ValueError: If weights invalid or databases unavailable
     """
@@ -960,16 +960,16 @@ def rerank(
 ) -> List[RerankingResult]:
     """
     Re-rank documents using LLM scoring.
-    
+
     Args:
         query: Original user query
         documents: List of documents to rerank
         batch_size: Documents per LLM batch call
         scoring_mode: RELEVANCE_ONLY, INFORMATIVENESS_ONLY, COMBINED
-    
+
     Returns:
         List of RerankingResult with updated scores
-    
+
     Raises:
         TimeoutError: If LLM call exceeds timeout
         RuntimeError: If Ollama unavailable
@@ -987,7 +987,7 @@ class HybridSearchConfig:
     reranking_config: ReRankingConfig
     ranking_strategy: RankingStrategy
     enable_hybrid_search: bool
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for logging/debugging."""
 ```
@@ -1023,6 +1023,6 @@ class HybridSearchConfig:
 
 ---
 
-**Maintainer:** VERITAS Development Team  
-**License:** Proprietary  
+**Maintainer:** VERITAS Development Team
+**License:** Proprietary
 **Last Review:** 2025-10-20

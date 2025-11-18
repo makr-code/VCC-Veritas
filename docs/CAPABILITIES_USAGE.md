@@ -108,7 +108,7 @@ class VeritasApp:
         # Capabilities beim Start laden
         self.capabilities: Dict[str, Any] = {}
         self._load_backend_capabilities()
-    
+
     def _load_backend_capabilities(self):
         """Lädt Backend-Capabilities vom /capabilities Endpoint"""
         try:
@@ -131,7 +131,7 @@ class VeritasApp:
 if app.is_feature_available('features.ollama.available'):
     # Zeige LLM-Modell-Auswahl
     models = app.get_capability_value('features.ollama.models', [])
-    
+
 # Prüfe ob Streaming verfügbar ist
 if app.is_feature_available('features.streaming.available'):
     # Aktiviere Streaming-UI
@@ -144,7 +144,7 @@ if app.is_feature_available('features.streaming.available'):
 def get_available_question_methods(self):
     """Lädt Modi aus Capabilities"""
     modes = self.get_capability_value('modes', {})
-    
+
     available_modes = []
     for mode_key, mode_info in modes.items():
         if mode_info.get('available', False):
@@ -154,7 +154,7 @@ def get_available_question_methods(self):
                 'display': mode_key.upper(),
                 'optimal': optimal
             })
-    
+
     # Sortiere: Optimale Modi zuerst
     available_modes.sort(key=lambda m: (not m['optimal'], m['key']))
     return available_modes
@@ -169,7 +169,7 @@ def get_available_llm_models(self):
     models = self.get_capability_value('features.ollama.models', [])
     if models:
         return models
-    
+
     # Fallback: API-Call
     response = requests.get(f"{API_BASE_URL}/get_models")
     # ...
@@ -254,7 +254,7 @@ def refresh_capabilities(self):
     """Aktualisiert Capabilities (z.B. alle 5 Minuten)"""
     old_capabilities = self.capabilities.copy()
     self._load_backend_capabilities()
-    
+
     # Prüfe auf Änderungen
     if old_capabilities != self.capabilities:
         logger.info("⚡ Capabilities haben sich geändert - UI aktualisieren")
@@ -275,7 +275,7 @@ for rec in app.get_capability_value('recommendations', []):
     rec_type = rec['type']
     message = rec['message']
     action = rec.get('action', '')
-    
+
     if rec_type == 'error':
         messagebox.showerror("System-Fehler", f"{message}\n\n{action}")
     elif rec_type == 'warning':
@@ -319,20 +319,20 @@ class VeritasApp:
         # 1. Capabilities laden
         self.capabilities = {}
         self._load_backend_capabilities()
-        
+
         # 2. UI basierend auf Capabilities konfigurieren
         self._configure_ui_from_capabilities()
-    
+
     def _configure_ui_from_capabilities(self):
         """Konfiguriert UI basierend auf verfügbaren Features"""
-        
+
         # LLM-Modelle
         if self.is_feature_available('features.ollama.available'):
             models = self.get_capability_value('features.ollama.models', [])
             self.llm_selector.configure(values=models)
         else:
             self.llm_selector.configure(state='disabled')
-        
+
         # Modi
         modes = self.get_capability_value('modes', {})
         for mode_key, mode_info in modes.items():
@@ -340,7 +340,7 @@ class VeritasApp:
                 self.mode_selector.add_option(mode_key, badge='✅')
             elif mode_info.get('available'):
                 self.mode_selector.add_option(mode_key, badge='⚠️')
-        
+
         # Recommendations anzeigen
         recommendations = self.get_capability_value('recommendations', [])
         for rec in recommendations:
@@ -350,6 +350,6 @@ class VeritasApp:
 
 ---
 
-**Version:** 1.0.0  
-**Erstellt:** 05.10.2025  
+**Version:** 1.0.0
+**Erstellt:** 05.10.2025
 **Autor:** VERITAS Development Team

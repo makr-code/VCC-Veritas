@@ -1,9 +1,9 @@
 # Scroll-to-Source Animation - Technische Dokumentation
 
-**Feature**: Rich-Text Enhancement #5  
-**Version**: v3.10.0  
-**Datum**: 2025-10-09  
-**Modul**: `frontend/ui/veritas_ui_chat_formatter.py`  
+**Feature**: Rich-Text Enhancement #5
+**Version**: v3.10.0
+**Datum**: 2025-10-09
+**Modul**: `frontend/ui/veritas_ui_chat_formatter.py`
 **Status**: ✅ Produktionsreif
 
 ---
@@ -92,10 +92,10 @@ Source Document/URL öffnet
 def ease_in_out_cubic(t: float) -> float:
     """
     Cubic Easing für flüssige Beschleunigung/Verzögerung
-    
+
     t ∈ [0.0, 1.0] → Progress
     Returns: Eased progress ∈ [0.0, 1.0]
-    
+
     Verlauf:
     - 0.0 → 0.5: Beschleunigung (4t³)
     - 0.5 → 1.0: Verzögerung (½(2t-2)³ + 1)
@@ -125,29 +125,29 @@ Progress (t)
 def scroll_to_source(self, source_index: int) -> None:
     # 1. Find target line
     pos = self.text_widget.search(f"{source_index}.", "1.0", tk.END)
-    
+
     # 2. Calculate yview positions
     current_yview = self.text_widget.yview()[0]  # 0.0 - 1.0
     target_line = int(pos.split('.')[0])
     total_lines = int(self.text_widget.index(tk.END).split('.')[0])
     target_yview = (target_line - 3) / total_lines  # 3-line padding
-    
+
     # 3. Skip if already visible
     if abs(current_yview - target_yview) < 0.05:
         self.highlight_line(pos)
         return
-    
+
     # 4. Animate
     def animate_frame(frame: int):
         progress = ease_in_out_cubic(frame / 30)
         interpolated_yview = current_yview + (target_yview - current_yview) * progress
         self.text_widget.yview_moveto(interpolated_yview)
-        
+
         if frame > 30:
             self.highlight_line(pos)
         else:
             self.parent_window.after(16, lambda: animate_frame(frame + 1))
-    
+
     animate_frame(1)
 ```
 
@@ -177,29 +177,29 @@ def highlight_line(self, line_index: str) -> None:
     # 1. Define line range
     line_start = f"{line_index.split('.')[0]}.0"
     line_end = f"{int(line_index.split('.')[0]) + 1}.0"
-    
+
     # 2. Add highlight tag
     highlight_tag = f"highlight_{line_index}"
     self.text_widget.tag_add(highlight_tag, line_start, line_end)
     self.text_widget.tag_configure(highlight_tag, background="#fff3cd")
-    
+
     # 3. Fade-out animation
     def fade_step(step: int, total_steps: int = 20):
         if step > total_steps:
             self.text_widget.tag_remove(highlight_tag, "1.0", tk.END)
             return
-        
+
         alpha = 1.0 - (step / total_steps)
-        
+
         # Color interpolation (Yellow → White)
         r = 255
         g = int(243 + (255 - 243) * (1 - alpha))
         b = int(205 + (255 - 205) * (1 - alpha))
         color = f"#{r:02x}{g:02x}{b:02x}"
-        
+
         self.text_widget.tag_configure(highlight_tag, background=color)
         self.parent_window.after(100, lambda: fade_step(step + 1))
-    
+
     fade_step(1)
 ```
 
@@ -212,7 +212,7 @@ def highlight_line(self, line_index: str) -> None:
 # ❌ FALSCH: Alle Lambdas teilen sich denselben `i` und `part`
 for i, source in enumerate(sources, 1):
     self.text_widget.tag_bind(
-        link_tag, 
+        link_tag,
         "<Button-1>",
         lambda e, url=part: self.scroll_to_source(i)  # i = letzte Iteration!
     )
@@ -350,7 +350,7 @@ assert "highlight_7.0" in text_widget.tag_names()  # Jetzt aktiv
 with self.assertLogs(level='WARNING') as logs:
     formatter.scroll_to_source(5)
     assert "Quelle #5 nicht gefunden" in logs.output[0]
-    
+
 # Keine Exception, Text-Widget unverändert
 ```
 
@@ -582,17 +582,17 @@ HIGHLIGHT_COLOR_END = "#ffffff"
 def scroll_to_source(self, source_index: int) -> None:
     """
     Animiert Scroll zur Quellen-Zeile mit Easing-Funktion
-    
+
     Args:
         source_index: Index der Quelle (1-basiert)
-    
+
     Behavior:
         - Sucht nach "1. ", "2. ", etc. in Quellen-Liste
         - Berechnet Ziel-Position mit 3-Zeilen-Padding
         - Prüft ob Scroll nötig (Skip bei < 5% Delta)
         - Animiert mit Cubic Easing über 500ms
         - Ruft highlight_line() nach Animation auf
-    
+
     Error Handling:
         - Source nicht gefunden → Warning + Return
         - Index-Fehler → Logger.error + Return
@@ -602,22 +602,22 @@ def scroll_to_source(self, source_index: int) -> None:
         # Find source line
         search_pattern = f"{source_index}."
         pos = self.text_widget.search(search_pattern, "1.0", stopindex=tk.END)
-        
+
         if not pos:
             logger.warning(f"⚠️ Quelle #{source_index} nicht gefunden")
             return
-        
+
         # Calculate positions
         current_yview = self.text_widget.yview()[0]
         target_line = int(pos.split('.')[0])
         total_lines = int(self.text_widget.index(tk.END).split('.')[0])
         target_yview = max(0.0, min(1.0, (target_line - 3) / total_lines))
-        
+
         # Skip if already visible
         if abs(current_yview - target_yview) < 0.05:
             self.highlight_line(pos)
             return
-        
+
         # Easing function
         def ease_in_out_cubic(t: float) -> float:
             if t < 0.5:
@@ -625,25 +625,25 @@ def scroll_to_source(self, source_index: int) -> None:
             else:
                 p = 2 * t - 2
                 return 0.5 * p * p * p + 1
-        
+
         # Animation loop
         duration = 500
         frames = 30
         frame_time = duration / frames
-        
+
         def animate_frame(frame: int):
             if frame > frames:
                 self.highlight_line(pos)
                 return
-            
+
             progress = ease_in_out_cubic(frame / frames)
             interpolated_yview = current_yview + (target_yview - current_yview) * progress
             self.text_widget.yview_moveto(interpolated_yview)
-            
+
             self.parent_window.after(int(frame_time), lambda: animate_frame(frame + 1))
-        
+
         animate_frame(1)
-        
+
     except Exception as e:
         logger.error(f"❌ Fehler beim Scroll-to-Source: {e}")
 ```
@@ -654,16 +654,16 @@ def scroll_to_source(self, source_index: int) -> None:
 def highlight_line(self, line_index: str) -> None:
     """
     Flash-Highlight der Ziel-Zeile mit Fade-out-Animation
-    
+
     Args:
         line_index: Tkinter-Index der Zeile (z.B. "5.0")
-    
+
     Behavior:
         - Fügt gelben Highlight-Tag zur Zeile hinzu
         - Fade-out von #fff3cd → #ffffff über 2s
         - 20 Schritte @ 100ms Intervall
         - Entfernt Tag nach Animation
-    
+
     Error Handling:
         - Index-Fehler → Logger.error + Return
         - Tag-Fehler → Silent Fail (Tag nicht hinzugefügt)
@@ -672,31 +672,31 @@ def highlight_line(self, line_index: str) -> None:
         # Define line range
         line_start = f"{line_index.split('.')[0]}.0"
         line_end = f"{int(line_index.split('.')[0]) + 1}.0"
-        
+
         # Add highlight tag
         highlight_tag = f"highlight_{line_index}"
         self.text_widget.tag_add(highlight_tag, line_start, line_end)
         self.text_widget.tag_configure(highlight_tag, background="#fff3cd")
-        
+
         # Fade-out animation
         def fade_step(step: int, total_steps: int = 20):
             if step > total_steps:
                 self.text_widget.tag_remove(highlight_tag, "1.0", tk.END)
                 return
-            
+
             alpha = 1.0 - (step / total_steps)
-            
+
             # Color interpolation
             r = int(255)
             g = int(243 + (255 - 243) * (1 - alpha))
             b = int(205 + (255 - 205) * (1 - alpha))
             color = f"#{r:02x}{g:02x}{b:02x}"
-            
+
             self.text_widget.tag_configure(highlight_tag, background=color)
             self.parent_window.after(100, lambda: fade_step(step + 1, total_steps))
-        
+
         fade_step(1)
-        
+
     except Exception as e:
         logger.error(f"❌ Fehler beim Highlight: {e}")
 ```
@@ -716,10 +716,10 @@ if self.source_link_handler:
                 lambda: self.source_link_handler.open_source_link(url)
             )
         return handler
-    
+
     self.text_widget.tag_bind(
-        link_tag, 
-        "<Button-1>", 
+        link_tag,
+        "<Button-1>",
         create_click_handler(i, part)
     )
 ```

@@ -1,7 +1,7 @@
 # VERITAS API - Authentication Guide
 
-**Version:** 1.0.0  
-**Last Updated:** 2025-10-08  
+**Version:** 1.0.0
+**Last Updated:** 2025-10-08
 **Status:** Production Ready
 
 ---
@@ -748,14 +748,14 @@ import time
 def make_request_with_retry(url, headers, max_retries=3):
     for attempt in range(max_retries):
         response = requests.get(url, headers=headers)
-        
+
         if response.status_code == 429:  # Rate limited
             retry_after = int(response.headers.get('Retry-After', 60))
             time.sleep(retry_after)
             continue
-        
+
         return response
-    
+
     raise Exception("Max retries exceeded")
 ```
 
@@ -783,7 +783,7 @@ try:
 except requests.exceptions.HTTPError as e:
     # Log full error internally
     logger.error(f"API error: {e}")
-    
+
     # Return generic error to user
     return {"error": "An error occurred"}
 ```
@@ -850,18 +850,18 @@ import time
 def make_request_with_backoff(url, headers):
     max_retries = 5
     base_delay = 1
-    
+
     for attempt in range(max_retries):
         response = requests.get(url, headers=headers)
-        
+
         if response.status_code != 429:
             return response
-        
+
         # Exponential backoff
         delay = base_delay * (2 ** attempt)
         print(f"Rate limited. Waiting {delay}s...")
         time.sleep(delay)
-    
+
     raise Exception("Max retries exceeded")
 ```
 
@@ -879,13 +879,13 @@ def reset_authentication():
     # Clear tokens
     access_token = None
     refresh_token = None
-    
+
     # Login fresh
     response = requests.post(
         f"{API_BASE}/auth/login",
         json={"username": USERNAME, "password": PASSWORD}
     )
-    
+
     tokens = response.json()
     return tokens["access_token"], tokens["refresh_token"]
 ```
@@ -903,6 +903,6 @@ For authentication issues:
 
 ---
 
-**Last Updated:** 2025-10-08  
-**Version:** 1.0.0  
+**Last Updated:** 2025-10-08
+**Version:** 1.0.0
 **License:** MIT

@@ -1,7 +1,7 @@
 # v7 API Test - Warning & Error Analyse
 
-**Datum:** 12. Oktober 2025  
-**Test:** tests/test_v7_api_endpoints.py  
+**Datum:** 12. Oktober 2025
+**Test:** tests/test_v7_api_endpoints.py
 **Status:** ✅ Alle Tests bestanden (6/6)
 
 ---
@@ -29,7 +29,7 @@
 
 **Fehler (ursprünglich):**
 ```
-ERROR:uds3.database.database_api_chromadb_remote:❌ CRITICAL: Collection 'vcc_vector_prod' 
+ERROR:uds3.database.database_api_chromadb_remote:❌ CRITICAL: Collection 'vcc_vector_prod'
 konnte nicht erstellt werden - ChromaDB API inkompatibel!
 ```
 
@@ -48,25 +48,25 @@ def _ensure_collection_exists(self, collection_name: Optional[str] = None) -> bo
     collection_info = self.get_collection(col_name)
     if collection_info and 'id' in collection_info:
         self.collection_id = collection_info['id']  # ← Extract UUID!
-        
+
 # ✅ FIX 2: Use Collection ID in v2 API Calls (Lines 290-300)
 if self._api_compatible and self.collection_id:
     add_url = urljoin(
-        self.base_url, 
+        self.base_url,
         f"/api/v2/.../collections/{self.collection_id}/add"  # ← Use UUID!
     )
 
 # ✅ FIX 3: search_similar() UUID Support (Lines 505-515)
 if self._api_compatible and self.collection_id:
     query_url = urljoin(
-        self.base_url, 
+        self.base_url,
         f"/api/v2/.../collections/{self.collection_id}/query"  # ← Use UUID!
     )
 
 # ✅ FIX 4: search_vectors() UUID Support (Lines 585-595)
 if self._api_compatible and self.collection_id:
     query_url = urljoin(
-        self.base_url, 
+        self.base_url,
         f"/api/v2/.../collections/{self.collection_id}/get"  # ← Use UUID!
     )
 ```
@@ -77,19 +77,19 @@ if self._api_compatible and self.collection_id:
 def get_collection_id(name: str) -> Optional[str]:
     """
     Ermittelt Collection UUID aus Namen (v2 API)
-    
+
     Example:
         >>> backend.get_collection_id('vcc_vector_prod')
         '04163b0f-22ab-4594-b97b-058009550738'
     """
-    
+
 # Method 2: Get All Collections with Details
 def get_all_collections() -> List[Dict[str, Any]]:
     """
     Ruft alle Collections mit vollständigen Details ab
-    
+
     Returns: List mit {id, name, metadata, tenant, database}
-    
+
     Example:
         >>> collections = backend.get_all_collections()
         >>> print(len(collections))  # 3
@@ -130,13 +130,13 @@ curl http://192.168.178.94:8000/api/v2/tenants/default_tenant/databases/default_
 
 **Fehler:**
 ```
-ERROR:backend.orchestration.unified_orchestrator_v7:❌ Supervisor phase failed: 
+ERROR:backend.orchestration.unified_orchestrator_v7:❌ Supervisor phase failed:
 'SupervisorAgent' object has no attribute 'query_decomposer'
 
-ERROR:backend.orchestration.unified_orchestrator_v7:❌ Phase supervisor_agent_selection failed: 
+ERROR:backend.orchestration.unified_orchestrator_v7:❌ Phase supervisor_agent_selection failed:
 PhaseResult.__init__() missing 1 required positional argument: 'confidence'
 
-ERROR:backend.orchestration.unified_orchestrator_v7:❌ Phase agent_result_synthesis failed: 
+ERROR:backend.orchestration.unified_orchestrator_v7:❌ Phase agent_result_synthesis failed:
 PhaseResult.__init__() missing 1 required positional argument: 'confidence'
 ```
 
@@ -216,7 +216,7 @@ Warning: Single Record Cache module not available
 
 **Warnings:**
 ```
-WARNING:backend.services.scientific_phase_executor:⚠️ OllamaClient nicht initialisiert - 
+WARNING:backend.services.scientific_phase_executor:⚠️ OllamaClient nicht initialisiert -
 nutze Mock-Response
 ```
 
@@ -240,10 +240,10 @@ nutze Mock-Response
 
 **Warnings:**
 ```
-WARNING:backend.orchestration.unified_orchestrator_v7:⚠️ AgentOrchestrator not available - 
+WARNING:backend.orchestration.unified_orchestrator_v7:⚠️ AgentOrchestrator not available -
 using mock results
 
-ERROR:backend.orchestration.unified_orchestrator_v7:❌ Phase agent_execution failed: 
+ERROR:backend.orchestration.unified_orchestrator_v7:❌ Phase agent_execution failed:
 'NoneType' object has no attribute 'get'
 ```
 
@@ -274,10 +274,10 @@ orchestrator_v7 = UnifiedOrchestratorV7(
 
 **Warnings:**
 ```
-WARNING:backend.orchestration.unified_orchestrator_v7:⚠️ Could not resolve path 
+WARNING:backend.orchestration.unified_orchestrator_v7:⚠️ Could not resolve path
 phases.hypothesis.output.missing_information at part 'missing_information'
 
-WARNING:backend.orchestration.unified_orchestrator_v7:⚠️ Could not resolve path 
+WARNING:backend.orchestration.unified_orchestrator_v7:⚠️ Could not resolve path
 phases.conclusion.output.final_answer at part 'final_answer'
 ```
 
@@ -401,5 +401,5 @@ Performance Improvement:
 
 ---
 
-**Letzte Aktualisierung:** 12. Oktober 2025, 23:45 Uhr  
+**Letzte Aktualisierung:** 12. Oktober 2025, 23:45 Uhr
 **Autor:** VERITAS v7.0 Team

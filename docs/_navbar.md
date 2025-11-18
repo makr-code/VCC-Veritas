@@ -1,1 +1,11 @@
+<<<<<<< Updated upstream
 ﻿* [:house: Startseite](/README.md)* [:rocket: Quick Start](QUICK_START_V7_REAL.md)* [:gear: API](API_REFERENCE.md)* [:mag: UDS3](UDS3_QUICK_START.md)* [:busts_in_silhouette: Agents](AGENT_FRAMEWORK_QUICKSTART.md)* [:package: Deployment](DEPLOYMENT_GUIDE.md)* [:octocat: GitHub](https://github.com/makr-code/VCC-Veritas)
+=======
+* [:house: Startseite](/README.md)
+* [:rocket: Quick Start](QUICK_START_V7_REAL.md)
+* [:gear: API](API_REFERENCE.md)
+* [:mag: UDS3](UDS3_QUICK_START.md)
+* [:busts_in_silhouette: Agents](AGENT_FRAMEWORK_QUICKSTART.md)
+* [:package: Deployment](DEPLOYMENT_GUIDE.md)
+* [:octocat: GitHub](https://github.com/makr-code/VCC-Veritas)
+>>>>>>> Stashed changes

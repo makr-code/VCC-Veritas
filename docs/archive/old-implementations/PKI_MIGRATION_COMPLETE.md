@@ -1,7 +1,7 @@
 # PKI Migration Complete - VERITAS
 
-**Datum:** 14. Oktober 2025  
-**Status:** ✅ Abgeschlossen  
+**Datum:** 14. Oktober 2025
+**Status:** ✅ Abgeschlossen
 **Externer PKI-Service:** `C:\VCC\PKI`
 
 ---
@@ -59,10 +59,10 @@ Migration von **lokaler PKI-Implementierung** zu **externem PKI-Service** erfolg
 
 ### Service-Details
 
-**Pfad:** `C:\VCC\PKI`  
-**URL:** `https://localhost:8443`  
-**API-Version:** v1  
-**Protokoll:** HTTPS (TLS 1.2+)  
+**Pfad:** `C:\VCC\PKI`
+**URL:** `https://localhost:8443`
+**API-Version:** v1
+**Protokoll:** HTTPS (TLS 1.2+)
 **Authentifizierung:** mTLS (Client-Zertifikate)
 
 ### Service-Zertifikate
@@ -116,7 +116,7 @@ if result['status'] == 'success':
     cert_pem = result['certificate']
     key_pem = result['private_key']
     serial = result['serial_number']
-    
+
     print(f"Certificate issued: {serial}")
 ```
 
@@ -534,6 +534,6 @@ python -c "import logging; logging.basicConfig(level=logging.DEBUG); exec(open('
 
 **Ende der Migrations-Dokumentation**
 
-**Version:** 1.0.0  
-**Erstellt:** 14. Oktober 2025  
+**Version:** 1.0.0
+**Erstellt:** 14. Oktober 2025
 **Autor:** VCC Development Team

@@ -488,8 +488,13 @@ class StreamingUIMixin:
         # Streaming-spezifische UI-State
         self.streaming_active = False
         self.current_stream_session = None
+<<<<<<< Updated upstream
         self.progress_widgets = {}
         
+=======
+        self.progress_widgets: Dict[str, Any] = {}
+
+>>>>>>> Stashed changes
         # Streaming Service
         self.streaming_service = VeritasStreamingService()
         

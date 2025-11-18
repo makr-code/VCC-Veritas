@@ -1,8 +1,8 @@
 # VERITAS Backend - Vollständiger Status-Bericht
 
-**Version:** 4.0.1  
-**Datum:** 20. Oktober 2025  
-**Status:** 🚀 **PRODUCTION READY** mit aktiven Optimierungen  
+**Version:** 4.0.1
+**Datum:** 20. Oktober 2025
+**Status:** 🚀 **PRODUCTION READY** mit aktiven Optimierungen
 **Letzte Updates:** JSON-Metadata-Extraktion, Template-Escaping-Fix
 
 ---
@@ -372,7 +372,7 @@ def extract_json_from_text(text: str) -> Tuple[str, Optional[Dict]]:
     1. ```json ... ``` (Markdown Code-Block)
     2. {...}$ (JSON am Ende)
     3. Mehrere JSON-Blöcke (letzter wird genommen)
-    
+
     Fallback-Chain:
     - json.loads() (Standard Python)
     - dirtyjson.loads() (Fault-tolerant, akzeptiert trailing commas)
@@ -380,16 +380,16 @@ def extract_json_from_text(text: str) -> Tuple[str, Optional[Dict]]:
     """
     # Pattern 1: JSON in Code-Block
     pattern1 = r'```json\s*(.*?)\s*```'
-    
+
     # Pattern 2: JSON am Ende
     pattern2 = r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}\s*$'
-    
+
     # Pattern 3: Alle JSON-Objekte finden
     pattern3 = r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}'
-    
+
     # Try patterns...
     json_str = # ... extracted via regex
-    
+
     # Parse with fallback
     return _parse_json_robust(json_str)
 
@@ -399,14 +399,14 @@ def _parse_json_robust(json_str: str) -> Optional[Dict]:
         return json.loads(json_str)
     except:
         pass
-    
+
     # Try 2: dirtyjson (accepts trailing commas, etc.)
     try:
         import dirtyjson
         return dirtyjson.loads(json_str)
     except:
         pass
-    
+
     # Try 3: Manual repair (remove trailing commas)
     try:
         repaired = re.sub(r',\s*([}\]])', r'\1', json_str)
@@ -420,17 +420,17 @@ def _parse_json_robust(json_str: str) -> Optional[Dict]:
 # backend/agents/veritas_ollama_client.py (synthesize_agent_results)
 async def synthesize_agent_results(...):
     response = await self.generate_response(request)
-    
+
     # 🆕 JSON-Extraktion
     from backend.utils.json_extractor import extract_json_from_text
     clean_text, json_metadata = extract_json_from_text(response.response)
-    
+
     result = {
         "response_text": clean_text,  # Ohne JSON
         "confidence_score": response.confidence_score,
         # ...
     }
-    
+
     if json_metadata:
         result["json_metadata"] = {
             "next_steps": extract_next_steps(json_metadata),
@@ -438,7 +438,7 @@ async def synthesize_agent_results(...):
             "raw": json_metadata
         }
         logger.info("✅ JSON-Metadaten extrahiert")
-    
+
     return result
 
 # backend/agents/veritas_intelligent_pipeline.py
@@ -484,7 +484,7 @@ async def stream_query():
                 "message": "Analysiere Query..."
             }
         }
-        
+
         # STEP 2: RAG Retrieval
         yield {
             "event": "progress",
@@ -494,7 +494,7 @@ async def stream_query():
                 "message": "Suche in 12.000+ Dokumenten..."
             }
         }
-        
+
         # STEP 3: Agent Execution
         for agent in agents:
             yield {
@@ -504,7 +504,7 @@ async def stream_query():
                     "progress": 50 + (i * 10)
                 }
             }
-        
+
         # STEP 4: Result Synthesis
         yield {
             "event": "synthesis",
@@ -513,7 +513,7 @@ async def stream_query():
                 "message": "Generiere Antwort..."
             }
         }
-        
+
         # FINAL: Complete Response
         yield {
             "event": "complete",
@@ -522,7 +522,7 @@ async def stream_query():
                 "progress": 100
             }
         }
-    
+
     return EventSourceResponse(event_generator())
 ```
 
@@ -552,13 +552,13 @@ class UnifiedSourceMetadata(BaseModel):
     id: str                          # "1", "2", "3" (numeric, NOT "src_1")
     title: str                       # Dokumenttitel
     type: SourceType                 # document, web, database
-    
+
     # BASIS-FELDER
     file: Optional[str]              # Dateiname/Pfad
     page: Optional[int]              # Seitennummer
     url: Optional[str]               # URL
     excerpt: Optional[str]           # Text-Auszug
-    
+
     # IEEE-FELDER
     authors: Optional[str]           # IEEE-formatiert
     ieee_citation: Optional[str]     # Vollständige Citation
@@ -566,14 +566,14 @@ class UnifiedSourceMetadata(BaseModel):
     year: Optional[int]              # Erscheinungsjahr
     publisher: Optional[str]         # Verlag
     original_source: Optional[str]   # Quelle der Quelle
-    
+
     # SCORING-FELDER
     similarity_score: Optional[float]  # Vector Similarity (0-1)
     rerank_score: Optional[float]      # Re-Ranking Score (0-1)
     quality_score: Optional[float]     # Quality Assessment (0-1)
     score: Optional[float]             # Combined Score (0-1)
     confidence: Optional[float]        # Confidence (0-1)
-    
+
     # LEGAL DOMAIN FELDER
     rechtsgebiet: Optional[str]      # Rechtsgebiet
     behörde: Optional[str]           # Zuständige Behörde
@@ -581,14 +581,14 @@ class UnifiedSourceMetadata(BaseModel):
     gericht: Optional[str]           # Gericht
     normtyp: Optional[str]           # Gesetz/Verordnung/etc
     fundstelle: Optional[str]        # Fundstelle
-    
+
     # ASSESSMENT-FELDER
     impact: Optional[ImpactLevel]    # High/Medium/Low
     relevance: Optional[RelevanceLevel]  # Very High/High/Medium/Low
-    
+
     # AGENT-FELDER
     agent_source: Optional[str]      # Welcher Agent hat Source gefunden
-    
+
     class Config:
         extra = "allow"  # Weitere Felder möglich (35+ insgesamt)
 ```
@@ -680,13 +680,13 @@ def _reciprocal_rank_fusion(
 ) -> List[SearchResult]:
     """Apply Reciprocal Rank Fusion (RRF) ranking"""
     k = 60  # RRF constant
-    
+
     # Calculate RRF scores
     for result in results:
         weight = self._get_weight_for_method(result.search_method, weights)
         rrf_score = weight * (1.0 / (k + result.rank))
         result.relevance_score = rrf_score
-    
+
     # Sort by RRF score
     return sorted(results, key=lambda r: r.relevance_score, reverse=True)
 ```
@@ -758,7 +758,7 @@ for result in results:
 
 **LLM Prompt Template:**
 ```
-You are a search result relevance evaluator. Rate each document's 
+You are a search result relevance evaluator. Rate each document's
 relevance to the user's query on a scale of 0.0 to 1.0.
 
 Query: "Bauantrag für Einfamilienhaus in Stuttgart"
@@ -824,7 +824,7 @@ async def hybrid_rag_query(query: str, top_k: int = 10):
         collection="verwaltung_docs",
         top_k=top_k
     )
-    
+
     # 2. Graph Traversal (Neo4j)
     # Finde verwandte Behörden, Gesetze, Verfahren
     graph_results = await uds3.graph_traverse(
@@ -832,27 +832,27 @@ async def hybrid_rag_query(query: str, top_k: int = 10):
         relationship_types=["REGELT", "ZUSTÄNDIG_FÜR", "VERWEIST_AUF"],
         depth=2
     )
-    
+
     # 3. Relational Query (PostgreSQL)
     # Finde aktuelle Verfahren, Fristen
     sql_results = await uds3.sql_query(
         table="verwaltungsakte",
         filters={"status": "offen", "frist_ablauf": ">= today"}
     )
-    
+
     # 4. Fusion & Re-Ranking
     combined = reciprocal_rank_fusion(
         vector_results,
         graph_results,
         sql_results
     )
-    
+
     reranked = await reranker.rerank(
         query=query,
         documents=combined,
         top_k=10
     )
-    
+
     return reranked
 ```
 
@@ -1046,7 +1046,7 @@ tests/
 1. JSON Extraction: 2/17 Tests fehlgeschlagen (Multi-JSON, Emoji-Rendering)
    - Impact: Low (Edge Cases)
    - Workaround: Funktioniert in 95% der Fälle
-   
+
 2. Template Escaping: Erfordert Disziplin bei neuen Prompts
    - Impact: Low (Dokumentiert)
    - Mitigation: Test-Suite validiert alle Templates
@@ -1239,10 +1239,10 @@ for agent_result in data['agent_results']:
 
 ## 🎓 Team & Kontakt
 
-**Lead Developer:** makr-code  
-**Repository:** github.com/makr-code/VCC-Veritas  
-**Branch:** main  
-**Version:** 4.0.1  
+**Lead Developer:** makr-code
+**Repository:** github.com/makr-code/VCC-Veritas
+**Branch:** main
+**Version:** 4.0.1
 **Last Update:** 20. Oktober 2025
 
 **Contact:**

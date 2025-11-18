@@ -1,0 +1,115 @@
+## VERITAS — Copilot / Projekt-Instructions (Empfohlen)
+
+Zweck: Diese Datei beschreibt projektweite Konventionen und Verhaltenserwartungen an automatisierte Assistenten (Copilot/Agents) beim Bearbeiten des Repositories. Fokus: `backend` + `shared`-Bereich, Windows PowerShell-Startbarkeit und Python 3.13.
+
+1) Projekt-Übersicht
+- Name: VERITAS. Komponenten: `backend` (FastAPI + Agents), `shared` (gemeinsame Bibliotheken), mehrere Services/Integrationen.
+- Ziel: sichere, typisierte und reproduzierbare Backend-Fixes; bevorzugt kleine, lokal-verifizierbare Änderungen.
+
+2) Indentation
+- Verwende Tabs (nicht Spaces). Projekt-Style ist Tabs — bitte beibehalten.
+
+3) Benennungs- und Stilregeln
+- Variablennamen: Verwende camelCase (z. B. `requestBody`, `calculateCosts`) — dies ist Projektkonvention.
+- Funktionen/Methoden: camelCase. Klassennamen: PascalCase.
+- Docstrings: Kurzbeschreibung auf Deutsch ist zulässig; bei öffentlicher API/Library-Kommentaren: Englisch empfohlen.
+- Hinweis: Python-Projekte verwenden typischerweise snake_case; dieses Projekt hat historische Gründe für camelCase — respektiere die Konventionen im Codebereich, an dem du arbeitest.
+
+4) Typisierung & Linting
+- Python-Version: Ziel ist Python 3.13.
+- Verwende das Projekt-`pyproject.toml` mypy-Setup. Änderungen im Scope `backend` + `shared` müssen mypy-konform sein.
+- Lokale Variable annotieren, wo mypy Fehler meldet (z. B. `Dict[str, Any]`, `list[str]`). Bei schnellen Fixes sind `cast(...)`-Kommentare erlaubt, aber markiere sie mit `# TODO` zur Nachbearbeitung.
+- Keine Laufzeitmanipulation von `sys.path` oder dynamische Import-Manipulationen.
+
+5) Sicherheitsregeln
+- Keine harte Kodierung von Secrets / Credentials.
+- Vermeide dynamisches SQL; nutze parameterisierte Queries. Bei Read-APIs: prefer SELECT-only + input whitelisting.
+- Änderungen mit sicherheitsrelevanten Auswirkungen (Auth, SQL, File I/O) müssen im PR klar gekennzeichnet werden.
+
+6) Tests & Local Run (Windows / PowerShell)
+- Virtualenv aktivieren:
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+- Abhängigkeiten installieren (falls nötig):
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+```
+- Scoped mypy (nur `backend` + `shared`):
+```powershell
+.\.venv\Scripts\python.exe -m mypy backend shared --config-file pyproject.toml
+```
+- Backend lokal starten (Beispiel):
+```powershell
+.\.venv\Scripts\python.exe -m uvicorn backend.main:app --reload --port 5000
+```
+
+7) Pre-commit / Local Checks
+- Lokale pre-commit Installation & Lauf:
+```powershell
+.\.venv\Scripts\python.exe -m pip install pre-commit
+pre-commit run --all-files
+```
+- Scoped: `pre-commit run --files <file1> <file2>`
+
+8) Commit / Branch / PR Workflow
+- Branch-Namenskonvention: `precommit/<short-desc>` für automatisierte Fix-Batches; `fix/<area>/<short-desc>` für manuelle Fixes.
+- Agenten/Automatisierte Werkzeuge: keine automatischen Commits ohne ausdrückliche Freigabe des Maintainers — Agenten sollen Diffs/patches vorlegen und um Zustimmung fragen.
+- PR-Inhalt: Kurzbeschreibung, betroffene Dateien, mypy-VORHER/NACHHER (nur geänderte Dateien), Tests / Risiken.
+
+9) Agent-Verhalten (Copilot / Automatisierter Agent)
+- Priorisiere minimal-invasive Änderungen (lokale Typannotationen, `cast`, kleine Refactors) gegenüber umfangreichen Refactors.
+- Für jede Batch (1-3 Dateien):
+	- Führe scoped mypy & tests lokal aus.
+	- Erzeuge Patch/Diff und zeige mypy Vorher/Nachher.
+	- Frage vor Commit um Freigabe.
+- Markiere unsichere Quickfixes mit `# TODO` und erkläre kurz, warum `cast`/`Any` verwendet wurde.
+
+10) Praktische Hinweise / Quickfix-Patterns
+- Bei `index` / `object`-Fehlern: explizit in `Dict[str, Any]` oder `list[str]` casten, z. B. `data = cast(Dict[str, Any], obj)`.
+- Bei `union-attr` (z. B. `Response | AsyncGenerator`): runtime Unterscheidung (`inspect.isasyncgen` / `async for`) und dokumentieren.
+
+11) Formatting & Styling Tools
+- Nutze project-configured Formatter / Linters nur wenn `pyproject.toml` vorschreibt; vermeide umfangreiche Reformatierungen.
+
+12) CI / Tests
+- Lokale Testausführung (pytest scoped):
+```powershell
+.\.venv\Scripts\python.exe -m pytest tests/<target> -q
+```
+- Vor PR: pre-commit, scoped mypy und scoped pytest durchlaufen lassen.
+
+13) Kontakt / Review
+- Bei unsicheren Änderungen: bitte Reviewer in PR erwähnen und kurz begründen.
+
+14) Dokumentationspflicht
+- Alle funktionalen Änderungen, API-Änderungen, Konfigurationsänderungen oder Architekturentscheidungen sollen in `docs/` dokumentiert werden.
+- Für kleinere Fixes genügt ein Eintrag mit kurzer Beschreibung, betroffene Dateien, Datum und Autor in `docs/changes.md` oder `docs/CHANGELOG.md` (falls vorhanden).
+- Für inhaltliche Änderungen (neue Endpunkte, Breaking Changes, Security-Fixes) erweitere bitte `docs/` um eine passende Seite oder Update und verlinke diese Änderung im PR-Text.
+- Beispiel-Eintrag (kurz) für `docs/changes.md`:
+```markdown
+- Datum: 2025-11-13
+- Autor: Vorname Nachname
+- Datei(en): `backend/agents/veritas_api_agent_social.py`
+- Kurz: Typannotations hinzugefügt, mypy-Fehler (index) behoben
+- PR: #123 (Link)
+```
+
+15) `docs/todo.md` und `docs/roadmap.md` (Pflicht)
+- Pflege von `docs/todo.md`:
+	- Enthält aktuelle, priorisierte Aufgaben, Status (not-started / in-progress / done), verantwortliche Person und geschätzte Aufwandsangabe.
+	- Jede Änderung, die Arbeit an mehreren Dateien oder architektonische Änderungen erfordert, sollte einen Eintrag in `docs/todo.md` haben.
+	- Format: kurze Zeilen; Beispiel:
+```markdown
+- [in-progress] Mypy-Fixes: indexed-assignment (Scope: backend + shared) — Owner: Max Mustermann — ETA: 2d
+```
+
+- Pflege von `docs/roadmap.md`:
+	- Enthält mittel- bis langfristige Ziele, Meilensteine und Abhängigkeiten.
+	- Bei größeren Änderungen (z. B. Umstellung auf neue DB, API-Versioning) aktualisiere die Roadmap mit Auswirkungen und Zieltermin.
+
+- PR-Anforderung: Wenn ein PR größere Änderungen enthält, prüfe und aktualisiere `docs/todo.md` und ggf. `docs/roadmap.md`. Falls nur ein Quickfix, vermerke in `docs/changes.md`.
+
+-- Ende --
+
+Wenn du möchtest, kann ich eine kurze englische Fassung erzeugen oder diese Datei zusätzlich in `README` referenzieren. Soll ich das Commiten (branch: `precommit/autoupdate`) oder nur die Datei hier anlegen? 

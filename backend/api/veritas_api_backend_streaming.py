@@ -144,6 +144,7 @@ async def root():
         "status": "active",
         "streaming_available": STREAMING_AVAILABLE,
         "endpoints": {
+<<<<<<< Updated upstream
             "chat": "/v2/query",
             "streaming_chat": "/v2/query/stream",
             "progress": "/progress/{session_id}",
@@ -151,6 +152,15 @@ async def root():
             "agents": "/agents/ask",
             "docs": "/docs"
         }
+=======
+            "chat": {"path": " / v2/query", "available": True, "production_ready": True},
+            "streaming_chat": {"path": " / v2/query / stream", "available": STREAMING_AVAILABLE, "production_ready": STREAMING_AVAILABLE},
+            "progress": {"path": " / progress/{session_id}", "available": STREAMING_AVAILABLE, "production_ready": STREAMING_AVAILABLE},
+            "rag": {"path": "/ask", "available": True, "production_ready": True},
+            "agents": {"path": "/agents/ask", "available": True, "production_ready": True},
+            "docs": {"path": "/docs", "available": True, "production_ready": True},
+        },
+>>>>>>> Stashed changes
     }
 
 @app.get("/health")
@@ -250,8 +260,13 @@ async def _process_streaming_query(session_id: str, query_id: str, request: Veri
         
         # 3. Agent Processing Stage
         progress_manager.update_stage(session_id, ProgressStage.AGENT_PROCESSING)
+<<<<<<< Updated upstream
         
         agent_results = {}
+=======
+
+        agent_results: Dict[str, Any] = {}
+>>>>>>> Stashed changes
         for i, agent_type in enumerate(selected_agents):
             # Agent startet
             progress_manager.update_agent_progress(

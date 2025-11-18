@@ -1,8 +1,8 @@
 # 🔬 Dialektische Synthese & Peer-Review - Implementierungsplan
 
-**Version:** 1.0.0  
-**Datum:** 16. Oktober 2025  
-**Status:** 🔄 In Arbeit  
+**Version:** 1.0.0
+**Datum:** 16. Oktober 2025
+**Status:** 🔄 In Arbeit
 **Priorität:** 🔥 Hoch (Wissenschaftliche Methode vervollständigen)
 
 ---
@@ -125,7 +125,7 @@ class ResolutionStrategy(Enum):
 class Thesis:
     """
     Kern-Aussage aus Agent-Result
-    
+
     Eine These ist eine extrahierte Behauptung/Position eines Agents
     mit Belegen und Konfidenz.
     """
@@ -135,7 +135,7 @@ class Thesis:
     confidence: float                    # Agent-Konfidenz (0-1)
     legal_basis: Optional[List[str]]     # Rechtsgrundlagen (z.B. ["§10 BauGB", "Art. 59 BayBO"])
     context: Optional[str]               # Kontext der Aussage
-    
+
     def __str__(self) -> str:
         return f"[{self.agent_source}] {self.claim} (Konfidenz: {self.confidence:.2f})"
 
@@ -143,7 +143,7 @@ class Thesis:
 class Contradiction:
     """
     Identifizierter Widerspruch zwischen zwei Thesen
-    
+
     Eine Antithese im dialektischen Sinne - zwei Aussagen die
     sich widersprechen oder inkonsistent sind.
     """
@@ -153,7 +153,7 @@ class Contradiction:
     severity: ContradictionSeverity
     description: str                     # Was widerspricht sich?
     potential_resolutions: List[str]     # Mögliche Auflösungen
-    
+
     def __str__(self) -> str:
         return (f"WIDERSPRUCH ({self.severity.value}): "
                 f"{self.thesis_a.agent_source} vs {self.thesis_b.agent_source} - "
@@ -163,7 +163,7 @@ class Contradiction:
 class DialecticalSynthesis:
     """
     Ergebnis der dialektischen Synthese
-    
+
     Die Synthese auf höherer Ebene, die Widersprüche auflöst
     und eine kohärente Gesamt-Aussage bildet.
     """
@@ -175,11 +175,11 @@ class DialecticalSynthesis:
     confidence: float                          # Gesamt-Konfidenz der Synthese (0-1)
     reasoning: str                             # LLM Begründung der Synthese
     metadata: dict                             # Zusätzliche Metadaten
-    
+
     def is_complete(self) -> bool:
         """Prüft ob alle Widersprüche aufgelöst wurden"""
         return len(self.unresolved_conflicts) == 0
-    
+
     def get_summary(self) -> str:
         """Kurze Zusammenfassung der Synthese"""
         return (f"Dialektische Synthese: {len(self.theses)} Thesen, "
@@ -227,7 +227,7 @@ class ReviewCriteria:
 class Review:
     """
     Einzelnes LLM-Review
-    
+
     Ein unabhängiges Review eines LLM-Modells mit detaillierten
     Bewertungen und Empfehlung.
     """
@@ -240,14 +240,14 @@ class Review:
     recommendation: ReviewRecommendation    # Empfehlung
     detailed_comments: str                  # Ausführliche Begründung
     review_timestamp: str                   # Zeitstempel
-    
+
     def get_weighted_score(self) -> float:
         """Berechnet gewichteten Gesamt-Score aus Kriterien"""
         total = 0.0
         for criterion in self.criteria_scores.values():
             total += criterion.score * criterion.weight
         return total
-    
+
     def __str__(self) -> str:
         return (f"Review von {self.reviewer_model}: {self.overall_score:.1f}/10 "
                 f"({self.recommendation.value})")
@@ -256,7 +256,7 @@ class Review:
 class ReviewConflict:
     """
     Uneinigkeit zwischen Reviewern
-    
+
     Identifiziert wo Reviewer stark unterschiedliche Bewertungen haben.
     """
     criterion: str                  # Bei welchem Kriterium?
@@ -267,11 +267,11 @@ class ReviewConflict:
     score_b: float
     comments_b: str
     difference: float               # Absolute Differenz
-    
+
     def is_significant(self, threshold: float = 3.0) -> bool:
         """Prüft ob Differenz signifikant ist (>= threshold)"""
         return abs(self.difference) >= threshold
-    
+
     def __str__(self) -> str:
         return (f"Konflikt bei '{self.criterion}': "
                 f"{self.reviewer_a} ({self.score_a:.1f}) vs "
@@ -282,7 +282,7 @@ class ReviewConflict:
 class PeerReviewResult:
     """
     Gesamt-Ergebnis des Multi-LLM Peer-Reviews
-    
+
     Aggregiert alle Reviews, berechnet Consensus und gibt
     finales Urteil ab.
     """
@@ -295,12 +295,12 @@ class PeerReviewResult:
     confidence: float                           # Konfidenz des Reviews (0-1)
     recommendations: List[str]                  # Verbesserungsvorschläge
     metadata: dict                              # Zusätzliche Metadaten
-    
+
     def get_approval_rate(self) -> float:
         """Berechnet Anteil der Approve-Empfehlungen"""
         approvals = sum(1 for r in self.reviews if r.recommendation == ReviewRecommendation.APPROVE)
         return approvals / len(self.reviews) if self.reviews else 0.0
-    
+
     def get_summary(self) -> str:
         """Kurze Zusammenfassung"""
         approval_rate = self.get_approval_rate()
@@ -503,6 +503,6 @@ Gib NUR das JSON zurück.
 
 ---
 
-**Status:** 📝 Konzept & Modelle dokumentiert  
-**Nächster Milestone:** Datenmodelle implementieren  
+**Status:** 📝 Konzept & Modelle dokumentiert
+**Nächster Milestone:** Datenmodelle implementieren
 **Geschätzte Zeit bis Completion:** 6-9 Stunden

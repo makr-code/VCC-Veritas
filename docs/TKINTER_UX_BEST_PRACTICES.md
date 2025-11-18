@@ -295,10 +295,10 @@ def fade_in_message(widget: tk.Widget, steps=10, delay=20):
     """Fade-in von alpha 0 → 1"""
     # Tkinter-Limitation: Kein echtes Alpha
     # Workaround: Farbe von Hell → Normal
-    
+
     start_color = '#F0F0F0'  # Heller
     end_color = '#212121'    # Normal
-    
+
     # Interpolation über `steps` Schritte
     for i in range(steps):
         color = interpolate_color(start_color, end_color, i/steps)
@@ -315,14 +315,14 @@ def smooth_expand(frame: tk.Frame, target_height: int, steps=10):
     """Smooth Expand von 0 → target_height"""
     current_height = 0
     step_size = target_height / steps
-    
+
     def animate_step(h):
         if h < target_height:
             frame.configure(height=int(h))
             frame.after(20, lambda: animate_step(h + step_size))
         else:
             frame.configure(height=target_height)
-    
+
     animate_step(current_height)
 ```
 
@@ -343,7 +343,7 @@ def show_error_message(error_msg: str, retry_callback: Callable):
         relief='solid',
         borderwidth=1
     )
-    
+
     # Error-Icon + Text
     error_label = tk.Label(
         error_frame,
@@ -352,7 +352,7 @@ def show_error_message(error_msg: str, retry_callback: Callable):
         fg='#C62828'
     )
     error_label.pack(side='left', padx=10)
-    
+
     # Retry-Button
     retry_btn = tk.Button(
         error_frame,
@@ -362,7 +362,7 @@ def show_error_message(error_msg: str, retry_callback: Callable):
         activebackground='#EF9A9A'
     )
     retry_btn.pack(side='right', padx=10)
-    
+
     chat_text_widget.window_create('end', window=error_frame)
 ```
 
@@ -372,9 +372,9 @@ def show_error_message(error_msg: str, retry_callback: Callable):
 def send_message_with_timeout(message: str, timeout=30):
     """Sendet Message mit Timeout"""
     import threading
-    
+
     result = {'done': False, 'response': None}
-    
+
     def send():
         try:
             response = backend.send(message)
@@ -383,16 +383,16 @@ def send_message_with_timeout(message: str, timeout=30):
             result['response'] = f"Error: {e}"
         finally:
             result['done'] = True
-    
+
     thread = threading.Thread(target=send)
     thread.start()
-    
+
     # Warte mit Timeout
     thread.join(timeout=timeout)
-    
+
     if not result['done']:
         return "⏱️ Timeout - Request took too long"
-    
+
     return result['response']
 ```
 
@@ -463,10 +463,10 @@ def get_colors():
 def toggle_theme():
     global CURRENT_THEME
     CURRENT_THEME = 'dark' if CURRENT_THEME == 'light' else 'light'
-    
+
     # Update alle Widgets
     update_all_colors()
-    
+
     # Speichere Preference
     save_preference('theme', CURRENT_THEME)
 ```
@@ -535,24 +535,24 @@ from frontend.ui.veritas_ui_chat_bubbles import (
 # 2. Setup in __init__
 def __init__(self):
     # ... bestehender Code ...
-    
+
     # Neue Handler
     self.metadata_handler = MetadataCompactWrapper(
         text_widget=self.chat_text,
         feedback_callback=self.on_feedback_received,
         initially_collapsed=True
     )
-    
+
     self.assistant_layout = AssistantFullWidthLayout(
         text_widget=self.chat_text,
         markdown_renderer=self.markdown_renderer,
         metadata_handler=self.metadata_handler
     )
-    
+
     # Performance-Optimierungen
     TkinterBestPractices.optimize_text_widget(self.chat_text)
     TkinterBestPractices.enable_smooth_scrolling(self.chat_text)
-    
+
     # Keyboard-Shortcuts
     shortcuts = {
         '<Control-k>': self.clear_chat,
@@ -631,6 +631,6 @@ def on_feedback_received(self, rating: str):
 
 ---
 
-**Erstellt:** 17. Oktober 2025  
-**Version:** 1.0  
+**Erstellt:** 17. Oktober 2025
+**Version:** 1.0
 **Status:** 🚀 Ready for Implementation

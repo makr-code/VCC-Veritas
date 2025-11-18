@@ -41,8 +41,12 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
+<<<<<<< Updated upstream
 from typing import Any, Dict, List, Optional, Set
 from collections import defaultdict
+=======
+from typing import Any, Dict, List, Optional, Set, DefaultDict
+>>>>>>> Stashed changes
 
 logger = logging.getLogger(__name__)
 
@@ -145,6 +149,7 @@ class ReciprocalRankFusion:
         top_k = top_k or self.config.top_k
         
         # RRF-Scores berechnen
+<<<<<<< Updated upstream
         rrf_scores = defaultdict(float)
         source_ranks = defaultdict(dict)
         source_scores = defaultdict(dict)
@@ -152,6 +157,17 @@ class ReciprocalRankFusion:
         doc_contents = {}  # doc_id → content
         doc_metadata = {}  # doc_id → metadata
         
+=======
+        from typing import Dict
+
+        rrf_scores: Dict[str, float] = defaultdict(float)
+        source_ranks: Dict[str, Dict[str, int]] = defaultdict(dict)
+        source_scores: Dict[str, Dict[str, float]] = defaultdict(dict)
+        sources: Dict[str, List[str]] = defaultdict(list)
+        doc_contents: Dict[str, str] = {}  # doc_id → content
+        doc_metadata: Dict[str, Any] = {}  # doc_id → metadata
+
+>>>>>>> Stashed changes
         for retriever_name, results in retriever_results.items():
             # Weight für Retriever
             weight = 1.0
@@ -281,7 +297,7 @@ class ReciprocalRankFusion:
             }
         
         # Source-Distribution (wie viele Docs von jedem Retriever)
-        source_counts = defaultdict(int)
+            source_counts: Dict[str, int] = defaultdict(int)
         for doc in fused_docs:
             for source in doc.sources:
                 source_counts[source] += 1

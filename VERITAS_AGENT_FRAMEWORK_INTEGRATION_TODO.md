@@ -1,8 +1,8 @@
 # 🤖 VERITAS AGENT FRAMEWORK INTEGRATION - TODO & ROADMAP
 
-**Date:** 8. Oktober 2025  
-**Source:** `codespaces-blank/` Mockup Implementation  
-**Target:** Integration in Veritas Production System  
+**Date:** 8. Oktober 2025
+**Source:** `codespaces-blank/` Mockup Implementation
+**Target:** Integration in Veritas Production System
 **Priority:** HIGH (Next Major Feature after Phase 5)
 
 ---
@@ -192,7 +192,7 @@ Das **codespaces-blank** Repository enthält ein **hochmodernes Multi-Agenten-Fr
 - [ ] **Schema Validator** (`backend/agents/framework/schema_validation.py`):
   ```python
   from jsonschema import Draft202012Validator, ValidationError
-  
+
   def validate_research_plan(plan_document: dict) -> bool:
       """Validate research plan against Veritas schema."""
       schema = load_schema("veritas_research_plan.schema.json")
@@ -238,7 +238,7 @@ Das **codespaces-blank** Repository enthält ein **hochmodernes Multi-Agenten-Fr
       created_at TIMESTAMPTZ DEFAULT NOW(),
       updated_at TIMESTAMPTZ DEFAULT NOW()
   );
-  
+
   -- research_plan_versions (Versionierung)
   CREATE TABLE research_plan_versions (
       plan_id UUID REFERENCES research_plans(plan_id),
@@ -249,7 +249,7 @@ Das **codespaces-blank** Repository enthält ein **hochmodernes Multi-Agenten-Fr
       created_at TIMESTAMPTZ DEFAULT NOW(),
       PRIMARY KEY (plan_id, version)
   );
-  
+
   -- research_plan_instances (Aktive Recherchen)
   CREATE TABLE research_plan_instances (
       instance_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -260,7 +260,7 @@ Das **codespaces-blank** Repository enthält ein **hochmodernes Multi-Agenten-Fr
       created_at TIMESTAMPTZ DEFAULT NOW(),
       updated_at TIMESTAMPTZ DEFAULT NOW()
   );
-  
+
   -- instance_history (Audit Trail / Saga-Log)
   CREATE TABLE instance_history (
       history_id BIGSERIAL PRIMARY KEY,
@@ -270,7 +270,7 @@ Das **codespaces-blank** Repository enthält ein **hochmodernes Multi-Agenten-Fr
       change_delta JSONB,
       full_document_snapshot JSONB
   );
-  
+
   -- Indexes
   CREATE INDEX idx_instances_status ON research_plan_instances(status);
   CREATE INDEX idx_history_instance ON instance_history(instance_id);
@@ -296,7 +296,7 @@ Das **codespaces-blank** Repository enthält ein **hochmodernes Multi-Agenten-Fr
       RETURN NEW;
   END;
   $$ LANGUAGE plpgsql;
-  
+
   CREATE TRIGGER instance_history_trigger
   AFTER UPDATE ON research_plan_instances
   FOR EACH ROW EXECUTE FUNCTION log_instance_change();
@@ -307,7 +307,7 @@ Das **codespaces-blank** Repository enthält ein **hochmodernes Multi-Agenten-Fr
   from sqlalchemy import Column, Integer, String, JSON, DateTime, Boolean
   from sqlalchemy.dialects.postgresql import UUID, JSONB
   import uuid
-  
+
   class ResearchPlan(Base):
       __tablename__ = "research_plans"
       plan_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -316,7 +316,7 @@ Das **codespaces-blank** Repository enthält ein **hochmodernes Multi-Agenten-Fr
       latest_version = Column(Integer, default=1)
       created_at = Column(DateTime, server_default=func.now())
       updated_at = Column(DateTime, onupdate=func.now())
-  
+
   class ResearchPlanInstance(Base):
       __tablename__ = "research_plan_instances"
       instance_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -332,13 +332,13 @@ Das **codespaces-blank** Repository enthält ein **hochmodernes Multi-Agenten-Fr
   ```python
   async def create_plan_instance(plan_id: UUID, overrides: dict) -> ResearchPlanInstance:
       """Create new research plan instance."""
-      
+
   async def get_plan_instance(instance_id: UUID) -> ResearchPlanInstance:
       """Retrieve plan instance by ID."""
-      
+
   async def update_plan_instance(instance_id: UUID, updates: dict) -> None:
       """Update plan instance (triggers audit log)."""
-      
+
   async def get_instance_history(instance_id: UUID) -> List[dict]:
       """Retrieve full audit trail for instance."""
   ```
@@ -368,7 +368,7 @@ Das **codespaces-blank** Repository enthält ein **hochmodernes Multi-Agenten-Fr
   ```python
   # Base auf codespaces-blank/app/orchestrator.py
   from enum import Enum
-  
+
   class WorkflowState(Enum):
       PENDING = "PENDING"
       PREPROCESSING = "PREPROCESSING"
@@ -377,20 +377,20 @@ Das **codespaces-blank** Repository enthält ein **hochmodernes Multi-Agenten-Fr
       AWAITING_REVIEW = "AWAITING_REVIEW"
       COMPLETED = "COMPLETED"
       FAILED = "FAILED"
-  
+
   class WorkflowStateMachine:
       """Manages research plan workflow transitions."""
-      
+
       def __init__(self, instance_id: UUID):
           self.instance_id = instance_id
           self.current_state = WorkflowState.PENDING
-          
+
       async def advance(self) -> WorkflowState:
           """Advance to next state."""
-          
+
       async def fail(self, reason: str) -> WorkflowState:
           """Mark workflow as failed."""
-          
+
       async def retry(self) -> WorkflowState:
           """Retry from last successful state."""
   ```
@@ -399,39 +399,39 @@ Das **codespaces-blank** Repository enthält ein **hochmodernes Multi-Agenten-Fr
   ```python
   class OrchestratorAgent(BaseAgent):
       """Master agent for workflow coordination."""
-      
+
       async def execute_plan(self, instance_id: UUID) -> dict:
           """Execute complete research plan."""
-          
+
           # 1. Load plan instance
           instance = await get_plan_instance(instance_id)
-          
+
           # 2. Initialize state machine
           sm = WorkflowStateMachine(instance_id)
-          
+
           # 3. Execute phases
           await self._execute_preprocess(instance)
           await sm.advance()
-          
+
           await self._execute_execution_steps(instance)
           await sm.advance()
-          
+
           await self._execute_postprocess(instance)
           await sm.advance()
-          
+
           await self._generate_report(instance)
           await sm.advance()
-          
+
           return {"status": "COMPLETED", "instance_id": instance_id}
-      
+
       async def _execute_execution_steps(self, instance: dict) -> None:
           """Execute DAG of execution steps."""
-          
+
           steps = instance["instance_document"]["stages"]["execution_steps"]
-          
+
           # Build dependency graph
           dag = self._build_dag(steps)
-          
+
           # Execute based on dependencies
           for step in dag.topological_sort():
               await self._execute_step(step)
@@ -465,29 +465,29 @@ Das **codespaces-blank** Repository enthält ein **hochmodernes Multi-Agenten-Fr
   ```python
   class VeritasPipelineAdapter:
       """Adapts new Orchestrator to existing Intelligent Pipeline."""
-      
-      def __init__(self, orchestrator: OrchestratorAgent, 
+
+      def __init__(self, orchestrator: OrchestratorAgent,
                    pipeline: IntelligentMultiAgentPipeline):
           self.orchestrator = orchestrator
           self.pipeline = pipeline
-      
+
       async def execute_hybrid(self, query: str) -> dict:
           """Execute using both old and new system."""
-          
+
           # Option 1: Use old pipeline
           if not self._should_use_new_orchestrator(query):
               return await self.pipeline.execute(query)
-          
+
           # Option 2: Use new orchestrator
           plan_instance = await self._create_research_plan(query)
           return await self.orchestrator.execute_plan(plan_instance.instance_id)
-      
+
       def _should_use_new_orchestrator(self, query: str) -> bool:
           """Decide which system to use based on query complexity."""
           # Feature flag
           if not os.getenv("VERITAS_ENABLE_AGENT_FRAMEWORK"):
               return False
-          
+
           # Complexity heuristic
           return len(query.split()) > 20  # Complex queries use new system
   ```
@@ -500,7 +500,7 @@ Das **codespaces-blank** Repository enthält ein **hochmodernes Multi-Agenten-Fr
       template_id: Optional[str] = None
   ):
       """Execute research plan (new orchestrator)."""
-      
+
       try:
           # Create plan instance
           if template_id:
@@ -508,17 +508,17 @@ Das **codespaces-blank** Repository enthält ein **hochmodernes Multi-Agenten-Fr
           else:
               # Auto-select template via TriageAgent
               instance = await triage_and_create(query)
-          
+
           # Execute
           orchestrator = get_orchestrator_agent()
           result = await orchestrator.execute_plan(instance.instance_id)
-          
+
           return {
               "instance_id": str(instance.instance_id),
               "status": result["status"],
               "result": result
           }
-      
+
       except Exception as e:
           logger.error(f"Research plan execution failed: {e}")
           raise HTTPException(status_code=500, detail=str(e))
@@ -547,31 +547,31 @@ Das **codespaces-blank** Repository enthält ein **hochmodernes Multi-Agenten-Fr
 - [ ] **Copy Registry** (`backend/agents/framework/registry.py`):
   ```python
   # Based on codespaces-blank/agents/registry.py
-  
+
   class AgentRegistry:
       """Central registry for all agents."""
-      
+
       def __init__(self):
           self._agents: Dict[str, BaseAgent] = {}
-      
+
       def register(self, name: str, agent: BaseAgent) -> None:
           """Register agent."""
           self._agents[name] = agent
-      
+
       def get(self, name: str) -> BaseAgent:
           """Get agent by name."""
           if name not in self._agents:
               raise ValueError(f"Agent '{name}' not registered")
           return self._agents[name]
-      
+
       def execute(self, request: AgentRequest) -> AgentResult:
           """Execute agent task."""
           agent = self.get(request.agent)
           return agent.run(request)
-  
+
   # Global instance
   _registry = None
-  
+
   def get_agent_registry() -> AgentRegistry:
       global _registry
       if _registry is None:
@@ -583,14 +583,14 @@ Das **codespaces-blank** Repository enthält ein **hochmodernes Multi-Agenten-Fr
 - [ ] **Base Agent Class** (`backend/agents/framework/base.py`):
   ```python
   # Based on codespaces-blank/agents/base.py
-  
+
   @dataclass
   class AgentRequest:
       task_id: str
       tool: str
       inputs: Dict[str, Any]
       context: Dict[str, Any] = field(default_factory=dict)
-  
+
   @dataclass
   class AgentResult:
       agent: str
@@ -600,13 +600,13 @@ Das **codespaces-blank** Repository enthält ein **hochmodernes Multi-Agenten-Fr
       source: Optional[str]
       preview: Dict[str, Any]
       metadata: Dict[str, Any] = field(default_factory=dict)
-  
+
   class BaseAgent:
       name: str = "BaseAgent"
-      
+
       def __init__(self, tool_registry: ToolRegistry):
           self._tool_registry = tool_registry
-      
+
       async def run(self, request: AgentRequest) -> AgentResult:
           raise NotImplementedError
   ```
@@ -635,7 +635,7 @@ Das **codespaces-blank** Repository enthält ein **hochmodernes Multi-Agenten-Fr
 class FinancialDataAgent:
     def __init__(self, db_manager):
         self.db_manager = db_manager
-    
+
     async def query_financial_data(self, query: str) -> dict:
         # Direct DB query
         results = await self.db_manager.query(query)
@@ -646,12 +646,12 @@ class FinancialDataAgent:
 ```python
 class DataRetrievalAgent(BaseAgent):
     name = "DataRetrievalAgent"
-    
+
     async def run(self, request: AgentRequest) -> AgentResult:
         """Execute data retrieval task."""
-        
+
         tool = request.tool
-        
+
         if tool == "financial_query":
             return await self._query_financial(request)
         elif tool == "web_search":
@@ -660,17 +660,17 @@ class DataRetrievalAgent(BaseAgent):
             return await self._phase5_search(request)
         else:
             raise AgentToolNotSupported(f"Tool '{tool}' not supported")
-    
+
     async def _phase5_search(self, request: AgentRequest) -> AgentResult:
         """Use Phase 5 Hybrid Search."""
         from backend.api.veritas_phase5_integration import get_hybrid_retriever
-        
+
         hybrid_retriever = get_hybrid_retriever()
         results = await hybrid_retriever.retrieve(
             request.inputs["query"],
             top_k=request.inputs.get("top_k", 10)
         )
-        
+
         return AgentResult(
             agent=self.name,
             task_id=request.task_id,
@@ -712,7 +712,7 @@ class DataRetrievalAgent(BaseAgent):
 - [ ] **Tool Registry** (`backend/agents/framework/tool_registry.py`):
   ```python
   # Based on codespaces-blank/app/tool_registry.py
-  
+
   @dataclass
   class ToolSpec:
       name: str
@@ -721,21 +721,21 @@ class DataRetrievalAgent(BaseAgent):
       scope: str  # "retrieval", "analysis", "synthesis", "validation"
       openapi_schema: dict
       metadata: dict = field(default_factory=dict)
-  
+
   class ToolRegistry:
       """Registry for all tools with OpenAPI specs."""
-      
+
       def __init__(self):
           self._tools: Dict[str, ToolSpec] = {}
-      
+
       def register(self, spec: ToolSpec) -> None:
           """Register tool."""
           self._tools[spec.name] = spec
-      
+
       def get(self, name: str) -> ToolSpec:
           """Get tool spec."""
           return self._tools[name]
-      
+
       def list_by_scope(self, scope: str) -> List[ToolSpec]:
           """List tools by scope."""
           return [t for t in self._tools.values() if t.scope == scope]
@@ -776,7 +776,7 @@ class DataRetrievalAgent(BaseAgent):
   ```python
   class ToolAccessControl:
       """Enforce least privilege for tool access."""
-      
+
       def __init__(self):
           self._agent_scopes = {
               "DataRetrievalAgent": ["retrieval"],
@@ -785,7 +785,7 @@ class DataRetrievalAgent(BaseAgent):
               "ValidationAgent": ["validation"],
               "OrchestratorAgent": ["retrieval", "analysis", "synthesis", "validation"]
           }
-      
+
       def can_access(self, agent: str, tool: str) -> bool:
           """Check if agent can access tool."""
           tool_spec = get_tool_registry().get(tool)
@@ -814,11 +814,11 @@ class DataRetrievalAgent(BaseAgent):
   ```python
   async def execute_parallel_tasks(tasks: List[AgentRequest]) -> List[AgentResult]:
       """Execute tasks in parallel."""
-      
+
       async def run_task(task):
           agent = get_agent_registry().get(task.agent)
           return await agent.run(task)
-      
+
       results = await asyncio.gather(*[run_task(t) for t in tasks])
       return results
   ```
@@ -827,13 +827,13 @@ class DataRetrievalAgent(BaseAgent):
   ```python
   async def execute_conditional_step(step: dict) -> AgentResult:
       """Execute step with conditional routing."""
-      
+
       # Execute first task
       first_result = await execute_task(step["tasks"][0])
-      
+
       # Evaluate condition
       next_task = _evaluate_condition(first_result, step["conditions"])
-      
+
       # Execute next task
       return await execute_task(next_task)
   ```
@@ -842,23 +842,23 @@ class DataRetrievalAgent(BaseAgent):
   ```python
   async def execute_collaborative_step(step: dict) -> AgentResult:
       """Execute with multi-agent collaboration."""
-      
+
       # Assemble team
       team = [get_agent_registry().get(t["agent"]) for t in step["tasks"]]
-      
+
       # Iterative refinement
       result = None
       for iteration in range(step.get("max_iterations", 3)):
           results = await asyncio.gather(*[
               agent.run(create_request(step, result)) for agent in team
           ])
-          
+
           # Check quality
           if meets_quality_threshold(results):
               break
-          
+
           result = aggregate_results(results)
-      
+
       return result
   ```
 
@@ -886,18 +886,18 @@ class DataRetrievalAgent(BaseAgent):
       latency_ms: float
       status: str
       metadata: dict
-  
+
   class TelemetryStore:
       """In-memory telemetry store."""
-      
+
       def __init__(self):
           self._events: List[TelemetryEvent] = []
-      
+
       def record(self, event: TelemetryEvent) -> None:
           """Record telemetry event."""
           self._events.append(event)
-      
-      def query(self, 
+
+      def query(self,
                 instance_id: Optional[UUID] = None,
                 agent: Optional[str] = None,
                 since: Optional[datetime] = None) -> List[TelemetryEvent]:
@@ -909,17 +909,17 @@ class DataRetrievalAgent(BaseAgent):
   ```python
   class EventStream:
       """SSE event stream for real-time updates."""
-      
+
       def __init__(self):
           self._events: List[dict] = []
           self._sequence = 0
-      
+
       def publish(self, event: dict) -> None:
           """Publish event."""
           event["sequence"] = self._sequence
           self._sequence += 1
           self._events.append(event)
-      
+
       async def stream(self, since: int = 0) -> AsyncGenerator:
           """Stream events since sequence number."""
           for event in self._events:
@@ -936,7 +936,7 @@ class DataRetrievalAgent(BaseAgent):
           get_event_stream().stream_instance(instance_id),
           media_type="text/event-stream"
       )
-  
+
   @app.get("/telemetry")
   async def get_telemetry(
       instance_id: Optional[str] = None,
@@ -963,7 +963,7 @@ class DataRetrievalAgent(BaseAgent):
   ```python
   async def execute_human_review_task(task: dict, instance_id: UUID) -> dict:
       """Execute human-in-the-loop review."""
-      
+
       # 1. Prepare review package
       package = {
           "instance_id": instance_id,
@@ -972,20 +972,20 @@ class DataRetrievalAgent(BaseAgent):
           "validation_results": await run_validation_agent(instance_id),
           "review_deadline": datetime.now() + timedelta(hours=24)
       }
-      
+
       # 2. Send notification
       await send_review_notification(package)
-      
+
       # 3. Wait for approval (polling or webhook)
       approval = await wait_for_approval(instance_id)
-      
+
       # 4. Update instance
       if approval["approved"]:
           await update_instance_status(instance_id, "COMPLETED")
       else:
           await update_instance_status(instance_id, "REJECTED")
           await log_rejection_reason(instance_id, approval["reason"])
-      
+
       return approval
   ```
 
@@ -995,7 +995,7 @@ class DataRetrievalAgent(BaseAgent):
   async def get_review_package(instance_id: str):
       """Get review package."""
       return await prepare_review_package(instance_id)
-  
+
   @app.post("/v2/research/instances/{instance_id}/approve")
   async def approve_instance(instance_id: str, approval: dict):
       """Approve/reject instance."""
@@ -1202,11 +1202,11 @@ Das **codespaces-blank** Mockup-System ist ein **hochmodernes Multi-Agenten-Fram
 
 ### Key Benefits:
 
-✅ **Compliance-Ready** - DSGVO/EU AI Act Audit Trail  
-✅ **Production-Grade** - State Machine, Error Handling, Retry  
-✅ **Flexible** - JSON Schema, Dynamic Orchestration  
-✅ **Scalable** - Parallel Execution, Event-Driven  
-✅ **Observable** - Telemetry, Event Stream, Replay  
+✅ **Compliance-Ready** - DSGVO/EU AI Act Audit Trail
+✅ **Production-Grade** - State Machine, Error Handling, Retry
+✅ **Flexible** - JSON Schema, Dynamic Orchestration
+✅ **Scalable** - Parallel Execution, Event-Driven
+✅ **Observable** - Telemetry, Event Stream, Replay
 
 ### Recommendation:
 
@@ -1222,8 +1222,8 @@ Effort: **~2-3 FTE** (Full-Time Equivalent)
 
 ---
 
-**Last Updated:** 8. Oktober 2025, 22:00  
-**Version:** 1.0 DRAFT  
+**Last Updated:** 8. Oktober 2025, 22:00
+**Version:** 1.0 DRAFT
 **Status:** READY FOR REVIEW
 
 ---

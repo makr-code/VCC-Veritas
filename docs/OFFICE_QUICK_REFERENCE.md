@@ -238,7 +238,7 @@ Help → Toggle Developer Tools
 ```
 
 ### Office Upload 400 Error
-**Ursache:** Unsupported File Type  
+**Ursache:** Unsupported File Type
 **Lösung:** Nur .docx, .xlsx, .pptx hochladen
 
 ---
@@ -299,6 +299,6 @@ Help → Toggle Developer Tools
 
 ---
 
-**Status:** 8/9 Tasks Complete ✅  
-**Ready for:** Testing + Parser Integration  
+**Status:** 8/9 Tasks Complete ✅
+**Ready for:** Testing + Parser Integration
 **Contact:** VERITAS Development Team

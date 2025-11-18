@@ -107,11 +107,17 @@ class ThemisDBAdapter:
     
     def _build_headers(self) -> Dict[str, str]:
         """Build HTTP headers for requests"""
+<<<<<<< Updated upstream
         headers = {
             "Content-Type": "application/json",
             "User-Agent": "Veritas-ThemisDB-Adapter/1.0"
         }
         
+=======
+        # Use standard header names without spaces
+        headers = {"Content-Type": "application/json", "User-Agent": "Veritas-ThemisDB-Adapter/1.0"}
+
+>>>>>>> Stashed changes
         if self.config.api_token:
             headers["Authorization"] = f"Bearer {self.config.api_token}"
         
@@ -132,6 +138,7 @@ class ThemisDBAdapter:
         Raises:
             httpx.HTTPError: If health check fails
         """
+<<<<<<< Updated upstream
         try:
             response = await self.client.get("/api/health")
             response.raise_for_status()
@@ -140,6 +147,44 @@ class ThemisDBAdapter:
             logger.error(f"❌ ThemisDB health check failed: {e}")
             raise
     
+=======
+        # Try common health endpoints - prefer /health (some Themis builds expose /health)
+        candidates = ["/health", "/api/health", "/"]
+
+        last_exc: Optional[Exception] = None
+        for path in candidates:
+            try:
+                response = await self.client.get(path)
+                # Accept 200 OK as healthy; if 404 then try next candidate
+                if response.status_code == 200:
+                    response.raise_for_status()
+                    return response.json()
+                if response.status_code == 404:
+                    logger.debug(f"Themis health endpoint {path} returned 404, trying next candidate")
+                    continue
+                # For other status codes, raise so retry can handle transient errors
+                response.raise_for_status()
+                return response.json()
+            except httpx.HTTPStatusError as e:
+                # HTTPStatusError wraps non-2xx responses
+                logger.debug(f"Health check {path} HTTP status error: {e}")
+                last_exc = e
+                if e.response is not None and e.response.status_code == 404:
+                    continue
+                raise
+            except httpx.HTTPError as e:
+                logger.error(f"❌ ThemisDB health check failed for {path}: {e}")
+                last_exc = e
+                # Let retry handle Connect/Timeout; for other HTTP errors, bubble up after attempts
+                raise
+
+        # If none of the candidates returned healthy, raise a summary error
+        msg = "All health endpoint candidates failed"
+        if last_exc:
+            raise httpx.HTTPError(msg) from last_exc
+        raise httpx.HTTPError(msg)
+
+>>>>>>> Stashed changes
     async def vector_search(
         self,
         query: str,

@@ -1,7 +1,7 @@
 # 🎛️ LLM-Parameter Referenz
 
-**VERITAS RAG System - LLM Konfiguration**  
-**Version:** 1.0  
+**VERITAS RAG System - LLM Konfiguration**
+**Version:** 1.0
 **Datum:** 10.10.2025
 
 ---
@@ -68,8 +68,8 @@ P(token_i) = exp(logit_i / T) / Σ exp(logit_j / T)
 
 **Antwort:**
 ```
-Eine Baugenehmigung ist ein behördlicher Verwaltungsakt nach § 29 BauGB, 
-der die Zulässigkeit eines Bauvorhabens bestätigt. Sie wird vom zuständigen 
+Eine Baugenehmigung ist ein behördlicher Verwaltungsakt nach § 29 BauGB,
+der die Zulässigkeit eines Bauvorhabens bestätigt. Sie wird vom zuständigen
 Bauordnungsamt erteilt und ist rechtliche Voraussetzung für den Baubeginn.
 ```
 
@@ -81,9 +81,9 @@ Bauordnungsamt erteilt und ist rechtliche Voraussetzung für den Baubeginn.
 
 **Antwort:**
 ```
-Eine Baugenehmigung ist die offizielle Erlaubnis der Bauaufsichtsbehörde 
-für Ihr Bauvorhaben. Ohne diese Genehmigung dürfen Sie nicht mit dem Bau 
-beginnen. Der Antrag wird beim zuständigen Bauordnungsamt gestellt und 
+Eine Baugenehmigung ist die offizielle Erlaubnis der Bauaufsichtsbehörde
+für Ihr Bauvorhaben. Ohne diese Genehmigung dürfen Sie nicht mit dem Bau
+beginnen. Der Antrag wird beim zuständigen Bauordnungsamt gestellt und
 prüft die Einhaltung der Bauvorschriften.
 ```
 
@@ -95,9 +95,9 @@ prüft die Einhaltung der Bauvorschriften.
 
 **Antwort:**
 ```
-Stellen Sie sich die Baugenehmigung als Ihren "Baupass" vor - eine Art 
-behördliches Okay für Ihr Bauprojekt. Die Behörde prüft dabei gründlich, 
-ob Ihre Pläne den rechtlichen Rahmenbedingungen entsprechen. Erst mit 
+Stellen Sie sich die Baugenehmigung als Ihren "Baupass" vor - eine Art
+behördliches Okay für Ihr Bauprojekt. Die Behörde prüft dabei gründlich,
+ob Ihre Pläne den rechtlichen Rahmenbedingungen entsprechen. Erst mit
 diesem grünen Licht können Sie loslegen.
 ```
 
@@ -146,7 +146,7 @@ DirectOllamaLLM(
 )
 ```
 
-**Wichtig:** 
+**Wichtig:**
 - Mehr Tokens = längere Antwortzeit
 - Mehr Tokens = höhere Rechenkosten
 - Max = 2048 für llama3:latest (Context Window)
@@ -185,8 +185,8 @@ Für eine Baugenehmigung in Brandenburg benötigen Sie folgende Unterlagen:
 • Statische Berechnungen (von Tragwerksplaner)
 • Baubeschreibung mit Materialangaben
 
-Der Bauantrag wird beim zuständigen Bauordnungsamt in 3-facher 
-Ausfertigung eingereicht. Die Bearbeitungsdauer beträgt in der 
+Der Bauantrag wird beim zuständigen Bauordnungsamt in 3-facher
+Ausfertigung eingereicht. Die Bearbeitungsdauer beträgt in der
 Regel 2-3 Monate.
 
 💡 Tipp: Bei Unsicherheiten können Sie vorab eine Bauvoranfrage stellen.
@@ -321,10 +321,10 @@ Die genaue Dauer hängt von der Komplexität des Bauvorhabens ab.
 
 **Antwort:**
 ```
-Die Bearbeitungszeit für Ihre Baugenehmigung liegt typischerweise bei 
-2-3 Monaten. Bei einem vereinfachten Genehmigungsverfahren geht es 
-schneller - hier können Sie mit 4-6 Wochen rechnen. Die tatsächliche 
-Dauer variiert je nach Komplexität Ihres Bauvorhabens und Auslastung 
+Die Bearbeitungszeit für Ihre Baugenehmigung liegt typischerweise bei
+2-3 Monaten. Bei einem vereinfachten Genehmigungsverfahren geht es
+schneller - hier können Sie mit 4-6 Wochen rechnen. Die tatsächliche
+Dauer variiert je nach Komplexität Ihres Bauvorhabens und Auslastung
 der Behörde.
 ```
 
@@ -336,10 +336,10 @@ der Behörde.
 
 **Antwort:**
 ```
-Planen Sie für Ihre Baugenehmigung üblicherweise einen Zeitraum von 
-2 bis 3 Monaten ein. Sollte Ihr Projekt für das vereinfachte Verfahren 
-qualifizieren, verkürzt sich die Wartezeit auf etwa 4-6 Wochen. Beachten 
-Sie, dass die konkrete Bearbeitungsdauer von verschiedenen Faktoren 
+Planen Sie für Ihre Baugenehmigung üblicherweise einen Zeitraum von
+2 bis 3 Monaten ein. Sollte Ihr Projekt für das vereinfachte Verfahren
+qualifizieren, verkürzt sich die Wartezeit auf etwa 4-6 Wochen. Beachten
+Sie, dass die konkrete Bearbeitungsdauer von verschiedenen Faktoren
 beeinflusst wird: Komplexität Ihres Vorhabens, aktuelle Behörden-
 auslastung und Vollständigkeit Ihrer Unterlagen.
 ```
@@ -550,7 +550,7 @@ Empfehlung: Passe alle 3 gemeinsam an!
 
 ---
 
-**Autor:** VERITAS System  
-**Version:** 1.0  
-**Letzte Aktualisierung:** 10.10.2025  
+**Autor:** VERITAS System
+**Version:** 1.0
+**Letzte Aktualisierung:** 10.10.2025
 **Lizenz:** MIT

@@ -1,8 +1,8 @@
 # Phase 4: RAG Integration - Complete Documentation
 
-**Author:** VERITAS AI  
-**Date:** 14. Oktober 2025  
-**Version:** 1.1 (Enhanced with Phase 5 Features)  
+**Author:** VERITAS AI
+**Date:** 14. Oktober 2025
+**Version:** 1.1 (Enhanced with Phase 5 Features)
 **Status:** ✅ **COMPLETE**
 
 ---
@@ -295,7 +295,7 @@ result = rag.hybrid_search(
 )
 ```
 
-**Formula:** `score = Σ(1 / (k + rank))`  
+**Formula:** `score = Σ(1 / (k + rank))`
 **Default k:** 60
 
 **Advantages:**
@@ -406,16 +406,16 @@ from backend.services.rag_service import RAGService
 
 async def search_multiple():
     rag = RAGService()
-    
+
     queries = [
         "Bauantrag Stuttgart",
         "Gewerbeanmeldung München",
         "Personalausweis beantragen"
     ]
-    
+
     # Parallel execution
     results = await rag.batch_search(queries)
-    
+
     for query, result in zip(queries, results):
         print(f"{query}: {len(result.results)} results")
 
@@ -621,13 +621,13 @@ async def enhanced_search(query: str):
     """Complete enhanced RAG workflow"""
     rag = RAGService()
     reranker = RerankerService()
-    
+
     # 1. Query expansion
     expansions = rag.expand_query(query, max_expansions=3)
-    
+
     # 2. Batch search
     results = await rag.batch_search(expansions)
-    
+
     # 3. Collect documents
     all_docs = []
     for result in results:
@@ -639,14 +639,14 @@ async def enhanced_search(query: str):
             }
             for doc in result.results
         ])
-    
+
     # 4. LLM re-ranking
     reranked = reranker.rerank(
         query=query,
         documents=all_docs,
         top_k=5
     )
-    
+
     return reranked
 
 # Usage
@@ -754,7 +754,7 @@ citation = SourceCitation(
 # Format for display
 formatted = citation.format_citation()
 print(formatted)
-# Output: "Bauantragsverfahren (Page 42, § 3 Bauantrag): 
+# Output: "Bauantragsverfahren (Page 42, § 3 Bauantrag):
 #          'Ein Bauantrag ist schriftlich...'"
 
 # Serialize
@@ -1006,15 +1006,15 @@ print(f"\nRAG Results:")
 for step_id, step_result in result['step_results'].items():
     metadata = step_result.get('metadata', {})
     docs_count = metadata.get('documents_retrieved', 0)
-    
+
     if docs_count > 0:
         print(f"\n  Step: {step_id}")
         print(f"  Documents retrieved: {docs_count}")
-        
+
         # Show citations
         data = step_result.get('data', {})
         citations = data.get('citations', [])
-        
+
         if citations:
             print(f"  Citations:")
             for citation in citations[:3]:  # First 3
@@ -1090,8 +1090,8 @@ for doc in results:
 
 ### Test Suite
 
-**File:** `tests/test_rag_integration.py`  
-**Tests:** 15  
+**File:** `tests/test_rag_integration.py`
+**Tests:** 15
 **Coverage:** 100%
 
 ### Running Tests
@@ -1136,7 +1136,7 @@ python -m pytest tests\test_rag_integration.py --cov=backend.services.rag_servic
 
 ```
 ================================= test session starts =================================
-collected 15 items                                                                     
+collected 15 items
 
 test_rag_integration.py::test_rag_service_initialization PASSED             [  6%]
 test_rag_integration.py::test_vector_search_basic PASSED                    [ 13%]
@@ -1260,7 +1260,7 @@ top_3 = results.get_top_documents(3)
 
 # Good: LLM re-ranking (Phase 5)
 reranker = RerankerService(scoring_mode=ScoringMode.COMBINED)
-documents = [{'document_id': d.document_id, 'content': d.content, 
+documents = [{'document_id': d.document_id, 'content': d.content,
               'relevance_score': d.relevance_score} for d in results.results]
 reranked = reranker.rerank(query, documents, top_k=3)
 # → 15-25% better precision!
@@ -1473,7 +1473,7 @@ result = rag.hybrid_search(query)  # Takes 5+ seconds
 4. Implement caching:
    ```python
    from functools import lru_cache
-   
+
    @lru_cache(maxsize=100)
    def cached_hybrid_search(query: str):
        return rag.hybrid_search(query)
@@ -1508,7 +1508,7 @@ print(len(context))  # 3000 chars (750 tokens - exceeds limit)
        if len(doc.content) > max_chars:
            doc.content = doc.content[:max_chars] + "..."
        return doc
-   
+
    truncated = [truncate_doc(d) for d in docs]
    context = rag.build_context_for_llm(truncated)
    ```
@@ -1716,7 +1716,7 @@ Comprehensive test script for verifying RAG integration with real UDS3 databases
 
 **Test Coverage:**
 1. **ChromaDB Connection Test** - Verify vector database connectivity
-2. **Neo4j Connection Test** - Verify graph database connectivity  
+2. **Neo4j Connection Test** - Verify graph database connectivity
 3. **PostgreSQL Connection Test** - Verify relational database connectivity
 4. **RAG Service Initialization** - Initialize with all real backends
 5. **Vector Search Test** - Test ChromaDB queries with real data
@@ -1734,27 +1734,27 @@ python tests/test_real_uds3.py
 # ================================================================================
 # REAL UDS3 DATABASE CONNECTION TEST
 # ================================================================================
-# 
+#
 # Test started: 2025-10-14 14:30:00
 # Target: Real UDS3 databases at 192.168.178.94
-# 
+#
 # 1. CHROMADB CONNECTION TEST
 # ✅ ChromaDB connection successful!
-# 
+#
 # 2. NEO4J CONNECTION TEST
 # ✅ Neo4j connection successful!
-# 
+#
 # 3. POSTGRESQL CONNECTION TEST
 # ✅ PostgreSQL connection successful!
-# 
+#
 # [... additional test output ...]
-# 
+#
 # TEST SUMMARY
 # Connection Tests:
 #   Chromadb     ✅ PASS
 #   Neo4j        ✅ PASS
 #   Postgresql   ✅ PASS
-# 
+#
 # Overall: 3/3 connections successful
 # ✅ RAG Service is operational with real UDS3 backends
 #    Ready for production use!
@@ -1775,20 +1775,18 @@ python tests/test_real_uds3.py
 
 Phase 4 ist **vollständig implementiert und getestet**. Das RAG-System bietet:
 
-✅ **3 Suchstrategien** (Vector, Graph, Relational)  
-✅ **3 Ranking-Algorithmen** (RRF, Weighted, Borda)  
-✅ **Präzise Quellenangaben** mit Seitenzahlen  
-✅ **Token-limitierte Kontexterstellung** für LLMs  
-✅ **100% Testabdeckung** (17/17 Tests)  
-✅ **Real UDS3 Test Script** (500+ LOC)  
-✅ **Production-Ready** mit Mock-Mode Fallback  
+✅ **3 Suchstrategien** (Vector, Graph, Relational)
+✅ **3 Ranking-Algorithmen** (RRF, Weighted, Borda)
+✅ **Präzise Quellenangaben** mit Seitenzahlen
+✅ **Token-limitierte Kontexterstellung** für LLMs
+✅ **100% Testabdeckung** (17/17 Tests)
+✅ **Real UDS3 Test Script** (500+ LOC)
+✅ **Production-Ready** mit Mock-Mode Fallback
 
 Das System ist bereit für **Phase 5: Enhanced Features** und Produktivnutzung.
 
 ---
 
-**Dokumentation Ende**  
-**Version:** 1.1  
+**Dokumentation Ende**
+**Version:** 1.1
 **Status:** ✅ COMPLETE
-
-

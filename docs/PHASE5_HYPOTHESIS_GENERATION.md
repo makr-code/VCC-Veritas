@@ -1,8 +1,8 @@
 # Phase 5: Hypothesis Generation & Enhanced RAG - Complete Documentation
 
-**Version:** 5.0  
-**Status:** ✅ COMPLETE  
-**Date:** 14. Oktober 2025  
+**Version:** 5.0
+**Status:** ✅ COMPLETE
+**Date:** 14. Oktober 2025
 **Author:** VERITAS AI Team
 
 ---
@@ -270,7 +270,7 @@ class Hypothesis:
     suggested_steps: List[str]              # Processing steps
     relevant_keywords: List[str]            # Key terms
     timestamp: str                          # ISO timestamp
-    
+
     # Utility methods
     def has_critical_gaps(self) -> bool
     def requires_clarification(self) -> bool
@@ -308,7 +308,7 @@ Output: {
   "information_gaps": []
 }
 
-Example 2: Low Confidence Query  
+Example 2: Low Confidence Query
 Input: "Wie viel kostet ein Bauantrag?"
 Output: {
   "question_type": "calculation",
@@ -403,33 +403,33 @@ class ProcessExecutor:
         self.hypothesis_service = None
         if enable_hypothesis:
             self.hypothesis_service = HypothesisService()
-    
+
     def execute_process(self, tree: ProcessTree) -> Dict[str, Any]:
         # 1. Generate hypothesis BEFORE execution
         hypothesis = None
         if self.hypothesis_service:
             # Get RAG context (optional)
             rag_context = self._get_rag_context(tree.query, top_k=3)
-            
+
             # Generate hypothesis
             hypothesis = self.hypothesis_service.generate_hypothesis(
                 query=tree.query,
                 rag_context=rag_context
             )
-            
+
             # Log results
             logger.info(f"Hypothesis: {hypothesis.question_type.value}, "
                        f"confidence: {hypothesis.confidence.value}")
-            
+
             # Warn if clarification needed
             if hypothesis.requires_clarification():
                 logger.warning("Query requires clarification")
                 for q in hypothesis.get_clarification_questions():
                     logger.info(f"   - {q}")
-        
+
         # 2. Execute ProcessTree normally
         result = self._execute_tree(tree)
-        
+
         # 3. Include hypothesis in results
         if hypothesis:
             result['hypothesis'] = hypothesis.to_dict()
@@ -440,7 +440,7 @@ class ProcessExecutor:
                 'has_critical_gaps': hypothesis.has_critical_gaps(),
                 'information_gaps_count': len(hypothesis.information_gaps)
             }
-        
+
         return result
 ```
 
@@ -489,14 +489,14 @@ async def batch_search(
 ) -> List[HybridSearchResult]:
     """
     Perform batch search for multiple queries in parallel
-    
+
     Args:
         queries: List of search query strings
         search_method: HYBRID, VECTOR, GRAPH, or RELATIONAL
         weights: Search method weights
         filters: Optional search filters
         ranking_strategy: Ranking strategy
-        
+
     Returns:
         List of HybridSearchResult objects
     """
@@ -516,18 +516,18 @@ from backend.services.rag_service import RAGService, SearchFilters
 
 async def main():
     rag = RAGService()
-    
+
     queries = [
         "Bauantrag Stuttgart",
         "Gewerbeanmeldung München",
         "Personalausweis beantragen"
     ]
-    
+
     results = await rag.batch_search(
         queries=queries,
         filters=SearchFilters(max_results=5)
     )
-    
+
     for query, result in zip(queries, results):
         print(f"{query}: {len(result.results)} results")
 
@@ -563,12 +563,12 @@ def expand_query(
 ) -> List[str]:
     """
     Expand query with synonyms and reformulations
-    
+
     Args:
         query: Original search query
         max_expansions: Maximum number of expansions
         include_original: Include original in results
-        
+
     Returns:
         List of query variations
     """
@@ -698,13 +698,13 @@ def rerank(
 ) -> List[RerankingResult]:
     """
     Rerank documents using LLM-based scoring
-    
+
     Args:
         query: User's search query
         documents: List of dicts with 'content', 'relevance_score', 'document_id'
         top_k: Return only top K results
         batch_size: Process in batches
-        
+
     Returns:
         List of RerankingResult objects, sorted by reranked_score
     """
@@ -768,7 +768,7 @@ for result in results:
 
 **LLM Prompt Template:**
 ```
-You are a search result relevance evaluator. Rate each document's 
+You are a search result relevance evaluator. Rate each document's
 relevance to the user's query on a scale of 0.0 to 1.0.
 
 Query: "{query}"
@@ -987,35 +987,35 @@ from backend.services.reranker_service import RerankerService, ScoringMode
 
 async def process_query_with_phase5_features(query: str):
     """Complete query processing with Phase 5 features"""
-    
+
     # Step 1: Generate Hypothesis
     print("Step 1: Generating hypothesis...")
     hypothesis_service = HypothesisService()
     hypothesis = hypothesis_service.generate_hypothesis(query)
-    
+
     print(f"  Question Type: {hypothesis.question_type.value}")
     print(f"  Confidence: {hypothesis.confidence.value}")
     print(f"  Requires Clarification: {hypothesis.requires_clarification()}")
-    
+
     if hypothesis.requires_clarification():
         print("  Clarification Questions:")
         for q in hypothesis.get_clarification_questions():
             print(f"    - {q}")
         return  # Stop if clarification needed
-    
+
     # Step 2: Query Expansion
     print("\nStep 2: Expanding query...")
     rag = RAGService()
     expansions = rag.expand_query(query, max_expansions=3)
     print(f"  Generated {len(expansions)} query variations")
-    
+
     # Step 3: Batch Search (parallel)
     print("\nStep 3: Batch searching...")
     results = await rag.batch_search(
         queries=expansions,
         filters=SearchFilters(max_results=10)
     )
-    
+
     # Collect all documents
     all_docs = []
     for result in results:
@@ -1025,9 +1025,9 @@ async def process_query_with_phase5_features(query: str):
                 'content': doc.content,
                 'relevance_score': doc.relevance_score
             })
-    
+
     print(f"  Found {len(all_docs)} total documents")
-    
+
     # Step 4: LLM Re-ranking
     print("\nStep 4: Re-ranking results...")
     reranker = RerankerService(scoring_mode=ScoringMode.COMBINED)
@@ -1036,14 +1036,14 @@ async def process_query_with_phase5_features(query: str):
         documents=all_docs,
         top_k=5
     )
-    
+
     print(f"  Top {len(reranked)} results after re-ranking:")
     for i, result in enumerate(reranked, 1):
         print(f"    {i}. {result.document_id}")
         print(f"       Original: {result.original_score:.3f}")
         print(f"       Reranked: {result.reranked_score:.3f}")
         print(f"       Delta: {result.score_delta:+.3f}")
-    
+
     return {
         'hypothesis': hypothesis.to_dict(),
         'expansions': expansions,
@@ -1070,22 +1070,22 @@ from backend.models.hypothesis import ConfidenceLevel, QuestionType
 
 def adaptive_query_processing(query: str):
     """Adapt processing based on hypothesis"""
-    
+
     # Generate hypothesis
     hypothesis_service = HypothesisService()
     hypothesis = hypothesis_service.generate_hypothesis(query)
-    
+
     # Adapt based on confidence
     if hypothesis.confidence == ConfidenceLevel.HIGH:
         # High confidence: Standard processing
         print("✅ High confidence - proceeding with standard search")
         return process_standard_search(query)
-    
+
     elif hypothesis.confidence == ConfidenceLevel.MEDIUM:
         # Medium confidence: Use query expansion
         print("⚠️ Medium confidence - using query expansion")
         return process_with_expansion(query)
-    
+
     elif hypothesis.confidence == ConfidenceLevel.LOW:
         # Low confidence: Ask for clarification
         print("❌ Low confidence - requesting clarification")
@@ -1094,20 +1094,20 @@ def adaptive_query_processing(query: str):
             'status': 'clarification_needed',
             'questions': questions
         }
-    
+
     # Adapt based on question type
     if hypothesis.question_type == QuestionType.COMPARISON:
         print("📊 Comparison query - using structured comparison")
         return process_comparison(query, hypothesis)
-    
+
     elif hypothesis.question_type == QuestionType.PROCEDURAL:
         print("📝 Procedural query - retrieving step-by-step guides")
         return process_procedural(query, hypothesis)
-    
+
     elif hypothesis.question_type == QuestionType.CALCULATION:
         print("🔢 Calculation query - extracting numerical data")
         return process_calculation(query, hypothesis)
-    
+
     # Default processing
     return process_standard_search(query)
 ```
@@ -1127,37 +1127,37 @@ from backend.services.rag_service import RAGService
 
 async def batch_process_with_progress(queries: List[str]):
     """Process queries in batches with progress reporting"""
-    
+
     rag = RAGService()
     total = len(queries)
-    
+
     print(f"Processing {total} queries...")
-    
+
     # Process in batches of 10
     batch_size = 10
     all_results = []
-    
+
     for i in range(0, total, batch_size):
         batch = queries[i:i+batch_size]
         batch_num = i // batch_size + 1
         total_batches = (total + batch_size - 1) // batch_size
-        
+
         print(f"\nBatch {batch_num}/{total_batches} ({len(batch)} queries)...")
-        
+
         # Execute batch
         results = await rag.batch_search(batch)
         all_results.extend(results)
-        
+
         # Progress report
         processed = min(i + batch_size, total)
         progress = (processed / total) * 100
         print(f"  Progress: {processed}/{total} ({progress:.1f}%)")
-        
+
         # Statistics
         total_docs = sum(len(r.results) for r in results)
         avg_docs = total_docs / len(results)
         print(f"  Found {total_docs} documents (avg: {avg_docs:.1f} per query)")
-    
+
     print(f"\n✅ Complete! Processed {total} queries")
     return all_results
 
@@ -1178,8 +1178,8 @@ results = asyncio.run(batch_process_with_progress(queries))
 
 ### Test Summary
 
-**Total Tests:** 58/58 passing (100%)  
-**Total Execution Time:** ~3.56s  
+**Total Tests:** 58/58 passing (100%)
+**Total Execution Time:** ~3.56s
 **Code Coverage:** Comprehensive
 
 #### Test Breakdown
@@ -1217,9 +1217,9 @@ pytest tests/test_hypothesis_service.py::test_confidence_* -v
 def test_generate_hypothesis_high_confidence(hypothesis_service):
     """Test high confidence hypothesis generation"""
     query = "Bauantrag für Einfamilienhaus in Stuttgart"
-    
+
     hypothesis = hypothesis_service.generate_hypothesis(query)
-    
+
     # Assertions
     assert hypothesis.confidence == ConfidenceLevel.HIGH
     assert hypothesis.question_type == QuestionType.PROCEDURAL
@@ -1232,17 +1232,17 @@ def test_generate_hypothesis_high_confidence(hypothesis_service):
 @pytest.mark.asyncio
 async def test_batch_search_performance(rag_service, sample_queries):
     """Test batch vs sequential performance"""
-    
+
     # Batch search
     start_batch = time.time()
     batch_results = await rag_service.batch_search(sample_queries)
     batch_time = time.time() - start_batch
-    
+
     # Sequential search
     start_seq = time.time()
     seq_results = [rag_service.hybrid_search(q) for q in sample_queries]
     seq_time = time.time() - start_seq
-    
+
     # Batch should be faster
     assert len(batch_results) == len(seq_results)
     print(f"Speedup: {seq_time/batch_time:.2f}x")

@@ -36,7 +36,13 @@ from typing import Dict, List, Any, Optional, Union
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from functools import lru_cache
+<<<<<<< Updated upstream
 import json
+=======
+from typing import Any, Dict, List, Optional, Union, Tuple
+
+import aiohttp
+>>>>>>> Stashed changes
 
 logger = logging.getLogger(__name__)
 
@@ -90,8 +96,8 @@ class Verfahren:
     behoerde: str = ""
     aktenzeichen: str = ""
     antragsgrund: Optional[str] = None
-    oeffentliche_beteiligung: int = 0
-    uvp_erforderlich: int = 0
+    oeffentliche_beteiligung: int | str = 0
+    uvp_erforderlich: int | str = 0
     bemerkungen: Optional[str] = None
     created_at: Optional[str] = None
 
@@ -105,10 +111,10 @@ class Messung:
     messart: str
     messdatum: str
     messzeit: str
-    messwert: float
+    messwert: float | str
     einheit: str
-    grenzwert: Optional[float] = None
-    ueberschreitung: int = 0
+    grenzwert: Optional[float | str] = None
+    ueberschreitung: int | str = 0
     messort: Optional[str] = None
     messmethode: Optional[str] = None
     messgeraet: Optional[str] = None
@@ -193,8 +199,8 @@ class Ansprechpartner:
     email: Optional[str] = None
     mobil: Optional[str] = None
     verfuegbarkeit: Optional[str] = None
-    notfallkontakt: int = 0
-    aktiv: int = 1
+    notfallkontakt: int | str = 0
+    aktiv: int | str = 1
 
 
 @dataclass
@@ -223,12 +229,12 @@ class Messreihe:
     messart: str
     zeitraum_von: str
     zeitraum_bis: str
-    anzahl_messungen: int
-    mittelwert: float
-    maximalwert: float
-    minimalwert: float
-    standardabweichung: float
-    ueberschreitungen_anzahl: int
+    anzahl_messungen: int | str
+    mittelwert: float | str
+    maximalwert: float | str
+    minimalwert: float | str
+    standardabweichung: float | str
+    ueberschreitungen_anzahl: int | str
     trend: str  # steigend, fallend, konstant
     bewertung: str  # unauffällig, auffällig, kritisch
 
@@ -255,7 +261,7 @@ class ComplianceHistorie:
     pruefungsdatum: str
     pruefungstyp: str
     ergebnis: str
-    bewertung_punkte: int
+    bewertung_punkte: int | str
     feststellungen: Optional[str] = None
     empfehlungen: Optional[str] = None
     folgepruefung: Optional[str] = None
@@ -285,7 +291,9 @@ class ResponseCache:
     """Einfacher Response-Cache mit TTL"""
     
     def __init__(self, ttl: int = 300):
-        self.cache: Dict[str, tuple] = {}
+        from typing import Tuple as _Tuple
+
+        self.cache: Dict[str, Tuple[Any, datetime]] = {}
         self.ttl = ttl
     
     def get(self, key: str) -> Optional[Any]:
@@ -336,10 +344,17 @@ class TestServerClient:
         self,
         method: str,
         endpoint: str,
+<<<<<<< Updated upstream
         params: Optional[Dict] = None,
         json_data: Optional[Dict] = None,
         use_cache: bool = True
     ) -> Dict[str, Any]:
+=======
+        params: Optional[Dict[str, Any]] = None,
+        json_data: Optional[Dict[str, Any]] = None,
+        use_cache: bool = True,
+    ) -> Any:
+>>>>>>> Stashed changes
         """
         HTTP Request mit Retry-Logic
         """
@@ -408,6 +423,7 @@ class TestServerClient:
                 return {"error": "unexpected_error", "message": str(e)}
         
         return {"error": "max_retries_exceeded"}
+<<<<<<< Updated upstream
     
     # =========================================================================
     # Health & Status
@@ -423,6 +439,68 @@ class TestServerClient:
         return result if isinstance(result, list) else []
     
     async def get_statistics(self) -> Dict[str, Any]:
+=======
+
+    # -----------------------------------------------------------------
+    # Small helpers for safe conversions from API responses
+    # -----------------------------------------------------------------
+    def _safe_int(self, value: Any, default: int = 0) -> int:
+        try:
+            if value is None:
+                return default
+            if isinstance(value, int):
+                return value
+            if isinstance(value, str) and value.isdigit():
+                return int(value)
+            return int(float(value))
+        except Exception:
+            return default
+
+    def _safe_float(self, value: Any, default: float = 0.0) -> float:
+        try:
+            if value is None:
+                return default
+            if isinstance(value, float):
+                return value
+            return float(value)
+        except Exception:
+            return default
+
+    # -----------------------------------------------------------------
+    # Parsers for response objects that need safe numeric coercion
+    # -----------------------------------------------------------------
+    def _parse_messung(self, m: Dict[str, Any]) -> Messung:
+        m_safe: Dict[str, Any] = dict(m)
+        m_safe["messwert"] = self._safe_float(m_safe.get("messwert"))
+        m_safe["grenzwert"] = None if m_safe.get("grenzwert") is None else self._safe_float(m_safe.get("grenzwert"))
+        m_safe["ueberschreitung"] = self._safe_int(m_safe.get("ueberschreitung"))
+        return Messung(**m_safe)
+
+    def _parse_messreihe(self, mr: Dict[str, Any]) -> Messreihe:
+        mr_safe: Dict[str, Any] = dict(mr)
+        mr_safe["anzahl_messungen"] = self._safe_int(mr_safe.get("anzahl_messungen"))
+        mr_safe["mittelwert"] = self._safe_float(mr_safe.get("mittelwert"))
+        mr_safe["maximalwert"] = self._safe_float(mr_safe.get("maximalwert"))
+        mr_safe["minimalwert"] = self._safe_float(mr_safe.get("minimalwert"))
+        mr_safe["standardabweichung"] = self._safe_float(mr_safe.get("standardabweichung"))
+        mr_safe["ueberschreitungen_anzahl"] = self._safe_int(mr_safe.get("ueberschreitungen_anzahl"))
+        return Messreihe(**mr_safe)
+
+    # =========================================================================
+    # Health & Status
+    # =========================================================================
+
+    async def health_check(self) -> Any:
+        """Health Check"""
+        return await self._request("GET", "/health")
+
+    async def get_databases(self) -> Any:
+        """Liste aller Datenbanken"""
+        result = await self._request("GET", "/databases")
+        return result if isinstance(result, list) else []
+
+    async def get_statistics(self) -> Any:
+>>>>>>> Stashed changes
         """Gesamtstatistik"""
         return await self._request("GET", "/statistik/overview")
     
@@ -436,10 +514,15 @@ class TestServerClient:
         bst_nr: Optional[str] = None,
         anl_nr: Optional[str] = None,
         ort: Optional[str] = None,
+<<<<<<< Updated upstream
         limit: int = 50
     ) -> Dict[str, Any]:
+=======
+        limit: int = 50,
+    ) -> Any:
+>>>>>>> Stashed changes
         """Anlagen suchen"""
-        params = {"db": db, "limit": limit}
+        params: Dict[str, Any] = {"db": db, "limit": limit}
         if bst_nr:
             params["bst_nr"] = bst_nr
         if anl_nr:
@@ -448,6 +531,7 @@ class TestServerClient:
             params["ort"] = ort
         
         return await self._request("GET", "/anlagen/search", params=params)
+<<<<<<< Updated upstream
     
     async def get_anlage(
         self,
@@ -455,6 +539,10 @@ class TestServerClient:
         bst_nr: str,
         anl_nr: str
     ) -> Dict[str, Any]:
+=======
+
+    async def get_anlage(self, db: str, bst_nr: str, anl_nr: str) -> Any:
+>>>>>>> Stashed changes
         """Einzelne Anlage abrufen"""
         return await self._request("GET", f"/anlagen/{db}/{bst_nr}/{anl_nr}")
     
@@ -469,10 +557,15 @@ class TestServerClient:
         status: Optional[str] = None,
         von_datum: Optional[str] = None,
         bis_datum: Optional[str] = None,
+<<<<<<< Updated upstream
         limit: int = 100
     ) -> List[Dict[str, Any]]:
+=======
+        limit: int = 100,
+    ) -> Any:
+>>>>>>> Stashed changes
         """Genehmigungsverfahren suchen"""
-        params = {"limit": limit}
+        params: Dict[str, Any] = {"limit": limit}
         if bst_nr:
             params["bst_nr"] = bst_nr
         if anl_nr:
@@ -486,8 +579,13 @@ class TestServerClient:
         
         result = await self._request("GET", "/verfahren/search", params=params)
         return result if isinstance(result, list) else []
+<<<<<<< Updated upstream
     
     async def get_verfahren(self, verfahren_id: str) -> Dict[str, Any]:
+=======
+
+    async def get_verfahren(self, verfahren_id: str) -> Any:
+>>>>>>> Stashed changes
         """Einzelnes Verfahren mit Bescheiden und Auflagen"""
         return await self._request("GET", f"/verfahren/{verfahren_id}")
     
@@ -503,10 +601,15 @@ class TestServerClient:
         ueberschreitung: Optional[bool] = None,
         von_datum: Optional[str] = None,
         bis_datum: Optional[str] = None,
+<<<<<<< Updated upstream
         limit: int = 200
     ) -> List[Dict[str, Any]]:
+=======
+        limit: int = 200,
+    ) -> Any:
+>>>>>>> Stashed changes
         """Messungen suchen"""
-        params = {"limit": limit}
+        params: Dict[str, Any] = {"limit": limit}
         if bst_nr:
             params["bst_nr"] = bst_nr
         if anl_nr:
@@ -528,14 +631,19 @@ class TestServerClient:
     # =========================================================================
     
     async def search_ueberwachung(
+<<<<<<< Updated upstream
         self,
         bst_nr: Optional[str] = None,
         anl_nr: Optional[str] = None,
         status: Optional[str] = None,
         limit: int = 100
     ) -> List[Dict[str, Any]]:
+=======
+        self, bst_nr: Optional[str] = None, anl_nr: Optional[str] = None, status: Optional[str] = None, limit: int = 100
+    ) -> Any:
+>>>>>>> Stashed changes
         """Überwachungsmaßnahmen suchen"""
-        params = {"limit": limit}
+        params: Dict[str, Any] = {"limit": limit}
         if bst_nr:
             params["bst_nr"] = bst_nr
         if anl_nr:
@@ -556,10 +664,15 @@ class TestServerClient:
         anl_nr: Optional[str] = None,
         status: Optional[str] = None,
         schweregrad: Optional[str] = None,
+<<<<<<< Updated upstream
         limit: int = 100
     ) -> List[Dict[str, Any]]:
+=======
+        limit: int = 100,
+    ) -> Any:
+>>>>>>> Stashed changes
         """Mängel suchen"""
-        params = {"limit": limit}
+        params: Dict[str, Any] = {"limit": limit}
         if bst_nr:
             params["bst_nr"] = bst_nr
         if anl_nr:
@@ -589,6 +702,7 @@ class TestServerClient:
         Returns:
             AnlageComplete oder None bei Fehler
         """
+<<<<<<< Updated upstream
         params = {
             "include_messungen": str(include_messungen).lower(),
             "include_verfahren": str(include_verfahren).lower()
@@ -600,6 +714,12 @@ class TestServerClient:
             params=params
         )
         
+=======
+        params: Dict[str, Any] = {"include_messungen": str(include_messungen).lower(), "include_verfahren": str(include_verfahren).lower()}
+
+        result = await self._request("GET", f"/anlage-complete/{bst_nr}/{anl_nr}", params=params)
+
+>>>>>>> Stashed changes
         if "error" in result:
             logger.error(f"Fehler bei get_anlage_complete: {result}")
             return None
@@ -610,7 +730,9 @@ class TestServerClient:
             anlage = AnlageBasic(**anlage_data)
             
             verfahren = [Verfahren(**v) for v in result.get("verfahren", [])]
-            messungen = [Messung(**m) for m in result.get("messungen", [])]
+            # Ensure numeric fields are converted safely for Messung
+            raw_messungen = result.get("messungen", [])
+            messungen = [self._parse_messung(m) for m in raw_messungen]
             ueberwachungen = [Ueberwachung(**u) for u in result.get("ueberwachungen", [])]
             maengel = [Mangel(**m) for m in result.get("maengel", [])]
             statistik = result.get("statistik", {})
@@ -638,8 +760,13 @@ class TestServerClient:
         anl_nr: Optional[str] = None,
         dokumenttyp: Optional[str] = None,
         status: str = "aktiv",
+<<<<<<< Updated upstream
         limit: int = 50
     ) -> List[Dict[str, Any]]:
+=======
+        limit: int = 50,
+    ) -> Any:
+>>>>>>> Stashed changes
         """
         Suche Dokumente
         
@@ -653,7 +780,7 @@ class TestServerClient:
         Returns:
             Liste von Dokumenten
         """
-        params = {"status": status, "limit": limit}
+        params: Dict[str, Any] = {"status": status, "limit": limit}
         if bst_nr:
             params["bst_nr"] = bst_nr
         if anl_nr:
@@ -663,8 +790,13 @@ class TestServerClient:
         
         result = await self._request("GET", "/dokumente/search", params=params)
         return result.get("dokumente", [])
+<<<<<<< Updated upstream
     
     async def get_dokument(self, dokument_id: str) -> Optional[Dict[str, Any]]:
+=======
+
+    async def get_dokument(self, dokument_id: str) -> Any:
+>>>>>>> Stashed changes
         """Einzelnes Dokument abrufen"""
         result = await self._request("GET", f"/dokumente/{dokument_id}")
         return result if "error" not in result else None
@@ -675,8 +807,13 @@ class TestServerClient:
         anl_nr: Optional[str] = None,
         funktion: Optional[str] = None,
         aktiv: int = 1,
+<<<<<<< Updated upstream
         limit: int = 50
     ) -> List[Dict[str, Any]]:
+=======
+        limit: int = 50,
+    ) -> Any:
+>>>>>>> Stashed changes
         """
         Suche Ansprechpartner
         
@@ -690,7 +827,7 @@ class TestServerClient:
         Returns:
             Liste von Ansprechpartnern
         """
-        params = {"aktiv": aktiv, "limit": limit}
+        params: Dict[str, Any] = {"aktiv": aktiv, "limit": limit}
         if bst_nr:
             params["bst_nr"] = bst_nr
         if anl_nr:
@@ -707,8 +844,13 @@ class TestServerClient:
         anl_nr: Optional[str] = None,
         wartungsart: Optional[str] = None,
         status: Optional[str] = None,
+<<<<<<< Updated upstream
         limit: int = 50
     ) -> List[Dict[str, Any]]:
+=======
+        limit: int = 50,
+    ) -> Any:
+>>>>>>> Stashed changes
         """
         Suche Wartungen
         
@@ -722,7 +864,7 @@ class TestServerClient:
         Returns:
             Liste von Wartungen
         """
-        params = {"limit": limit}
+        params: Dict[str, Any] = {"limit": limit}
         if bst_nr:
             params["bst_nr"] = bst_nr
         if anl_nr:
@@ -741,8 +883,13 @@ class TestServerClient:
         anl_nr: Optional[str] = None,
         messart: Optional[str] = None,
         bewertung: Optional[str] = None,
+<<<<<<< Updated upstream
         limit: int = 50
     ) -> List[Dict[str, Any]]:
+=======
+        limit: int = 50,
+    ) -> Any:
+>>>>>>> Stashed changes
         """
         Suche Messreihen (Zeitreihen-Analysen)
         
@@ -756,7 +903,7 @@ class TestServerClient:
         Returns:
             Liste von Messreihen
         """
-        params = {"limit": limit}
+        params: Dict[str, Any] = {"limit": limit}
         if bst_nr:
             params["bst_nr"] = bst_nr
         if anl_nr:
@@ -768,8 +915,13 @@ class TestServerClient:
         
         result = await self._request("GET", "/messreihen/search", params=params)
         return result.get("messreihen", [])
+<<<<<<< Updated upstream
     
     async def get_kritische_messreihen(self, limit: int = 20) -> List[Dict[str, Any]]:
+=======
+
+    async def get_kritische_messreihen(self, limit: int = 20) -> Any:
+>>>>>>> Stashed changes
         """
         Kritische Messreihen abrufen
         
@@ -777,6 +929,7 @@ class TestServerClient:
             Liste kritischer Messreihen sortiert nach Überschreitungen
         """
         result = await self._request("GET", "/messreihen/kritische", params={"limit": limit})
+<<<<<<< Updated upstream
         return result.get("messreihen", [])
     
     async def search_behoerden(
@@ -785,6 +938,14 @@ class TestServerClient:
         abteilung: Optional[str] = None,
         limit: int = 50
     ) -> List[Dict[str, Any]]:
+=======
+        raw = result or {}
+        return [self._parse_messreihe(mr) for mr in raw.get("messreihen", [])]
+
+    async def search_behoerden(
+        self, behoerde: Optional[str] = None, abteilung: Optional[str] = None, limit: int = 50
+    ) -> Any:
+>>>>>>> Stashed changes
         """
         Suche Behörden-Kontakte
         
@@ -796,7 +957,7 @@ class TestServerClient:
         Returns:
             Liste von Behörden-Kontakten
         """
-        params = {"limit": limit}
+        params: Dict[str, Any] = {"limit": limit}
         if behoerde:
             params["behoerde"] = behoerde
         if abteilung:
@@ -806,12 +967,17 @@ class TestServerClient:
         return result.get("kontakte", [])
     
     async def search_compliance(
+<<<<<<< Updated upstream
         self,
         bst_nr: Optional[str] = None,
         anl_nr: Optional[str] = None,
         ergebnis: Optional[str] = None,
         limit: int = 50
     ) -> List[Dict[str, Any]]:
+=======
+        self, bst_nr: Optional[str] = None, anl_nr: Optional[str] = None, ergebnis: Optional[str] = None, limit: int = 50
+    ) -> Any:
+>>>>>>> Stashed changes
         """
         Suche Compliance-Historie
         
@@ -824,7 +990,7 @@ class TestServerClient:
         Returns:
             Liste von Compliance-Prüfungen
         """
-        params = {"limit": limit}
+        params: Dict[str, Any] = {"limit": limit}
         if bst_nr:
             params["bst_nr"] = bst_nr
         if anl_nr:
@@ -855,6 +1021,7 @@ class TestServerClient:
         Returns:
             AnlageExtended oder None bei Fehler
         """
+<<<<<<< Updated upstream
         params = {
             "include_messungen": str(include_messungen).lower(),
             "include_dokumente": str(include_dokumente).lower()
@@ -866,6 +1033,12 @@ class TestServerClient:
             params=params
         )
         
+=======
+        params: Dict[str, Any] = {"include_messungen": str(include_messungen).lower(), "include_dokumente": str(include_dokumente).lower()}
+
+        result = await self._request("GET", f"/anlage-extended/{bst_nr}/{anl_nr}", params=params)
+
+>>>>>>> Stashed changes
         if "error" in result:
             logger.error(f"Fehler bei get_anlage_extended: {result}")
             return None
@@ -876,7 +1049,9 @@ class TestServerClient:
             anlage = AnlageBasic(**anlage_data)
             
             verfahren = [Verfahren(**v) for v in result.get("verfahren", [])]
-            messungen = [Messung(**m) for m in result.get("messungen", [])]
+            # See get_anlage_complete for safe parsing of numeric fields
+            raw_messungen = result.get("messungen", [])
+            messungen = [self._parse_messung(m) for m in raw_messungen]
             ueberwachungen = [Ueberwachung(**u) for u in result.get("ueberwachungen", [])]
             maengel = [Mangel(**m) for m in result.get("maengel", [])]
             dokumente = [Dokument(**d) for d in result.get("dokumente", [])]
@@ -909,12 +1084,17 @@ class TestServerClient:
     # =========================================================================
     
     async def get_grenzwertueberschreitungen(
+<<<<<<< Updated upstream
         self,
         bst_nr: Optional[str] = None,
         anl_nr: Optional[str] = None,
         von_datum: Optional[str] = None,
         limit: int = 100
     ) -> List[Dict[str, Any]]:
+=======
+        self, bst_nr: Optional[str] = None, anl_nr: Optional[str] = None, von_datum: Optional[str] = None, limit: int = 100
+    ) -> Any:
+>>>>>>> Stashed changes
         """Nur Grenzwertüberschreitungen abrufen"""
         return await self.search_messungen(
             bst_nr=bst_nr,
@@ -925,6 +1105,7 @@ class TestServerClient:
         )
     
     async def get_offene_maengel(
+<<<<<<< Updated upstream
         self,
         bst_nr: Optional[str] = None,
         schweregrad: Optional[str] = None
@@ -937,6 +1118,14 @@ class TestServerClient:
         )
     
     async def get_kritische_anlagen(self) -> List[Dict[str, Any]]:
+=======
+        self, bst_nr: Optional[str] = None, schweregrad: Optional[str] = None
+    ) -> Any:
+        """Nur offene Mängel abrufen"""
+        return await self.search_maengel(bst_nr=bst_nr, status="offen", schweregrad=schweregrad)
+
+    async def get_kritische_anlagen(self) -> Any:
+>>>>>>> Stashed changes
         """
         Anlagen mit kritischen Mängeln oder häufigen Überschreitungen
         """

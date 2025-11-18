@@ -1,7 +1,7 @@
 # VERITAS Documentation Index
 
-**Last Updated:** 14. Oktober 2025  
-**Version:** 3.25.0  
+**Last Updated:** 14. Oktober 2025
+**Version:** 3.25.0
 **Status:** ✅ Production Ready
 
 ---
@@ -264,6 +264,6 @@ For questions about documentation:
 
 ---
 
-**Last Updated:** 14. Oktober 2025, 18:00 Uhr  
-**Documentation Version:** 3.25.0  
+**Last Updated:** 14. Oktober 2025, 18:00 Uhr
+**Documentation Version:** 3.25.0
 **Status:** ✅ Current & Complete

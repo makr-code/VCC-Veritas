@@ -71,14 +71,14 @@ create_backup_dir() {
 backup_database() {
     local timestamp=$(date +%Y%m%d_%H%M%S)
     local backup_file="${BACKUP_PATH}/veritas_${timestamp}.sql"
-    
+
     log "Starting database backup..."
     log "Database: ${DB_NAME}@${DB_HOST}:${DB_PORT}"
     log "Backup file: $backup_file"
-    
+
     # Set password for pg_dump
     export PGPASSWORD="$DB_PASSWORD"
-    
+
     # Perform backup
     if pg_dump -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" \
         --clean --if-exists --create --verbose > "$backup_file" 2>/dev/null; then
@@ -86,7 +86,7 @@ backup_database() {
     else
         error "Failed to backup database"
     fi
-    
+
     # Compress backup
     if [ "$BACKUP_COMPRESSION" = "true" ]; then
         log "Compressing backup..."
@@ -94,24 +94,24 @@ backup_database() {
         backup_file="${backup_file}.gz"
         log "✅ Backup compressed: $backup_file"
     fi
-    
+
     # Calculate size
     local size=$(du -h "$backup_file" | cut -f1)
     log "Backup size: $size"
-    
+
     echo "$backup_file"
 }
 
 # Clean old backups
 cleanup_old_backups() {
     log "Cleaning up backups older than ${BACKUP_RETENTION_DAYS} days..."
-    
+
     local count=0
     while IFS= read -r -d '' file; do
         rm -f "$file"
         ((count++))
     done < <(find "$BACKUP_PATH" -name "veritas_*.sql*" -mtime +${BACKUP_RETENTION_DAYS} -print0)
-    
+
     if [ $count -gt 0 ]; then
         log "✅ Removed $count old backup(s)"
     else
@@ -122,16 +122,16 @@ cleanup_old_backups() {
 # Upload to S3
 upload_to_s3() {
     local backup_file="$1"
-    
+
     log "Uploading backup to S3..."
-    
+
     if ! command -v aws &> /dev/null; then
         log "⚠️  AWS CLI not installed, skipping S3 upload"
         return
     fi
-    
+
     local s3_path="s3://${REMOTE_BACKUP_BUCKET}/veritas/$(basename $backup_file)"
-    
+
     if aws s3 cp "$backup_file" "$s3_path"; then
         log "✅ Backup uploaded to S3: $s3_path"
     else
@@ -142,16 +142,16 @@ upload_to_s3() {
 # Upload to Azure Blob Storage
 upload_to_azure() {
     local backup_file="$1"
-    
+
     log "Uploading backup to Azure Blob Storage..."
-    
+
     if ! command -v az &> /dev/null; then
         log "⚠️  Azure CLI not installed, skipping Azure upload"
         return
     fi
-    
+
     local blob_name="veritas/$(basename $backup_file)"
-    
+
     if az storage blob upload \
         --container-name "$REMOTE_BACKUP_BUCKET" \
         --name "$blob_name" \
@@ -166,16 +166,16 @@ upload_to_azure() {
 # Upload to Google Cloud Storage
 upload_to_gcs() {
     local backup_file="$1"
-    
+
     log "Uploading backup to Google Cloud Storage..."
-    
+
     if ! command -v gsutil &> /dev/null; then
         log "⚠️  gsutil not installed, skipping GCS upload"
         return
     fi
-    
+
     local gcs_path="gs://${REMOTE_BACKUP_BUCKET}/veritas/$(basename $backup_file)"
-    
+
     if gsutil cp "$backup_file" "$gcs_path"; then
         log "✅ Backup uploaded to GCS: $gcs_path"
     else
@@ -186,16 +186,16 @@ upload_to_gcs() {
 # Upload backup to remote storage
 upload_backup() {
     local backup_file="$1"
-    
+
     if [ "$REMOTE_BACKUP_ENABLED" != "true" ]; then
         return
     fi
-    
+
     if [ -z "$REMOTE_BACKUP_BUCKET" ]; then
         log "⚠️  REMOTE_BACKUP_BUCKET not set, skipping remote upload"
         return
     fi
-    
+
     case "$REMOTE_BACKUP_TYPE" in
         s3)
             upload_to_s3 "$backup_file"
@@ -220,19 +220,19 @@ main() {
     log "=" * 80
     log "VERITAS Database Backup"
     log "=" * 80
-    
+
     # Create backup directory
     create_backup_dir
-    
+
     # Perform backup
     backup_file=$(backup_database)
-    
+
     # Upload to remote storage
     upload_backup "$backup_file"
-    
+
     # Cleanup old backups
     cleanup_old_backups
-    
+
     log "=" * 80
     log "✅ Backup completed successfully!"
     log "=" * 80

@@ -35,19 +35,19 @@ async def run_evaluation():
         enable_hybrid=False,
         enable_query_expansion=False
     )
-    
+
     hybrid = await evaluator.evaluate_configuration(
         "Hybrid (Dense+Sparse+RRF)",
         enable_hybrid=True,
         enable_query_expansion=False
     )
-    
+
     hybrid_qe = await evaluator.evaluate_configuration(
         "Hybrid + Query Expansion",
         enable_hybrid=True,
         enable_query_expansion=True
     )
-    
+
     # Ergebnisse vergleichen
     evaluator.print_comparison([baseline, hybrid, hybrid_qe])
 
@@ -256,6 +256,6 @@ ls backend/agents/veritas_query_expansion.py
 
 ---
 
-**Autor:** VERITAS System  
-**Datum:** 6. Oktober 2025  
+**Autor:** VERITAS System
+**Datum:** 6. Oktober 2025
 **Version:** 1.0

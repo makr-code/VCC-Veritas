@@ -14,18 +14,19 @@ Verwendung:
         --host http://localhost:8000
 """
 
-from locust import HttpUser, task, between, events
 import json
 import random
+
+from locust import HttpUser, between, events, task
 
 
 class ThemisDBUser(HttpUser):
     """
     Simulated User für ThemisDB/UDS3 Adapter Load Testing
     """
-    
+
     wait_time = between(1, 3)  # 1-3 Sekunden Wartezeit zwischen Tasks
-    
+
     # Sample Queries
     queries = [
         "machine learning",
@@ -35,34 +36,24 @@ class ThemisDBUser(HttpUser):
         "deep learning",
         "natural language processing",
         "computer vision",
-        "reinforcement learning"
+        "reinforcement learning",
     ]
-    
+
     def on_start(self):
         """
         Wird beim Start jedes Users ausgeführt
         """
-        self.client.headers = {
-            "Content-Type": "application/json",
-            "User-Agent": "Locust Load Test"
-        }
-    
+        self.client.headers = {"Content-Type": "application/json", "User-Agent": "Locust Load Test"}
+
     @task(10)
     def vector_search(self):
         """
         Test Vector Search Endpoint (hohe Gewichtung)
         """
-        payload = {
-            "query": random.choice(self.queries),
-            "top_k": random.randint(3, 10),
-            "collection": "documents"
-        }
-        
+        payload = {"query": random.choice(self.queries), "top_k": random.randint(3, 10), "collection": "documents"}
+
         with self.client.post(
-            "/api/v3/themis/vector/search",
-            json=payload,
-            catch_response=True,
-            name="Vector Search"
+            "/api/v3/themis/vector/search", json=payload, catch_response=True, name="Vector Search"
         ) as response:
             if response.status_code == 200:
                 data = response.json()
@@ -72,17 +63,13 @@ class ThemisDBUser(HttpUser):
                     response.failure("No results returned")
             else:
                 response.failure(f"Status code: {response.status_code}")
-    
+
     @task(5)
     def adapter_status(self):
         """
         Test Adapter Status Endpoint
         """
-        with self.client.get(
-            "/api/v3/adapters/status",
-            catch_response=True,
-            name="Adapter Status"
-        ) as response:
+        with self.client.get("/api/v3/adapters/status", catch_response=True, name="Adapter Status") as response:
             if response.status_code == 200:
                 data = response.json()
                 if "current_adapter" in data:
@@ -91,41 +78,34 @@ class ThemisDBUser(HttpUser):
                     response.failure("Missing current_adapter field")
             else:
                 response.failure(f"Status code: {response.status_code}")
-    
+
     @task(3)
     def adapter_metrics(self):
         """
         Test Adapter Metrics Endpoint
         """
-        self.client.get(
-            "/api/v3/adapters/metrics",
-            name="Adapter Metrics"
-        )
-    
+        self.client.get("/api/v3/adapters/metrics", name="Adapter Metrics")
+
     @task(2)
     def adapter_capabilities(self):
         """
         Test Adapter Capabilities Endpoint
         """
-        with self.client.get(
-            "/api/v3/adapters/capabilities",
-            catch_response=True,
-            name="Adapter Capabilities"
-        ) as response:
+        with self.client.get("/api/v3/adapters/capabilities", catch_response=True, name="Adapter Capabilities") as response:
             if response.status_code == 200:
                 data = response.json()
                 if isinstance(data, list) and len(data) > 0:
                     response.success()
                 else:
                     response.failure("Invalid capabilities response")
-    
+
     @task(1)
     def health_check(self):
         """
         Test Health Check Endpoint (niedrige Gewichtung)
         """
         self.client.get("/api/v3/themis/health", name="Health Check")
-    
+
     @task(1)
     def graph_traverse(self):
         """
@@ -135,39 +115,28 @@ class ThemisDBUser(HttpUser):
             "start_vertex": f"doc{random.randint(1, 100)}",
             "edge_collection": "citations",
             "direction": "outbound",
-            "max_depth": random.randint(1, 3)
+            "max_depth": random.randint(1, 3),
         }
-        
-        self.client.post(
-            "/api/v3/themis/graph/traverse",
-            json=payload,
-            name="Graph Traverse"
-        )
-    
+
+        self.client.post("/api/v3/themis/graph/traverse", json=payload, name="Graph Traverse")
+
     @task(1)
     def aql_query(self):
         """
         Test AQL Query Endpoint
         """
-        payload = {
-            "query": "FOR doc IN documents LIMIT 10 RETURN doc",
-            "bind_vars": {}
-        }
-        
-        self.client.post(
-            "/api/v3/themis/aql/query",
-            json=payload,
-            name="AQL Query"
-        )
+        payload = {"query": "FOR doc IN documents LIMIT 10 RETURN doc", "bind_vars": {}}
+
+        self.client.post("/api/v3/themis/aql/query", json=payload, name="AQL Query")
 
 
 class WebSocketUser(HttpUser):
     """
     WebSocket Load Testing (experimental)
     """
-    
+
     wait_time = between(2, 5)
-    
+
     @task
     def websocket_search(self):
         """
@@ -180,6 +149,7 @@ class WebSocketUser(HttpUser):
 
 
 # Event Handlers für Custom Metrics
+
 
 @events.test_start.add_listener
 def on_test_start(environment, **kwargs):
@@ -213,4 +183,5 @@ def on_request(request_type, name, response_time, response_length, exception, **
 
 if __name__ == "__main__":
     import os
+
     os.system("locust -f locustfile.py --host http://localhost:8000")

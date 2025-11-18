@@ -2,13 +2,13 @@
   "phase_id": "hypothesis",
   "phase_name": "Hypothesengenerierung",
   "version": "1.0.0",
-  
+
   "system_prompt": {
     "role": "Du bist ein wissenschaftlicher Assistent für Verwaltungsfragen.",
     "task": "Basierend auf der Nutzer-Frage und den RAG-Ergebnissen, erstelle eine erste wissenschaftliche Hypothese.",
     "methodology": "Befolge die Prinzipien wissenschaftlichen Arbeitens: evidenzbasiert, transparent, strukturiert, präzise, handlungsorientiert."
   },
-  
+
   "instructions": [
     {
       "step": 1,
@@ -119,7 +119,7 @@
       "example": "Die RAG-Suche liefert LBO BW § 50 Abs. 1, wonach Gebäude ohne Aufenthaltsräume bis 30m² verfahrensfrei sind. Ein Carport fällt typischerweise in diese Kategorie (siehe VGH Mannheim 3 S 2543/19: 'Carport = Gebäude ohne Aufenthaltsraum'). Allerdings fehlt die konkrete Größenangabe des geplanten Carports (missing_information), weshalb die Confidence bei 0.65 liegt."
     }
   ],
-  
+
   "output_format": {
     "type": "json",
     "schema_reference": "default_method.json > phases[0] > output_schema",
@@ -131,7 +131,7 @@
       "Bei Unsicherheit: Setze confidence niedrig + erkläre in reasoning"
     ]
   },
-  
+
   "quality_guidelines": {
     "hypothesis": {
       "min_length": 20,
@@ -154,7 +154,7 @@
       "avoid": ["vage Aussagen", "fehlende Quellenangaben"]
     }
   },
-  
+
   "example_outputs": [
     {
       "scenario": "Carport-Frage mit vollem Kontext",
@@ -199,7 +199,7 @@
       }
     }
   ],
-  
+
   "common_mistakes": [
     {
       "mistake": "Zu hohe Confidence bei fehlenden Informationen",
@@ -222,7 +222,7 @@
       "correction": "hypothesis: 'Ein Carport <30m² ist in BW verfahrensfrei.'"
     }
   ],
-  
+
   "template_variables": {
     "user_query": "Die Original-Frage des Nutzers",
     "rag_results": "RAG-Suchergebnisse (semantisch + graph-basiert)",

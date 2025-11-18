@@ -52,7 +52,7 @@ Beispielhafte Roh-Ausgabe (gekürzt):
 
 Nächste Aktionen (Optional)
 ---------------------------
-- Ich kann automatische Korrektur-Vorschläge erstellen (z. B. ersetzen `docs/PHASE3_COMPLETE.md` → `PHASE3_COMPLETE.md`) in einem separaten Branch/Commit — mache ich das? 
+- Ich kann automatische Korrektur-Vorschläge erstellen (z. B. ersetzen `docs/PHASE3_COMPLETE.md` → `PHASE3_COMPLETE.md`) in einem separaten Branch/Commit — mache ich das?
 - Ich kann die fehlenden PKI-Ziel-Dateien als Platzhalter anlegen (Leere MD-Dateien mit Hinweis), falls Sie lokalen Links bevorzugen und die PKI-Repo nicht direkt referenziert werden soll.
 - Ich kann die Änderungen sofort committen, wenn Sie das wünschen.
 

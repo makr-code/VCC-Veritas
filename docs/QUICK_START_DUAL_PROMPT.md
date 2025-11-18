@@ -96,9 +96,9 @@ Invoke-RestMethod -Uri "http://localhost:5000/api/intelligent-pipeline" `
 ```
 Antwort auf die Frage 'Was brauche ich für eine Baugenehmigung?':
 
-Basierend auf den bereitgestellten Informationen kann ich Ihnen mitteilen, 
-dass Sie verschiedene Unterlagen benötigen. Dazu gehören unter anderem 
-der Bauantrag, Lagepläne und weitere Dokumente. Für detaillierte 
+Basierend auf den bereitgestellten Informationen kann ich Ihnen mitteilen,
+dass Sie verschiedene Unterlagen benötigen. Dazu gehören unter anderem
+der Bauantrag, Lagepläne und weitere Dokumente. Für detaillierte
 Informationen wenden Sie sich bitte an die zuständige Behörde.
 ```
 
@@ -123,7 +123,7 @@ Für eine Baugenehmigung in Brandenburg benötigen Sie folgende Unterlagen:
 • Statische Berechnungen (von Tragwerksplaner)
 • Baubeschreibung mit Materialangaben
 
-Der Bauantrag wird beim zuständigen Bauordnungsamt in 3-facher Ausfertigung 
+Der Bauantrag wird beim zuständigen Bauordnungsamt in 3-facher Ausfertigung
 eingereicht. Die Bearbeitungsdauer beträgt in der Regel 2-3 Monate.
 
 💡 Tipp: Bei Unsicherheiten können Sie vorab eine Bauvoranfrage stellen.
@@ -165,7 +165,7 @@ WISSEN:
 - Freibeträge
 
 STIL: Präzise, rechtlich korrekt, verständlich""",
-    
+
     "user_template": """**Steuerrechts-Anfrage:** {query}
 
 **Relevante Dokumente:** {documents}
@@ -209,13 +209,13 @@ _query_enrichment_cache: Dict[str, Dict[str, Any]] = {}
 
 async def enrich_query_for_rag(self, query: str, domain: str, ...):
     cache_key = f"{domain}:{query[:50]}"
-    
+
     if cache_key in _query_enrichment_cache:
         logger.info(f"✅ Cache HIT: {cache_key}")
         return _query_enrichment_cache[cache_key]
-    
+
     # ... normale Enrichment-Logik ...
-    
+
     _query_enrichment_cache[cache_key] = enriched
     return enriched
 ```
@@ -236,10 +236,10 @@ async def enrich_query_for_rag(self, query: str, domain: str, ...):
 1. **Prüfe Template:**
    ```python
    from backend.agents.veritas_ollama_client import VeritasOllamaClient
-   
+
    client = VeritasOllamaClient()
    template = client.prompt_templates[PipelineStage.RESULT_AGGREGATION]
-   
+
    print(template["system"])
    # Sollte enthalten: "VERBOTEN: 'Antwort auf die Frage...'"
    ```
@@ -316,6 +316,6 @@ Nach der Implementierung sollten folgende Punkte erfüllt sein:
 
 ---
 
-**Autor:** VERITAS System  
-**Version:** 1.0  
+**Autor:** VERITAS System
+**Version:** 1.0
 **Datum:** 2025-01-07

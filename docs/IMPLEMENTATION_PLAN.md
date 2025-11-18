@@ -1,7 +1,7 @@
 # VERITAS/VCC Deep Research System - Gap Analysis & Implementation Plan
 
-**Datum:** 11. Oktober 2025  
-**Version:** 1.0  
+**Datum:** 11. Oktober 2025
+**Version:** 1.0
 **Status:** 🔴 CRITICAL - Architektur-Refactoring erforderlich
 
 ---
@@ -198,19 +198,19 @@ class SupervisorAgent:
     async def process_query(self, query, context):
         # 1. Agent Selection
         selected_agents = await self.selector.select_agents(query)
-        
+
         # 2. Agent Execution (parallel)
         agent_results = await self.execute_agents(selected_agents, query)
-        
+
         # 3. Synthesis
         synthesized = await self.synthesize_results(agent_results, query)
-        
+
         return synthesized
 ```
 
 **Gap:**
 - ✅ Hat: Agent Selection, Parallel Execution, Synthesis
-- ❌ Fehlt: 
+- ❌ Fehlt:
   - Keine explizite StateGraph (LangGraph)
   - Keine Reflexions-Schleife (evaluate → refine → retry)
   - Keine bedingten Verzweigungen
@@ -349,7 +349,7 @@ class EvaluatorAgent:
     async def evaluate(self, query: str, context: str, answer: str):
         """
         Bewertet Antwort-Qualität nach RAG-Triade
-        
+
         Returns:
             {
                 "context_relevance": 0.0-1.0,
@@ -359,7 +359,7 @@ class EvaluatorAgent:
                 "refinement_needed": True/False
             }
         """
-        
+
         evaluation_prompt = f"""
 Du bist ein kritischer Evaluator. Bewerte die Qualität der Antwort:
 
@@ -382,7 +382,7 @@ Gib JSON zurück:
   "refinement_needed": true/false
 }}
 """
-        
+
         evaluation = await self.llm.generate(evaluation_prompt)
         return json.loads(evaluation)
 ```
@@ -395,17 +395,17 @@ SupervisorAgent macht:
 async def synthesize_results(self, agent_results, query):
     # 1. Deduplizierung
     deduplicated = self._deduplicate_information(agent_results)
-    
+
     # 2. Konflikt-Detektion (basic)
     conflicts = self._detect_contradictions(agent_results)
-    
+
     # 3. LLM Synthesis (JSON → IEEE)
     synthesized_text = await self.llm.generate(...)
-    
+
     # ❌ KEINE Evaluation der Qualität!
     # ❌ KEINE Reflexion!
     # ❌ KEIN Feedback-Loop!
-    
+
     return SynthesizedResult(response_text=synthesized_text)
 ```
 
@@ -475,10 +475,10 @@ async def synthesize_results(self, agent_results, query):
 1. **Schema Design**
    ```python
    # backend/agents/veritas_research_state.py
-   
+
    from typing import TypedDict, List, Dict, Any
    from datetime import datetime
-   
+
    class ExecutionTraceEntry(TypedDict):
        task_id: int
        timestamp: str
@@ -487,7 +487,7 @@ async def synthesize_results(self, agent_results, query):
        input: Dict[str, Any]
        output: Dict[str, Any]
        evaluation: Dict[str, Any]  # RAG-Triade Scores
-   
+
    class ResearchState(TypedDict):
        research_id: str
        initial_query: str
@@ -502,7 +502,7 @@ async def synthesize_results(self, agent_results, query):
 2. **PostgreSQL Persistence**
    ```python
    # backend/agents/veritas_state_persister.py
-   
+
    class ResearchStatePersister:
        async def save_state(self, research_id: str, state: ResearchState):
            """Speichert Zustand in PostgreSQL"""
@@ -512,7 +512,7 @@ async def synthesize_results(self, agent_results, query):
                "ON CONFLICT (id) DO UPDATE SET state_json = $2, updated_at = $3",
                research_id, json.dumps(state), datetime.utcnow()
            )
-       
+
        async def load_state(self, research_id: str) -> ResearchState:
            """Lädt Zustand aus PostgreSQL"""
            row = await self.db.fetchrow(
@@ -525,24 +525,24 @@ async def synthesize_results(self, agent_results, query):
 3. **Integration in SupervisorAgent**
    ```python
    # backend/agents/veritas_supervisor_agent.py
-   
+
    class SupervisorAgent:
        def __init__(self):
            self.persister = ResearchStatePersister()
-       
+
        async def process_query(self, query: str, research_id: str = None):
            # Load or create state
            if research_id:
                state = await self.persister.load_state(research_id)
            else:
                state = self._create_initial_state(query)
-           
+
            # Process with state tracking
            while state['status'] == 'IN_PROGRESS':
                result = await self._execute_next_step(state)
                state['execution_trace'].append(result)
                await self.persister.save_state(state['research_id'], state)
-           
+
            return state
    ```
 
@@ -566,10 +566,10 @@ async def synthesize_results(self, agent_results, query):
 2. **StateGraph Definition**
    ```python
    # backend/agents/veritas_langgraph_workflow.py
-   
+
    from langgraph.graph import StateGraph
    from langgraph.checkpoint.postgres import PostgresSaver
-   
+
    # State Schema
    class VeritasAgentState(TypedDict):
        query: str
@@ -578,11 +578,11 @@ async def synthesize_results(self, agent_results, query):
        evaluation: Dict[str, Any]
        refinement_count: int
        final_answer: str
-   
+
    # Workflow Definition
    def create_veritas_workflow():
        workflow = StateGraph(VeritasAgentState)
-       
+
        # Nodes
        workflow.add_node("parse_query", parse_initial_query)
        workflow.add_node("generate_plan", planner_agent)
@@ -590,16 +590,16 @@ async def synthesize_results(self, agent_results, query):
        workflow.add_node("execute_agents", execute_parallel_agents)
        workflow.add_node("evaluate", evaluator_agent)
        workflow.add_node("synthesize", synthesize_results)
-       
+
        # Entry Point
        workflow.set_entry_point("parse_query")
-       
+
        # Edges
        workflow.add_edge("parse_query", "generate_plan")
        workflow.add_edge("generate_plan", "select_agents")
        workflow.add_edge("select_agents", "execute_agents")
        workflow.add_edge("execute_agents", "evaluate")
-       
+
        # Conditional Edge (Reflexions-Schleife!)
        workflow.add_conditional_edges(
            "evaluate",
@@ -610,14 +610,14 @@ async def synthesize_results(self, agent_results, query):
                "complete": "synthesize"    # Gut → Fertig
            }
        )
-       
+
        workflow.add_edge("synthesize", END)
-       
+
        # PostgreSQL Checkpointer
        checkpointer = PostgresSaver.from_conn_string(
            "postgresql://user:pass@localhost/veritas"
        )
-       
+
        return workflow.compile(checkpointer=checkpointer)
    ```
 
@@ -628,18 +628,18 @@ async def synthesize_results(self, agent_results, query):
        Entscheidet basierend auf Evaluation, was als nächstes passiert
        """
        eval = state['evaluation']
-       
+
        # Check RAG-Triade Scores
        avg_score = (
            eval['context_relevance'] +
            eval['groundedness'] +
            eval['answer_relevance']
        ) / 3
-       
+
        # Check refinement limit
        if state['refinement_count'] >= 3:
            return "complete"  # Max. 3 Versuche
-       
+
        # Decision based on quality
        if avg_score >= 0.8:
            return "complete"  # Gut genug!
@@ -664,20 +664,20 @@ async def synthesize_results(self, agent_results, query):
 1. **Evaluator Implementation**
    ```python
    # backend/agents/veritas_evaluator_agent.py
-   
+
    class EvaluatorAgent:
        def __init__(self, ollama_client):
            self.ollama = ollama_client
-       
+
        async def evaluate_rag_triade(
-           self, 
-           query: str, 
-           context: str, 
+           self,
+           query: str,
+           context: str,
            answer: str
        ) -> Dict[str, Any]:
            """
            Bewertet Antwort nach RAG-Triade
-           
+
            Returns:
                {
                    "context_relevance": 0.0-1.0,
@@ -687,28 +687,28 @@ async def synthesize_results(self, agent_results, query):
                    "refinement_needed": True/False
                }
            """
-           
+
            prompt = self._build_evaluation_prompt(query, context, answer)
-           
+
            response = await self.ollama.generate(
                model="llama3.2:latest",
                prompt=prompt,
                temperature=0.2  # Niedrig für konsistente Bewertung
            )
-           
+
            evaluation = json.loads(response)
-           
+
            # Add refinement_needed flag
            avg_score = (
                evaluation['context_relevance'] +
                evaluation['groundedness'] +
                evaluation['answer_relevance']
            ) / 3
-           
+
            evaluation['refinement_needed'] = avg_score < 0.7
-           
+
            return evaluation
-       
+
        def _build_evaluation_prompt(self, query, context, answer):
            return f"""
 Du bist ein kritischer Qualitäts-Evaluator für RAG-Systeme.
@@ -753,28 +753,28 @@ Bewerte die folgende Antwort nach drei Kriterien (0.0-1.0):
 2. **Integration in Workflow**
    ```python
    # Im LangGraph Workflow
-   
+
    async def evaluator_agent(state: VeritasAgentState):
        """Node: Evaluiert die Agent-Ergebnisse"""
-       
+
        evaluator = EvaluatorAgent(ollama_client)
-       
+
        # Kombiniere alle Agent-Antworten
        context = "\n\n".join([
            f"[Agent {r.agent_type}]: {r.response_text}"
            for r in state['agent_results']
        ])
-       
+
        # Letzte Antwort (Synthesis)
        answer = state['agent_results'][-1].response_text
-       
+
        # Evaluate
        evaluation = await evaluator.evaluate_rag_triade(
            query=state['query'],
            context=context,
            answer=answer
        )
-       
+
        # Update State
        return {
            "evaluation": evaluation,
@@ -814,10 +814,10 @@ Bewerte die folgende Antwort nach drei Kriterien (0.0-1.0):
 2. **Graph Agent Implementation**
    ```python
    # backend/agents/veritas_neo4j_agent.py
-   
+
    from langchain.chains.graph_qa.cypher import GraphCypherQAChain
    from langchain_community.graphs import Neo4jGraph
-   
+
    class Neo4jAgent:
        def __init__(self):
            self.graph = Neo4jGraph(
@@ -825,25 +825,25 @@ Bewerte die folgende Antwort nach drei Kriterien (0.0-1.0):
                username="neo4j",
                password="veritas123"
            )
-           
+
            self.qa_chain = GraphCypherQAChain.from_llm(
                llm=ollama_llm,
                graph=self.graph,
                verbose=True
            )
-       
+
        async def query(self, question: str) -> Dict[str, Any]:
            """
            Beantwortet Fragen über Beziehungen/Netzwerke
-           
+
            Beispiele:
            - "Welche Abteilungen arbeiten an Projekt X?"
            - "Wer sind die Experten für Thema Y?"
            - "Welche Projekte sind mit Technologie Z verbunden?"
            """
-           
+
            result = await self.qa_chain.arun(question)
-           
+
            return {
                "agent": "Neo4jAgent",
                "answer": result,
@@ -856,7 +856,7 @@ Bewerte die folgende Antwort nach drei Kriterien (0.0-1.0):
    ```python
    # Registriere Neo4j Agent
    self.agents['neo4j'] = Neo4jAgent()
-   
+
    # Agent Selector erkennt Graph-Queries
    if self._is_relationship_query(query):
        selected_agents.append('neo4j')
@@ -891,23 +891,23 @@ Bewerte die folgende Antwort nach drei Kriterien (0.0-1.0):
 2. **Web Search Agent**
    ```python
    # backend/agents/veritas_web_search_agent.py
-   
+
    import aiohttp
-   
+
    class SearxNGAgent:
        def __init__(self):
            self.base_url = "http://localhost:8080"
-       
+
        async def search(self, query: str, num_results: int = 5):
            """
            Sucht im Web über SearxNG (On-Premise!)
-           
+
            Vorteile:
            - Keine Weitergabe von Queries an Google/Bing
            - Aggregiert Ergebnisse von 100+ Suchmaschinen
            - Datenschutzkonform
            """
-           
+
            async with aiohttp.ClientSession() as session:
                async with session.get(
                    f"{self.base_url}/search",
@@ -918,7 +918,7 @@ Bewerte die folgende Antwort nach drei Kriterien (0.0-1.0):
                    }
                ) as resp:
                    data = await resp.json()
-           
+
            results = []
            for item in data.get('results', [])[:num_results]:
                results.append({
@@ -926,7 +926,7 @@ Bewerte die folgende Antwort nach drei Kriterien (0.0-1.0):
                    "url": item['url'],
                    "snippet": item['content']
                })
-           
+
            return {
                "agent": "SearxNGAgent",
                "results": results,
@@ -951,16 +951,16 @@ Bewerte die folgende Antwort nach drei Kriterien (0.0-1.0):
 1. **Hash-Kette Implementation**
    ```python
    # backend/agents/veritas_integrity_manager.py
-   
+
    import hashlib
    import json
    from cryptography.hazmat.primitives import hashes, serialization
    from cryptography.hazmat.primitives.asymmetric import rsa, padding
-   
+
    class IntegrityManager:
        def __init__(self):
            self.private_key = self._load_or_generate_key()
-       
+
        def compute_state_hash(self, execution_trace: List[Dict]) -> str:
            """
            Berechnet SHA-256 Hash über execution_trace
@@ -968,7 +968,7 @@ Bewerte die folgende Antwort nach drei Kriterien (0.0-1.0):
            trace_json = json.dumps(execution_trace, sort_keys=True)
            hash_obj = hashlib.sha256(trace_json.encode('utf-8'))
            return hash_obj.hexdigest()
-       
+
        def sign_state(self, state_hash: str) -> str:
            """
            Signiert Hash mit privatem Schlüssel
@@ -982,7 +982,7 @@ Bewerte die folgende Antwort nach drei Kriterien (0.0-1.0):
                hashes.SHA256()
            )
            return signature.hex()
-       
+
        def verify_integrity(self, state: ResearchState) -> bool:
            """
            Verifiziert Hash-Kette + Signatur
@@ -992,14 +992,14 @@ Bewerte die folgende Antwort nach drei Kriterien (0.0-1.0):
                prev_hash = self.compute_state_hash(
                    state['execution_trace'][:i]
                )
-               
+
                if state['integrity_chain'][i-1] != prev_hash:
                    return False  # Manipulation detected!
-           
+
            # 2. Verify signature
            current_hash = self.compute_state_hash(state['execution_trace'])
            return self._verify_signature(
-               current_hash, 
+               current_hash,
                state['integrity']['stateSignature']
            )
    ```
@@ -1011,14 +1011,14 @@ Bewerte die folgende Antwort nach drei Kriterien (0.0-1.0):
        current_hash = self.integrity.compute_state_hash(
            state['execution_trace']
        )
-       
+
        # Update integrity block
        state['integrity'] = {
            "currentStateHash": current_hash,
            "previousStateHash": state['integrity'].get('currentStateHash'),
            "stateSignature": self.integrity.sign_state(current_hash)
        }
-       
+
        # Save
        await self.db.execute(...)
    ```
@@ -1038,10 +1038,10 @@ Bewerte die folgende Antwort nach drei Kriterien (0.0-1.0):
 1. **TSP Client Implementation**
    ```python
    # backend/agents/veritas_timestamp_client.py
-   
+
    import requests
    from rfc3161ng import RemoteTimestamper
-   
+
    class QualifiedTimestampClient:
        def __init__(self):
            # eIDAS-zertifizierter TSP (Beispiel: Deutsche Telekom)
@@ -1050,22 +1050,22 @@ Bewerte die folgende Antwort nach drei Kriterien (0.0-1.0):
                self.tsp_url,
                certificate="telekom_tsp.crt"
            )
-       
+
        async def get_timestamp(self, data_hash: str) -> str:
            """
            Holt qualifizierten Zeitstempel (QET)
-           
+
            Rechtliche Wirkung (eIDAS):
            - EU-weite Beweiskraft
            - Vermutung der Richtigkeit
            - Gerichtlich verwertbar
            """
-           
+
            timestamp_token = self.timestamper(
                data=data_hash.encode('utf-8'),
                hashname='sha256'
            )
-           
+
            return timestamp_token.hex()
    ```
 
@@ -1073,19 +1073,19 @@ Bewerte die folgende Antwort nach drei Kriterien (0.0-1.0):
    ```python
    async def finalize_research(self, research_id):
        state = await self.load_state(research_id)
-       
+
        # Sign
        final_hash = self.integrity.compute_state_hash(
            state['execution_trace']
        )
        signature = self.integrity.sign_state(final_hash)
-       
+
        # Timestamp
        timestamp_token = await self.tsp.get_timestamp(final_hash)
-       
+
        state['integrity']['qualifiedTimestampToken'] = timestamp_token
        state['status'] = 'COMPLETED_AND_SEALED'
-       
+
        await self.save_state(research_id, state)
    ```
 
@@ -1113,10 +1113,10 @@ Bewerte die folgende Antwort nach drei Kriterien (0.0-1.0):
 2. **Workflow Definition**
    ```python
    # backend/workflows/deep_research_workflow.py
-   
+
    from prefect import flow, task
    from prefect.task_runners import ConcurrentTaskRunner
-   
+
    @task(retries=3, retry_delay_seconds=60)
    async def execute_research_phase(research_id: str, phase: str):
        """
@@ -1127,35 +1127,35 @@ Bewerte die folgende Antwort nach drei Kriterien (0.0-1.0):
            json={"research_id": research_id, "phase": phase}
        )
        return response.json()
-   
+
    @flow(name="Deep Research", task_runner=ConcurrentTaskRunner())
    async def deep_research_flow(query: str):
        """
        Langlebiger Deep Research Workflow
-       
+
        Vorteile:
        - Läuft über Stunden/Tage
        - Automatische Retries bei Fehlern
        - Human-in-the-Loop Checkpoints
        - Zentrale Überwachung
        """
-       
+
        # Phase 1: Initial Research
        research_id = await init_research(query)
-       
+
        # Phase 2: Data Collection (parallelisiert)
        results = await execute_research_phase.map([
            (research_id, "web_search"),
            (research_id, "database_query"),
            (research_id, "graph_analysis")
        ])
-       
+
        # Phase 3: Human Review (pausiert Workflow!)
        await human_review_checkpoint(research_id)
-       
+
        # Phase 4: Synthesis
        final_result = await synthesize_results(research_id)
-       
+
        return final_result
    ```
 

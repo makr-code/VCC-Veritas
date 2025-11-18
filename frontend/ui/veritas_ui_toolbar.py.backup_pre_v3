@@ -1,6 +1,6 @@
 """
 VERITAS Protected Module
-WARNING: This file contains embedded protection keys. 
+WARNING: This file contains embedded protection keys.
 Modification will be detected and may result in license violations.
 """
 
@@ -79,11 +79,11 @@ class ChatToolbar(ttk.Frame):
                 chat_id = value.split('|')[-1].strip()
                 self._open_and_continue_chat(chat_id)
     """Moderne Toolbar für Single-Chat-Windows."""
-    
+
     def __init__(self, parent, chat_window, show_user_profile=True, **kwargs):
         """
         Initialisiert die Toolbar.
-        
+
         Args:
             parent: Parent-Widget
             chat_window: Referenz zum Chat-Fenster
@@ -92,15 +92,15 @@ class ChatToolbar(ttk.Frame):
         super().__init__(parent, **kwargs)
         self.chat_window = chat_window
         self.show_user_profile = show_user_profile
-        
+
         # Benutzer-Info
         self.current_user = self._load_user_info()
-        
+
         self._create_widgets()
-        
+
         # Forest-Styles anwenden nach Widget-Erstellung
         self.after(100, lambda: self._apply_forest_theme())
-        
+
     def get_app_instance(self):
         """Holt die globale App-Instanz."""
         try:
@@ -108,7 +108,7 @@ class ChatToolbar(ttk.Frame):
             return get_veritas_app()
         except ImportError:
             return None
-        
+
     def _create_widgets(self):
         """Erstellt alle Toolbar-Widgets."""
     # Linker Bereich - Hauptaktionen und Chatliste
@@ -195,14 +195,14 @@ class ChatToolbar(ttk.Frame):
         # Benutzeridentifikation
         if self.show_user_profile:
             self._create_user_profile_section(right_frame)
-    
+
     def _create_hamburger_button(self, parent):
         """Erstellt den Hamburger-Button (nur für Hauptfenster)."""
-        hamburger_btn = ttk.Button(parent, text="☰", 
+        hamburger_btn = ttk.Button(parent, text="☰",
                                  command=self._show_hamburger_menu, width=3)
         hamburger_btn.pack(side="left", padx=(0, 2))
         self.hamburger_btn = hamburger_btn
-        
+
     def _show_hamburger_menu(self):
         """Zeigt das Hamburger-Menü."""
         menu = Menu(self, tearoff=0)
@@ -262,7 +262,7 @@ class ChatToolbar(ttk.Frame):
         # Verfügbare offene Chats anzeigen (wie bisher)
         app = self.get_app_instance()
         if app and app.chat_windows:
-            other_chats = [w for w in app.chat_windows.values() 
+            other_chats = [w for w in app.chat_windows.values()
                           if w != self.chat_window and hasattr(w, 'winfo_exists') and w.winfo_exists()]
             if other_chats:
                 menu.add_command(label="📋 Verfügbare Chats:", state="disabled")
@@ -284,70 +284,70 @@ class ChatToolbar(ttk.Frame):
                 messagebox.showinfo("Chat öffnen", f"Chat {chat_id} öffnen (Logik noch ergänzen)")
         except Exception as e:
             messagebox.showerror("Fehler", f"Chat konnte nicht geöffnet werden: {e}")
-    
+
     def _create_user_profile_section(self, parent_frame):
         """Erstellt die Benutzer-Profil-Sektion in der Toolbar als Split-Button."""
         # Separator
         separator = ttk.Separator(parent_frame, orient="vertical")
         separator.pack(side="left", fill="y", padx=5)
-        
+
         # Benutzer-Frame für Split-Button
         user_frame = ttk.Frame(parent_frame)
         user_frame.pack(side="left", padx=(5, 0))
-        
+
         # Hauptbutton (Profil bearbeiten)
         user_text = f"{self.current_user['avatar']} {self.current_user['name']}"
-        self.user_main_btn = ttk.Button(user_frame, text=user_text, 
+        self.user_main_btn = ttk.Button(user_frame, text=user_text,
                                        command=self._edit_user_profile, width=10)
         self.user_main_btn.pack(side="left")
-        
+
         # Dropdown-Button
-        self.user_dropdown_btn = ttk.Button(user_frame, text="▼", 
+        self.user_dropdown_btn = ttk.Button(user_frame, text="▼",
                                            command=self._show_user_menu, width=2)
         self.user_dropdown_btn.pack(side="left", padx=(1, 0))
-    
+
     def _create_chat_actions(self, parent):
         """Erstellt Chat-Aktions-Buttons in der Toolbar."""
         # Chat exportieren
-        export_btn = ttk.Button(parent, text="📋", width=3, 
+        export_btn = ttk.Button(parent, text="📋", width=3,
                                command=self._export_chat)
         export_btn.pack(side="left", padx=(0, 2))
         Tooltip(export_btn, "Chat als Textdatei exportieren")
-        
+
         # Chat löschen
-        clear_btn = ttk.Button(parent, text="🗑️", width=3, 
+        clear_btn = ttk.Button(parent, text="🗑️", width=3,
                               command=self._clear_chat)
         clear_btn.pack(side="left", padx=(0, 2))
         Tooltip(clear_btn, "Chat-Verlauf löschen")
-        
+
         # Detaillierte Quellen
-        sources_btn = ttk.Button(parent, text="📚", width=3, 
+        sources_btn = ttk.Button(parent, text="📚", width=3,
                                 command=self._show_detailed_sources)
         sources_btn.pack(side="left", padx=(0, 5))
         Tooltip(sources_btn, "Detaillierte Quelleninformationen der letzten Antwort")
-        
+
         # Separator nach Chat-Aktionen
         separator1 = ttk.Separator(parent, orient="vertical")
         separator1.pack(side="left", fill="y", padx=(2, 5))
-    
+
     def _create_api_status_button(self, parent):
         """Erstellt den API-Status-Button."""
         # API-Status Button mit Forest-Style
         accent_style = get_forest_style_for_widget('important_button')
         if accent_style:
-            self.api_status_btn = ttk.Button(parent, text="🔴", width=3, 
+            self.api_status_btn = ttk.Button(parent, text="🔴", width=3,
                                             style=accent_style,
                                             command=self._check_api_status)
         else:
-            self.api_status_btn = ttk.Button(parent, text="🔴", width=3, 
+            self.api_status_btn = ttk.Button(parent, text="🔴", width=3,
                                             command=self._check_api_status)
-        
+
         self.api_status_btn.pack(side="left", padx=(5, 5))
         Tooltip(self.api_status_btn, "API-Status prüfen")
-        
+
         # Initial API-Status prüfen
         self._check_api_status_async()
-    
+
     def _apply_forest_theme(self):
         """Wendet Forest-Theme auf die Toolbar an."""
         try:
@@ -355,12 +355,12 @@ class ChatToolbar(ttk.Frame):
             logger.debug("Forest-Styles auf Toolbar angewandt")
         except Exception as e:
             logger.error(f"Fehler beim Anwenden der Forest-Styles auf Toolbar: {e}")
-    
+
     def _create_tooltip(self, widget, text):
         """Erstellt ein Tooltip für ein Widget - Deprecated, verwende Tooltip-Klasse."""
         # Diese Methode ist deprecated, verwende stattdessen die Tooltip-Klasse
         Tooltip(widget, text)
-    
+
     def _load_user_info(self):
         """Lädt Benutzerinformationen."""
         try:
@@ -380,42 +380,42 @@ class ChatToolbar(ttk.Frame):
             logger.error(f"Fehler beim Laden der Benutzerinfo: {e}")
             return {
                 "name": "Benutzer",
-                "email": "benutzer@veritas.local", 
+                "email": "benutzer@veritas.local",
                 "avatar": "👤",
                 "theme": "dark"
             }
-    
+
     def _save_user_info(self):
         """Speichert Benutzerinformationen."""
         try:
             user_file = os.path.join("data", "user_profile.json")
             os.makedirs(os.path.dirname(user_file), exist_ok=True)
-            
+
             with open(user_file, 'w', encoding='utf-8') as f:
                 json.dump(self.current_user, f, ensure_ascii=False, indent=2)
-                
+
         except Exception as e:
             logger.error(f"Fehler beim Speichern der Benutzerinfo: {e}")
-    
+
     def _show_user_menu(self):
         """Zeigt das Benutzer-Profil-Menü ohne 'Über Veritas'."""
         menu = Menu(self, tearoff=0)
-        
+
         # Benutzer-Info
-        menu.add_command(label=f"👤 {self.current_user['name']}", 
+        menu.add_command(label=f"👤 {self.current_user['name']}",
                         state="disabled")
-        menu.add_command(label=f"📧 {self.current_user['email']}", 
+        menu.add_command(label=f"📧 {self.current_user['email']}",
                         state="disabled")
         menu.add_separator()
-        
+
         # Profil bearbeiten
-        menu.add_command(label="✏️ Profil bearbeiten", 
+        menu.add_command(label="✏️ Profil bearbeiten",
                         command=self._edit_user_profile)
-        
+
         # Einstellungen
-        menu.add_command(label="⚙️ Einstellungen", 
+        menu.add_command(label="⚙️ Einstellungen",
                         command=self._show_settings)
-        
+
         # Menü anzeigen
         try:
             x = self.user_dropdown_btn.winfo_rootx()
@@ -423,7 +423,7 @@ class ChatToolbar(ttk.Frame):
             menu.post(x, y)
         except:
             pass
-    
+
     # Event-Handler
     def _create_new_chat(self):
         """Erstellt einen neuen Chat."""
@@ -440,7 +440,7 @@ class ChatToolbar(ttk.Frame):
                 messagebox.showwarning("Info", "Neuer Chat kann nicht erstellt werden.\nStellen Sie sicher, dass die Anwendung korrekt gestartet wurde.")
         except Exception as e:
             logger.error(f"Fehler beim Erstellen eines neuen Chats: {e}")
-    
+
     def _open_chat(self):
         """Öffnet einen existierenden Chat."""
         try:
@@ -451,36 +451,36 @@ class ChatToolbar(ttk.Frame):
                 self.chat_window._open_chat()
         except Exception as e:
             logger.error(f"Fehler beim Öffnen eines Chats: {e}")
-    
+
     def _save_chat(self):
         """Speichert den aktuellen Chat."""
         if hasattr(self.chat_window, 'save_chat'):
             self.chat_window.save_chat()
-    
+
     def _export_chat(self):
         """Exportiert den Chat als Textdatei."""
         if hasattr(self.chat_window, '_export_chat'):
             self.chat_window._export_chat()
-    
+
     def _clear_chat(self):
         """Löscht den Chat-Verlauf."""
         if hasattr(self.chat_window, '_clear_chat'):
             self.chat_window._clear_chat()
-    
+
     def _show_detailed_sources(self):
         """Zeigt detaillierte Quelleninformationen."""
         if hasattr(self.chat_window, '_show_detailed_sources'):
             self.chat_window._show_detailed_sources()
-    
+
     def _check_api_status(self):
         """Prüft den API-Status manuell."""
         self._check_api_status_async()
-    
+
     def _check_api_status_async(self):
         """Prüft den API-Status asynchron."""
         import threading
         import requests
-        
+
         def check_status():
             try:
                 from config import API_BASE_URL
@@ -504,9 +504,9 @@ class ChatToolbar(ttk.Frame):
                 except RuntimeError:
                     # Main thread ist nicht im main loop - ignorieren
                     pass
-        
+
         threading.Thread(target=check_status, daemon=True).start()
-    
+
     def _update_api_status(self, is_online):
         """Aktualisiert den API-Status-Button."""
         if hasattr(self, 'api_status_btn'):
@@ -516,7 +516,7 @@ class ChatToolbar(ttk.Frame):
             else:
                 self.api_status_btn.config(text="🔴")
                 tooltip_text = "API ist nicht erreichbar"
-            
+
             # Tooltip mit der Tooltip-Klasse aktualisieren
             # Entferne alte Bindings falls vorhanden
             try:
@@ -524,10 +524,10 @@ class ChatToolbar(ttk.Frame):
                 self.api_status_btn.unbind("<Leave>")
             except:
                 pass
-            
+
             # Neues Tooltip setzen
             Tooltip(self.api_status_btn, tooltip_text)
-    
+
     def _switch_to_chat(self, target_window):
         """Wechselt zu einem anderen Chat-Fenster."""
         try:
@@ -536,14 +536,14 @@ class ChatToolbar(ttk.Frame):
                 target_window.focus_force()
         except Exception as e:
             logger.error(f"Fehler beim Wechseln zum Chat-Fenster: {e}")
-    
+
     def _search_in_chat(self, event=None):
         """Sucht im aktuellen Chat."""
         search_term = self.search_var.get().strip()
         if not search_term or not hasattr(self.chat_window, '_search_in_chat'):
             return
         self.chat_window._search_in_chat(search_term)
-    
+
     def _edit_user_profile(self):
         """Öffnet Dialog zum Bearbeiten des Benutzerprofils."""
         try:
@@ -553,19 +553,19 @@ class ChatToolbar(ttk.Frame):
                 messagebox.showinfo("Profil", "Profil-Bearbeitung noch nicht implementiert")
         except Exception as e:
             logger.error(f"Fehler beim Öffnen des Profil-Dialogs: {e}")
-    
+
     def _show_settings(self):
         """Zeigt Einstellungen."""
-        messagebox.showinfo("Einstellungen", 
+        messagebox.showinfo("Einstellungen",
                           "Einstellungen-Dialog ist noch nicht implementiert.")
-    
+
     def _show_info(self):
         """Zeigt Programm-Informationen."""
-        messagebox.showinfo("Info", 
+        messagebox.showinfo("Info",
                           "Veritas Chat v3.1.0\n\n"
                           "RAG-basiertes Chat-System mit\n"
                           "Multi-Datenbank Support")
-    
+
     def _quit_app(self):
         """Beendet die Anwendung."""
         if hasattr(self.chat_window, 'veritas_app'):
@@ -574,20 +574,20 @@ class ChatToolbar(ttk.Frame):
         else:
             # Normales Chat-Fenster schließen
             self.chat_window._on_close()
-    
+
     def update_user_display(self):
         """Aktualisiert die Benutzer-Anzeige."""
         if hasattr(self, 'user_btn'):
             user_text = f"{self.current_user['avatar']} {self.current_user['name']}"
             self.user_btn.config(text=user_text)
-    
+
     def set_status(self, message, message_type="info"):
         """Setzt den Status mit Theme-passender Farbe."""
         if hasattr(self, 'status_label'):
             # Theme-basierte Farben verwenden
             style_map = {
                 "info": "Info.TLabel",
-                "success": "Success.TLabel", 
+                "success": "Success.TLabel",
                 "warning": "Warning.TLabel",
                 "error": "Error.TLabel"
             }

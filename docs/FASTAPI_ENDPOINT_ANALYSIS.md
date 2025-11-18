@@ -1,5 +1,5 @@
 # FastAPI Backend Endpoint-Analyse: ThemisDB/UDS3 Integration
-**Datum:** 7. November 2025  
+**Datum:** 7. November 2025
 **Kontext:** Prüfung auf Best-Practices (MCP, SSE, RESTful API)
 
 ---
@@ -80,7 +80,7 @@ async def stream_agent_progress(
     last_event_id: Optional[str] = Query(None, alias="Last-Event-ID")
 ):
     """Stream agent execution progress via SSE."""
-    
+
     async def event_generator() -> AsyncGenerator:
         # Event Replay (Last-Event-ID Support)
         if last_event_id and streaming_manager:
@@ -93,7 +93,7 @@ async def stream_agent_progress(
                     "id": event.event_id,
                     "retry": 5000
                 }
-        
+
         # Live Events
         async for event in streaming_manager.subscribe_session(session_id):
             yield {
@@ -102,7 +102,7 @@ async def stream_agent_progress(
                 "id": event.event_id,
                 "retry": 5000
             }
-    
+
     return EventSourceResponse(event_generator())
 ```
 
@@ -281,36 +281,36 @@ class ThemisHealthResponse(BaseModel):
 async def themis_vector_search(request: ThemisVectorSearchRequest):
     """
     Direct ThemisDB Vector Search.
-    
+
     Bypasses adapter factory - direct ThemisDB access only.
     Use for ThemisDB-specific features or testing.
     """
     import time
     start_time = time.time()
-    
+
     try:
         # Force ThemisDB adapter (no fallback)
         adapter = get_database_adapter(
             adapter_type=DatabaseAdapterType.THEMIS,
             enable_fallback=False
         )
-        
+
         results = await adapter.vector_search(
             query=request.query,
             top_k=request.top_k,
             collection=request.collection,
             threshold=request.threshold
         )
-        
+
         execution_time = (time.time() - start_time) * 1000
-        
+
         return ThemisVectorSearchResponse(
             results=results,
             count=len(results),
             collection=request.collection,
             execution_time_ms=execution_time
         )
-        
+
     except Exception as e:
         raise HTTPException(
             status_code=503,
@@ -322,7 +322,7 @@ async def themis_vector_search(request: ThemisVectorSearchRequest):
 async def themis_graph_traverse(request: ThemisGraphTraverseRequest):
     """
     Direct ThemisDB Graph Traversal.
-    
+
     Property Graph Model - bidirectional traversal.
     """
     try:
@@ -330,7 +330,7 @@ async def themis_graph_traverse(request: ThemisGraphTraverseRequest):
             adapter_type=DatabaseAdapterType.THEMIS,
             enable_fallback=False
         )
-        
+
         results = await adapter.graph_traverse(
             start_vertex=request.start_vertex,
             edge_collection=request.edge_collection,
@@ -338,13 +338,13 @@ async def themis_graph_traverse(request: ThemisGraphTraverseRequest):
             min_depth=request.min_depth,
             max_depth=request.max_depth
         )
-        
+
         return {
             "paths": results,
             "count": len(results),
             "start_vertex": request.start_vertex
         }
-        
+
     except Exception as e:
         raise HTTPException(
             status_code=503,
@@ -356,9 +356,9 @@ async def themis_graph_traverse(request: ThemisGraphTraverseRequest):
 async def themis_aql_query(request: ThemisAQLRequest):
     """
     Execute AQL Query (ThemisDB Query Language).
-    
+
     Similar to ArangoDB AQL - supports multi-model queries.
-    
+
     Example:
         {
             "query": "FOR doc IN documents FILTER doc.year >= @year RETURN doc",
@@ -370,17 +370,17 @@ async def themis_aql_query(request: ThemisAQLRequest):
             adapter_type=DatabaseAdapterType.THEMIS,
             enable_fallback=False
         )
-        
+
         results = await adapter.execute_aql(
             query=request.query,
             bind_vars=request.bind_vars
         )
-        
+
         return {
             "result": results,
             "count": len(results)
         }
-        
+
     except Exception as e:
         raise HTTPException(
             status_code=503,
@@ -392,7 +392,7 @@ async def themis_aql_query(request: ThemisAQLRequest):
 async def themis_health():
     """
     ThemisDB Health Check.
-    
+
     Returns server status and basic metrics.
     """
     try:
@@ -400,16 +400,16 @@ async def themis_health():
             adapter_type=DatabaseAdapterType.THEMIS,
             enable_fallback=False
         )
-        
+
         health = await adapter.health_check()
-        
+
         return ThemisHealthResponse(
             status="healthy",
             version=health.get("version"),
             uptime_seconds=health.get("uptime"),
             available=True
         )
-        
+
     except Exception as e:
         return ThemisHealthResponse(
             status="unhealthy",
@@ -421,7 +421,7 @@ async def themis_health():
 async def themis_stats():
     """
     ThemisDB Adapter Statistics.
-    
+
     Returns query counts, latencies, success rates.
     """
     try:
@@ -429,15 +429,15 @@ async def themis_stats():
             adapter_type=DatabaseAdapterType.THEMIS,
             enable_fallback=False
         )
-        
+
         stats = adapter.get_stats()
-        
+
         return {
             "adapter": "ThemisDB",
             "statistics": stats,
             "timestamp": datetime.utcnow().isoformat()
         }
-        
+
     except Exception as e:
         raise HTTPException(
             status_code=503,
@@ -495,7 +495,7 @@ class AdapterMetrics(BaseModel):
 async def get_adapter_status():
     """
     Get current adapter status and availability.
-    
+
     Returns:
         - current_adapter: Active adapter (themis/uds3)
         - themis_available: ThemisDB reachable
@@ -503,12 +503,12 @@ async def get_adapter_status():
         - failover_enabled: Fallback enabled
     """
     import os
-    
+
     current = get_adapter_type()
     themis_ok = is_themisdb_available()
     uds3_ok = is_uds3_available()
     fallback = os.getenv("USE_UDS3_FALLBACK", "true").lower() == "true"
-    
+
     return AdapterStatus(
         current_adapter=str(current),
         themis_available=themis_ok,
@@ -522,11 +522,11 @@ async def get_adapter_status():
 async def get_adapter_metrics():
     """
     Get performance metrics for all adapters.
-    
+
     Returns query counts, latencies, success rates.
     """
     metrics = []
-    
+
     # ThemisDB metrics
     if is_themisdb_available():
         try:
@@ -535,7 +535,7 @@ async def get_adapter_metrics():
                 enable_fallback=False
             )
             stats = adapter.get_stats()
-            
+
             metrics.append(AdapterMetrics(
                 adapter="themis",
                 total_queries=stats['total_queries'],
@@ -546,10 +546,10 @@ async def get_adapter_metrics():
             ))
         except Exception:
             pass
-    
+
     # UDS3 metrics (if available)
     # TODO: Implement UDS3VectorSearchAdapter.get_stats()
-    
+
     return metrics
 
 
@@ -557,7 +557,7 @@ async def get_adapter_metrics():
 async def switch_adapter(target: Literal["themis", "uds3"]):
     """
     Switch primary adapter (requires restart).
-    
+
     This endpoint only validates the switch is possible.
     Actual switch requires environment change + restart.
     """
@@ -567,19 +567,19 @@ async def switch_adapter(target: Literal["themis", "uds3"]):
                 status_code=503,
                 detail="ThemisDB not available - cannot switch"
             )
-        
+
         return {
             "message": "Switch to ThemisDB validated",
             "action_required": "Set THEMIS_ENABLED=true and restart backend"
         }
-    
+
     elif target == "uds3":
         if not is_uds3_available():
             raise HTTPException(
                 status_code=503,
                 detail="UDS3 not available - cannot switch"
             )
-        
+
         return {
             "message": "Switch to UDS3 validated",
             "action_required": "Set THEMIS_ENABLED=false and restart backend"
@@ -590,7 +590,7 @@ async def switch_adapter(target: Literal["themis", "uds3"]):
 async def get_failover_history():
     """
     Get failover event history.
-    
+
     Returns log of adapter switches (planned/emergency).
     TODO: Implement persistent failover logging.
     """
@@ -634,16 +634,16 @@ async def stream_vector_search(
 ):
     """
     Streaming Vector Search with progress updates.
-    
+
     Works with both ThemisDB and UDS3 adapters.
-    
+
     Events:
         - search_started
         - embedding_generated
         - search_completed
         - result
     """
-    
+
     async def event_generator() -> AsyncGenerator:
         try:
             # Start event
@@ -655,26 +655,26 @@ async def stream_vector_search(
                     "timestamp": datetime.utcnow().isoformat()
                 })
             }
-            
+
             # Get adapter (auto-selects ThemisDB/UDS3)
             adapter = get_database_adapter()
             adapter_name = adapter.__class__.__name__
-            
+
             yield {
                 "event": "adapter_selected",
                 "data": json.dumps({"adapter": adapter_name})
             }
-            
+
             # Embedding generation (mock progress)
             await asyncio.sleep(0.5)
             yield {
                 "event": "embedding_generated",
                 "data": json.dumps({"dimension": 768})
             }
-            
+
             # Execute search
             results = await adapter.vector_search(query=query, top_k=top_k)
-            
+
             # Stream results incrementally
             for idx, result in enumerate(results):
                 yield {
@@ -686,7 +686,7 @@ async def stream_vector_search(
                     })
                 }
                 await asyncio.sleep(0.1)  # Simulate incremental loading
-            
+
             # Completion event
             yield {
                 "event": "search_completed",
@@ -695,13 +695,13 @@ async def stream_vector_search(
                     "adapter": adapter_name
                 })
             }
-            
+
         except Exception as e:
             yield {
                 "event": "error",
                 "data": json.dumps({"error": str(e)})
             }
-    
+
     return EventSourceResponse(event_generator())
 ```
 
@@ -935,5 +935,5 @@ tests/api/test_streaming.py          # Integration-Tests für SSE
 
 ---
 
-**Status:** ✅ Analyse abgeschlossen - Ready für Implementation  
+**Status:** ✅ Analyse abgeschlossen - Ready für Implementation
 **Next Steps:** Implementierung ThemisDB Router + Adapter Management

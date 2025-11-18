@@ -1,7 +1,7 @@
 # VERITAS - Re-Ranking & Evaluation Framework
 
-**Datum:** 6. Oktober 2025  
-**Status:** ✅ Phase 1 Abgeschlossen - Re-Ranking operational  
+**Datum:** 6. Oktober 2025
+**Status:** ✅ Phase 1 Abgeschlossen - Re-Ranking operational
 **Version:** 1.0
 
 ---
@@ -10,8 +10,8 @@
 
 Diese Implementierung bringt **Hyperscaler-Best-Practices** nach VERITAS - **vollständig on-premise** und **souverän**:
 
-✅ **Azure Semantic Ranker** → VERITAS Re-Ranking-Service  
-✅ **AWS Bedrock Evaluations** → VERITAS Golden Dataset Framework  
+✅ **Azure Semantic Ranker** → VERITAS Re-Ranking-Service
+✅ **AWS Bedrock Evaluations** → VERITAS Golden Dataset Framework
 ✅ **GCP Vertex AI Ranking** → Cross-Encoder-basiertes zweistufiges Retrieval
 
 ---
@@ -25,10 +25,10 @@ Query → UDS3 Vektor-Suche → Top-5 Dokumente → Graph-Synthese → LLM
 
 ### Nachher (zweistufig - Hyperscaler-Standard):
 ```
-Query → UDS3 Vektor-Suche (Top-20, Recall) 
-      → Re-Ranking (Cross-Encoder, Precision) 
-      → Top-5 Dokumente 
-      → Graph-Synthese 
+Query → UDS3 Vektor-Suche (Top-20, Recall)
+      → Re-Ranking (Cross-Encoder, Precision)
+      → Top-5 Dokumente
+      → Graph-Synthese
       → LLM
 ```
 
@@ -112,11 +112,11 @@ class RAGQueryOptions:
 async def build_context(self, query_text, ...):
     # 1. UDS3 Query (Top-20)
     raw_result = await self._run_unified_query(...)
-    
+
     # 2. Re-Ranking (Top-20 → Top-5) - AUTOMATISCH!
     if self.reranking_enabled:
         reranked_docs = await self.reranking_service.rerank_documents(...)
-    
+
     # 3. Graph-Synthese
     # 4. LLM-Generation
 ```
@@ -151,19 +151,19 @@ context = await service.build_context(query, options=opts)
   "category": "legal",
   "complexity": "simple",
   "question": "Was steht im Taschengeldparagraphen?",
-  
+
   "expected_retrieval": {
     "expected_documents": ["bgb_110.pdf"],
     "expected_entities": ["§ 110 BGB", "Minderjährige"],
     "min_relevance_score": 0.85
   },
-  
+
   "expected_answer": {
     "must_contain": ["§ 110 BGB", "ohne Zustimmung"],
     "must_not_contain": ["Geldtransport", "räumliche Dimension"],
     "expected_structure": ["legal_reference", "definition"]
   },
-  
+
   "hallucination_triggers": [
     "Geldtransport",
     "räumliche Dimension"
@@ -191,7 +191,7 @@ context = await service.build_context(query, options=opts)
 }
 ```
 
-**Vorher:** System halluzinierte über "Geldtransport" und "räumliche Dimension"  
+**Vorher:** System halluzinierte über "Geldtransport" und "räumliche Dimension"
 **Nachher:** Diese Begriffe werden als Fehler erkannt!
 
 ---
@@ -243,8 +243,8 @@ Service-Statistiken:
   Top-K: 5
 ```
 
-✅ **Cross-Encoder funktioniert korrekt!**  
-✅ **Python-Dokumente werden höher gereiht als JavaScript**  
+✅ **Cross-Encoder funktioniert korrekt!**
+✅ **Python-Dokumente werden höher gereiht als JavaScript**
 ✅ **Latenz: 91.2ms (akzeptabel)**
 
 ---
@@ -565,6 +565,6 @@ score = -8.4  # Überhaupt nicht relevant
 
 ---
 
-**Erstellt:** 6. Oktober 2025  
-**Version:** 1.0  
+**Erstellt:** 6. Oktober 2025
+**Version:** 1.0
 **Status:** ✅ Production-Ready

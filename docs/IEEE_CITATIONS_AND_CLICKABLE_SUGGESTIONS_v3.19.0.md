@@ -1,8 +1,8 @@
 # IEEE-Zitationen & Klickbare Vorschläge - v3.19.0 Implementierungsplan
 
-**Status:** 📋 PLANUNG (10.10.2025)  
-**Priorität:** HOCH - UX-Verbesserung für wissenschaftliches Arbeiten  
-**Geschätzter Aufwand:** 6-8 Stunden (Backend 3h, Frontend 4h, Testing 1h)  
+**Status:** 📋 PLANUNG (10.10.2025)
+**Priorität:** HOCH - UX-Verbesserung für wissenschaftliches Arbeiten
+**Geschätzter Aufwand:** 6-8 Stunden (Backend 3h, Frontend 4h, Testing 1h)
 
 ---
 
@@ -11,20 +11,20 @@
 ### Feature #1: IEEE-konforme Inline-Zitationen
 > "Zitierte Quellen müssen zwingend in der Antwort mit hochgestellter Nummerierung [¹] (IEEE-Standard) gekennzeichnet werden. Diese soll als Link eingebunden werden und auf die Quelle verweisen. Die Quellen haben grundsätzlich das IEEE Format"
 
-**Ziel:** 
+**Ziel:**
 - In-Text-Zitationen mit hochgestellten Nummern `[¹]`, `[²]`, `[³]`
 - Klickbar → scrollt zur Quellenangabe unten
 - IEEE-Format für Quellenangaben
 
 **Beispiel:**
 ```
-Nach § 58 LBO BW ist eine Baugenehmigung erforderlich[¹]. Die Bearbeitungsdauer 
+Nach § 58 LBO BW ist eine Baugenehmigung erforderlich[¹]. Die Bearbeitungsdauer
 beträgt laut Verwaltungsvorschrift in der Regel 2-3 Monate[²].
 
 📚 Quellen:
-[1] Landesbauordnung Baden-Württemberg (LBO BW), § 58 "Baugenehmigung", 
+[1] Landesbauordnung Baden-Württemberg (LBO BW), § 58 "Baugenehmigung",
     Stand: 2023, https://www.landesrecht-bw.de/...
-[2] Verwaltungsvorschrift des Wirtschaftsministeriums zur LBO, 
+[2] Verwaltungsvorschrift des Wirtschaftsministeriums zur LBO,
     Abschnitt 3.2 "Bearbeitungsfristen", 2022
 ```
 
@@ -94,8 +94,8 @@ Backend empfängt
 
 ### Phase 1: Backend-Anpassung (Prompt Engineering)
 
-**Datei:** `backend/agents/veritas_enhanced_prompts.py`  
-**Funktion:** `USER_FACING_RESPONSE` Template erweitern  
+**Datei:** `backend/agents/veritas_enhanced_prompts.py`
+**Funktion:** `USER_FACING_RESPONSE` Template erweitern
 
 **Änderungen:**
 
@@ -110,11 +110,11 @@ WISSENSCHAFTLICHE ZITATIONEN (WICHTIG!):
 - Verwende fortlaufende Nummerierung
 
 BEISPIEL (GUT):
-"Nach § 58 LBO BW ist eine Baugenehmigung erforderlich[1]. Die Bearbeitungsdauer 
+"Nach § 58 LBO BW ist eine Baugenehmigung erforderlich[1]. Die Bearbeitungsdauer
 beträgt in der Regel 2-3 Monate[2]. Bei Naturschutzgebieten gelten Sonderregelungen[3]."
 
 BEISPIEL (SCHLECHT):
-"Nach § 58 LBO BW ist eine Baugenehmigung erforderlich. Die Bearbeitungsdauer 
+"Nach § 58 LBO BW ist eine Baugenehmigung erforderlich. Die Bearbeitungsdauer
 beträgt in der Regel 2-3 Monate."  ← Keine Zitationen!
 
 STIL:
@@ -122,7 +122,7 @@ STIL:
 - Strukturiert mit Aufzählungen
 - Konkrete Handlungsempfehlungen
 - Quellenbasiert (IMMER mit [N] zitieren)""",
-    
+
     "user_template": """**User fragte:** {query}
 
 **Kontext aus Dokumenten:**
@@ -159,8 +159,8 @@ source_list = "\n".join([
 
 ### Phase 2: Frontend-Anpassung (Markdown Rendering)
 
-**Datei:** `frontend/ui/veritas_markdown_renderer.py`  
-**Neue Funktion:** `_parse_ieee_citations()`  
+**Datei:** `frontend/ui/veritas_markdown_renderer.py`
+**Neue Funktion:** `_parse_ieee_citations()`
 
 **Implementierung:**
 
@@ -168,77 +168,77 @@ source_list = "\n".join([
 def _parse_ieee_citations(self, text: str) -> str:
     """
     Parst IEEE-Zitationen [1], [2] und erstellt superscript Links
-    
+
     Args:
         text: Eingabe-Text mit [1], [2] Annotationen
-    
+
     Returns:
         Text mit ersetzten Zitationen (Marker für Rendering)
-    
+
     Beispiel:
         Input:  "§ 58 LBO BW[1] regelt..."
         Output: "§ 58 LBO BW<CITE id=1> regelt..."
     """
     # Regex: [1], [2], [3] etc.
     citation_pattern = r'\[(\d+)\]'
-    
+
     def replace_citation(match):
         cite_num = match.group(1)
         # Marker für späteren Rendering-Schritt
         return f'<CITE id={cite_num}>'
-    
+
     return re.sub(citation_pattern, replace_citation, text)
 
 def render_markdown(self, markdown_text: str, default_tag: str = "assistant_main"):
     """Rendert Markdown mit IEEE-Zitationen"""
-    
+
     # 1. Parse IEEE-Zitationen ZUERST
     text_with_cite_markers = self._parse_ieee_citations(markdown_text)
-    
+
     # 2. Standard Markdown-Parsing
     # ... (bestehende Logik)
-    
+
     # 3. Rendere Zitations-Marker
     for match in re.finditer(r'<CITE id=(\d+)>', text_with_cite_markers):
         cite_num = match.group(1)
         cite_start = self.text_widget.index(tk.END)
-        
+
         # Hochgestellte Zahl
         self.text_widget.insert(tk.END, f"[{cite_num}]", "citation_superscript")
         cite_end = self.text_widget.index(tk.END)
-        
+
         # Einzigartiger Tag für Click-Handler
         cite_tag = f"citation_link_{cite_num}"
         self.text_widget.tag_add(cite_tag, cite_start, cite_end)
-        
+
         # Click-Handler: Scroll zu Source
         self.text_widget.tag_bind(
-            cite_tag, 
-            "<Button-1>", 
+            cite_tag,
+            "<Button-1>",
             lambda e, num=cite_num: self._scroll_to_source(num)
         )
-        
+
         # Styling
         self.text_widget.tag_config(cite_tag, foreground='#0066CC', underline=1)
-        self.text_widget.tag_bind(cite_tag, "<Enter>", 
+        self.text_widget.tag_bind(cite_tag, "<Enter>",
             lambda e: self.text_widget.config(cursor="hand2"))
-        self.text_widget.tag_bind(cite_tag, "<Leave>", 
+        self.text_widget.tag_bind(cite_tag, "<Leave>",
             lambda e: self.text_widget.config(cursor=""))
 
 def _scroll_to_source(self, source_num: str):
     """Scrollt zur Quellenangabe mit gegebener Nummer"""
     # Suche nach Tag "source_entry_{source_num}"
     source_tag = f"source_entry_{source_num}"
-    
+
     # Finde Tag-Range
     ranges = self.text_widget.tag_ranges(source_tag)
     if ranges:
         # Scroll zu erster Position
         self.text_widget.see(ranges[0])
-        
+
         # Optional: Highlight-Animation
         self.text_widget.tag_config(source_tag, background='#FFFFCC')
-        self.text_widget.after(2000, lambda: 
+        self.text_widget.after(2000, lambda:
             self.text_widget.tag_config(source_tag, background=''))
 ```
 
@@ -261,8 +261,8 @@ text_widget.tag_configure(
 
 ### Phase 3: IEEE-Formatierung der Quellen
 
-**Datei:** `frontend/ui/veritas_ui_chat_formatter.py`  
-**Funktion:** `_insert_sources_collapsible()` erweitern  
+**Datei:** `frontend/ui/veritas_ui_chat_formatter.py`
+**Funktion:** `_insert_sources_collapsible()` erweitern
 
 **IEEE-Format-Konvention:**
 
@@ -272,13 +272,13 @@ text_widget.tag_configure(
 
 **Beispiele:**
 ```
-[1] Landesbauordnung Baden-Württemberg (LBO BW), § 58 "Baugenehmigung", 
+[1] Landesbauordnung Baden-Württemberg (LBO BW), § 58 "Baugenehmigung",
     Landesrecht BW, 2023, [Online]. Verfügbar: https://www.landesrecht-bw.de/...
 
 [2] Bundesimmissionsschutzgesetz (BImSchG), § 4 "Genehmigungsbedürftige Anlagen",
     Bundesrecht, 2022
 
-[3] Verwaltungsvorschrift Technische Baubestimmungen, Abschnitt 3.2, 
+[3] Verwaltungsvorschrift Technische Baubestimmungen, Abschnitt 3.2,
     Wirtschaftsministerium BW, 2021
 ```
 
@@ -288,12 +288,12 @@ text_widget.tag_configure(
 def _format_source_ieee(self, source: str, index: int, metadata: Dict) -> str:
     """
     Formatiert Quelle im IEEE-Standard
-    
+
     Args:
         source: Source-String (kann bereits formatiert sein)
         index: 1-basierter Index
         metadata: Metadaten (type, year, url, author)
-    
+
     Returns:
         IEEE-formatierter String
     """
@@ -303,44 +303,44 @@ def _format_source_ieee(self, source: str, index: int, metadata: Dict) -> str:
     year = metadata.get('year', '')
     url = metadata.get('url', '')
     author = metadata.get('author', '')
-    
+
     # Baue IEEE-Format
     parts = [f"[{index}]"]
-    
+
     if author:
         parts.append(f"{author},")
-    
+
     parts.append(f'"{title}",')
-    
+
     if doc_type:
         parts.append(f"{doc_type},")
-    
+
     if year:
         parts.append(f"{year}")
-    
+
     if url:
         parts.append(f"[Online]. Verfügbar: {url}")
-    
+
     return " ".join(parts)
 
 def _insert_sources_collapsible(self, sources: List[str], message_id: str):
     """Fügt Quellen mit IEEE-Formatierung ein"""
-    
+
     # ... (bestehende CollapsibleSection-Logik)
-    
+
     for i, source in enumerate(sources, 1):
         # Extrahiere Metadaten
         metadata = self._extract_source_metadata(source)
-        
+
         # IEEE-Formatierung
         ieee_formatted = self._format_source_ieee(source, i, metadata)
-        
+
         # Rendere mit eindeutigem Tag (für Citation-Links!)
         source_tag = f"source_entry_{i}"
         source_start = self.text_widget.index(tk.END)
-        
+
         self.text_widget.insert(tk.END, f"  {ieee_formatted}\n", "source")
-        
+
         source_end = self.text_widget.index(tk.END)
         self.text_widget.tag_add(source_tag, source_start, source_end)
 ```
@@ -353,8 +353,8 @@ def _insert_sources_collapsible(self, sources: List[str], message_id: str):
 
 ### Phase 1: Backend - Follow-up-Generierung
 
-**Datei:** `backend/agents/veritas_enhanced_prompts.py`  
-**Erweiterung:** Follow-up-Generierung im Prompt  
+**Datei:** `backend/agents/veritas_enhanced_prompts.py`
+**Erweiterung:** Follow-up-Generierung im Prompt
 
 **Änderungen:**
 
@@ -376,7 +376,7 @@ BEISPIEL:
 - Wie hoch sind die Gebühren für eine Baugenehmigung in Baden-Württemberg?
 - Kann ich eine Bauvoranfrage stellen?"
 """,
-    
+
     "user_template": """**User fragte:** {query}
 
 ... (bestehende Instruktionen) ...
@@ -397,12 +397,12 @@ BEISPIEL:
 def _extract_suggestions(llm_response: str) -> List[str]:
     """Extrahiert Follow-up-Vorschläge aus LLM-Antwort"""
     suggestions = []
-    
+
     # Suche nach "💡 Vorschläge:" Section
     match = re.search(r'💡 Vorschläge?:(.+?)(?:\n\n|$)', llm_response, re.DOTALL | re.IGNORECASE)
     if match:
         section = match.group(1)
-        
+
         # Parse Bullet-Points
         for line in section.strip().split('\n'):
             line = line.strip()
@@ -410,7 +410,7 @@ def _extract_suggestions(llm_response: str) -> List[str]:
             line = re.sub(r'^[•\-\*]\s*', '', line)
             if line:
                 suggestions.append(line)
-    
+
     return suggestions[:5]  # Max 5 Vorschläge
 
 # In Response-Datenstruktur
@@ -427,8 +427,8 @@ response = {
 
 ### Phase 2: Frontend - Klickbare Suggestion-Buttons
 
-**Datei:** `frontend/ui/veritas_ui_chat_formatter.py`  
-**Funktion:** `_insert_suggestions_collapsible()` erweitern  
+**Datei:** `frontend/ui/veritas_ui_chat_formatter.py`
+**Funktion:** `_insert_suggestions_collapsible()` erweitern
 
 **Implementierung:**
 
@@ -436,17 +436,17 @@ response = {
 def _insert_suggestions_collapsible(self, suggestions: List[str], message_id: str):
     """
     Fügt Vorschläge als klickbare Buttons/Links ein
-    
+
     Args:
         suggestions: Liste von Follow-up-Fragen
         message_id: Eindeutige Message-ID
     """
     if not suggestions:
         return
-    
+
     # CollapsibleSection
     self.text_widget.insert(tk.END, "\n")
-    
+
     if COLLAPSIBLE_AVAILABLE:
         section = CollapsibleSection(
             self.text_widget,
@@ -457,18 +457,18 @@ def _insert_suggestions_collapsible(self, suggestions: List[str], message_id: st
         section.insert_header()
     else:
         self.text_widget.insert(tk.END, "💡 Vorschläge:\n", "header")
-    
+
     # Rendere jeden Vorschlag als klickbarer Link
     for i, suggestion in enumerate(suggestions, 1):
         self._insert_suggestion_link(suggestion, i, message_id)
-    
+
     if COLLAPSIBLE_AVAILABLE:
         section.finalize()
 
 def _insert_suggestion_link(self, suggestion_text: str, index: int, message_id: str):
     """
     Rendert einzelnen Vorschlag als klickbaren Link
-    
+
     Args:
         suggestion_text: Text des Vorschlags (Frage)
         index: Nummer des Vorschlags
@@ -476,17 +476,17 @@ def _insert_suggestion_link(self, suggestion_text: str, index: int, message_id: 
     """
     # Link-Icon
     link_icon = "🔗" if not ICONS_AVAILABLE else VeritasIcons.action('link')
-    
+
     # Eindeutiger Tag
     suggestion_tag = f"suggestion_link_{message_id}_{index}"
-    
+
     # Rendere als klickbarer Text
     link_start = self.text_widget.index(tk.END)
     self.text_widget.insert(tk.END, f"  {link_icon} ", "suggestion_icon")
     self.text_widget.insert(tk.END, suggestion_text, suggestion_tag)
     self.text_widget.insert(tk.END, "\n")
     link_end = self.text_widget.index(tk.END)
-    
+
     # Click-Handler: Sende als neue Query
     if self.suggestion_click_handler:
         self.text_widget.tag_bind(
@@ -494,7 +494,7 @@ def _insert_suggestion_link(self, suggestion_text: str, index: int, message_id: 
             "<Button-1>",
             lambda e, text=suggestion_text: self.suggestion_click_handler(text)
         )
-    
+
     # Styling: Hover-Effekt
     self.text_widget.tag_config(
         suggestion_tag,
@@ -502,10 +502,10 @@ def _insert_suggestion_link(self, suggestion_text: str, index: int, message_id: 
         underline=0,  # Nur bei Hover
         font=('Segoe UI', 9)
     )
-    
-    self.text_widget.tag_bind(suggestion_tag, "<Enter>", 
+
+    self.text_widget.tag_bind(suggestion_tag, "<Enter>",
         lambda e, tag=suggestion_tag: self._on_suggestion_hover(tag, True))
-    self.text_widget.tag_bind(suggestion_tag, "<Leave>", 
+    self.text_widget.tag_bind(suggestion_tag, "<Leave>",
         lambda e, tag=suggestion_tag: self._on_suggestion_hover(tag, False))
 
 def _on_suggestion_hover(self, tag: str, is_hovering: bool):
@@ -535,15 +535,15 @@ text_widget.tag_configure(
 
 ### Phase 3: Frontend - Click-Handler Integration
 
-**Datei:** `frontend/veritas_app.py`  
-**Funktion:** Suggestion-Click-Callback  
+**Datei:** `frontend/veritas_app.py`
+**Funktion:** Suggestion-Click-Callback
 
 **Implementierung:**
 
 ```python
 def __init__(self, ...):
     # ... (bestehende Initialisierung)
-    
+
     # Registriere Suggestion-Click-Handler
     if hasattr(self, 'chat_formatter'):
         self.chat_formatter.suggestion_click_handler = self._on_suggestion_clicked
@@ -551,23 +551,23 @@ def __init__(self, ...):
 def _on_suggestion_clicked(self, suggestion_text: str):
     """
     Callback wenn User auf Vorschlag klickt
-    
+
     Args:
         suggestion_text: Text des geklickten Vorschlags
     """
     logging.info(f"[SUGGESTION-CLICK] User klickte auf: '{suggestion_text}'")
-    
+
     # 1. Setze Query-Input
     self.user_input.delete("1.0", tk.END)
     self.user_input.insert("1.0", suggestion_text)
-    
+
     # 2. Zeige System-Message
     self.add_system_message(f"🔗 Follow-up-Frage: {suggestion_text[:60]}...")
-    
+
     # 3. Sende automatisch (optional: User muss bestätigen)
     # Option A: Automatisch senden
     self._send_message()
-    
+
     # Option B: User muss Enter drücken (nur vorausfüllen)
     # self.user_input.focus_set()
 ```
@@ -605,8 +605,8 @@ else:
 Query: "Wie beantrage ich eine Baugenehmigung in Baden-Württemberg?"
 
 Erwartete Antwort (LLM):
-"Nach § 58 LBO BW ist eine Baugenehmigung beim zuständigen Bauordnungsamt zu 
-beantragen[1]. Die erforderlichen Unterlagen sind in der Verwaltungsvorschrift 
+"Nach § 58 LBO BW ist eine Baugenehmigung beim zuständigen Bauordnungsamt zu
+beantragen[1]. Die erforderlichen Unterlagen sind in der Verwaltungsvorschrift
 geregelt[2]. Die Bearbeitungsdauer beträgt in der Regel 2-3 Monate[1]."
 
 Validierung:
@@ -630,9 +630,9 @@ Erwartung:
 ```python
 Erwartete Quellen-Section:
 "📚 Quellen:
-[1] Landesbauordnung Baden-Württemberg (LBO BW), § 58 "Baugenehmigung", 
+[1] Landesbauordnung Baden-Württemberg (LBO BW), § 58 "Baugenehmigung",
     Landesrecht BW, 2023, [Online]. Verfügbar: https://www.landesrecht-bw.de/...
-[2] Verwaltungsvorschrift Technische Baubestimmungen, Abschnitt 3.2, 
+[2] Verwaltungsvorschrift Technische Baubestimmungen, Abschnitt 3.2,
     Wirtschaftsministerium BW, 2021"
 
 Validierung:
@@ -697,7 +697,7 @@ Erwartung:
 
 ### Backend Response Schema (Erweiterung)
 
-**Datei:** `backend/api/veritas_api_endpoint.py`  
+**Datei:** `backend/api/veritas_api_endpoint.py`
 
 **VORHER:**
 ```python
@@ -815,28 +815,28 @@ Interaktionen:
 ## 🔍 Potential Issues & Lösungen
 
 ### Issue #1: LLM vergisst Zitationen
-**Problem:** LLM generiert Text ohne [1], [2] Marker  
+**Problem:** LLM generiert Text ohne [1], [2] Marker
 **Lösung:**
 - Prompt-Engineering: Mehrfache Betonung + Beispiele
 - Post-Processing: Regex-basierte Zitations-Injection (Fallback)
 - Few-Shot-Learning: Gute Beispiele im Prompt zeigen
 
 ### Issue #2: Falsche Zitations-Nummerierung
-**Problem:** LLM nutzt [1], [3], [1] statt [1], [2], [3]  
+**Problem:** LLM nutzt [1], [3], [1] statt [1], [2], [3]
 **Lösung:**
 - Source-List im Prompt mit [N] Präfix versehen
 - Post-Processing: Normalisierung der Nummern
 - Validation: Check ob alle Nummern in Sources existieren
 
 ### Issue #3: Suggestion-Text zu lang für Input
-**Problem:** Vorschlag hat 200+ Zeichen, Query-Input zu klein  
+**Problem:** Vorschlag hat 200+ Zeichen, Query-Input zu klein
 **Lösung:**
 - Prompt-Constraint: "Max. 80 Zeichen pro Vorschlag"
 - UI: Multi-Line Input (bereits vorhanden)
 - Truncate: Kürze Vorschlag auf 150 Zeichen mit "..."
 
 ### Issue #4: IEEE-Format nicht korrekt
-**Problem:** Metadaten fehlen (Jahr, Autor, URL)  
+**Problem:** Metadaten fehlen (Jahr, Autor, URL)
 **Lösung:**
 - Backend: Metadaten-Extraktion aus ChromaDB verbessern
 - Fallback: Minimales IEEE-Format ohne optionale Felder
@@ -948,7 +948,7 @@ Interaktionen:
 
 ---
 
-**Version:** v3.19.0 Planung  
-**Datum:** 10. Oktober 2025  
-**Autor:** GitHub Copilot  
+**Version:** v3.19.0 Planung
+**Datum:** 10. Oktober 2025
+**Autor:** GitHub Copilot
 **Review:** ⏳ Pending User Approval

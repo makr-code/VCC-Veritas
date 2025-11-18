@@ -96,12 +96,12 @@ Python 3.13 deprecated `datetime.utcnow()` because it returns a naive datetime o
 **Naive vs Aware Datetime:**
 ```python
 # NAIVE (Deprecated)
-dt = datetime.utcnow()  
+dt = datetime.utcnow()
 # → datetime(2025, 10, 13, 12, 0, 0)
 # → No timezone info!
 
 # AWARE (Correct)
-dt = datetime.now(timezone.utc)  
+dt = datetime.now(timezone.utc)
 # → datetime(2025, 10, 13, 12, 0, 0, tzinfo=timezone.utc)
 # → Has timezone info!
 ```
@@ -153,7 +153,7 @@ All 307 deprecation warnings successfully eliminated. PKI System is now fully Py
 
 ---
 
-**Updated:** 13. Oktober 2025  
-**Status:** ✅ COMPLETE  
-**Warnings:** 307 → 0 (-100%)  
+**Updated:** 13. Oktober 2025
+**Status:** ✅ COMPLETE
+**Warnings:** 307 → 0 (-100%)
 **Test Success:** 97% (unchanged)

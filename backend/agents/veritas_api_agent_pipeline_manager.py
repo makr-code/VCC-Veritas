@@ -45,12 +45,21 @@ from contextlib import contextmanager
 from backend.agents.veritas_shared_enums import QueryStatus, QueryComplexity, QueryDomain
 
 # Import der Konfiguration
+<<<<<<< Updated upstream
 try:
     from config import config
+=======
+from typing import Any
+
+config: Any = {}
+try:
+    from config import config as _imported_config
+
+    config = _imported_config
+>>>>>>> Stashed changes
     CONFIG_AVAILABLE = True
 except ImportError:
     CONFIG_AVAILABLE = False
-    config = {}
 
 logger = logging.getLogger(__name__)
 
@@ -146,6 +155,7 @@ class AgentPipelineManager:
         self.query_timeout = kwargs.get('query_timeout', 300)  # 5 Minuten
         
         # Statistics
+<<<<<<< Updated upstream
         self.stats = {
             'queries_submitted': 0,
             'queries_processed': 0,
@@ -155,15 +165,35 @@ class AgentPipelineManager:
             'active_queries_count': 0,
             'buffer_utilization': 0.0,
             'last_activity': None
+=======
+        self.stats: Dict[str, Any] = {
+            "queries_submitted": 0,
+            "queries_processed": 0,
+            "queries_failed": 0,
+            "average_processing_time": 0.0,
+            "total_processing_time": 0.0,
+            "active_queries_count": 0,
+            "buffer_utilization": 0.0,
+            "last_activity": None,
+>>>>>>> Stashed changes
         }
         
         # Agent-spezifische Statistiken
+<<<<<<< Updated upstream
         self.agent_stats = {
             'agent_invocations': {},
             'agent_success_rates': {},
             'agent_processing_times': {},
             'capability_usage': {},
             'domain_distribution': {}
+=======
+        self.agent_stats: Dict[str, Any] = {
+            "agent_invocations": {},
+            "agent_success_rates": {},
+            "agent_processing_times": {},
+            "capability_usage": {},
+            "domain_distribution": {},
+>>>>>>> Stashed changes
         }
         
         logger.info(f"🎯 Agent Pipeline Manager initialisiert (Buffer: {buffer_size})")
@@ -457,11 +487,23 @@ class AgentPipelineManager:
         
         with self._lock:
             # Suche in allen Queues
+<<<<<<< Updated upstream
             for query_dict, location in [
                 (self.query_buffer, 'buffer'),
                 (self.active_queries, 'active'),
                 (self.completed_queries, 'completed')
             ]:
+=======
+            from typing import Any as _Any
+
+            search_spaces: List[Tuple[Dict[str, _Any], str]] = [
+                (self.query_buffer, "buffer"),
+                (self.active_queries, "active"),
+                (self.completed_queries, "completed"),
+            ]
+
+            for query_dict, location in search_spaces:
+>>>>>>> Stashed changes
                 if query_id in query_dict:
                     query_item = query_dict[query_id]
                     
@@ -515,7 +557,7 @@ class AgentPipelineManager:
             }
             
             # Komplexitäts-Verteilung analysieren
-            complexity_dist = {}
+            complexity_dist: Dict[str, int] = {}
             for query_item in list(self.active_queries.values()) + list(self.completed_queries.values()):
                 complexity = query_item.complexity.value if query_item.complexity else 'unknown'
                 complexity_dist[complexity] = complexity_dist.get(complexity, 0) + 1

@@ -142,9 +142,15 @@ class RerankerService:
             return []
         
         self.logger.info(f"Reranking {len(documents)} documents for query: '{query}'")
+<<<<<<< Updated upstream
         
         results = []
         
+=======
+
+        results: List[RerankingResult] = []
+
+>>>>>>> Stashed changes
         # Process in batches for efficiency
         for i in range(0, len(documents), batch_size):
             batch = documents[i:i+batch_size]
@@ -205,7 +211,7 @@ class RerankerService:
             scores = self._parse_llm_scores(response, len(documents))
             
             # Create RerankingResult objects
-            results = []
+            results: List[RerankingResult] = []
             for i, doc in enumerate(documents):
                 original_score = doc.get('relevance_score', 0.5)
                 reranked_score = scores.get(i, original_score)
@@ -275,7 +281,7 @@ Scores:"""
                 scores_array = json.loads(json_match.group(0))
                 
                 # Validate and normalize scores
-                scores = {}
+                scores: Dict[int, float] = {}
                 for i, score in enumerate(scores_array[:expected_count]):
                     # Clamp to 0.0-1.0 range
                     normalized_score = max(0.0, min(1.0, float(score)))
@@ -296,8 +302,13 @@ Scores:"""
         documents: List[Dict[str, Any]]
     ) -> List[RerankingResult]:
         """Fallback scoring when LLM is unavailable"""
+<<<<<<< Updated upstream
         results = []
         
+=======
+        results: List[RerankingResult] = []
+
+>>>>>>> Stashed changes
         for doc in documents:
             original_score = doc.get('relevance_score', 0.5)
             

@@ -1,8 +1,8 @@
 # 🎨 VERITAS Structured LLM Response System - Konzeptplan
 
-**Version:** v4.1.0 (Rich Media + Streaming + Dynamic Tokens + Templates)  
-**Created:** 12. Oktober 2025, 18:00 Uhr  
-**Updated:** 12. Oktober 2025, 18:15 Uhr  
+**Version:** v4.1.0 (Rich Media + Streaming + Dynamic Tokens + Templates)
+**Created:** 12. Oktober 2025, 18:00 Uhr
+**Updated:** 12. Oktober 2025, 18:15 Uhr
 **Status:** 📋 KONZEPTPHASE - Ready for Implementation
 
 ---
@@ -131,14 +131,14 @@ class StreamingStructuredResponseParser:
     Parst Streaming-Response inkrementell
     Unterstützt Mix aus Text-Chunks und JSON-Widgets
     """
-    
+
     def __init__(self, chat_formatter, widget_renderer):
         self.chat_formatter = chat_formatter
         self.widget_renderer = widget_renderer
         self.buffer = ""
         self.current_metadata = {}
         self.widgets_queue = []
-    
+
     async def process_chunk(self, chunk: str) -> None:
         """
         Verarbeitet einzelnen Streaming-Chunk
@@ -155,38 +155,38 @@ class StreamingStructuredResponseParser:
         else:
             # Text-Chunk → sofort rendern
             await self._handle_text_chunk(chunk)
-    
+
     async def _handle_json_chunk(self, data: dict):
         chunk_type = data.get('type')
-        
+
         if chunk_type == 'response_start':
             # Initialisiere Response (Template, Metadata)
             self.current_metadata = data.get('metadata', {})
             # UI: Zeige Template-Badge
-            
+
         elif chunk_type == 'text_chunk':
             # Text inkrementell rendern
             content = data.get('content', '')
             position = data.get('position', 'main')
-            
+
             if position == 'main':
                 # Markdown rendern (incrementell!)
                 self.chat_formatter.markdown_renderer.render_markdown(
                     content, append=True  # WICHTIG: append statt replace
                 )
-            
+
         elif chunk_type == 'widget':
             # Widget sofort rendern
             widget_spec = data.get('widget', {})
             self.widget_renderer.render_widget(widget_spec)
-            
+
         elif chunk_type == 'response_end':
             # Finalisiere (Quellen, Vorschläge, Confidence)
             final_metadata = data.get('metadata', {})
             self.chat_formatter._insert_sources(final_metadata.get('sources', []))
             self.chat_formatter._insert_suggestions(final_metadata.get('suggestions', []))
             self.chat_formatter._insert_confidence_badge(final_metadata.get('confidence'))
-    
+
     async def _handle_text_chunk(self, text: str):
         """Plain-Text-Chunk (kein JSON)"""
         # Sofort rendern (Streaming-Feeling!)
@@ -199,7 +199,7 @@ class StreamingStructuredResponseParser:
 
 ### 2. **Dynamische Token-Size** 📏 (NEU)
 
-**Problem:** 
+**Problem:**
 Feste Token-Limits (z.B. 4096) sind bei komplexen verwaltungsrechtlichen Themen kontraproduktiv:
 - Einfache Frage ("Wer ist zuständig?") → 500 Tokens reichen
 - Komplexe Frage ("Vollständige Prüfung Bauantrag inkl. formell, rechtlich, sachlich") → 8000+ Tokens nötig
@@ -215,14 +215,14 @@ class AdaptiveTokenManager:
     3. RAG-Kontext-Größe (wie viele Quellen gefunden)
     4. User-Historie (Follow-up vs. Neue Frage)
     """
-    
+
     TOKEN_LIMITS = {
         'min': 1024,      # Minimales Context-Window
         'default': 4096,  # Standard für einfache Fragen
         'extended': 8192, # Erweitert für komplexe Themen
         'max': 16384      # Maximum (nur für sehr komplexe Analysen)
     }
-    
+
     TEMPLATE_TOKEN_REQUIREMENTS = {
         'zustaendigkeit_behoerde': 2048,  # Einfache Zuständigkeits-Frage
         'formale_pruefung': 4096,         # Formale Prüfung (Antragsbestandteile)
@@ -230,27 +230,27 @@ class AdaptiveTokenManager:
         'sachliche_pruefung': 8192,       # Sachliche Prüfung (technische Details)
         'vollstaendige_pruefung': 16384,  # Alle 3 Prüfungen kombiniert
     }
-    
-    def estimate_required_tokens(self, 
+
+    def estimate_required_tokens(self,
                                  user_query: str,
                                  template: str,
                                  rag_context_size: int,
                                  is_followup: bool = False) -> int:
         """
         Schätzt benötigte Token-Anzahl dynamisch
-        
+
         Args:
             user_query: User-Frage
             template: Gewähltes Prompt-Template
             rag_context_size: Größe des RAG-Kontexts (Anzahl Tokens)
             is_followup: Ist es eine Follow-up-Frage?
-        
+
         Returns:
             int: Empfohlene Token-Anzahl
         """
         # 1. Template-Basis
         base_tokens = self.TEMPLATE_TOKEN_REQUIREMENTS.get(template, self.TOKEN_LIMITS['default'])
-        
+
         # 2. Frage-Komplexität analysieren
         query_complexity = self._analyze_query_complexity(user_query)
         complexity_factor = {
@@ -259,28 +259,28 @@ class AdaptiveTokenManager:
             'complex': 1.5,   # Multi-Teil-Frage → 150% von base
             'very_complex': 2.0  # Vollständige Analyse → 200% von base
         }.get(query_complexity, 1.0)
-        
+
         # 3. RAG-Kontext einberechnen
         rag_overhead = min(rag_context_size, 2048)  # Max 2048 Tokens für RAG
-        
+
         # 4. Follow-up Reduktion (Context bereits geladen)
         followup_reduction = 0.7 if is_followup else 1.0
-        
+
         # Finale Berechnung
         estimated_tokens = int(
             (base_tokens * complexity_factor + rag_overhead) * followup_reduction
         )
-        
+
         # Clamp auf min/max
         return max(
             self.TOKEN_LIMITS['min'],
             min(estimated_tokens, self.TOKEN_LIMITS['max'])
         )
-    
+
     def _analyze_query_complexity(self, query: str) -> str:
         """
         Analysiert Frage-Komplexität via NLP
-        
+
         Indikatoren:
         - Wort-Anzahl
         - Anzahl Rechtsbegriffe
@@ -289,20 +289,20 @@ class AdaptiveTokenManager:
         """
         words = query.split()
         word_count = len(words)
-        
+
         # Rechtsbegriffe (vereinfacht)
-        legal_terms = ['BauGB', 'BauNVO', 'LBO', 'Genehmigung', 'Zuständigkeit', 
+        legal_terms = ['BauGB', 'BauNVO', 'LBO', 'Genehmigung', 'Zuständigkeit',
                        'Prüfung', 'Verfahren', 'Antrag', 'Bebauungsplan']
         legal_term_count = sum(1 for term in legal_terms if term in query)
-        
+
         # Komplexitäts-Keywords
-        complex_keywords = ['vollständig', 'detailliert', 'alle', 'sämtliche', 
+        complex_keywords = ['vollständig', 'detailliert', 'alle', 'sämtliche',
                             'komplett', 'umfassend', 'inklusiv']
         has_complex_keywords = any(kw in query.lower() for kw in complex_keywords)
-        
+
         # Multi-Teil-Fragen
         question_parts = query.count('?') + query.count(' und ') + query.count(' sowie ')
-        
+
         # Klassifizierung
         if word_count < 10 and legal_term_count <= 1:
             return 'simple'
@@ -326,7 +326,7 @@ async def generate_response(self, request: OllamaRequest, template: str = None):
         rag_context_size=len(request.context or []),
         is_followup=request.context is not None
     )
-    
+
     # Ollama Request mit dynamischer Token-Anzahl
     payload = {
         "model": request.model,
@@ -337,7 +337,7 @@ async def generate_response(self, request: OllamaRequest, template: str = None):
             "temperature": request.temperature,
         }
     }
-    
+
     logger.info(f"🎯 Estimated Tokens: {estimated_tokens} (Template: {template})")
 ```
 
@@ -372,13 +372,13 @@ class PromptTemplate:
     required_context: List[str]
     expected_tokens: int
     response_structure: Dict[str, Any]
-    
+
 class PromptTemplateLibrary:
     """
     Zentrale Template-Bibliothek für verwaltungsrechtliche Aspekte
     SERVERSEITIG - Templates werden NUR im Backend verwaltet
     """
-    
+
     TEMPLATES = {
         'zustaendigkeit_behoerde': PromptTemplate(
             id='zustaendigkeit_behoerde',
@@ -428,7 +428,7 @@ QUELLEN: Verwende RAG-Kontext für lokale Besonderheiten.
                 'metadata': ['sources', 'confidence']
             }
         ),
-        
+
         'formale_pruefung': PromptTemplate(
             id='formale_pruefung',
             name='Formale Prüfung Bauantrag',
@@ -443,12 +443,12 @@ PRÜF-KATALOG:
    - Bauvorlagen vollständig? (Bauzeichnungen, Baubeschreibung, etc.)
    - Unterschriften vorhanden?
    - Bauvorlageberechtigung nachgewiesen?
-   
+
 2. **Formale Anforderungen**:
    - Richtiger Antragsweg?
    - Zuständigkeit gegeben?
    - Fristen eingehalten?
-   
+
 3. **Gebühren**:
    - Gebührentatbestand?
    - Betrag?
@@ -485,7 +485,7 @@ WICHTIG:
                 'metadata': ['sources', 'suggestions']
             }
         ),
-        
+
         'rechtliche_pruefung': PromptTemplate(
             id='rechtliche_pruefung',
             name='Rechtliche Prüfung',
@@ -501,12 +501,12 @@ PRÜF-EBENEN:
    - Art der baulichen Nutzung?
    - Maß der baulichen Nutzung?
    - Bauweise, überbaubare Grundstücksfläche?
-   
+
 2. **Bauordnungsrecht** (LBO):
    - Abstandsflächen?
    - Brandschutz?
    - Barrierefreiheit?
-   
+
 3. **Fachrecht**:
    - Naturschutz?
    - Denkmalschutz?
@@ -548,7 +548,7 @@ WICHTIG:
                 'metadata': ['sources', 'confidence', 'suggestions']
             }
         ),
-        
+
         'sachliche_pruefung': PromptTemplate(
             id='sachliche_pruefung',
             name='Sachliche/Technische Prüfung',
@@ -562,16 +562,16 @@ PRÜF-ASPEKTE:
 1. **Standsicherheit**:
    - Statik-Nachweis plausibel?
    - Gründung angemessen?
-   
+
 2. **Brandschutz**:
    - Gebäudeklasse?
    - Rettungswege?
    - Feuerwiderstandsklassen?
-   
+
 3. **Schall-/Wärmeschutz**:
    - EnEV/GEG Anforderungen?
    - Schallschutz nach DIN 4109?
-   
+
 4. **Erschließung**:
    - Zufahrt vorhanden?
    - Ver-/Entsorgung gesichert?
@@ -609,7 +609,7 @@ WICHTIG:
                 'metadata': ['sources', 'confidence', 'suggestions']
             }
         ),
-        
+
         'vollstaendige_pruefung': PromptTemplate(
             id='vollstaendige_pruefung',
             name='Vollständige Prüfung (Formell + Rechtlich + Sachlich)',
@@ -660,17 +660,17 @@ WICHTIG:
             }
         ),
     }
-    
+
     @classmethod
     def get_template(cls, template_id: str) -> PromptTemplate:
         """Holt Template nach ID"""
         return cls.TEMPLATES.get(template_id)
-    
+
     @classmethod
     def select_template_auto(cls, user_query: str, rag_context: Dict) -> str:
         """
         Wählt automatisch passendes Template basierend auf User-Frage
-        
+
         Keyword-Matching:
         - "zuständig" → zustaendigkeit_behoerde
         - "vollständig" oder "Unterlagen" → formale_pruefung
@@ -679,7 +679,7 @@ WICHTIG:
         - "komplett" oder "umfassend" → vollstaendige_pruefung
         """
         query_lower = user_query.lower()
-        
+
         # Keyword-Matching (vereinfacht, später via NLP/Classifier)
         if 'zuständig' in query_lower or 'behörde' in query_lower:
             return 'zustaendigkeit_behoerde'
@@ -713,9 +713,9 @@ async def chat_structured(
     # 1. Template auswählen (auto oder explizit)
     if template_id is None:
         template_id = PromptTemplateLibrary.select_template_auto(user_query, rag_context or {})
-    
+
     template = PromptTemplateLibrary.get_template(template_id)
-    
+
     if template is None:
         # Fallback auf Standard-Prompt
         system_prompt = "Du bist VERITAS, ein KI-Assistent für deutsches Baurecht."
@@ -723,7 +723,7 @@ async def chat_structured(
     else:
         system_prompt = template.system_prompt
         estimated_tokens = template.expected_tokens
-    
+
     # 2. Dynamische Token-Anpassung
     token_manager = AdaptiveTokenManager()
     final_tokens = token_manager.estimate_required_tokens(
@@ -732,9 +732,9 @@ async def chat_structured(
         rag_context_size=len(str(rag_context or {})),
         is_followup=False  # TODO: Session-History checken
     )
-    
+
     logger.info(f"📋 Template: {template_id} | Tokens: {final_tokens}")
-    
+
     # 3. Ollama Request mit Streaming
     ollama_request = OllamaRequest(
         model="llama3.2:latest",
@@ -743,7 +743,7 @@ async def chat_structured(
         temperature=0.3,  # Niedrig für rechtliche Präzision
         max_tokens=final_tokens  # DYNAMISCH!
     )
-    
+
     # 4. Streaming Response
     async def stream_structured_response():
         # Header-Chunk (sofort)
@@ -755,7 +755,7 @@ async def chat_structured(
                 "confidence": None  # Wird später aktualisiert
             }
         }) + "\n"
-        
+
         # LLM Streaming
         async for chunk in ollama_client.generate_response(ollama_request, stream=True):
             # Text-Chunk
@@ -764,7 +764,7 @@ async def chat_structured(
                 "content": chunk.response,
                 "position": "main"
             }) + "\n"
-        
+
         # Finale Metadaten (am Ende)
         yield json.dumps({
             "type": "response_end",
@@ -774,7 +774,7 @@ async def chat_structured(
                 "suggestions": [...]  # TODO: Generieren
             }
         }) + "\n"
-    
+
     return StreamingResponse(
         stream_structured_response(),
         media_type="application/x-ndjson"  # Newline-Delimited JSON
@@ -798,13 +798,13 @@ class VeritasStreamingService:
     - Thread-Safe Integration (ThreadManager)
     - StreamingUIMixin (Frontend-Binding)
     - Cancel-Funktionalität
-    
+
 class StreamingUIMixin:
     # Frontend-Integration:
     - init_streaming_ui() - UI Setup
     - setup_streaming_integration() - Backend-Binding
     - _handle_streaming_message() - Message Processing
-    
+
 # Ollama-Client Streaming
 async def generate_response(stream=True) -> AsyncGenerator:
     # Liefert inkrementelle Chunks
@@ -957,16 +957,16 @@ class WidgetRenderer:
     Rendert strukturierte Widgets im Chat
     Erweitert MarkdownRenderer um Rich-Media-Support
     """
-    
+
     def __init__(self, text_widget: tk.Text, parent_window: tk.Tk):
         self.text_widget = text_widget
         self.parent_window = parent_window
         self.embedded_widgets = []  # Referenzen für Cleanup
-        
+
     def render_widget(self, widget_spec: dict) -> None:
         """Dispatcher für verschiedene Widget-Typen"""
         widget_type = widget_spec.get('type')
-        
+
         if widget_type == 'code_block':
             self._render_code_block(widget_spec)
         elif widget_type == 'table':
@@ -982,11 +982,11 @@ class WidgetRenderer:
         elif widget_type == 'chart':
             self._render_chart(widget_spec)
         # ... weitere Widget-Typen
-    
+
     def _render_image(self, spec: dict) -> None:
         """Bindet Bild direkt im Chat ein"""
         from PIL import Image, ImageTk
-        
+
         # Bild laden
         if 'url' in spec:
             # Von URL laden
@@ -997,24 +997,24 @@ class WidgetRenderer:
         elif 'base64' in spec:
             # Von Base64 laden
             image = self._load_image_from_base64(spec['base64'])
-        
+
         # Resize wenn nötig
         if 'width' in spec:
             image = self._resize_image(image, spec['width'])
-        
+
         # In Tkinter-Format konvertieren
         photo = ImageTk.PhotoImage(image)
-        
+
         # Im Text-Widget einbetten
         self.text_widget.image_create(tk.END, image=photo)
-        
+
         # Referenz speichern (wichtig!)
         self.embedded_widgets.append(photo)
-        
+
         # Caption hinzufügen
         if 'caption' in spec:
             self.text_widget.insert(tk.END, f"\n{spec['caption']}\n", "image_caption")
-    
+
     def _render_button(self, spec: dict) -> None:
         """Bindet klickbaren Button im Chat ein"""
         # Button-Frame erstellen
@@ -1028,14 +1028,14 @@ class WidgetRenderer:
             padx=10,
             pady=5
         )
-        
+
         # Button im Text-Widget einbetten
         self.text_widget.window_create(tk.END, window=button)
         self.text_widget.insert(tk.END, "\n")
-        
+
         # Referenz speichern
         self.embedded_widgets.append(button)
-    
+
     def _render_canvas(self, spec: dict) -> None:
         """Rendert Canvas mit Zeichnungen/Diagrammen"""
         # Canvas erstellen
@@ -1047,7 +1047,7 @@ class WidgetRenderer:
             relief=tk.SOLID,
             borderwidth=1
         )
-        
+
         # Zeichnungen ausführen
         for cmd in spec.get('draw_commands', []):
             if cmd['cmd'] == 'line':
@@ -1071,46 +1071,46 @@ class WidgetRenderer:
                     fill=cmd.get('color', 'black')
                 )
             # ... weitere Zeichenbefehle
-        
+
         # Canvas einbetten
         self.text_widget.window_create(tk.END, window=canvas)
         self.text_widget.insert(tk.END, "\n")
-        
+
         # Referenz speichern
         self.embedded_widgets.append(canvas)
-    
+
     def _render_chart(self, spec: dict) -> None:
         """Rendert Diagramm (z.B. mit matplotlib)"""
         import matplotlib.pyplot as plt
         from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-        
+
         # Matplotlib-Figure erstellen
         fig, ax = plt.subplots(figsize=(6, 4))
-        
+
         chart_type = spec.get('chart_type', 'bar')
         data = spec.get('data', {})
-        
+
         if chart_type == 'bar':
             ax.bar(data['labels'], data['values'])
         elif chart_type == 'line':
             ax.plot(data['x'], data['y'])
         elif chart_type == 'pie':
             ax.pie(data['values'], labels=data['labels'])
-        
+
         ax.set_title(spec.get('title', ''))
-        
+
         # In Tkinter einbetten
         canvas = FigureCanvasTkAgg(fig, self.text_widget)
         canvas.draw()
         canvas_widget = canvas.get_tk_widget()
-        
+
         self.text_widget.window_create(tk.END, window=canvas_widget)
         self.text_widget.insert(tk.END, "\n")
-        
+
         # Referenz speichern
         self.embedded_widgets.append(canvas_widget)
         plt.close(fig)
-    
+
     def cleanup(self) -> None:
         """Cleanup embedded widgets (wichtig für Memory-Management!)"""
         for widget in self.embedded_widgets:
@@ -1191,10 +1191,10 @@ class ChatDisplayFormatter:
     def __init__(self, ..., widget_renderer=None):
         # ... existing code ...
         self.widget_renderer = widget_renderer
-    
+
     def _render_assistant_message(self, message: dict, ...):
         content = message.get('content', '')
-        
+
         # Prüfe ob strukturierte Response
         if self._is_structured_response(content):
             response_data = json.loads(content)
@@ -1202,29 +1202,29 @@ class ChatDisplayFormatter:
         else:
             # Fallback: Alte Markdown-Rendering
             self.markdown_renderer.render_markdown(content)
-    
+
     def _render_structured_response(self, data: dict):
         """Rendert strukturierte LLM-Response"""
         content = data.get('content', {})
-        
+
         # 1. Haupttext rendern
         main_text = content.get('text', '')
         self.markdown_renderer.render_markdown(main_text)
-        
+
         # 2. Widgets rendern
         for widget_spec in content.get('widgets', []):
             self.widget_renderer.render_widget(widget_spec)
-        
+
         # 3. Metadaten rendern
         metadata = content.get('metadata', {})
         if metadata:
             self._insert_metadata_section(metadata)
-        
+
         # 4. Quellen rendern
         sources = metadata.get('sources', [])
         if sources:
             self._insert_sources(sources)
-        
+
         # 5. Vorschläge rendern
         suggestions = content.get('suggestions', [])
         if suggestions:
@@ -1457,7 +1457,7 @@ def clear_chat_display(self):
     # 1. Widget-Renderer cleanup
     if hasattr(self, 'widget_renderer'):
         self.widget_renderer.cleanup()
-    
+
     # 2. Text löschen
     self.chat_text.delete('1.0', tk.END)
 ```
@@ -1515,25 +1515,25 @@ def clear_chat_display(self):
    - MarkdownRenderer (1,000 LOC)
    - ChatDisplayFormatter (2,100 LOC)
    - **StreamingService** ⚡ (639 LOC - BEREITS VORHANDEN!)
-   
+
 2. **Erweitere mit WidgetRenderer** (neue Komponente ~500 LOC)
    - Image/Video Support (PIL/Pillow)
    - Canvas-Widgets (tkinter.Canvas)
    - Chart-Widgets (matplotlib)
    - **Streaming-fähig** (inkrementelles Rendering)
-   
+
 3. **Implementiere Template-System** 📋 (Backend, ~400 LOC)
    - `PromptTemplateLibrary` (5 Templates: Zuständigkeit, Formell, Rechtlich, Sachlich, Vollständig)
    - Auto-Selection via Keyword-Matching
    - Template-spezifische System-Prompts
-   
+
 4. **Implementiere Adaptive Token-Manager** 📏 (~200 LOC)
    - Dynamische Token-Size basierend auf:
      - Frage-Komplexität (NLP-Analyse)
      - Template-Requirements
      - RAG-Kontext-Größe
      - Follow-up Detection
-   
+
 5. **Erweitere Streaming für Structured Response** ⚡ (~300 LOC)
    - `StreamingStructuredResponseParser`
    - Newline-Delimited JSON (NDJSON)
@@ -1599,36 +1599,36 @@ def clear_chat_display(self):
 ## 🎯 Nächste Schritte (PRIORISIERT)
 
 **Option 1: 🏗️ Streaming-Prototyp (EMPFOHLEN)** ⚡
-→ Erstelle `StreamingStructuredResponseParser`  
-→ Test-Skript für Mock-Streaming-Responses (NDJSON)  
-→ Integration mit bestehendem `StreamingService`  
-→ **Zeit:** 60-90 Min  
+→ Erstelle `StreamingStructuredResponseParser`
+→ Test-Skript für Mock-Streaming-Responses (NDJSON)
+→ Integration mit bestehendem `StreamingService`
+→ **Zeit:** 60-90 Min
 → **Benefit:** Validiert Streaming-Architektur SOFORT
 
-**Option 2: 📋 Template-System Backend** 
-→ Erstelle `PromptTemplateLibrary` (5 Templates)  
-→ `AdaptiveTokenManager` implementieren  
-→ Backend API Endpoint  
-→ **Zeit:** 90-120 Min  
+**Option 2: 📋 Template-System Backend**
+→ Erstelle `PromptTemplateLibrary` (5 Templates)
+→ `AdaptiveTokenManager` implementieren
+→ Backend API Endpoint
+→ **Zeit:** 90-120 Min
 → **Benefit:** Validiert verwaltungsrechtliche Spezialisierung
 
 **Option 3: 🖼️ Widget-Renderer Prototyp**
-→ Erstelle `WidgetRenderer` mit Image + Button Support (streaming-fähig)  
-→ Test-Skript für Mock-Responses  
-→ **Zeit:** 60-90 Min  
+→ Erstelle `WidgetRenderer` mit Image + Button Support (streaming-fähig)
+→ Test-Skript für Mock-Responses
+→ **Zeit:** 60-90 Min
 → **Benefit:** Validiert UI-Rendering
 
 **Option 4: 📐 JSON-Schema finalisieren**
-→ Finalisiere NDJSON Streaming-Format  
-→ LLM-Prompt-Templates dokumentieren  
-→ **Zeit:** 30-45 Min  
+→ Finalisiere NDJSON Streaming-Format
+→ LLM-Prompt-Templates dokumentieren
+→ **Zeit:** 30-45 Min
 → **Benefit:** Design-Dokumentation komplett
 
 **Option 5: 📚 Alle Specs finalisieren**
-→ Komplettes Design vor Implementation  
-→ Widget-Galerie dokumentieren  
-→ Template-Specs detaillieren  
-→ **Zeit:** 90-120 Min  
+→ Komplettes Design vor Implementation
+→ Widget-Galerie dokumentieren
+→ Template-Specs detaillieren
+→ **Zeit:** 90-120 Min
 → **Benefit:** Vollständige Spezifikation
 
 ---
@@ -1744,15 +1744,15 @@ def clear_chat_display(self):
 
 **Möchtest du, dass ich mit der Implementation beginne?** 🚀
 
-**Meine Empfehlung:**  
-**Option 1: Streaming-Prototyp** (60-90 Min)  
-→ Validiert Architektur SOFORT  
-→ Kann HEUTE getestet werden  
+**Meine Empfehlung:**
+**Option 1: Streaming-Prototyp** (60-90 Min)
+→ Validiert Architektur SOFORT
+→ Kann HEUTE getestet werden
 → Zeigt ob Streaming + Structured Response kompatibel sind
 
-**Alternative:**  
-**Option 2: Template-System** (90-120 Min)  
-→ Validiert verwaltungsrechtliche Spezialisierung  
+**Alternative:**
+**Option 2: Template-System** (90-120 Min)
+→ Validiert verwaltungsrechtliche Spezialisierung
 → Kann sofort mit bestehendem Backend getestet werden
 
 **Lass mich wissen, welche Option du bevorzugst!** 😊
@@ -1760,4 +1760,3 @@ def clear_chat_display(self):
 ---
 
 **END OF KONZEPTPLAN (v4.1.0)**
-

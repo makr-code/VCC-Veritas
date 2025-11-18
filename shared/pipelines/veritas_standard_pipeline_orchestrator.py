@@ -41,8 +41,14 @@ class VeritasPipelineOrchestrator:
         self.job_chains = self._load_job_chains_from_db()
         self.backend_integrations = self._load_backend_integrations_from_db()
         self.pipeline_metrics = self._initialize_pipeline_metrics()
+<<<<<<< Updated upstream
         
         self.processing_queue = Queue()
+=======
+
+        # typed instance attributes
+        self.processing_queue: Queue = Queue()
+>>>>>>> Stashed changes
         self.orchestration_active = False
         self.orchestration_thread = None
         
@@ -117,11 +123,22 @@ class VeritasPipelineOrchestrator:
                     FROM job_chains 
                     WHERE active = 1
                     ORDER BY priority DESC
+<<<<<<< Updated upstream
                 ''')
                 
                 chains = {}
                 chain_descriptions = {}
                 
+=======
+                """
+                )
+
+                from typing import Dict
+
+                chains: Dict[str, List[str]] = {}
+                chain_descriptions: Dict[str, Dict[str, Any]] = {}
+
+>>>>>>> Stashed changes
                 for source_job, target_job, priority, active, description in cursor.fetchall():
                     if source_job not in chains:
                         chains[source_job] = []

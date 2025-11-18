@@ -21,7 +21,11 @@ import os
 from typing import Dict, Any, List, Optional
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
+<<<<<<< Updated upstream
 import time
+=======
+from typing import Any, Dict, List, Optional, cast
+>>>>>>> Stashed changes
 
 # Add project root to path
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -207,6 +211,7 @@ class ProcessExecutor:
                 rag_context = None
                 if self.rag_service:
                     try:
+<<<<<<< Updated upstream
                         # Quick RAG search for context (limit to 3 results)
                         search_results = self.rag_service.search(tree.query, top_k=3)
                         if search_results and "results" in search_results:
@@ -214,6 +219,15 @@ class ProcessExecutor:
                                 result.get("content", "")[:200]  # First 200 chars
                                 for result in search_results["results"]
                             ]
+=======
+                        # Use the hybrid_search API with SearchFilters for RAG context (limit to 3 results)
+                        from backend.services.rag_service import SearchFilters
+
+                        filters = SearchFilters(max_results=3, min_relevance=0.0)
+                        search_result = self.rag_service.hybrid_search(query=tree.query, filters=filters)
+                        if search_result and getattr(search_result, "results", None):
+                            rag_context = [getattr(res, "content", "")[:200] for res in search_result.results]
+>>>>>>> Stashed changes
                     except Exception as e:
                         logger.warning(f"⚠️ RAG context retrieval failed: {e}")
                 
@@ -253,7 +267,7 @@ class ProcessExecutor:
         logger.info(f"Execution plan: {len(execution_plan)} levels")
         
         # Step 3: Execute each level sequentially, steps within level in parallel
-        step_results = {}
+        step_results: Dict[str, StepResult] = {}
         completed_steps = set()
         failed_steps = set()
         current_step_num = 0
@@ -338,8 +352,13 @@ class ProcessExecutor:
         Returns:
             Dictionary of step_id -> StepResult
         """
+<<<<<<< Updated upstream
         results = {}
         
+=======
+        results: Dict[str, Any] = {}
+
+>>>>>>> Stashed changes
         # Emit step started events for all steps in this group
         if progress_callback and self.streaming_available:
             for i, step_id in enumerate(step_ids):
@@ -627,8 +646,13 @@ class ProcessExecutor:
             Mock data dictionary
         """
         step_type = step.step_type
+<<<<<<< Updated upstream
         params = step.parameters
         
+=======
+        params: Dict[str, Any] = step.parameters
+
+>>>>>>> Stashed changes
         # Generate mock data based on step type
         if step_type == StepType.SEARCH:
             return {
@@ -724,7 +748,7 @@ class ProcessExecutor:
         failed = len(step_results) - completed
         
         # Collect all data from successful steps
-        aggregated_data = {}
+        aggregated_data: Dict[str, Any] = {}
         for step_id, result in step_results.items():
             if result.success and result.data:
                 step = tree.get_step(step_id)
@@ -732,12 +756,13 @@ class ProcessExecutor:
         
         # Get leaf steps (final results)
         leaf_steps = tree.get_leaf_steps()
-        final_results = {}
+        final_results: Dict[str, Any] = {}
         for step in leaf_steps:
             if step.id in step_results and step_results[step.id].success:
                 final_results[step.name] = step_results[step.id].data
         
         # Build result dictionary
+<<<<<<< Updated upstream
         result = {
             'success': failed == 0,
             'query': tree.query,
@@ -753,10 +778,25 @@ class ProcessExecutor:
             },
             'tree_metadata': tree.metadata,
             'timestamp': datetime.now().isoformat()
+=======
+        process_result = {
+            "success": failed == 0,
+            "query": tree.query,
+            "data": aggregated_data,
+            "final_results": final_results,
+            "execution_time": execution_time,
+            "steps_total": len(step_results),
+            "steps_completed": completed,
+            "steps_failed": failed,
+            "step_results": {step_id: res.to_dict() for step_id, res in step_results.items()},
+            "tree_metadata": tree.metadata,
+            "timestamp": datetime.now().isoformat(),
+>>>>>>> Stashed changes
         }
         
         # Add hypothesis if available (Phase 5)
         if hypothesis:
+<<<<<<< Updated upstream
             result['hypothesis'] = hypothesis.to_dict()
             result['hypothesis_metadata'] = {
                 'question_type': hypothesis.question_type.value,
@@ -768,6 +808,19 @@ class ProcessExecutor:
         
         return result
     
+=======
+            process_result["hypothesis"] = hypothesis.to_dict()
+            process_result["hypothesis_metadata"] = {
+                "question_type": hypothesis.question_type.value,
+                "confidence": hypothesis.confidence.value,
+                "requires_clarification": hypothesis.requires_clarification(),
+                "has_critical_gaps": hypothesis.has_critical_gaps(),
+                "information_gaps_count": len(hypothesis.information_gaps),
+            }
+
+        return process_result
+
+>>>>>>> Stashed changes
     # ============================================================================
     # RAG Integration Methods (Phase 4)
     # ============================================================================
@@ -863,8 +916,8 @@ class ProcessExecutor:
                     document_id=result.document_id,
                     title=result.metadata.title,
                     content=result.content,
-                    source_type=result.metadata.source_type,
-                    relevance_score=result.relevance_score,
+                    source_type=cast(Any, result.metadata.source_type),
+                    relevance_score=cast(Any, result.relevance_score),
                     file_path=result.metadata.file_path,
                     page_count=result.metadata.page_count,
                     tags=result.metadata.tags

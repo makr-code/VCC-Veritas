@@ -129,6 +129,7 @@ class BrightSkyWeatherAgent:
             }
         
         try:
+<<<<<<< Updated upstream
             params = {
                 "lat": latitude,
                 "lon": longitude
@@ -139,6 +140,11 @@ class BrightSkyWeatherAgent:
                 params=params,
                 timeout=self.timeout
             )
+=======
+            params: Dict[str, Any] = {"lat": latitude, "lon": longitude}
+
+            response = self.session.get(BRIGHTSKY_CURRENT_ENDPOINT, params=params, timeout=self.timeout)
+>>>>>>> Stashed changes
             response.raise_for_status()
             
             data = response.json()
@@ -211,7 +217,7 @@ class BrightSkyWeatherAgent:
             last_date = datetime.now()
         
         try:
-            params = {
+            params: Dict[str, Any] = {
                 "lat": latitude,
                 "lon": longitude,
                 "date": date.strftime("%Y-%m-%d"),
@@ -280,6 +286,7 @@ class BrightSkyWeatherAgent:
             }
         
         try:
+<<<<<<< Updated upstream
             params = {
                 "lat": latitude,
                 "lon": longitude
@@ -290,6 +297,11 @@ class BrightSkyWeatherAgent:
                 params=params,
                 timeout=self.timeout
             )
+=======
+            params: Dict[str, Any] = {"lat": latitude, "lon": longitude}
+
+            response = self.session.get(BRIGHTSKY_ALERTS_ENDPOINT, params=params, timeout=self.timeout)
+>>>>>>> Stashed changes
             response.raise_for_status()
             
             data = response.json()

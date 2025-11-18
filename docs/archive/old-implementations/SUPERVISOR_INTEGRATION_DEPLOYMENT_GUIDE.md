@@ -1,7 +1,7 @@
 # SUPERVISOR INTEGRATION - DEPLOYMENT GUIDE 🚀
 
-**Version:** v7.0 with Supervisor Layer (Config v2.0.0)  
-**Date:** 12. Oktober 2025  
+**Version:** v7.0 with Supervisor Layer (Config v2.0.0)
+**Date:** 12. Oktober 2025
 **Status:** ✅ **READY FOR PRODUCTION DEPLOYMENT**
 
 ---
@@ -181,21 +181,21 @@ import asyncio
 async def test():
     client = VeritasOllamaClient('http://localhost:11434', timeout=120)
     await client.initialize()
-    
+
     orch = UnifiedOrchestratorV7(
         config_dir='config',
         method_id='default_method',
         ollama_client=client,
         enable_streaming=False
     )
-    
+
     result = await orch.process_query(
         user_query='Was besagt § 50 LBO BW?'
     )
-    
+
     print(f'Confidence: {result.confidence}')
     print(f'Answer: {result.final_answer.get(\"main_answer\", \"\")[:200]}...')
-    
+
     await client.close()
 
 asyncio.run(test())
@@ -228,7 +228,7 @@ import asyncio
 async def test():
     client = VeritasOllamaClient('http://localhost:11434', timeout=120)
     await client.initialize()
-    
+
     orch = UnifiedOrchestratorV7(
         config_dir='config',
         method_id='default_method',
@@ -236,22 +236,22 @@ async def test():
         agent_orchestrator=None,  # Mock mode
         enable_streaming=False
     )
-    
+
     result = await orch.process_query(
         user_query='Brauche ich Baugenehmigung für Carport mit PV in München?'
     )
-    
+
     # Check if supervisor phases executed
     phases = result.scientific_process.keys()
     print(f'Phases executed: {len(phases)}')
     print(f'Supervisor phases: {[p for p in phases if \"supervisor\" in p or \"agent\" in p]}')
-    
+
     await client.close()
 
 asyncio.run(test())
 "
 
-# Expected: 
+# Expected:
 # - 9 phases executed (6 scientific + 3 supervisor)
 # - supervisor_agent_selection, agent_execution, agent_result_synthesis present
 # - Mock agent results in metadata
@@ -481,7 +481,7 @@ Phases: 6 (scientific only)
 
 **Option 2 (Progressive - supervisor_enabled=true, mock agents):**
 ```
-Answer: "Nach § 50 LBO BW ist ein Carport bis 30m² verfahrensfrei. 
+Answer: "Nach § 50 LBO BW ist ein Carport bis 30m² verfahrensfrei.
          [Mock-Daten für Solar, Kosten, Grenzabstand]"
 Confidence: 0.80 (+0.02)
 Sources: UDS3, LLM, Mock Agents (3)
@@ -492,7 +492,7 @@ Phases: 9 (6 scientific + 3 supervisor)
 **Option 3 (Full - real agents):**
 ```
 Answer: "Nach § 50 LBO BW ist ein Carport bis 30m² verfahrensfrei.
-         Für München (Solarstrahlung: 1,200 kWh/m²/a) lohnt sich PV 
+         Für München (Solarstrahlung: 1,200 kWh/m²/a) lohnt sich PV
          mit Kosten von 5K-15K EUR und ROI von 8-12 Jahren."
 Confidence: 0.85 (+0.07)
 Sources: UDS3, LLM, Construction Agent, Weather Agent, Financial Agent
@@ -586,7 +586,7 @@ Phases: 9 (6 scientific + 3 supervisor)
 
 **Status:** ✅ **READY FOR PRODUCTION DEPLOYMENT**
 
-**Recommendation:** 
+**Recommendation:**
 1. **Week 1-2:** Deploy Option 1 (Conservative, supervisor_enabled=false)
 2. **Week 3-4:** Deploy Option 2 (Progressive, supervisor_enabled=true, mock agents)
 3. **Week 5+:** Deploy Option 3 (Full, real agents)
@@ -601,6 +601,6 @@ Phases: 9 (6 scientific + 3 supervisor)
 
 **END OF DEPLOYMENT GUIDE**
 
-**Date:** 12. Oktober 2025  
-**Version:** v7.0 with Supervisor Layer (Config v2.0.0)  
+**Date:** 12. Oktober 2025
+**Version:** v7.0 with Supervisor Layer (Config v2.0.0)
 **Status:** ✅ READY FOR PRODUCTION 🚀

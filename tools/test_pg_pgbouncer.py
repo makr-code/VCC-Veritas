@@ -1,8 +1,9 @@
 """
 Connectivity test against pgBouncer on localhost:6432.
 """
-import psycopg2
 import os
+
+import psycopg2
 
 host = os.getenv("POSTGRES_HOST", "localhost")
 port = int(os.getenv("POSTGRES_PORT", "6432"))

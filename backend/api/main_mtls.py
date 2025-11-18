@@ -42,8 +42,12 @@ Created: 2025-10-13
 import sys
 import os
 from pathlib import Path
+<<<<<<< Updated upstream
 import logging
 from typing import Dict, Any
+=======
+from typing import Any, Dict, cast
+>>>>>>> Stashed changes
 
 # Add project root to path
 project_root = Path(__file__).parent.parent.parent
@@ -171,7 +175,9 @@ async def health_check() -> Dict[str, Any]:
 @app.get("/api/v1/health", tags=["Monitoring"])
 async def health_check_v1() -> Dict[str, Any]:
     """Alternative health check endpoint."""
-    return await health_check()
+    # Cast the result to the declared return type to satisfy strict static
+    # checking when health_check() could be resolved as Any in some analysis paths.
+    return cast(Dict[str, Any], await health_check())
 
 
 # ============================================================================
@@ -188,9 +194,15 @@ async def root(request: Request) -> Dict[str, Any]:
     Returns:
         API info dict with client certificate details
     """
+<<<<<<< Updated upstream
     mtls_info = {}
     
     if hasattr(request.state, 'mtls_validated') and request.state.mtls_validated:
+=======
+    mtls_info: Dict[str, Any] = {}
+
+    if hasattr(request.state, "mtls_validated") and request.state.mtls_validated:
+>>>>>>> Stashed changes
         mtls_info = {
             "authenticated": True,
             "client_service": request.state.client_service,

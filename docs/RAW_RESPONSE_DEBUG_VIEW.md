@@ -1,8 +1,8 @@
 # 🔍 Raw-Response Debug-View - Feature Documentation
 
-**Version:** v3.18.3  
-**Erstellt:** 10.10.2025  
-**Feature-Typ:** Debugging Tool  
+**Version:** v3.18.3
+**Erstellt:** 10.10.2025
+**Feature-Typ:** Debugging Tool
 **Status:** ✅ IMPLEMENTED
 
 ---
@@ -107,14 +107,14 @@ Bei der Analyse von LLM-Antworten traten generische Meta-Phrasen auf:
 #### 1. Neue Methode: `_insert_raw_response_collapsible()`
 ```python
 def _insert_raw_response_collapsible(
-    self, 
-    content: str, 
-    metadata: Dict, 
+    self,
+    content: str,
+    metadata: Dict,
     message_id: str
 ) -> None:
     """
     Fügt Raw-Response als Collapsible Section ein (für Debugging)
-    
+
     Features:
     - LLM-Parameter-Display
     - Ungefilterte Content-Anzeige
@@ -166,7 +166,7 @@ backend_response = {
 1. **Sende Query:** "Was ist das BImSchG?"
 2. **Erwarte:** `▶ 🔍 Raw-Antwort (Debug)` eingeklappt
 3. **Klicke:** Expand Section
-4. **Erwarte:** 
+4. **Erwarte:**
    - LLM-Parameter visible
    - Ungefilterte Antwort visible
    - Problem-Detection (falls zutreffend)
@@ -177,7 +177,7 @@ backend_response = {
    ```
    ⚠️ Erkannte Probleme:
      • ⚠️ Generische Meta-Phrase: 'Antwort auf die Frage'
-   
+
    💡 Tipp: Prüfe Dual-Prompt System im Backend
    ```
 
@@ -324,7 +324,7 @@ Feature funktioniert wie erwartet.
 
 ---
 
-**Erstellt:** 10.10.2025  
-**Autor:** VERITAS AI System  
-**Version:** v3.18.3  
+**Erstellt:** 10.10.2025
+**Autor:** VERITAS AI System
+**Version:** v3.18.3
 **Status:** ✅ PRODUCTION READY

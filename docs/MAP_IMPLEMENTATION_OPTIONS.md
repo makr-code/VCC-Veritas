@@ -1,6 +1,6 @@
 # Technische Implementierungsoptionen: Interaktive Karte in Tkinter
 
-**Datum:** 10. Oktober 2025  
+**Datum:** 10. Oktober 2025
 **Kontext:** IMMI API Map-Visualisierung ohne Browser-Komponenten
 
 ---
@@ -47,45 +47,45 @@ class IMMIMapWidget(tk.Frame):
     def __init__(self, parent, backend_url="http://localhost:5000"):
         super().__init__(parent)
         self.backend_url = backend_url
-        
+
         # Map Widget erstellen
         self.map_widget = TkinterMapView(self, width=800, height=600)
         self.map_widget.pack(fill="both", expand=True)
-        
+
         # Brandenburg-Zentrum setzen
         self.map_widget.set_position(52.45, 13.37)  # Lat, Lon
         self.map_widget.set_zoom(8)
-        
+
         # Marker laden
         self.load_markers()
-    
+
     def load_markers(self):
         """Lädt BImSchG + WKA Marker von IMMI API"""
         import requests
-        
+
         # BImSchG-Anlagen laden
         response = requests.get(f"{self.backend_url}/api/immi/markers/bimschg?limit=1000")
         if response.status_code == 200:
             markers = response.json()
             for marker in markers:
                 self.add_marker(
-                    marker['lat'], 
-                    marker['lon'], 
+                    marker['lat'],
+                    marker['lon'],
                     text=marker['name'],
                     marker_color='red' if 'Feuerung' in marker['category'] else 'blue'
                 )
-    
+
     def add_marker(self, lat, lon, text, marker_color='red'):
         """Fügt Marker zur Karte hinzu"""
         marker = self.map_widget.set_marker(
-            lat, lon, 
+            lat, lon,
             text=text,
             marker_color_circle=marker_color,
             marker_color_outside=marker_color
         )
         marker.command = lambda: self.on_marker_click(text)
         return marker
-    
+
     def on_marker_click(self, name):
         """Marker wurde geklickt"""
         print(f"Marker clicked: {name}")
@@ -100,7 +100,7 @@ def load_markers_smart(self):
     # Aktuelle Map-Bounds ermitteln
     bounds = self.map_widget.get_bounds()
     # bounds = (north, south, east, west)
-    
+
     # API-Request mit Bounds-Filter
     url = f"{self.backend_url}/api/immi/markers/bimschg"
     params = {
@@ -108,7 +108,7 @@ def load_markers_smart(self):
         'limit': 1000
     }
     response = requests.get(url, params=params)
-    
+
     # Marker hinzufügen
     for marker in response.json():
         self.add_marker(marker['lat'], marker['lon'], marker['name'])
@@ -123,7 +123,7 @@ def cluster_markers(self, markers, zoom_level):
         # Grid-basiertes Clustering
         grid_size = 0.1  # ~10km
         clusters = {}
-        
+
         for marker in markers:
             grid_key = (
                 round(marker['lat'] / grid_size) * grid_size,
@@ -132,7 +132,7 @@ def cluster_markers(self, markers, zoom_level):
             if grid_key not in clusters:
                 clusters[grid_key] = []
             clusters[grid_key].append(marker)
-        
+
         # Cluster-Marker erstellen
         for (lat, lon), group in clusters.items():
             count = len(group)
@@ -184,27 +184,27 @@ import cartopy.feature as cfeature
 class StaticMapWidget(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
-        
+
         # Matplotlib Figure erstellen
         self.fig, self.ax = plt.subplots(
             subplot_kw={'projection': ccrs.PlateCarree()},
             figsize=(10, 8)
         )
-        
+
         # Karte zeichnen
         self.ax.set_extent([11.5, 15.0, 51.0, 53.5], crs=ccrs.PlateCarree())
         self.ax.add_feature(cfeature.COASTLINE)
         self.ax.add_feature(cfeature.BORDERS, linestyle=':')
         self.ax.add_feature(cfeature.LAND, color='lightgray')
-        
+
         # Canvas in Tkinter einbetten
         self.canvas = FigureCanvasTkAgg(self.fig, master=self)
         self.canvas.draw()
         self.canvas.get_tk_widget().pack(fill="both", expand=True)
-    
+
     def add_markers(self, lats, lons, colors):
         """Fügt Marker hinzu"""
-        self.ax.scatter(lons, lats, c=colors, s=50, alpha=0.6, 
+        self.ax.scatter(lons, lats, c=colors, s=50, alpha=0.6,
                        transform=ccrs.PlateCarree())
         self.canvas.draw()
 ```
@@ -235,20 +235,20 @@ from tkinterweb import HtmlFrame
 class FoliumMapWidget(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
-        
+
         # Folium-Karte erstellen
         self.map = folium.Map(
             location=[52.45, 13.37],
             zoom_start=8,
             tiles='OpenStreetMap'
         )
-        
+
         # Marker hinzufügen
         folium.Marker([52.5, 13.4], popup="Test").add_to(self.map)
-        
+
         # Als HTML speichern
         self.map.save("temp_map.html")
-        
+
         # In HtmlFrame laden
         self.html_frame = HtmlFrame(self, horizontal_scrollbar="auto")
         self.html_frame.load_file("temp_map.html")
@@ -277,27 +277,27 @@ class FoliumMapWidget(tk.Frame):
 class CustomCanvasMap(tk.Canvas):
     def __init__(self, parent, width=800, height=600):
         super().__init__(parent, width=width, height=height, bg='lightblue')
-        
+
         self.center_lat = 52.45
         self.center_lon = 13.37
         self.zoom = 8
-        
+
         # Background (vereinfachte Karte)
         self.create_rectangle(0, 0, width, height, fill='lightblue', outline='')
-        
+
         # Land (Brandenburg - grob)
         self.create_polygon(
             100, 100, 700, 100, 700, 500, 100, 500,
             fill='lightgreen', outline='black'
         )
-    
+
     def lat_lon_to_pixel(self, lat, lon):
         """Konvertiert Lat/Lon zu Canvas-Koordinaten"""
         # Mercator-Projektion (vereinfacht)
         x = (lon - self.center_lon) * 50 * (2 ** self.zoom) + 400
         y = 300 - (lat - self.center_lat) * 50 * (2 ** self.zoom)
         return x, y
-    
+
     def add_marker(self, lat, lon, color='red'):
         """Fügt Marker hinzu"""
         x, y = self.lat_lon_to_pixel(lat, lon)
@@ -380,16 +380,16 @@ import requests
 class IMMIMapWidget(tk.Frame):
     def __init__(self, parent, backend_url="http://localhost:5000"):
         super().__init__(parent)
-        
+
         # Map erstellen
         self.map = TkinterMapView(self, width=800, height=600)
         self.map.pack(fill="both", expand=True)
         self.map.set_position(52.45, 13.37)
         self.map.set_zoom(8)
-        
+
         # Marker laden
         self.load_markers()
-    
+
     def load_markers(self):
         # Von IMMI API laden
         pass

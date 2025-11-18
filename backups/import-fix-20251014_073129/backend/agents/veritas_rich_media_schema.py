@@ -11,18 +11,19 @@ Erweitert das JSON-Schema um Rich Media Support:
 - 📋 Tables (Structured Data)
 """
 
-from typing import Dict, List, Any, Optional, Literal
-from dataclasses import dataclass
 import json
-
+from dataclasses import dataclass
+from typing import Any, Dict, List, Literal, Optional
 
 # ============================================================================
 # RICH MEDIA TYPES
 # ============================================================================
 
+
 @dataclass
 class ImageMedia:
     """Image embedding"""
+
     url: str
     caption: Optional[str] = None
     alt_text: Optional[str] = None
@@ -34,6 +35,7 @@ class ImageMedia:
 @dataclass
 class GeoMapMedia:
     """Geographic map with markers"""
+
     center: tuple[float, float]  # (lat, lon)
     zoom: int = 12
     markers: List[Dict[str, Any]] = None  # [{"lat": 52.5, "lon": 13.4, "label": "Berlin"}]
@@ -44,6 +46,7 @@ class GeoMapMedia:
 @dataclass
 class ChartMedia:
     """Data visualization chart"""
+
     chart_type: Literal["bar", "line", "pie", "scatter", "heatmap"]
     data: Dict[str, Any]  # Chart.js or Plotly JSON format
     title: Optional[str] = None
@@ -53,6 +56,7 @@ class ChartMedia:
 @dataclass
 class VideoMedia:
     """Video embedding"""
+
     url: str
     platform: Literal["youtube", "vimeo", "local"]
     title: Optional[str] = None
@@ -63,6 +67,7 @@ class VideoMedia:
 @dataclass
 class DocumentMedia:
     """Document download/preview"""
+
     url: str
     filename: str
     file_type: Literal["pdf", "docx", "xlsx", "txt", "csv"]
@@ -73,6 +78,7 @@ class DocumentMedia:
 @dataclass
 class TableMedia:
     """Structured data table"""
+
     headers: List[str]
     rows: List[List[Any]]
     caption: Optional[str] = None
@@ -87,32 +93,14 @@ RICH_MEDIA_SCHEMA = {
     "type": "object",
     "required": ["direct_answer", "details", "citations", "sources"],
     "properties": {
-        "direct_answer": {
-            "type": "string",
-            "description": "Kurze, direkte Antwort (2-3 Sätze)"
-        },
-        "details": {
-            "type": "array",
-            "items": {"type": "string"},
-            "description": "Detail-Punkte mit Fakten"
-        },
+        "direct_answer": {"type": "string", "description": "Kurze, direkte Antwort (2-3 Sätze)"},
+        "details": {"type": "array", "items": {"type": "string"}, "description": "Detail-Punkte mit Fakten"},
         "citations": {
             "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "text": {"type": "string"},
-                    "source_id": {"type": "integer"}
-                }
-            },
-            "description": "Text-Fragment → Quellen-ID Zuordnung"
+            "items": {"type": "object", "properties": {"text": {"type": "string"}, "source_id": {"type": "integer"}}},
+            "description": "Text-Fragment → Quellen-ID Zuordnung",
         },
-        "sources": {
-            "type": "array",
-            "items": {"type": "string"},
-            "description": "Verwendete Quellen (nummeriert)"
-        },
-        
+        "sources": {"type": "array", "items": {"type": "string"}, "description": "Verwendete Quellen (nummeriert)"},
         # Rich Media Extensions
         "images": {
             "type": "array",
@@ -122,10 +110,10 @@ RICH_MEDIA_SCHEMA = {
                     "url": {"type": "string"},
                     "caption": {"type": "string"},
                     "alt_text": {"type": "string"},
-                    "source_id": {"type": "integer"}
-                }
+                    "source_id": {"type": "integer"},
+                },
             },
-            "description": "🖼️ Eingebettete Bilder"
+            "description": "🖼️ Eingebettete Bilder",
         },
         "maps": {
             "type": "array",
@@ -135,10 +123,10 @@ RICH_MEDIA_SCHEMA = {
                     "center": {"type": "array", "items": {"type": "number"}},
                     "zoom": {"type": "integer"},
                     "markers": {"type": "array"},
-                    "geojson": {"type": "object"}
-                }
+                    "geojson": {"type": "object"},
+                },
             },
-            "description": "🗺️ Geografische Karten"
+            "description": "🗺️ Geografische Karten",
         },
         "charts": {
             "type": "array",
@@ -147,10 +135,10 @@ RICH_MEDIA_SCHEMA = {
                 "properties": {
                     "chart_type": {"type": "string", "enum": ["bar", "line", "pie", "scatter"]},
                     "data": {"type": "object"},
-                    "title": {"type": "string"}
-                }
+                    "title": {"type": "string"},
+                },
             },
-            "description": "📊 Datenvisualisierungen"
+            "description": "📊 Datenvisualisierungen",
         },
         "videos": {
             "type": "array",
@@ -159,22 +147,18 @@ RICH_MEDIA_SCHEMA = {
                 "properties": {
                     "url": {"type": "string"},
                     "platform": {"type": "string", "enum": ["youtube", "vimeo", "local"]},
-                    "title": {"type": "string"}
-                }
+                    "title": {"type": "string"},
+                },
             },
-            "description": "🎥 Video-Einbettungen"
+            "description": "🎥 Video-Einbettungen",
         },
         "documents": {
             "type": "array",
             "items": {
                 "type": "object",
-                "properties": {
-                    "url": {"type": "string"},
-                    "filename": {"type": "string"},
-                    "file_type": {"type": "string"}
-                }
+                "properties": {"url": {"type": "string"}, "filename": {"type": "string"}, "file_type": {"type": "string"}},
             },
-            "description": "📄 Dokumente zum Download"
+            "description": "📄 Dokumente zum Download",
         },
         "tables": {
             "type": "array",
@@ -183,28 +167,21 @@ RICH_MEDIA_SCHEMA = {
                 "properties": {
                     "headers": {"type": "array", "items": {"type": "string"}},
                     "rows": {"type": "array"},
-                    "caption": {"type": "string"}
-                }
+                    "caption": {"type": "string"},
+                },
             },
-            "description": "📋 Strukturierte Tabellen"
+            "description": "📋 Strukturierte Tabellen",
         },
-        
-        "next_steps": {
-            "type": "string",
-            "description": "Was sollte User als nächstes tun?"
-        },
-        "follow_ups": {
-            "type": "array",
-            "items": {"type": "string"},
-            "description": "3-5 Follow-up Fragen"
-        }
-    }
+        "next_steps": {"type": "string", "description": "Was sollte User als nächstes tun?"},
+        "follow_ups": {"type": "array", "items": {"type": "string"}, "description": "3-5 Follow-up Fragen"},
+    },
 }
 
 
 # ============================================================================
 # RICH MEDIA PROMPT TEMPLATES
 # ============================================================================
+
 
 def get_rich_media_prompt() -> Dict[str, str]:
     """
@@ -224,7 +201,7 @@ Deine Antwort MUSS diesem JSON-Schema folgen:
     {"text": "Zu zitierender Fakt", "source_id": 1}
   ],
   "sources": ["Quelle 1", "Quelle 2"],
-  
+
   // OPTIONAL: Rich Media
   "images": [
     {
@@ -268,7 +245,7 @@ Deine Antwort MUSS diesem JSON-Schema folgen:
   ],
   "videos": [...],  // Optional
   "documents": [...],  // Optional
-  
+
   "next_steps": "Was sollte User als nächstes tun?",
   "follow_ups": ["Frage 1?", "Frage 2?", "Frage 3?"]
 }
@@ -286,7 +263,6 @@ WANN Rich Media nutzen:
 🎥 Videos: Bei Tutorials, Erklärvideos
 📄 Documents: Bei Formularen, Merkblättern, PDFs
 """,
-
         "user_template": """**User fragte:** {query}
 
 **Verfügbare Quellen:**
@@ -452,7 +428,7 @@ Frage: "Welche Unterlagen brauche ich für einen Bauantrag?"
 }}
 
 **Jetzt beantworte die User-Frage im GLEICHEN JSON-FORMAT (mit Rich Media wenn sinnvoll!):**
-"""
+""",
     }
 
 
@@ -460,87 +436,90 @@ Frage: "Welche Unterlagen brauche ich für einen Bauantrag?"
 # FRONTEND RENDERER (Conceptual)
 # ============================================================================
 
+
 def render_rich_media_response(json_response: Dict[str, Any]) -> str:
     """
     Conceptual: Wie Frontend Rich Media rendern würde
-    
+
     Returns:
         HTML/Markdown string with embedded rich media
     """
     output = []
-    
+
     # Direct Answer
     output.append(f"**Direkte Antwort:**\n{json_response['direct_answer']}\n")
-    
+
     # Details
-    if json_response.get('details'):
+    if json_response.get("details"):
         output.append("**Details:**\n")
-        for detail in json_response['details']:
+        for detail in json_response["details"]:
             output.append(f"• {detail}")
         output.append("")
-    
+
     # Images
-    if json_response.get('images'):
+    if json_response.get("images"):
         output.append("**📸 Bilder:**\n")
-        for img in json_response['images']:
+        for img in json_response["images"]:
             output.append(f"![{img.get('alt_text', 'Image')}]({img['url']})")
-            if img.get('caption'):
+            if img.get("caption"):
                 output.append(f"*{img['caption']}*")
         output.append("")
-    
+
     # Maps
-    if json_response.get('maps'):
+    if json_response.get("maps"):
         output.append("**🗺️ Karte:**\n")
-        for map_data in json_response['maps']:
+        for map_data in json_response["maps"]:
             output.append(f"<div class='map' data-center='{map_data['center']}' data-zoom='{map_data['zoom']}'></div>")
         output.append("")
-    
+
     # Charts
-    if json_response.get('charts'):
+    if json_response.get("charts"):
         output.append("**📊 Diagramme:**\n")
-        for chart in json_response['charts']:
-            output.append(f"<canvas id='chart-{chart.get('title', 'data')}' data-config='{json.dumps(chart['data'])}'></canvas>")
+        for chart in json_response["charts"]:
+            output.append(
+                f"<canvas id='chart-{chart.get('title', 'data')}' data-config='{json.dumps(chart['data'])}'></canvas>"
+            )
         output.append("")
-    
+
     # Tables
-    if json_response.get('tables'):
-        for table in json_response['tables']:
-            if table.get('caption'):
+    if json_response.get("tables"):
+        for table in json_response["tables"]:
+            if table.get("caption"):
                 output.append(f"**{table['caption']}**\n")
-            
+
             # Markdown table
-            output.append("| " + " | ".join(table['headers']) + " |")
-            output.append("| " + " | ".join(["---"] * len(table['headers'])) + " |")
-            for row in table['rows']:
+            output.append("| " + " | ".join(table["headers"]) + " |")
+            output.append("| " + " | ".join(["---"] * len(table["headers"])) + " |")
+            for row in table["rows"]:
                 output.append("| " + " | ".join(str(cell) for cell in row) + " |")
             output.append("")
-    
+
     # Sources
-    if json_response.get('sources'):
+    if json_response.get("sources"):
         output.append("**Quellen:**")
-        for i, source in enumerate(json_response['sources'], 1):
+        for i, source in enumerate(json_response["sources"], 1):
             output.append(f"[{i}] {source}")
         output.append("")
-    
+
     # Follow-ups
-    if json_response.get('follow_ups'):
+    if json_response.get("follow_ups"):
         output.append("**💡 Vorschläge:**")
-        for q in json_response['follow_ups']:
+        for q in json_response["follow_ups"]:
             output.append(f"• {q}")
-    
+
     return "\n".join(output)
 
 
 if __name__ == "__main__":
-    print("="*80)
+    print("=" * 80)
     print("🎨 RICH MEDIA JSON SCHEMA")
-    print("="*80)
+    print("=" * 80)
     print("\nSchema Preview:")
     print(json.dumps(RICH_MEDIA_SCHEMA, indent=2))
-    
-    print("\n" + "="*80)
+
+    print("\n" + "=" * 80)
     print("📋 Supported Media Types:")
-    print("="*80)
+    print("=" * 80)
     print("🖼️  Images - URLs, Captions, Alt-Text")
     print("🗺️  Maps - GeoJSON, Markers, Interactive")
     print("📊 Charts - Bar, Line, Pie, Scatter")

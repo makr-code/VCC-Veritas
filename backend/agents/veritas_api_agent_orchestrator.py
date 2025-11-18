@@ -1036,7 +1036,7 @@ class AgentOrchestrator:
                 follow_up_suggestions.extend(result["follow_up_suggestions"])
 
         # RAG Context sammeln
-        rag_context = {}
+        rag_context: Dict[str, Any] = {}
         for agent_type, result in agent_results.items():
             if "rag_context" in result:
                 rag_context[agent_type] = result["rag_context"]

@@ -70,7 +70,7 @@ kubectl create namespace "${NAMESPACE}" --dry-run=client -o yaml | kubectl apply
 echo -e "${BLUE}Step 2: Checking for existing release...${NC}"
 if helm status "${RELEASE_NAME}" -n "${NAMESPACE}" &> /dev/null; then
     echo -e "${YELLOW}Release exists. Performing upgrade...${NC}"
-    
+
     helm upgrade "${RELEASE_NAME}" "${CHART_PATH}" \
         --namespace "${NAMESPACE}" \
         --values "${VALUES_FILE}" \
@@ -78,11 +78,11 @@ if helm status "${RELEASE_NAME}" -n "${NAMESPACE}" &> /dev/null; then
         --timeout 10m \
         --atomic \
         --cleanup-on-fail
-    
+
     echo -e "${GREEN}✓ Upgrade completed${NC}"
 else
     echo -e "${YELLOW}No existing release found. Performing fresh install...${NC}"
-    
+
     helm install "${RELEASE_NAME}" "${CHART_PATH}" \
         --namespace "${NAMESPACE}" \
         --values "${VALUES_FILE}" \
@@ -90,7 +90,7 @@ else
         --timeout 10m \
         --atomic \
         --cleanup-on-fail
-    
+
     echo -e "${GREEN}✓ Installation completed${NC}"
 fi
 

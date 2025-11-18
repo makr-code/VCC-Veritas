@@ -1,7 +1,7 @@
 # VERITAS Chat-Design v2.0 - Dokumentation
 
-**Status:** ✅ Vollständig implementiert  
-**Datum:** 9. Oktober 2025  
+**Status:** ✅ Vollständig implementiert
+**Datum:** 9. Oktober 2025
 **Version:** 2.0.0
 
 ---
@@ -60,7 +60,7 @@ Hier ist die Analyse:
 - **Während Verarbeitung:** "⏳ Verarbeite Anfrage..."
 - **Animation:** Pulsierende Punkte (., .., ...)
 - **Ersetzung:** Mark-basiert (robust gegen Textänderungen)
-- **Implementierung:** 
+- **Implementierung:**
   - `insert_processing_placeholder(message_id)`
   - `replace_placeholder_with_response(message_id, content, metadata)`
 
@@ -197,9 +197,9 @@ canvas = tk.Canvas(text_widget, ...)
 canvas.create_rounded_rectangle(...)
 
 # ✅ RICHTIG (Tag-basiert):
-text_widget.tag_configure("user_bubble", 
-    background='#E3F2FD', 
-    relief='solid', 
+text_widget.tag_configure("user_bubble",
+    background='#E3F2FD',
+    relief='solid',
     borderwidth=1)
 ```
 
@@ -237,7 +237,7 @@ def _render_user_message(
 ) -> None:
     """
     Rendert User-Message als rechtsbündige Sprechblase.
-    
+
     Args:
         content: Nachrichtentext
         timestamp_short: "Heute 14:23" (relativ)
@@ -261,7 +261,7 @@ def _render_assistant_message_structured(
 ) -> None:
     """
     Rendert strukturierte Assistant-Message.
-    
+
     Args:
         content: Antwort-Content (Markdown)
         timestamp_short: "Heute 14:23"
@@ -285,10 +285,10 @@ def insert_processing_placeholder(
 ) -> None:
     """
     Fügt animierten Platzhalter ein.
-    
+
     Args:
         message_id: Eindeutige ID für späteren Ersatz
-    
+
     Animation:
         - Pulsierende Punkte: . → .. → ...
         - Intervall: 500ms
@@ -307,12 +307,12 @@ def replace_placeholder_with_response(
 ) -> None:
     """
     Ersetzt Platzhalter durch echte Antwort.
-    
+
     Args:
         message_id: ID des Platzhalters
         content: Antwort-Content
         metadata: Metriken (siehe oben)
-    
+
     Mechanismus:
         - Stoppt Animation (Stopp-Flag)
         - Findet Marks (placeholder_start/end_{message_id})
@@ -368,6 +368,6 @@ Bei Fragen oder Problemen:
 
 ---
 
-**Entwickler:** GitHub Copilot + User  
-**Lizenz:** Projekt-Intern  
+**Entwickler:** GitHub Copilot + User
+**Lizenz:** Projekt-Intern
 **Version:** 2.0.0 (9. Oktober 2025)

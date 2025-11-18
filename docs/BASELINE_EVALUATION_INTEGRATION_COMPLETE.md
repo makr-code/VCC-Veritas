@@ -1,8 +1,8 @@
 # Baseline-Evaluation Integration Complete
 
-**Status:** ✅ **READY FOR TESTING**  
-**Datum:** 06.10.2025  
-**Komponenten:** run_baseline_evaluation.py + RAG Evaluator Integration  
+**Status:** ✅ **READY FOR TESTING**
+**Datum:** 06.10.2025
+**Komponenten:** run_baseline_evaluation.py + RAG Evaluator Integration
 
 ---
 
@@ -49,8 +49,8 @@ python backend/evaluation/run_baseline_evaluation.py --mode baseline
 python backend/evaluation/run_baseline_evaluation.py --mode comparative
 ```
 
-**Status:** Leitet zur Standard-Baseline um.  
-**Grund:** Re-Ranking-Toggle muss in RAGContextService noch verifiziert werden.  
+**Status:** Leitet zur Standard-Baseline um.
+**Grund:** Re-Ranking-Toggle muss in RAGContextService noch verifiziert werden.
 **Roadmap:** Phase 3+
 
 ---
@@ -72,16 +72,16 @@ async def _run_pipeline(self, query: str) -> Dict[str, Any]:
     if self.pipeline:
         # Echte Pipeline-Ausführung
         from backend.agents.veritas_intelligent_pipeline import IntelligentPipelineRequest
-        
+
         request = IntelligentPipelineRequest(
             query_id=f"eval_{hash(query)}",
             query_text=query,
             user_id="evaluator",
             session_id="baseline_evaluation"
         )
-        
+
         response = await self.pipeline.process_intelligent_query(request)
-        
+
         # Konvertiere Response zu Standard-Format
         return {
             "answer": response.response_text,
@@ -98,7 +98,7 @@ async def _run_pipeline(self, query: str) -> Dict[str, Any]:
                 "agents_used": list(response.agent_results.keys())
             }
         }
-    
+
     # Fallback: Mock-Response
     return {...}
 ```
@@ -108,11 +108,11 @@ async def _run_pipeline(self, query: str) -> Dict[str, Any]:
 def _extract_entities_from_response(self, response) -> List[str]:
     """
     Extrahiert Entities aus Pipeline-Response.
-    
+
     Quellen:
     - response.rag_context.get("entities", [])
     - agent_result.get("entities", []) für alle Agents
-    
+
     Returns: Deduplizierte Liste
     """
 ```
@@ -145,8 +145,8 @@ def _extract_entities_from_response(self, response) -> List[str]:
 - `pipeline.executor.shutdown(wait=True)` in `finally`-Block
 
 #### `async def run_comparative_evaluation()`
-**Status:** Temporär deaktiviert  
-**Redirect:** Ruft `run_baseline_evaluation()` auf  
+**Status:** Temporär deaktiviert
+**Redirect:** Ruft `run_baseline_evaluation()` auf
 **Warnung:** "Re-Ranking toggle needs to be implemented in RAGContextService"
 
 ---
@@ -315,31 +315,31 @@ evaluator.test_cases = evaluator.test_cases[:1]  # Nur erster Test-Case
 ## 🎯 Success Criteria
 
 ### Minimum (Phase 1):
-✅ Script läuft durch ohne Crash  
-✅ Report wird generiert  
-✅ Console-Summary wird ausgegeben  
+✅ Script läuft durch ohne Crash
+✅ Report wird generiert
+✅ Console-Summary wird ausgegeben
 
 ### Good (Phase 2):
-✅ Pass Rate > 0% (mindestens 1 Test-Case passed)  
-✅ Keine RuntimeErrors  
-✅ Alle Metriken berechnet (Precision@K, Recall@K, MRR)  
+✅ Pass Rate > 0% (mindestens 1 Test-Case passed)
+✅ Keine RuntimeErrors
+✅ Alle Metriken berechnet (Precision@K, Recall@K, MRR)
 
 ### Excellent (Phase 3):
-✅ Pass Rate > 60%  
-✅ Precision@5 > 60%  
-✅ Hallucination Rate < 10%  
-✅ MRR > 0.65  
+✅ Pass Rate > 60%
+✅ Precision@5 > 60%
+✅ Hallucination Rate < 10%
+✅ MRR > 0.65
 
 ---
 
 ## 🚦 Status
 
-**Current State:**  
+**Current State:**
 - ✅ Code implementiert
 - ✅ Script getestet (Help-Output funktioniert)
 - ⏳ **READY FOR FIRST RUN**
 
-**Next Action:**  
+**Next Action:**
 ```powershell
 python backend/evaluation/run_baseline_evaluation.py --mode baseline
 ```
@@ -348,6 +348,6 @@ python backend/evaluation/run_baseline_evaluation.py --mode baseline
 
 ---
 
-**Author:** VERITAS System  
-**Version:** 1.0  
+**Author:** VERITAS System
+**Version:** 1.0
 **Last Updated:** 06.10.2025

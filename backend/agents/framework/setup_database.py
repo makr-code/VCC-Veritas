@@ -258,7 +258,16 @@ class DatabaseSetup:
             ]
             
             for table in tables:
+<<<<<<< Updated upstream
                 cursor.execute(f"SELECT COUNT(*) FROM {table}")
+=======
+                # 'table' values come from internal introspection of the DB schema
+                # and are not user-controlled. Use psycopg2.sql to safely format
+                # identifiers rather than simple f-strings. This avoids dynamic
+                # SQL injection patterns that static scanners flag as B608.
+                query = sql.SQL("SELECT COUNT(*) FROM {}")
+                cursor.execute(query.format(sql.Identifier(table)))
+>>>>>>> Stashed changes
                 count = cursor.fetchone()[0]
                 stats[table] = count
             

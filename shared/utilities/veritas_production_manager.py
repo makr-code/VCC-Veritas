@@ -6,6 +6,16 @@ Produktiver Manager für alle VERITAS Scraper mit einheitlicher Orchestrierung
 
 import json
 import logging
+<<<<<<< Updated upstream
+=======
+import threading
+import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+>>>>>>> Stashed changes
 import schedule
 import time
 from datetime import datetime, timedelta
@@ -44,22 +54,36 @@ class VERITASProductionManager:
         self.scraper_manager = ScraperManager(self.config.get('scraper_config', {}))
         
         # Scraper Registry
-        self.scrapers = {}
+        self.scrapers: Dict[str, Any] = {}
         self._initialize_scrapers()
         
         # Production Status
+<<<<<<< Updated upstream
         self.production_status = {
             'last_run': None,
             'next_scheduled': None,
             'total_documents_today': 0,
             'errors_today': 0,
             'active_jobs': []
+=======
+        self.production_status: Dict[str, Any] = {
+            "last_run": None,
+            "next_scheduled": None,
+            "total_documents_today": 0,
+            "errors_today": 0,
+            "active_jobs": [],
+>>>>>>> Stashed changes
         }
         
         # Scheduling
         self.scheduler_running = False
+<<<<<<< Updated upstream
         self.scheduler_thread = None
         
+=======
+        self.scheduler_thread: Optional[threading.Thread] = None
+
+>>>>>>> Stashed changes
         self.logger.info("VERITAS Production Manager initialized")
     
     def _load_config(self, config_path: str) -> Dict:
@@ -479,6 +503,7 @@ class VERITASProductionManager:
         """Verarbeitet Ergebnisse des täglichen Updates"""
         total_documents = 0
         total_errors = 0
+<<<<<<< Updated upstream
         
         summary = {
             'timestamp': datetime.now().isoformat(),
@@ -487,6 +512,16 @@ class VERITASProductionManager:
             'total_errors': 0
         }
         
+=======
+
+        summary: Dict[str, Any] = {
+            "timestamp": datetime.now().isoformat(),
+            "sources": {},
+            "total_documents": 0,
+            "total_errors": 0,
+        }
+
+>>>>>>> Stashed changes
         for result in results:
             source_name = result.scraper_name
             doc_count = len(result.documents) if result.success else 0
@@ -623,15 +658,21 @@ class VERITASProductionManager:
                     priority=1
                 )
                 jobs.append(job)
+<<<<<<< Updated upstream
         
         results = self.scraper_manager.execute_jobs_parallel(jobs)
+=======
+
+        results: List[ScrapingResult] = self.scraper_manager.execute_jobs_parallel(jobs)
+>>>>>>> Stashed changes
         self._process_daily_results(results)
         
         return results
     
     def get_scraper_statistics(self) -> Dict:
         """Gibt Scraper-Statistiken zurück"""
-        return self.scraper_manager.get_statistics()
+        stats: Dict[str, Any] = self.scraper_manager.get_statistics()
+        return stats
 
 # CLI Interface für Production Management
 def main():

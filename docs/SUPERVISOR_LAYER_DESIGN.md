@@ -1,17 +1,17 @@
 # SUPERVISOR LAYER DESIGN - Intelligent Agent Selection in Scientific Pipeline
 
-**Author:** VERITAS v7.0 Development  
-**Date:** 12. Oktober 2025, 03:30 Uhr  
+**Author:** VERITAS v7.0 Development
+**Date:** 12. Oktober 2025, 03:30 Uhr
 **Status:** 🎯 **DESIGN PROPOSAL - Ready for Implementation**
 
 ---
 
 ## 📋 Executive Summary
 
-**Problem:**  
+**Problem:**
 UnifiedOrchestratorV7 hat einen `agent_orchestrator` Parameter, nutzt ihn aber nicht. Es gibt bereits einen **SupervisorAgent** (`veritas_supervisor_agent.py`, 1,154 LOC) der **LLM-basiert Agents auswählt**, aber er ist nicht in die Scientific Pipeline integriert.
 
-**Lösung:**  
+**Lösung:**
 **Intelligente Supervisor-Schicht zwischen Scientific Phases**
 
 ```
@@ -31,7 +31,7 @@ Flow:
    - Final answer mit external data
 ```
 
-**Key Innovation:**  
+**Key Innovation:**
 **JSON-Driven Supervisor Integration** - Kein Code-Refactoring der Scientific Phases nötig!
 
 ---
@@ -48,7 +48,7 @@ Flow:
    - LLM-basierte Query-Zerlegung in atomare Subqueries
    - Dependency-Graph-Validierung (DAG)
    - Output: `List[SubQuery]`
-   
+
    ```python
    subqueries = await query_decomposer.decompose_query(
        query_text="Brauche ich Baugenehmigung für Carport mit PV in München?",
@@ -68,7 +68,7 @@ Flow:
    - RAG-Context-Boosting
    - Confidence-Scoring
    - Output: `AgentSelection` (selected_agents + fallback_agents)
-   
+
    ```python
    agent_selection = await agent_selector.select_agents(
        subquery=subqueries[0],
@@ -91,7 +91,7 @@ Flow:
    - Konflikt-Detektion zwischen Agent-Ergebnissen
    - Deduplizierung redundanter Informationen
    - Output: `SynthesizedResult`
-   
+
    ```python
    synthesized = await result_synthesizer.synthesize_results(
        query_text="Brauche ich Baugenehmigung...",
@@ -121,16 +121,16 @@ Flow:
 async def process_query(user_query: str) -> OrchestratorResult:
     # 1. RAG Search (UDS3)
     rag_results = await self._collect_rag_results(user_query)
-    
+
     # 2. Scientific Phases (6 phases)
     phase_results = await self._execute_scientific_phases(
         query=user_query,
         rag_results=rag_results
     )
-    
+
     # 3. Final Answer
     final_answer = self._extract_final_answer(phase_results)
-    
+
     return OrchestratorResult(...)
 ```
 
@@ -148,17 +148,17 @@ async def process_query(user_query: str) -> OrchestratorResult:
 async def execute_phase(phase_config: Dict, context: PhaseExecutionContext):
     # 1. Load Jinja2 prompt from JSON
     prompt = self._construct_prompt(phase_config, context)
-    
+
     # 2. Ollama LLM Call
     llm_response = await self.ollama_client.generate_response(...)
-    
+
     # 3. JSON Schema Validation
     validated_output = self._validate_output(llm_response, phase_config["output_schema"])
-    
+
     return PhaseResult(...)
 ```
 
-**Key Feature:**  
+**Key Feature:**
 `PhaseExecutionContext` (Lines 20-47) - **Kann erweitert werden!**
 
 ```python
@@ -168,7 +168,7 @@ class PhaseExecutionContext:
     rag_results: Dict[str, Any]
     previous_phases: Dict[str, PhaseResult]
     metadata: Dict[str, Any] = field(default_factory=dict)
-    
+
     # 🆕 NEW: Supervisor-Ergebnisse
     # supervisor_subqueries: List[SubQuery] = field(default_factory=list)
     # supervisor_agent_plan: AgentExecutionPlan = None
@@ -181,7 +181,7 @@ class PhaseExecutionContext:
 
 ### Option 1: JSON-Driven Supervisor Phases ⭐ **EMPFOHLEN**
 
-**Idee:**  
+**Idee:**
 Supervisor-Logik als **zusätzliche Pseudo-Phases** in JSON-Config
 
 **Vorteile:**
@@ -199,34 +199,34 @@ Supervisor-Logik als **zusätzliche Pseudo-Phases** in JSON-Config
   "method_id": "default_scientific_method",
   "version": "2.0.0",
   "supervisor_enabled": true,  // 🆕 Feature Flag
-  
+
   "phases": [
     // ... existing Phase 1: Hypothesis ...
-    
+
     {
       "phase_id": "supervisor_agent_selection",  // 🆕 NEW
       "phase_number": 1.5,
       "name": "Intelligente Agent-Auswahl",
       "description": "LLM-basierte Auswahl von Spezial-Agents basierend auf missing_information",
-      
+
       "dependencies": {
         "required_steps": ["hypothesis"],
         "wait_for_completion": true
       },
-      
+
       "execution": {
         "executor": "supervisor",  // 🆕 Custom Executor
         "method": "select_agents",
         "timeout_seconds": 10
       },
-      
+
       "input_mapping": {
         "query": "user_query",
         "missing_information": "phases.hypothesis.output.missing_information",
         "rag_results": "rag_results",
         "user_context": "metadata.user_context"
       },
-      
+
       "output_schema": {
         "type": "object",
         "required": ["subqueries", "agent_plan", "selected_agents"],
@@ -266,31 +266,31 @@ Supervisor-Logik als **zusätzliche Pseudo-Phases** in JSON-Config
         }
       }
     },
-    
+
     {
       "phase_id": "agent_execution",  // 🆕 NEW
       "phase_number": 1.6,
       "name": "Parallel Agent-Execution",
       "description": "Führt ausgewählte Agents parallel aus",
-      
+
       "dependencies": {
         "required_steps": ["supervisor_agent_selection"],
         "wait_for_completion": true
       },
-      
+
       "execution": {
         "executor": "agent_coordinator",  // 🆕 Custom Executor
         "method": "execute_agents",
         "max_parallel": 5,
         "timeout_seconds": 30
       },
-      
+
       "input_mapping": {
         "agent_plan": "phases.supervisor_agent_selection.output.agent_plan",
         "rag_results": "rag_results",
         "user_query": "user_query"
       },
-      
+
       "output_schema": {
         "type": "object",
         "required": ["agent_results", "execution_metadata"],
@@ -319,33 +319,33 @@ Supervisor-Logik als **zusätzliche Pseudo-Phases** in JSON-Config
         }
       }
     },
-    
+
     // ... existing Phase 2-6 ...
-    
+
     {
       "phase_id": "agent_result_synthesis",  // 🆕 NEW
       "phase_number": 6.5,
       "name": "Agent Result Synthesis",
       "description": "Merge scientific process + agent results zu finaler Antwort",
-      
+
       "dependencies": {
         "required_steps": ["metacognition", "agent_execution"],
         "wait_for_completion": true
       },
-      
+
       "execution": {
         "executor": "supervisor",
         "method": "synthesize_results",
         "timeout_seconds": 15
       },
-      
+
       "input_mapping": {
         "query": "user_query",
         "scientific_conclusion": "phases.conclusion.output",
         "agent_results": "phases.agent_execution.output.agent_results",
         "rag_results": "rag_results"
       },
-      
+
       "output_schema": {
         "type": "object",
         "required": ["final_answer", "confidence_score", "sources"],
@@ -372,44 +372,44 @@ Supervisor-Logik als **zusätzliche Pseudo-Phases** in JSON-Config
 class UnifiedOrchestratorV7:
     def __init__(self, ...):
         # ... existing code ...
-        
+
         # 🆕 Initialize SupervisorAgent
         if self.agent_orchestrator or self._is_supervisor_enabled():
             from backend.agents.veritas_supervisor_agent import get_supervisor_agent
             self.supervisor_agent = await get_supervisor_agent(self.ollama_client)
         else:
             self.supervisor_agent = None
-    
+
     def _is_supervisor_enabled(self) -> bool:
         """Check if supervisor is enabled in method config"""
         method_config = self.phase_executor.get_method_config()
         return method_config.get("supervisor_enabled", False)
-    
+
     async def _execute_scientific_phases(self, ...):
         """Execute all phases INCLUDING supervisor phases"""
-        
+
         for phase_config in phases:
             phase_id = phase_config["phase_id"]
-            
+
             # Check executor type
             executor = phase_config.get("execution", {}).get("executor", "llm")
-            
+
             if executor == "supervisor":
                 # 🆕 Supervisor-Phase
                 result = await self._execute_supervisor_phase(phase_config, context)
-            
+
             elif executor == "agent_coordinator":
                 # 🆕 Agent-Execution-Phase
                 result = await self._execute_agent_coordination_phase(phase_config, context)
-            
+
             else:
                 # Standard LLM-Phase
                 result = await self.phase_executor.execute_phase(phase_config, context)
-            
+
             phase_results[phase_id] = result
-        
+
         return phase_results
-    
+
     async def _execute_supervisor_phase(
         self,
         phase_config: Dict[str, Any],
@@ -417,17 +417,17 @@ class UnifiedOrchestratorV7:
     ) -> PhaseResult:
         """
         Execute Supervisor-Phase
-        
+
         Possible methods:
         - select_agents: Query Decomposition + Agent Selection
         - synthesize_results: Final Answer Synthesis
         """
         method = phase_config["execution"]["method"]
         input_mapping = phase_config.get("input_mapping", {})
-        
+
         # Map inputs from context
         inputs = self._map_inputs(input_mapping, context)
-        
+
         if method == "select_agents":
             # Phase 1.5: Agent Selection
             subqueries = await self.supervisor_agent.query_decomposer.decompose_query(
@@ -435,12 +435,12 @@ class UnifiedOrchestratorV7:
                 user_context=inputs.get("user_context", {}),
                 complexity_hint=self._infer_complexity(inputs["missing_information"])
             )
-            
+
             agent_plan = await self.supervisor_agent.create_agent_plan(
                 subqueries=subqueries,
                 rag_context=inputs["rag_results"]
             )
-            
+
             output = {
                 "subqueries": [sq.to_dict() for sq in subqueries],
                 "agent_plan": agent_plan.to_dict(),
@@ -453,7 +453,7 @@ class UnifiedOrchestratorV7:
                     for _, a in agent_plan.parallel_agents + agent_plan.sequential_agents
                 ]
             }
-            
+
         elif method == "synthesize_results":
             # Phase 6.5: Final Synthesis
             synthesized = await self.supervisor_agent.result_synthesizer.synthesize_results(
@@ -461,15 +461,15 @@ class UnifiedOrchestratorV7:
                 agent_results=self._convert_to_agent_results(inputs["agent_results"]),
                 rag_context=inputs["rag_results"]
             )
-            
+
             output = synthesized.to_dict()
-        
+
         else:
             raise ValueError(f"Unknown supervisor method: {method}")
-        
+
         # Validate output against schema
         validated_output = self._validate_output(output, phase_config["output_schema"])
-        
+
         return PhaseResult(
             phase_id=phase_config["phase_id"],
             status="completed",
@@ -477,7 +477,7 @@ class UnifiedOrchestratorV7:
             execution_time_ms=...,
             metadata={"executor": "supervisor", "method": method}
         )
-    
+
     async def _execute_agent_coordination_phase(
         self,
         phase_config: Dict[str, Any],
@@ -485,27 +485,27 @@ class UnifiedOrchestratorV7:
     ) -> PhaseResult:
         """
         Execute Agent-Coordination-Phase (Phase 1.6)
-        
+
         Uses existing AgentCoordinator to execute agents in parallel
         """
         input_mapping = phase_config.get("input_mapping", {})
         inputs = self._map_inputs(input_mapping, context)
-        
+
         agent_plan = inputs["agent_plan"]
-        
+
         # Execute agents via AgentCoordinator
         if self.agent_orchestrator:
             # Use existing AgentCoordinator
             from backend.agents.veritas_api_agent_core_components import create_agent_coordinator
-            
+
             coordinator = create_agent_coordinator(
                 orchestrator=self.agent_orchestrator
             )
-            
+
             agent_results = {}
             successful = 0
             failed = 0
-            
+
             # Execute parallel agents
             for subquery_id, assignment in agent_plan["parallel_agents"]:
                 try:
@@ -522,7 +522,7 @@ class UnifiedOrchestratorV7:
                 except Exception as e:
                     logger.error(f"Agent {assignment['agent_type']} failed: {e}")
                     failed += 1
-            
+
             output = {
                 "agent_results": agent_results,
                 "execution_metadata": {
@@ -541,9 +541,9 @@ class UnifiedOrchestratorV7:
                     "failed_agents": 0
                 }
             }
-        
+
         validated_output = self._validate_output(output, phase_config["output_schema"])
-        
+
         return PhaseResult(
             phase_id=phase_config["phase_id"],
             status="completed",
@@ -551,7 +551,7 @@ class UnifiedOrchestratorV7:
             execution_time_ms=...,
             metadata={"executor": "agent_coordinator"}
         )
-    
+
     def _map_inputs(
         self,
         input_mapping: Dict[str, str],
@@ -559,20 +559,20 @@ class UnifiedOrchestratorV7:
     ) -> Dict[str, Any]:
         """
         Map input_mapping to actual values from context
-        
+
         Example:
             input_mapping = {
                 "query": "user_query",
                 "missing_information": "phases.hypothesis.output.missing_information"
             }
-            
+
             → {
                 "query": "Brauche ich Baugenehmigung...",
                 "missing_information": ["solar radiation", "cost estimate"]
             }
         """
         inputs = {}
-        
+
         for key, path in input_mapping.items():
             if path == "user_query":
                 inputs[key] = context.user_query
@@ -591,13 +591,13 @@ class UnifiedOrchestratorV7:
             elif path.startswith("metadata."):
                 key_name = path.split(".", 1)[1]
                 inputs[key] = context.metadata.get(key_name)
-        
+
         return inputs
-    
+
     def _infer_complexity(self, missing_information: List[str]) -> str:
         """
         Infer query complexity from missing_information
-        
+
         Rules:
         - 0-1 items: "simple"
         - 2-3 items: "standard"
@@ -790,10 +790,10 @@ Current Output (v7.0 without agents):
 "Nach § 50 LBO BW ist ein Carport bis 30m² verfahrensfrei."
 
 With Supervisor Integration:
-"Nach § 50 LBO BW ist ein Carport bis 30m² verfahrensfrei. 
-Für München (Solarstrahlung: 1,200 kWh/m²/a) lohnt sich eine 
-PV-Anlage mit Kosten von 5,000-15,000 EUR und ROI von 8-12 Jahren 
-(800 EUR/Jahr Ersparnis). Beachten Sie Grenzabstand (3m) und ggf. 
+"Nach § 50 LBO BW ist ein Carport bis 30m² verfahrensfrei.
+Für München (Solarstrahlung: 1,200 kWh/m²/a) lohnt sich eine
+PV-Anlage mit Kosten von 5,000-15,000 EUR und ROI von 8-12 Jahren
+(800 EUR/Jahr Ersparnis). Beachten Sie Grenzabstand (3m) und ggf.
 Denkmalschutz."
 
 Sources:

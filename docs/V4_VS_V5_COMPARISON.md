@@ -209,20 +209,20 @@ Frontend Rendering
 Phase 1: Foundation (2-3 days)
   - NDJSON Parser
   - WidgetRenderer
-  
+
 Phase 2: Templates (2-3 days)
   - 5 Templates (800 LOC each)
   - Keyword-matching
-  
+
 Phase 3: Widgets (2-3 days)
   - Image, Button, Canvas, Chart
-  
+
 Phase 4: Integration (1-2 days)
   - ChatDisplayFormatter
-  
+
 Phase 5: Advanced (2-3 days)
   - Video, Interactive Widgets
-  
+
 Phase 6: Testing (2-3 days)
 
 Total: 11-17 days
@@ -233,25 +233,25 @@ Total: 11-17 days
 Phase 1: Hypothesis (2-3 days)
   - Hypothesis Prompt
   - 5 Basic Frameworks (100 LOC each)
-  
+
 Phase 2: Template Construction (2-3 days)
   - Auto-Form-Generator
   - Auto-Table-Generator
   - System-Prompt-Generator
-  
+
 Phase 3: Quality Monitoring (2-3 days)
   - Completeness Check
   - Accuracy Check
   - Self-Correction
-  
+
 Phase 4: Frontend Integration (2-3 days)
   - Interactive Form Widget
   - Process Graph Widget
-  
+
 Phase 5: E2E Testing (2-3 days)
   - Real questions
   - Quality validation
-  
+
 Phase 6: Optimization (1-2 days)
   - Caching, Tuning
 

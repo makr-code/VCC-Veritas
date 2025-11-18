@@ -86,6 +86,7 @@ class HypothesisService:
         self.max_tokens = max_tokens
         
         # Initialize Ollama client
+        self.ollama_client: Optional[Any] = None
         try:
             self.ollama_client = DirectOllamaLLM(
                 model=model_name,
@@ -103,9 +104,15 @@ class HypothesisService:
             prompt_file = Path(__file__).parent.parent / "prompts" / "hypothesis_prompt.txt"
         
         self.prompt_template = self._load_prompt_template(prompt_file)
+<<<<<<< Updated upstream
         
         # Statistics
         self.stats = {
+=======
+
+        # Statistics (typed for mypy)
+        self.stats: Dict[str, Any] = {
+>>>>>>> Stashed changes
             "total_hypotheses": 0,
             "high_confidence": 0,
             "medium_confidence": 0,
@@ -328,7 +335,7 @@ Respond ONLY with valid JSON. Do not include explanations outside the JSON."""
             
             # Parse information gaps
             gaps_data = data.get("information_gaps", [])
-            information_gaps = []
+            information_gaps: List[InformationGap] = []
             for gap_data in gaps_data:
                 # Handle severity case-insensitivity
                 severity_str = gap_data.get("severity", "optional").lower()
@@ -511,7 +518,9 @@ if __name__ == "__main__":
     service = HypothesisService(model_name="llama3.1:8b")
     
     # Test queries
-    test_queries = [
+    from typing import Any as _Any
+
+    test_queries: List[Dict[str, _Any]] = [
         {
             "query": "Bauantrag für Einfamilienhaus in Stuttgart",
             "context": [

@@ -6,6 +6,23 @@ from backend.models.peer_review import Review, PeerReviewResult, ReviewCriteria,
 from typing import List, Dict, Any
 import asyncio
 import json
+<<<<<<< Updated upstream
+=======
+from typing import Any, Dict, List, cast
+
+from backend.models.peer_review import (
+    DEFAULT_REVIEW_CRITERIA,
+    ApprovalStatus,
+    PeerReviewResult,
+    Review,
+    ReviewCriteria,
+    ReviewRecommendation,
+    calculate_consensus_score,
+    determine_approval_status,
+    identify_conflicts,
+)
+
+>>>>>>> Stashed changes
 
 class PeerReviewValidationService:
     def __init__(self, llm_client, reviewer_models=None):
@@ -53,14 +70,24 @@ class PeerReviewValidationService:
         response = await loop.run_in_executor(None, lambda: self.llm_client.generate(prompt, model=model, temperature=0.2, max_tokens=2048))
         data = json.loads(response)
         # Mapping auf Review-Dataclass
-        criteria = {}
+        criteria: Dict[str, ReviewCriteria] = {}
         for k, v in data.get("criteria_scores", {}).items():
+            # DEFAULT_REVIEW_CRITERIA may contain untyped values; coerce safely
+            weight_val = DEFAULT_REVIEW_CRITERIA.get(k, {}).get("weight", 0.2)
+            desc_val = DEFAULT_REVIEW_CRITERIA.get(k, {}).get("description", "")
             criteria[k] = ReviewCriteria(
                 name=k,
+<<<<<<< Updated upstream
                 weight=DEFAULT_REVIEW_CRITERIA.get(k, {}).get("weight", 0.2),
                 description=DEFAULT_REVIEW_CRITERIA.get(k, {}).get("description", ""),
                 score=v.get("score", 0.0),
                 comments=v.get("comments", "")
+=======
+                weight=float(cast(Any, weight_val)),
+                description=str(cast(Any, desc_val)),
+                score=float(cast(Any, v.get("score", 0.0))),
+                comments=v.get("comments", ""),
+>>>>>>> Stashed changes
             )
         return Review(
             reviewer_model=model,

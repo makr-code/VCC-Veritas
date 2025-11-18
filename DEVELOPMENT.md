@@ -19,10 +19,10 @@
 2. **Virtuelle Umgebung erstellen:**
    ```bash
    python -m venv venv
-   
+
    # Windows
    .\venv\Scripts\activate
-   
+
    # Linux/Mac
    source venv/bin/activate
    ```
@@ -139,3 +139,11 @@ docker run -p 8000:8000 vcc-veritas
 ---
 
 *Letzte Aktualisierung: 16.10.2025*
+
+## Änderung: `docs` Endpoint Format
+
+Kürzlich wurde der FastAPI-`/capabilities`-Endpoint vereinheitlicht: der `endpoints`-Abschnitt liefert jetzt für jeden Endpunkt ein strukturiertes `dict` mit mindestens den Schlüsseln `path`, `available` und `production_ready` (anstatt einfacher String-Pfade).
+
+Kurzinfo für Contributor:
+- Achte beim Arbeiten an Endpunkten darauf, dass Consumer jetzt `endpoints["..."].get("path")` anstelle von `endpoints["..."]` verwenden.
+- Tests und Mock-Server wurden bereits auf das neue Format umgestellt. Falls du Code findest, der weiterhin Strings erwartet, passe ihn bitte entsprechend an oder frage nach einem Kompatibilitäts-Wrapper.

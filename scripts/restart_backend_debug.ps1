@@ -12,7 +12,7 @@ $backendPort = netstat -ano | findstr ":5000" | findstr "LISTENING"
 if ($backendPort) {
     $backendPid = ($backendPort -split '\s+')[-1]
     Write-Host "✓ Backend gefunden auf PID: $backendPid" -ForegroundColor Green
-    
+
     # 2. Stoppe Backend
     Write-Host "⏹️ Stoppe Backend..." -ForegroundColor Yellow
     try {

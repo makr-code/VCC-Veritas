@@ -2,7 +2,7 @@
 
 **JSON-basierte wissenschaftliche Methodik mit Selbstverbesserung**
 
-**Erstellt:** 12. Oktober 2025, 22:00 Uhr  
+**Erstellt:** 12. Oktober 2025, 22:00 Uhr
 **Status:** ✅ **DESIGN COMPLETE - Ready for Implementation**
 
 ---
@@ -55,7 +55,7 @@ ScientificPhaseExecutor.execute_phase(phase_id, context)
   "scientific_foundation": {
     "version": "1.0.0",
     "improvement_iteration": 1,
-    
+
     "core_principles": {
       "principles": [
         {
@@ -68,7 +68,7 @@ ScientificPhaseExecutor.execute_phase(phase_id, context)
         }
       ]
     },
-    
+
     "scientific_method": {
       "steps": [
         {
@@ -80,7 +80,7 @@ ScientificPhaseExecutor.execute_phase(phase_id, context)
         ...  // 6 Schritte total
       ]
     },
-    
+
     "source_quality_hierarchy": {
       "levels": [
         {
@@ -91,7 +91,7 @@ ScientificPhaseExecutor.execute_phase(phase_id, context)
       ],
       "conflict_resolution_rules": [...]
     },
-    
+
     "prompt_improvement": {
       "improvement_metrics": [
         {
@@ -208,28 +208,28 @@ class UnifiedOrchestratorV7:
     2. Agent Tasks (existing AgentOrchestrator)
     3. Prompt Improvement (PromptImprovementEngine)
     """
-    
+
     async def process_query(self, user_query: str) -> Dict:
         # 1. RAG Retrieval (existing)
         rag_results = await self.rag_service.retrieve(user_query)
-        
+
         # 2. Execute Scientific Phases (JSON-driven)
-        for phase_id in ["hypothesis", "synthesis", "analysis", 
+        for phase_id in ["hypothesis", "synthesis", "analysis",
                         "validation", "conclusion", "metacognition"]:
             result = await self.scientific_executor.execute_phase(
                 phase_id, context
             )
             scientific_results[phase_id] = result
-        
+
         # 3. Coordinate Agents (existing AgentOrchestrator)
         agent_results = await self._coordinate_agents(scientific_results)
-        
+
         # 4. Collect Metrics
         metrics = self._collect_quality_metrics(scientific_results)
-        
+
         # 5. Record Metrics (triggers improvement after 10 queries)
         self.improvement_engine.record_query_metrics(metrics)
-        
+
         return {
             "scientific_process": scientific_results,
             "agent_results": agent_results,
@@ -316,7 +316,7 @@ docs/
   - [x] source_quality_hierarchy
   - [x] output_quality_standards
   - [x] prompt_improvement metadata
-  
+
 - [ ] `config/scientific_methods/default_method.json` (400 Zeilen)
   - [ ] 6 Phasen mit prompt_templates
   - [ ] output_schemas

@@ -1,6 +1,6 @@
 # Capabilities System - Implementierungs-Zusammenfassung
 
-**Datum:** 05.10.2025  
+**Datum:** 05.10.2025
 **Version:** VERITAS v3.5.0 / Backend v1.0.0-production
 
 ## Übersicht
@@ -122,9 +122,9 @@ curl http://localhost:5000/capabilities
   "features": {
     "ollama": {
       "available": true,
-      "models": ["all-minilm:latest", "gpt-oss:latest", "phi3:latest", 
+      "models": ["all-minilm:latest", "gpt-oss:latest", "phi3:latest",
                  "llama3:latest", "nomic-embed-text:latest", "llama3.2:latest",
-                 "qwen2.5-coder:1.5b-base", "codellama:latest", 
+                 "qwen2.5-coder:1.5b-base", "codellama:latest",
                  "mixtral:latest", "gemma3:latest"],
       "model_count": 10,
       "default_model": "llama3:latest",
@@ -133,7 +133,7 @@ curl http://localhost:5000/capabilities
     "intelligent_pipeline": {
       "available": true,
       "initialized": true,
-      "available_agents": ["geo_context", "legal_framework", 
+      "available_agents": ["geo_context", "legal_framework",
                           "document_retrieval", "financial_analysis",
                           "environmental_assessment", "social_impact",
                           "construction_management", "traffic_planning"]
@@ -259,6 +259,6 @@ Das System ist produktionsreif und kann sofort genutzt werden. Das Frontend erke
 
 ---
 
-**Erstellt am:** 05.10.2025, 20:30 Uhr  
-**Status:** ✅ Abgeschlossen und getestet  
+**Erstellt am:** 05.10.2025, 20:30 Uhr
+**Status:** ✅ Abgeschlossen und getestet
 **Nächster Schritt:** End-to-End Test mit produktiver Pipeline

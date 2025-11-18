@@ -132,7 +132,29 @@ async def upload_office_document(
         # index_document(parsed_data)
         
         logger.info(f"[STUB] Office Upload: {filename} ({file_type}, {size_bytes} bytes)")
+<<<<<<< Updated upstream
         
+=======
+
+        # Minimal persistence: enqueue document to RAGService persistence queue
+        try:
+            from backend.services.rag_service import RAGService
+
+            rag = RAGService()
+            # Create a minimal document payload for indexing/persistence
+            doc = {
+                "title": filename,
+                "content": content.decode("utf-8", errors="ignore")[: 10_000],
+                "source_type": file_type,
+                "uploaded_at": datetime.utcnow().isoformat(),
+            }
+
+            # Enqueue persistence (background mirroring to Themis)
+            await rag.persist_document(collection="documents", document=doc, key=None, sync=False)
+            logger.info("🔁 Document enqueued for persistence to Themis via RAGService")
+        except Exception as e:
+            logger.warning(f"⚠️ Failed to enqueue document for persistence: {e}")
+>>>>>>> Stashed changes
         # Create dummy job
         jobs_db[job_id] = {
             'job_id': job_id,

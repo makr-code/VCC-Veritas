@@ -15,10 +15,7 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
 
-from backend.agents.veritas_intelligent_pipeline import (  # noqa: E402
-    IntelligentMultiAgentPipeline,
-    IntelligentPipelineRequest,
-)
+from backend.agents.veritas_intelligent_pipeline import IntelligentMultiAgentPipeline, IntelligentPipelineRequest  # noqa: E402
 
 
 def _build_demo_request() -> IntelligentPipelineRequest:
@@ -51,9 +48,7 @@ async def run_execution_plan_demo() -> None:
             "parallel_agents": ["environmental", "financial"],
             "sequential_agents": ["quality_assessor"],
         },
-        "orchestrator_context": {
-            "dynamic_actions": {"disabled": ["document_retrieval"]}
-        },
+        "orchestrator_context": {"dynamic_actions": {"disabled": ["document_retrieval"]}},
     }
 
     context = {

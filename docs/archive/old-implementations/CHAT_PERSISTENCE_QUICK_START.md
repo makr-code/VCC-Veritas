@@ -1,7 +1,7 @@
 # 🚀 VERITAS v3.20.0 - Chat Persistence Quick Start Guide
 
-**Version:** v3.20.0  
-**Datum:** 12. Oktober 2025  
+**Version:** v3.20.0
+**Datum:** 12. Oktober 2025
 **Zielgruppe:** Entwickler & Benutzer
 
 ---
@@ -327,12 +327,12 @@ from shared.chat_schema import ChatSession
 # Client initialisieren
 async with VeritasOllamaClient() as client:
     await client.initialize()
-    
+
     # Session mit History
     session = ChatSession()
     session.add_message("user", "Was ist das BImSchG?")
     session.add_message("assistant", "Das Bundes-Immissionsschutzgesetz...")
-    
+
     # Query mit Context
     response = await client.query_with_context(
         query="Welche Grenzwerte gelten?",
@@ -340,7 +340,7 @@ async with VeritasOllamaClient() as client:
         context_strategy="sliding_window",
         max_context_messages=10
     )
-    
+
     print(f"Response: {response.response}")
     print(f"Confidence: {response.confidence_score}")
 ```

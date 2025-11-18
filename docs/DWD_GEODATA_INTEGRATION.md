@@ -38,8 +38,8 @@ Der Flow-Simulation Request enthält immer **calculation_bounds**:
 
 ```python
 from backend.agents.veritas_api_agent_atmospheric_flow import (
-    FlowCalculationRequest, 
-    EmissionSource, 
+    FlowCalculationRequest,
+    EmissionSource,
     ReceptorPoint,
     Coordinate
 )
@@ -48,7 +48,7 @@ from backend.agents.veritas_api_agent_atmospheric_flow import (
 flow_request = FlowCalculationRequest(
     query_id="berlin-traffic-001",
     query_text="Verkehrsemissionen Berlin Innenstadt",
-    
+
     # ⭐ GEODATEN: Berechnungsbereich definieren
     calculation_bounds={
         'lat_min': 52.48,  # Süd
@@ -56,10 +56,10 @@ flow_request = FlowCalculationRequest(
         'lon_min': 13.38,  # West
         'lon_max': 13.42   # Ost
     },
-    
+
     grid_resolution_m=200.0,  # 200m Raster
     use_weather_data=True,    # DWD Integration aktivieren
-    
+
     # Emissionsquellen mit Koordinaten
     emission_sources=[
         EmissionSource(
@@ -68,7 +68,7 @@ flow_request = FlowCalculationRequest(
             # ... weitere Parameter
         )
     ],
-    
+
     # Rezeptoren mit Koordinaten
     receptor_points=[
         ReceptorPoint(
@@ -99,7 +99,7 @@ center_lon = (bounds['lon_min'] + bounds['lon_max']) / 2
 
 # Finde nächste DWD Station
 station = agent.find_nearest_station(
-    lat=center_lat, 
+    lat=center_lat,
     lon=center_lon,
     parameter="temperature"  # oder "wind", "precipitation"
 )
@@ -133,10 +133,10 @@ def haversine_distance(lat1, lon1, lat2, lon2) -> float:
     R = 6371000  # Erdradius in Metern
     dlat = radians(lat2 - lat1)
     dlon = radians(lon2 - lon1)
-    
+
     a = sin(dlat/2)**2 + cos(radians(lat1)) * cos(radians(lat2)) * sin(dlon/2)**2
     c = 2 * atan2(sqrt(a), sqrt(1-a))
-    
+
     return R * c  # Distanz in Metern
 ```
 
@@ -200,20 +200,20 @@ Der **Atmospheric Flow Agent** konvertiert DWD-Daten in ein **WindField**:
 
 async def _get_wind_field_from_dwd(self, request: FlowCalculationRequest) -> WindField:
     """Windfeld vom DWD Weather Agent erstellen"""
-    
+
     # 1. Zentrum des Berechnungsgebiets
-    center_lat = (request.calculation_bounds['lat_min'] + 
+    center_lat = (request.calculation_bounds['lat_min'] +
                   request.calculation_bounds['lat_max']) / 2
-    center_lon = (request.calculation_bounds['lon_min'] + 
+    center_lon = (request.calculation_bounds['lon_min'] +
                   request.calculation_bounds['lon_max']) / 2
-    
+
     # 2. DWD Open Data Agent initialisieren
     from backend.agents.veritas_api_agent_dwd_opendata import DWDOpenDataAgent
     dwd_agent = DWDOpenDataAgent()
-    
+
     # 3. Nächste Station finden
     station = dwd_agent.find_nearest_station(center_lat, center_lon, "wind")
-    
+
     # 4. Wind-Daten abrufen (letzte 24h)
     wind_data = dwd_agent.get_weather_data(
         station_id=station['station_id'],
@@ -222,11 +222,11 @@ async def _get_wind_field_from_dwd(self, request: FlowCalculationRequest) -> Win
         start_date=datetime.now() - timedelta(hours=24),
         end_date=datetime.now()
     )
-    
+
     # 5. Durchschnittswind berechnen
     avg_wind_speed = sum(r['wind_speed'] for r in wind_data) / len(wind_data)
     avg_wind_direction = sum(r['wind_direction'] for r in wind_data) / len(wind_data)
-    
+
     # 6. WindField erstellen
     return WindField(
         grid_vectors={
@@ -255,16 +255,16 @@ Für **große Berechnungsgebiete** können mehrere Stationen genutzt werden:
 
 ```python
 def get_multi_station_wind_field(
-    bounds: Dict[str, float], 
+    bounds: Dict[str, float],
     resolution_m: float
 ) -> WindField:
     """Windfeld aus mehreren DWD Stationen interpolieren"""
-    
+
     agent = DWDOpenDataAgent()
-    
+
     # 1. Alle verfügbaren Stationen laden
     all_stations = agent.get_stations()
-    
+
     # 2. Stationen im/nahe am Berechnungsgebiet filtern
     relevant_stations = []
     for station in all_stations.values():
@@ -272,7 +272,7 @@ def get_multi_station_wind_field(
         if (bounds['lat_min'] - 0.5 <= station['latitude'] <= bounds['lat_max'] + 0.5 and
             bounds['lon_min'] - 0.5 <= station['longitude'] <= bounds['lon_max'] + 0.5):
             relevant_stations.append(station)
-    
+
     # 3. Wetterdaten von allen Stationen abrufen
     station_wind_data = {}
     for station in relevant_stations[:5]:  # Max. 5 Stationen
@@ -283,39 +283,39 @@ def get_multi_station_wind_field(
             start_date=datetime.now() - timedelta(hours=12),
             end_date=datetime.now()
         )
-        
+
         if wind_records:
             # Durchschnitt berechnen
             avg_speed = sum(r['wind_speed'] for r in wind_records) / len(wind_records)
             avg_direction = sum(r['wind_direction'] for r in wind_records) / len(wind_records)
-            
+
             station_wind_data[station['station_id']] = {
                 'latitude': station['latitude'],
                 'longitude': station['longitude'],
                 'wind_speed': avg_speed,
                 'wind_direction': avg_direction
             }
-    
+
     # 4. Windfeld-Grid erstellen mit Interpolation
     grid_vectors = {}
-    
+
     lat_steps = int((bounds['lat_max'] - bounds['lat_min']) * 111320 / resolution_m)
     lon_steps = int((bounds['lon_max'] - bounds['lon_min']) * 111320 / resolution_m)
-    
+
     for i in range(lat_steps):
         for j in range(lon_steps):
             lat = bounds['lat_min'] + i * (bounds['lat_max'] - bounds['lat_min']) / lat_steps
             lon = bounds['lon_min'] + j * (bounds['lon_max'] - bounds['lon_min']) / lon_steps
-            
+
             # Inverse Distance Weighting (IDW) Interpolation
             wind_vector = interpolate_wind_idw(
                 target_lat=lat,
                 target_lon=lon,
                 station_data=station_wind_data
             )
-            
+
             grid_vectors[f"{lat:.4f}_{lon:.4f}"] = wind_vector
-    
+
     return WindField(
         grid_vectors=grid_vectors,
         stability_class=AtmosphericStabilityClass.D,
@@ -331,25 +331,25 @@ def interpolate_wind_idw(
     power: float = 2.0
 ) -> WindVector:
     """Inverse Distance Weighting Interpolation für Wind"""
-    
+
     weighted_speed = 0.0
     weighted_direction = 0.0
     total_weight = 0.0
-    
+
     for station_id, data in station_data.items():
         # Distanz berechnen
         distance = haversine_distance(
             target_lat, target_lon,
             data['latitude'], data['longitude']
         )
-        
+
         # Gewicht: 1 / distance^power
         weight = 1.0 / (distance ** power) if distance > 0 else 1e10
-        
+
         weighted_speed += data['wind_speed'] * weight
         weighted_direction += data['wind_direction'] * weight
         total_weight += weight
-    
+
     return WindVector(
         speed_ms=weighted_speed / total_weight if total_weight > 0 else 5.0,
         direction_deg=weighted_direction / total_weight if total_weight > 0 else 270.0,
@@ -368,15 +368,15 @@ Der **Atmospheric Flow Agent** ruft bereits DWD-Daten ab:
 ```python
 async def _get_wind_field(self, request: FlowCalculationRequest) -> Optional[WindField]:
     """Windfeld abrufen (manuelle Daten, DWD, oder Default)"""
-    
+
     # Priorität 1: Manuelle Winddaten
     if request.manual_wind_data:
         return self._create_wind_field_from_manual_data(...)
-    
+
     # Priorität 2: DWD Weather Agent ⭐
     if self.weather_agent and request.use_weather_data:
         return await self._get_wind_field_from_dwd(request)  # ← HIER
-    
+
     # Priorität 3: Default-Windfeld
     return self._create_default_wind_field(...)
 ```
@@ -402,7 +402,7 @@ async def _get_wind_field(self, request: FlowCalculationRequest) -> Optional[Win
 # ALT:
 try:
     from .veritas_api_agent_dwd_weather import (
-        DwdWeatherAgent, DwdWeatherQueryRequest, 
+        DwdWeatherAgent, DwdWeatherQueryRequest,
         WeatherParameter, WeatherInterval, create_dwd_weather_agent
     )
     DWD_INTEGRATION_AVAILABLE = True
@@ -449,27 +449,27 @@ async def _get_wind_field_from_dwd(self, request: FlowCalculationRequest) -> Opt
     """Windfeld vom DWD Open Data Agent abrufen"""
     if not DWD_INTEGRATION_AVAILABLE or not self.weather_agent:
         return None
-    
+
     try:
         # Zentrum des Berechnungsgebiets bestimmen
-        center_lat = (request.calculation_bounds['lat_min'] + 
+        center_lat = (request.calculation_bounds['lat_min'] +
                       request.calculation_bounds['lat_max']) / 2
-        center_lon = (request.calculation_bounds['lon_min'] + 
+        center_lon = (request.calculation_bounds['lon_min'] +
                       request.calculation_bounds['lon_max']) / 2
-        
+
         # Nächste DWD Station finden
         station = self.weather_agent.find_nearest_station(
             lat=center_lat,
             lon=center_lon,
             parameter="wind"
         )
-        
+
         if not station:
             self.logger.warning("No DWD station found for wind data")
             return None
-        
+
         self.logger.info(f"📍 Using DWD Station: {station['name']} (ID: {station['station_id']})")
-        
+
         # Wind-Daten der letzten 24h abrufen
         wind_records = self.weather_agent.get_weather_data(
             station_id=station['station_id'],
@@ -478,18 +478,18 @@ async def _get_wind_field_from_dwd(self, request: FlowCalculationRequest) -> Opt
             start_date=datetime.now() - timedelta(hours=24),
             end_date=datetime.now()
         )
-        
+
         if not wind_records:
             self.logger.warning("No wind data available from DWD")
             return None
-        
+
         # Durchschnitts-Wind berechnen
         avg_speed_ms = sum(r.get('wind_speed', 5.0) for r in wind_records) / len(wind_records)
         avg_direction_deg = sum(r.get('wind_direction', 270.0) for r in wind_records) / len(wind_records)
-        
+
         self.logger.info(f"🌬️  DWD Wind: {avg_speed_ms:.1f} m/s aus {avg_direction_deg:.0f}°")
         self._stats['weather_queries_made'] += 1
-        
+
         # Windfeld erstellen (einheitlich für gesamtes Gebiet)
         return self._create_uniform_wind_field(
             bounds=request.calculation_bounds,
@@ -498,7 +498,7 @@ async def _get_wind_field_from_dwd(self, request: FlowCalculationRequest) -> Opt
             wind_direction_deg=avg_direction_deg,
             data_source=f"DWD Station {station['station_id']} ({station['name']})"
         )
-        
+
     except Exception as e:
         self.logger.warning(f"DWD Open Data integration error: {e}", exc_info=True)
         return None
@@ -513,29 +513,29 @@ def _create_uniform_wind_field(
     data_source: str
 ) -> WindField:
     """Erstelle einheitliches Windfeld aus DWD-Daten"""
-    
+
     grid_vectors = {}
-    
+
     lat_range = bounds['lat_max'] - bounds['lat_min']
     lon_range = bounds['lon_max'] - bounds['lon_min']
-    
+
     lat_steps = max(3, int(lat_range * 111320 / resolution))
     lon_steps = max(3, int(lon_range * 111320 / resolution))
-    
+
     for i in range(lat_steps):
         for j in range(lon_steps):
             lat = bounds['lat_min'] + (lat_range * i / (lat_steps - 1))
             lon = bounds['lon_min'] + (lon_range * j / (lon_steps - 1))
-            
+
             # Leichte Variation für Realismus (±10%)
             speed_variation = 1.0 + 0.1 * ((i + j) - (lat_steps + lon_steps) / 2) / (lat_steps + lon_steps)
-            
+
             grid_vectors[f"{lat:.4f}_{lon:.4f}"] = WindVector(
                 speed_ms=wind_speed_ms * speed_variation,
                 direction_deg=wind_direction_deg,
                 height_m=10.0
             )
-    
+
     return WindField(
         grid_vectors=grid_vectors,
         stability_class=AtmosphericStabilityClass.D,  # Neutral (Default)
@@ -663,6 +663,6 @@ Ergebnisse:
 
 ---
 
-**Dokument-Version:** 1.0  
-**Letzte Aktualisierung:** 19. Oktober 2025  
+**Dokument-Version:** 1.0
+**Letzte Aktualisierung:** 19. Oktober 2025
 **Autor:** VERITAS Development Team

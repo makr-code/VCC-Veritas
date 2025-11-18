@@ -1,6 +1,6 @@
 # UDS3 RAG Integration - Vollständige Analyse
 
-**Datum:** 05.10.2025, 20:45 Uhr  
+**Datum:** 05.10.2025, 20:45 Uhr
 **Status:** 🔴 Problem identifiziert - UDS3 hat keine passende Query-Methode
 
 ## Problem-Analyse
@@ -51,7 +51,7 @@ if self.uds3_strategy is not None:
             "top_k": opts.limit_documents,
             "threshold": 0.7
         } if strategy_weights.get("vector", 0) > 0 else None
-        
+
         result = query_method(
             vector_params=vector_params,
             graph_params=graph_params,
@@ -61,7 +61,7 @@ if self.uds3_strategy is not None:
         )
 ```
 
-**Status:** ✅ Implementiert  
+**Status:** ✅ Implementiert
 **Problem:** UDS3 ist leer → trotzdem Mock-Fallback
 
 ### Option 2: Dokumente in UDS3 indizieren (Mittelfristig)
@@ -92,7 +92,7 @@ Statt generischer Mock-Dokumente → spezifische Test-Dokumente mit echtem Inhal
 ```python
 def _build_fallback_context(self, query_text, user_context, opts):
     """Erstellt REALISTISCHE Test-Daten statt generischer Mocks."""
-    
+
     # Erkenne Thema aus Query
     if "taschengeld" in query_text.lower():
         return {
@@ -120,7 +120,7 @@ def _build_fallback_context(self, query_text, user_context, opts):
                 "note": "Verwendet Test-Daten - UDS3 enthält noch keine echten Dokumente"
             }
         }
-    
+
     # Default: Generische Hinweise
     return {
         "documents": [],
@@ -146,19 +146,19 @@ def _build_fallback_context(self, query_text, user_context, opts):
 ## Empfohlener Weg
 
 ### Phase 1: Sofort (30 Min) - Test-Daten
-✅ Implementiere realistische Test-Daten für häufige Queries  
-✅ Frontend kann mit sinnvollen Antworten testen  
+✅ Implementiere realistische Test-Daten für häufige Queries
+✅ Frontend kann mit sinnvollen Antworten testen
 ✅ Demo-fähig für Stakeholder
 
 ### Phase 2: Kurzfristig (2-4 Std) - UDS3 Befüllen
-📋 Sammle 10-20 wichtige Dokumente (BGB, Verwaltungsvorschriften)  
-📋 Indiziere in UDS3 via Ingestion Pipeline  
+📋 Sammle 10-20 wichtige Dokumente (BGB, Verwaltungsvorschriften)
+📋 Indiziere in UDS3 via Ingestion Pipeline
 📋 Teste mit echten RAG-Queries
 
 ### Phase 3: Mittelfristig (1-2 Tage) - Production Ready
-📋 Umfangreiche Dokumenten-Sammlung  
-📋 Automatische Re-Indizierung  
-📋 Quality Monitoring  
+📋 Umfangreiche Dokumenten-Sammlung
+📋 Automatische Re-Indizierung
+📋 Quality Monitoring
 📋 Performance Tuning
 
 ## Nächster Schritt
@@ -196,7 +196,7 @@ REALISTIC_TEST_DATA = {
 
 def _build_fallback_context(self, query_text, user_context, opts):
     query_lower = query_text.lower()
-    
+
     # Prüfe auf bekannte Test-Cases
     for keyword, test_data in REALISTIC_TEST_DATA.items():
         if keyword in query_lower:
@@ -209,7 +209,7 @@ def _build_fallback_context(self, query_text, user_context, opts):
                     "note": "⚠️ Demo-Modus - Verwendet vordefinierte Test-Daten"
                 }
             }
-    
+
     # Fallback: Leere Antwort mit Hinweis
     return {...}
 ```
@@ -218,17 +218,17 @@ def _build_fallback_context(self, query_text, user_context, opts):
 
 Möchten Sie:
 
-**A) Schnelle Demo mit Test-Daten** (30 Min)  
+**A) Schnelle Demo mit Test-Daten** (30 Min)
 → Sofort funktionsfähig, aber begrenzt
 
-**B) UDS3 mit echten Dokumenten befüllen** (2-4 Std)  
+**B) UDS3 mit echten Dokumenten befüllen** (2-4 Std)
 → Echte RAG-Pipeline, aber Zeitaufwand
 
-**C) Beides parallel** (empfohlen)  
+**C) Beides parallel** (empfohlen)
 → Sofort Demo-fähig + parallel UDS3-Setup
 
 ---
 
-**Status:** ⏸️ Wartet auf Entscheidung  
-**Backend läuft:** ✅ Mit UDS3-Adapter, aber leere DB  
+**Status:** ⏸️ Wartet auf Entscheidung
+**Backend läuft:** ✅ Mit UDS3-Adapter, aber leere DB
 **Frontend:** ✅ Funktionsfähig, zeigt Mock-Daten

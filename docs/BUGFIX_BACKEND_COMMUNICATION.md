@@ -1,7 +1,7 @@
 # ✅ Backend & Frontend Kommunikation - Fix Log
 
-**Datum:** 17. Oktober 2025, 21:19 Uhr  
-**Problem:** Kommunikation zwischen Frontend und Backend gestört  
+**Datum:** 17. Oktober 2025, 21:19 Uhr
+**Problem:** Kommunikation zwischen Frontend und Backend gestört
 **Status:** ✅ BEHOBEN
 
 ---
@@ -116,8 +116,8 @@ cd C:\VCC\veritas
 python frontend\veritas_app.py
 ```
 
-**Backend läuft auf:** `http://127.0.0.1:5000`  
-**Health-Check:** `http://127.0.0.1:5000/health`  
+**Backend läuft auf:** `http://127.0.0.1:5000`
+**Health-Check:** `http://127.0.0.1:5000/health`
 **API-Docs:** `http://127.0.0.1:5000/docs`
 
 ---
@@ -169,6 +169,6 @@ python frontend\veritas_app.py
 
 ---
 
-**Erstellt:** 17. Oktober 2025, 21:19 Uhr  
-**Getestet:** Backend Health Check ✅  
+**Erstellt:** 17. Oktober 2025, 21:19 Uhr
+**Getestet:** Backend Health Check ✅
 **Status:** READY FOR TESTING 🚀

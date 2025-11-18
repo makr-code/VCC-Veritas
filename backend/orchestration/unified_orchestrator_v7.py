@@ -40,7 +40,17 @@ try:
     from uds3 import get_optimized_unified_strategy
     UDS3_AVAILABLE = True
 except ImportError as e:
-    logger.warning(f"UDS3 not available: {e}")
+    # logger may not yet be defined at this point; ensure a module logger exists early
+    # (defined below as well to satisfy other modules)
+    # We'll define module-level logger early to avoid 'used-before-def' mypy warnings.
+    # Actual logger object defined below as well.
+    # Note: use print as fallback if logging not yet configured.
+    try:
+        import logging as _logging
+
+        _logging.getLogger(__name__).warning(f"UDS3 not available: {e}")
+    except Exception:
+        print(f"UDS3 not available: {e}")
     UDS3_AVAILABLE = False
     get_optimized_unified_strategy = None
 
@@ -123,6 +133,7 @@ class UnifiedOrchestratorV7:
         method_id: str = "default_method",
         ollama_client: Optional[VeritasOllamaClient] = None,
         uds3_strategy: Optional[Any] = None,  # UDS3 UnifiedDatabaseStrategy
+        rag_service: Optional[Any] = None,
         agent_orchestrator: Optional[Any] = None,
         enable_streaming: bool = True
     ):
@@ -142,7 +153,15 @@ class UnifiedOrchestratorV7:
         self.ollama_client = ollama_client
         self.agent_orchestrator = agent_orchestrator
         self.enable_streaming = enable_streaming
+<<<<<<< Updated upstream
         
+=======
+
+        # Backwards-compat alias: allow callers to pass `rag_service`
+        if rag_service is not None and uds3_strategy is None:
+            uds3_strategy = rag_service
+
+>>>>>>> Stashed changes
         # Initialize UDS3 Strategy
         if uds3_strategy is None and UDS3_AVAILABLE:
             try:
@@ -174,7 +193,8 @@ class UnifiedOrchestratorV7:
         )
         
         # Initialize SupervisorAgent (if enabled in method config)
-        self.supervisor_agent = None
+        from typing import Any as _Any
+        self.supervisor_agent: Optional[_Any] = None
         if self._is_supervisor_enabled():
             try:
                 from backend.agents.veritas_supervisor_agent import get_supervisor_agent
@@ -330,9 +350,15 @@ class UnifiedOrchestratorV7:
             )
             
             # 3. Execute Scientific Phases (6 Phasen mit Streaming)
+<<<<<<< Updated upstream
             scientific_process = {}
             phase_ids = ['hypothesis', 'synthesis', 'analysis', 'validation', 'conclusion', 'metacognition']
             
+=======
+            scientific_process: Dict[str, Any] = {}
+            phase_ids = ["hypothesis", "synthesis", "analysis", "validation", "conclusion", "metacognition"]
+
+>>>>>>> Stashed changes
             for idx, phase_id in enumerate(phase_ids):
                 progress = 0.2 + (0.7 * (idx / len(phase_ids)))
                 
@@ -690,6 +716,7 @@ class UnifiedOrchestratorV7:
             Final answer string
         """
         # Priority 1: Agent Result Synthesis (Phase 6.5)
+<<<<<<< Updated upstream
         if 'agent_result_synthesis' in scientific_process:
             synthesis = scientific_process['agent_result_synthesis']
             if 'final_answer' in synthesis:
@@ -700,6 +727,18 @@ class UnifiedOrchestratorV7:
         if 'main_answer' in conclusion:
             return conclusion['main_answer']
         
+=======
+        if "agent_result_synthesis" in scientific_process:
+            synthesis = scientific_process["agent_result_synthesis"]
+            if "final_answer" in synthesis:
+                return str(synthesis["final_answer"])
+
+        # Priority 2: Conclusion (Phase 5)
+        conclusion = scientific_process.get("conclusion", {})
+        if "main_answer" in conclusion:
+            return str(conclusion["main_answer"])
+
+>>>>>>> Stashed changes
         # Fallback
         return "Keine finale Antwort verfügbar."
     
@@ -752,7 +791,7 @@ class UnifiedOrchestratorV7:
             if method_config_path.exists():
                 with open(method_config_path, 'r', encoding='utf-8') as f:
                     method_config = json.load(f)
-                    return method_config.get("supervisor_enabled", False)
+                    return bool(method_config.get("supervisor_enabled", False))
         except Exception as e:
             logger.warning(f"⚠️ Could not check supervisor_enabled flag: {e}")
         
@@ -798,8 +837,13 @@ class UnifiedOrchestratorV7:
         Returns:
             Mapped inputs dictionary
         """
+<<<<<<< Updated upstream
         inputs = {}
         
+=======
+        inputs: Dict[str, Any] = {}
+
+>>>>>>> Stashed changes
         for key, path in input_mapping.items():
             try:
                 if path == "user_query":
@@ -891,6 +935,7 @@ class UnifiedOrchestratorV7:
                 phase_id=phase_config["phase_id"],
                 status="skipped",
                 output={"reason": "supervisor_not_available"},
+                confidence=0.0,
                 execution_time_ms=0,
                 metadata={"executor": "supervisor", "skipped": True}
             )
@@ -983,11 +1028,24 @@ class UnifiedOrchestratorV7:
             # Note: Validation happens in phase_executor if needed
             
             execution_time_ms = (datetime.now() - start_time).total_seconds() * 1000
+<<<<<<< Updated upstream
             
+=======
+
+            # Safely derive confidence from output if present
+            conf_val = output.get("confidence", 0.5) if isinstance(output, dict) else 0.5
+            if not isinstance(conf_val, (int, float)):
+                try:
+                    conf_val = float(str(conf_val))
+                except Exception:
+                    conf_val = 0.5
+
+>>>>>>> Stashed changes
             return PhaseResult(
                 phase_id=phase_config["phase_id"],
                 status="completed",
                 output=output,
+                confidence=float(conf_val),
                 execution_time_ms=execution_time_ms,
                 metadata={"executor": "supervisor", "method": method}
             )
@@ -1000,6 +1058,7 @@ class UnifiedOrchestratorV7:
                 phase_id=phase_config["phase_id"],
                 status="failed",
                 output={"error": str(e)},
+                confidence=0.0,
                 execution_time_ms=execution_time_ms,
                 metadata={"executor": "supervisor", "method": method, "error": str(e)}
             )
@@ -1057,11 +1116,23 @@ class UnifiedOrchestratorV7:
             }
             
             execution_time_ms = (datetime.now() - start_time).total_seconds() * 1000
+<<<<<<< Updated upstream
             
+=======
+
+            conf_val = output.get("confidence", 0.5) if isinstance(output, dict) else 0.5
+            if not isinstance(conf_val, (int, float)):
+                try:
+                    conf_val = float(str(conf_val))
+                except Exception:
+                    conf_val = 0.5
+
+>>>>>>> Stashed changes
             return PhaseResult(
                 phase_id=phase_config["phase_id"],
                 status="completed",
                 output=output,
+                confidence=float(conf_val),
                 execution_time_ms=execution_time_ms,
                 metadata={"executor": "agent_coordinator", "mock": True}
             )
@@ -1069,12 +1140,19 @@ class UnifiedOrchestratorV7:
         # Execute agents via AgentCoordinator
         try:
             from backend.agents.veritas_api_agent_core_components import create_agent_coordinator
+<<<<<<< Updated upstream
             
             coordinator = create_agent_coordinator(
                 orchestrator=self.agent_orchestrator
             )
             
             agent_results = {}
+=======
+
+            coordinator = create_agent_coordinator(orchestrator=self.agent_orchestrator)
+
+            agent_results: Dict[str, Any] = {}
+>>>>>>> Stashed changes
             successful = 0
             failed = 0
             execution_order = []
@@ -1137,16 +1215,30 @@ class UnifiedOrchestratorV7:
             }
             
             execution_time_ms = (datetime.now() - start_time).total_seconds() * 1000
+<<<<<<< Updated upstream
             
             logger.info(
                 f"✅ Agent Coordination: {successful} successful, {failed} failed, "
                 f"{execution_time_ms:.0f}ms"
             )
             
+=======
+
+            logger.info(f"✅ Agent Coordination: {successful} successful, {failed} failed, " f"{execution_time_ms:.0f}ms")
+
+            conf_val = output.get("confidence", 0.5) if isinstance(output, dict) else 0.5
+            if not isinstance(conf_val, (int, float)):
+                try:
+                    conf_val = float(str(conf_val))
+                except Exception:
+                    conf_val = 0.5
+
+>>>>>>> Stashed changes
             return PhaseResult(
                 phase_id=phase_config["phase_id"],
                 status="completed",
                 output=output,
+                confidence=float(conf_val),
                 execution_time_ms=execution_time_ms,
                 metadata={"executor": "agent_coordinator"}
             )
@@ -1159,6 +1251,7 @@ class UnifiedOrchestratorV7:
                 phase_id=phase_config["phase_id"],
                 status="failed",
                 output={"error": str(e), "agent_results": {}},
+                confidence=0.0,
                 execution_time_ms=execution_time_ms,
                 metadata={"executor": "agent_coordinator", "error": str(e)}
             )

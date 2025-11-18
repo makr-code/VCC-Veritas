@@ -1,7 +1,7 @@
 # 🎉 IMMI-Karte - Erfolgreiche Implementation
 
-**Datum:** 10. Oktober 2025  
-**Status:** ✅ **PRODUKTIONSREIF**  
+**Datum:** 10. Oktober 2025
+**Status:** ✅ **PRODUKTIONSREIF**
 **Technologie:** tkintermapview (Native Tkinter Canvas)
 
 ---
@@ -104,33 +104,33 @@ pip install pillow==11.3.0        # ✅ Installiert
 ```python
 class IMMIMapWidget(tk.Frame):
     """Native Tkinter Map Widget mit tkintermapview"""
-    
+
     # Marker-Farben
     BIMSCHG_COLORS = {'Feuerung': '#FF4444', ...}
     WKA_COLORS = {'in Betrieb': '#00CC00', ...}
-    
+
     # Clustering
     class MarkerCluster:
         def __init__(self, grid_size=0.05): ...
         def add_marker(self, lat, lon, data): ...
         def get_clusters(self): ...
-    
+
     # UI-Komponenten
     def _create_sidebar(self): ...      # Filter + Controls
     def _create_map(self): ...          # tkintermapview Map
     def _create_statusbar(self): ...    # Status + Koordinaten
-    
+
     # Marker-Management
     def _load_markers_thread(self): ... # API-Requests
     def _display_markers(self, markers): ...
     def _add_marker(self, marker_data): ...
     def _apply_clustering(self, markers): ...
-    
+
     # Event-Handler
     def _on_marker_click(self, marker_data): ...
     def _show_marker_info(self, marker_data): ...
     def _show_cluster_info(self, cluster_data): ...
-    
+
     # Search
     def _execute_search(self, query): ...
     def _show_search_results(self, results): ...
@@ -165,7 +165,7 @@ def show_hamburger_menu(self):
     menu = tk.Menu(self.root, tearoff=0)
     # ... existing items ...
     menu.add_separator()
-    menu.add_command(label="🗺️ IMMI-Karte öffnen", 
+    menu.add_command(label="🗺️ IMMI-Karte öffnen",
                     command=self.open_immi_map)  # NEU
     # ... rest ...
 ```
@@ -176,15 +176,15 @@ def open_immi_map(self):
     """Öffnet IMMI-Karte in separatem Fenster"""
     try:
         from frontend.ui.veritas_ui_map_widget import IMMIMapWidget
-        
+
         map_window = tk.Toplevel(self.root)
         map_window.title("🗺️ IMMI-Karte - BImSchG & WKA Geodaten")
         map_window.geometry("1400x800")
-        
-        map_widget = IMMIMapWidget(map_window, 
+
+        map_widget = IMMIMapWidget(map_window,
                                    backend_url="http://localhost:5000")
         map_widget.pack(fill="both", expand=True)
-        
+
         logger.info("✅ IMMI-Karte geöffnet")
     except ImportError:
         messagebox.showerror("Fehler", "tkintermapview nicht installiert")
@@ -317,13 +317,13 @@ def _add_heatmap_layer(self):
     # Heatmap-Daten von API laden
     response = requests.get(f"{backend_url}/api/immi/heatmap/bimschg")
     heatmap_data = response.json()
-    
+
     # Matplotlib Figure erstellen
     fig, ax = plt.subplots(figsize=(10, 8), transparent=True)
-    
+
     # Heatmap zeichnen
     ax.hexbin(lons, lats, gridsize=50, cmap='YlOrRd', alpha=0.6)
-    
+
     # Als transparentes Overlay über Map
     canvas = FigureCanvasTkAgg(fig, master=self.map_widget)
     canvas.get_tk_widget().place(x=0, y=0, relwidth=1, relheight=1)
@@ -335,18 +335,18 @@ def _load_visible_markers(self):
     # Aktuelle Map-Bounds ermitteln
     bounds = self.map_widget.get_bounds()
     north, south, east, west = bounds
-    
+
     # API-Request mit bounds-Filter
     url = f"{self.backend_url}/api/immi/markers/bimschg"
     params = {
         'bounds': f"{south},{west},{north},{east}",
         'limit': 5000  # Höher, da gefiltert
     }
-    
+
     # Nur sichtbare Marker laden
     response = requests.get(url, params=params)
     markers = response.json()
-    
+
     # Performance-Boost: 9160 → ~500 sichtbare Marker
 ```
 
@@ -358,7 +358,7 @@ from PIL import Image, ImageDraw
 def create_custom_icon(category, size=32):
     img = Image.new('RGBA', (size, size), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
-    
+
     # Icon je nach Kategorie zeichnen
     if category == 'Feuerung':
         draw.ellipse([8, 8, 24, 24], fill='#FF4444', outline='#CC0000')
@@ -366,7 +366,7 @@ def create_custom_icon(category, size=32):
     elif category == 'Tierhaltung':
         draw.ellipse([8, 8, 24, 24], fill='#44FF44', outline='#00CC00')
         draw.text((12, 10), '🐄', fill='white')
-    
+
     return img
 ```
 
@@ -431,12 +431,12 @@ def create_custom_icon(category, size=32):
 
 ### Highlights
 
-**🏭 BImSchG-Anlagen:** 4,062 Umweltgenehmigungen  
-**🌬️ Windkraftanlagen:** 5,457 WKA  
-**📍 Geodaten-Punkte:** 9,160 validiert  
-**🗺️ Karten-Service:** OpenStreetMap (kostenlos)  
-**⚡ Performance:** <350ms Initial-Laden  
-**🎨 Marker-Clustering:** Automatisch bei Zoom < 10  
+**🏭 BImSchG-Anlagen:** 4,062 Umweltgenehmigungen
+**🌬️ Windkraftanlagen:** 5,457 WKA
+**📍 Geodaten-Punkte:** 9,160 validiert
+**🗺️ Karten-Service:** OpenStreetMap (kostenlos)
+**⚡ Performance:** <350ms Initial-Laden
+**🎨 Marker-Clustering:** Automatisch bei Zoom < 10
 
 ### Next Steps (Optional)
 
@@ -459,13 +459,13 @@ python frontend/veritas_app.py
 
 ---
 
-**Status:** ✅ **PRODUKTIONSREIF**  
-**Deployment:** Sofort möglich  
-**Dokumentation:** Vollständig  
-**Tests:** 100% bestanden  
+**Status:** ✅ **PRODUKTIONSREIF**
+**Deployment:** Sofort möglich
+**Dokumentation:** Vollständig
+**Tests:** 100% bestanden
 
-**Erstellt von:** VERITAS Agent System  
-**Datum:** 10. Oktober 2025  
+**Erstellt von:** VERITAS Agent System
+**Datum:** 10. Oktober 2025
 **Version:** 1.0
 
 🎉 **IMMI-Karte ist online!** 🗺️

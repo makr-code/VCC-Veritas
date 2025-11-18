@@ -54,7 +54,7 @@ Root (User Query)
   "timestamp_end": "2025-10-12T18:45:05.800Z",
   "total_duration_ms": 5800,
   "status": "completed",
-  
+
   "process_tree": {
     "root": {
       "step_id": "root",
@@ -358,7 +358,7 @@ Root (User Query)
       ]
     }
   },
-  
+
   "metadata": {
     "total_steps": 17,
     "total_llm_calls": 2,
@@ -800,7 +800,7 @@ def aggregate_results(node: ProcessNode) -> dict:
     for child in node.children:
         child_result = aggregate_results(child)
         child_results.append(child_result)
-    
+
     # Then, aggregate this node
     if node.step_type == "rag_retrieval":
         # Combine documents from all child RAG searches
@@ -808,10 +808,10 @@ def aggregate_results(node: ProcessNode) -> dict:
         for child in child_results:
             if "documents" in child:
                 all_documents.extend(child["documents"])
-        
+
         node.result["documents"] = all_documents
         node.result["aggregated_from_children"] = True
-    
+
     return node.result
 
 # Usage: Aggregate all RAG results
@@ -827,17 +827,17 @@ def extract_path(node: ProcessNode, target_step_id: str, path: List[str] = None)
     """Extract path from root to target step"""
     if path is None:
         path = []
-    
+
     path.append(node.step_id)
-    
+
     if node.step_id == target_step_id:
         return path
-    
+
     for child in node.children:
         result_path = extract_path(child, target_step_id, path.copy())
         if result_path:
             return result_path
-    
+
     return None
 
 # Usage: Find path to specific quality check
@@ -854,13 +854,13 @@ print(" → ".join(path))
 def find_branching_points(node: ProcessNode) -> List[ProcessNode]:
     """Find all nodes with multiple children (branching points)"""
     branching_points = []
-    
+
     if len(node.children) > 1:
         branching_points.append(node)
-    
+
     for child in node.children:
         branching_points.extend(find_branching_points(child))
-    
+
     return branching_points
 
 # Usage: Identify dynamic decision points
@@ -877,7 +877,7 @@ for branch in branches:
 def detect_parallel_steps(node: ProcessNode) -> List[List[ProcessNode]]:
     """Detect steps that can run in parallel"""
     parallel_groups = []
-    
+
     if len(node.children) > 1:
         # Check if children have no dependencies
         independent_children = []
@@ -885,14 +885,14 @@ def detect_parallel_steps(node: ProcessNode) -> List[List[ProcessNode]]:
             # If child doesn't depend on sibling results → parallel
             if not depends_on_siblings(child, node.children):
                 independent_children.append(child)
-        
+
         if len(independent_children) > 1:
             parallel_groups.append(independent_children)
-    
+
     # Recurse
     for child in node.children:
         parallel_groups.extend(detect_parallel_steps(child))
-    
+
     return parallel_groups
 
 # Usage: Optimize execution
@@ -955,45 +955,45 @@ LLM muss ALLE Ergebnisse aus dem Tree kombinieren:
 ```python
 def serialize_tree_for_llm(root: ProcessNode) -> str:
     """Convert process tree to LLM-consumable context"""
-    
+
     context_sections = []
-    
+
     # 1. Collect all RAG results
     rag_results = []
     def collect_rag(node):
         if node.step_type in ["semantic_search", "graph_search", "graph_traversal"]:
             rag_results.append(node.result)
     traverse_process_tree(root, collect_rag)
-    
+
     context_sections.append("# RAG CONTEXT (Aggregated from all retrieval steps)\n")
     for i, rag in enumerate(rag_results):
         context_sections.append(f"## Source {i+1}: {rag['source']}\n")
         context_sections.append(f"{format_rag_result(rag)}\n")
-    
+
     # 2. Collect user input
     user_inputs = []
     def collect_input(node):
         if node.step_type == "interactive_form_wait":
             user_inputs.append(node.result['user_input'])
     traverse_process_tree(root, collect_input)
-    
+
     if user_inputs:
         context_sections.append("# USER INPUT (From interactive forms)\n")
         for inp in user_inputs:
             context_sections.append(f"{json.dumps(inp, indent=2)}\n")
-    
+
     # 3. Include hypothesis
     hypothesis_node = find_node_by_type(root, "hypothesis_generation")
     if hypothesis_node:
         context_sections.append("# HYPOTHESIS (Required criteria to address)\n")
         context_sections.append(f"{json.dumps(hypothesis_node.result['hypothesis'], indent=2)}\n")
-    
+
     # 4. Include evidence evaluation
     evidence_node = find_node_by_type(root, "evidence_evaluation")
     if evidence_node:
         context_sections.append("# EVIDENCE EVALUATION (Document relevance scores)\n")
         context_sections.append(f"{format_evidence(evidence_node.result)}\n")
-    
+
     return "\n".join(context_sections)
 
 # Usage in Answer Generation
@@ -1034,27 +1034,27 @@ class ProcessNode:
         self.duration_ms: Optional[int] = None
         self.result: Dict[str, Any] = {}
         self.children: List[ProcessNode] = []
-    
+
     def start(self):
         self.status = "in_progress"
         self.timestamp_start = datetime.utcnow()
-    
+
     def complete(self, result: Dict[str, Any]):
         self.status = "completed"
         self.timestamp_end = datetime.utcnow()
         self.duration_ms = int((self.timestamp_end - self.timestamp_start).total_seconds() * 1000)
         self.result = result
-    
+
     def fail(self, error: str):
         self.status = "failed"
         self.timestamp_end = datetime.utcnow()
         self.duration_ms = int((self.timestamp_end - self.timestamp_start).total_seconds() * 1000)
         self.result = {"error": error}
-    
+
     def add_child(self, child: 'ProcessNode'):
         self.children.append(child)
         return child
-    
+
     def to_dict(self) -> dict:
         return {
             "step_id": self.step_id,
@@ -1073,7 +1073,7 @@ class ProcessTreeManager:
         self.root = ProcessNode(step_id="root", step_type="query_root")
         self.current_node = self.root
         self.node_index: Dict[str, ProcessNode] = {"root": self.root}
-    
+
     def add_step(
         self,
         step_id: str,
@@ -1084,81 +1084,81 @@ class ProcessTreeManager:
         parent = self.node_index.get(parent_id or "root")
         if not parent:
             raise ValueError(f"Parent node {parent_id} not found")
-        
+
         node = ProcessNode(step_id=step_id, step_type=step_type, parent_id=parent.step_id)
         parent.add_child(node)
         self.node_index[step_id] = node
         self.current_node = node
-        
+
         return node
-    
+
     def start_step(self, step_id: str):
         node = self.node_index.get(step_id)
         if node:
             node.start()
-    
+
     def complete_step(self, step_id: str, result: Dict[str, Any]):
         node = self.node_index.get(step_id)
         if node:
             node.complete(result)
-    
+
     def fail_step(self, step_id: str, error: str):
         node = self.node_index.get(step_id)
         if node:
             node.fail(error)
-    
+
     def get_path(self, step_id: str) -> List[str]:
         """Get path from root to step"""
         node = self.node_index.get(step_id)
         if not node:
             return []
-        
+
         path = [node.step_id]
         while node.parent_id:
             node = self.node_index[node.parent_id]
             path.insert(0, node.step_id)
-        
+
         return path
-    
+
     def traverse(self, visit_fn: Callable[[ProcessNode], None]):
         """Depth-first traversal"""
         def _traverse(node: ProcessNode):
             visit_fn(node)
             for child in node.children:
                 _traverse(child)
-        
+
         _traverse(self.root)
-    
+
     def aggregate_results(self, node: ProcessNode = None) -> dict:
         """Aggregate results bottom-up"""
         if node is None:
             node = self.root
-        
+
         # Recursively aggregate children
         child_results = []
         for child in node.children:
             child_result = self.aggregate_results(child)
             child_results.append(child_result)
-        
+
         # Aggregate based on step type
         if node.step_type == "rag_retrieval":
             all_docs = []
             for child in child_results:
                 if "documents" in child:
                     all_docs.extend(child["documents"])
-            
+
             node.result["documents"] = all_docs
             node.result["aggregated_from_children"] = True
-        
+
         return node.result
-    
+
     def to_dict(self) -> dict:
         # Calculate metadata
         total_steps = len(self.node_index)
         llm_calls = 0
         rag_queries = 0
         total_tokens = 0
-        
+
         def count_nodes(node):
             nonlocal llm_calls, rag_queries, total_tokens
             if node.step_type in ["llm_call", "llm_call_streaming"]:
@@ -1167,9 +1167,9 @@ class ProcessTreeManager:
                     total_tokens += node.result["tokens_total"]
             elif node.step_type in ["semantic_search", "graph_search", "graph_traversal"]:
                 rag_queries += 1
-        
+
         self.traverse(count_nodes)
-        
+
         return {
             "process_id": str(uuid4()),
             "root": self.root.to_dict(),
@@ -1192,72 +1192,72 @@ async def query_pipeline(request: QueryRequest):
     # Initialize process tree
     tree = ProcessTreeManager()
     tree.root.start()
-    
+
     # Step 1: NLP
     step_nlp = tree.add_step("step_nlp", "nlp_preprocessing", parent_id="root")
     step_nlp.start()
     nlp_result = await nlp_service.process(request.query)
     step_nlp.complete({"nlp": nlp_result.dict()})
     yield StreamEvent(type="processing_step", step_id="step_nlp", path=tree.get_path("step_nlp"), data=step_nlp.to_dict())
-    
+
     # Step 2: RAG (parent)
     step_rag = tree.add_step("step_rag_initial", "rag_retrieval", parent_id="root")
     step_rag.start()
-    
+
     # Step 2.1: Semantic Search (child)
     step_semantic = tree.add_step("step_rag_semantic", "semantic_search", parent_id="step_rag_initial")
     step_semantic.start()
     semantic_results = await rag_service._semantic_search(nlp_result)
     step_semantic.complete({"source": "chromadb", "results_count": len(semantic_results), ...})
     yield StreamEvent(type="processing_step", step_id="step_rag_semantic", path=tree.get_path("step_rag_semantic"), data=step_semantic.to_dict())
-    
+
     # Step 2.2: Graph Search (child, parallel)
     step_graph = tree.add_step("step_rag_graph", "graph_search", parent_id="step_rag_initial")
     step_graph.start()
     graph_results = await rag_service._graph_search(nlp_result)
     step_graph.complete({"source": "neo4j", "nodes_found": len(graph_results), ...})
     yield StreamEvent(type="processing_step", step_id="step_rag_graph", path=tree.get_path("step_rag_graph"), data=step_graph.to_dict())
-    
+
     # Aggregate RAG results
     rag_aggregated = tree.aggregate_results(step_rag)
     step_rag.complete(rag_aggregated)
     yield StreamEvent(type="processing_step", step_id="step_rag_initial", path=tree.get_path("step_rag_initial"), data=step_rag.to_dict())
-    
+
     # Step 3: Hypothesis
     step_hypothesis = tree.add_step("step_hypothesis", "hypothesis_generation", parent_id="root")
     step_hypothesis.start()
-    
+
     # Step 3.1: LLM Call
     step_hyp_llm = tree.add_step("step_hypothesis_llm", "llm_call", parent_id="step_hypothesis")
     step_hyp_llm.start()
     hypothesis = await hypothesis_service.generate(request.query, rag_aggregated)
     step_hyp_llm.complete({"model": "llama3.1:70b", "tokens_total": 1734, "response_json": hypothesis.dict()})
-    
+
     # Step 3.2: Interactive Form (if missing info)
     if hypothesis.missing_information:
         step_form = tree.add_step("step_missing_info_form", "interactive_form_wait", parent_id="step_hypothesis")
         step_form.start()
         yield StreamEvent(type="interactive_form", step_id="step_missing_info_form", data={"fields": hypothesis.missing_information})
-        
+
         # Wait for user input
         user_input = await wait_for_user_input()
         step_form.complete({"form_displayed": True, "user_input": user_input})
-        
+
         # Step 3.3: Additional RAG (triggered by user input)
         step_rag_add = tree.add_step("step_rag_additional", "rag_retrieval_refined", parent_id="step_hypothesis")
         step_rag_add.start()
-        
+
         # ... additional RAG children (LBO-specific, Process graph)
-        
+
         step_rag_add.complete({...})
-    
+
     step_hypothesis.complete({"hypothesis": hypothesis.dict()})
-    
+
     # ... continue with Evidence, Template, Answer
-    
+
     # Final: Complete root
     tree.root.complete({"final_response": {...}})
-    
+
     # Emit full tree
     yield StreamEvent(type="processing_complete", data=tree.to_dict())
 ```

@@ -37,12 +37,21 @@ try:
     from .quality_gate import QualityGate, QualityPolicy, GateDecision
     from .agent_monitoring import AgentMonitor
 except ImportError:
+<<<<<<< Updated upstream
     from schema_validation import validate_research_plan, validate_step
     from state_machine import StateMachine, PlanState, StateTransition, StateTransitionError
     from dependency_resolver import DependencyResolver, DependencyError
     from retry_handler import RetryHandler, RetryConfig, RetryStrategy
     from quality_gate import QualityGate, QualityPolicy, GateDecision
     from agent_monitoring import AgentMonitor
+=======
+    from agent_monitoring import AgentMonitor  # type: ignore[no-redef]
+    from dependency_resolver import DependencyError, DependencyResolver  # type: ignore[no-redef]
+    from quality_gate import GateDecision, QualityGate, QualityPolicy  # type: ignore[no-redef]
+    from retry_handler import RetryConfig, RetryHandler, RetryStrategy  # type: ignore[no-redef]
+    from schema_validation import validate_research_plan, validate_step  # type: ignore[no-redef]
+    from state_machine import PlanState, StateMachine, StateTransition, StateTransitionError  # type: ignore[no-redef]
+>>>>>>> Stashed changes
 
 # Configure logging
 logging.basicConfig(
@@ -100,7 +109,7 @@ class BaseAgent(ABC):
         self.agent_id = agent_id or str(uuid4())
         self.db_path = db_path or Path(__file__).parent.parent.parent.parent / "data" / "agent_framework.db"
         self.config = config or {}
-        self._connection = None
+        self._connection: Optional[sqlite3.Connection] = None
         self._state_machines: Dict[str, StateMachine] = {}  # plan_id -> StateMachine
         
         # Initialize quality gate if policy provided
@@ -444,7 +453,7 @@ class BaseAgent(ABC):
         Returns:
             Execution results dictionary
         """
-        results = {}
+        results: Dict[str, Any] = {}
         succeeded = 0
         failed = 0
         total_quality = 0.0

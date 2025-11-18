@@ -1,6 +1,6 @@
 # 🎉 VERITAS v3.16.0 Release Notes
 
-**Release Date:** 2025-10-09  
+**Release Date:** 2025-10-09
 **Code Name:** "Backend Feedbacksystem"
 
 ---
@@ -92,7 +92,7 @@ CREATE TABLE feedback (
     category TEXT,
     comment TEXT,
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-    
+
     UNIQUE(message_id, user_id) ON CONFLICT REPLACE
 );
 

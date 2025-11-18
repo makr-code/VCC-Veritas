@@ -19,6 +19,7 @@ import logging
 import time
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
+from typing import cast
 
 logger = logging.getLogger(__name__)
 
@@ -204,9 +205,20 @@ class RAGContextService:
                     hybrid_applied = True
                     
                     hybrid_duration = (time.time() - hybrid_start) * 1000
+<<<<<<< Updated upstream
                     
                     # Extrahiere Fusion-Stats
                     fusion_stats = self.hybrid_retriever.rrf.get_fusion_stats(hybrid_results) if hybrid_results else {}
+=======
+
+                    # Extrahiere Fusion-Stats (cast the hybrid results to a permissive type
+                    # to avoid strict type mismatch between HybridResult and FusedDocument)
+                    fusion_stats = (
+                        self.hybrid_retriever.rrf.get_fusion_stats(cast(List[Any], hybrid_results))
+                        if hybrid_results
+                        else {}
+                    )
+>>>>>>> Stashed changes
                     overlap_rate = fusion_stats.get("overlap_rate", 0)
                     
                     logger.info(
@@ -304,6 +316,7 @@ class RAGContextService:
 
         # 1) UDS3 Strategie bevorzugen, sofern verfügbar
         if self.uds3_strategy is not None:
+<<<<<<< Updated upstream
             # Prüfe auf query_across_databases (UDS3 v3.0)
             query_method = getattr(self.uds3_strategy, "query_across_databases", None)
             logger.info(f"🔍 UDS3 query_across_databases: {query_method is not None and callable(query_method)}")
@@ -339,13 +352,35 @@ class RAGContextService:
                     
                     logger.info(f"✅ UDS3 query_across_databases erfolgreich aufgerufen")
                     
+=======
+            # UDS3PolyglotManager hat semantic_search() und answer_query()
+            # Keine query_across_databases() oder unified_query() verfügbar
+            
+            # Verwende semantic_search für Vector-basierte Suche
+            semantic_search_method = getattr(self.uds3_strategy, "semantic_search", None)
+            
+            if callable(semantic_search_method):
+                try:
+                    logger.info(f"🔍 UDS3 semantic_search aufrufen: query='{query_text[:50]}...', top_k={opts.limit_documents}")
+                    
+                    # UDS3 semantic_search API:
+                    # semantic_search(query: str, top_k: int = 10, **kwargs)
+                    result = semantic_search_method(
+                        query=query_text,
+                        top_k=opts.limit_documents
+                    )
+                    
+                    logger.info("✅ UDS3 semantic_search erfolgreich aufgerufen")
+
+>>>>>>> Stashed changes
                     if asyncio.iscoroutine(result):
                         return await result
                     loop = asyncio.get_running_loop()
                     return await loop.run_in_executor(None, lambda: result)
                 except Exception as e:
-                    logger.error(f"❌ UDS3 query_across_databases fehlgeschlagen: {e}")
+                    logger.error(f"❌ UDS3 semantic_search fehlgeschlagen: {e}")
                     # Weiter zum Fallback
+<<<<<<< Updated upstream
             
             # Fallback: Alte unified_query Methode
             unified_query = getattr(self.uds3_strategy, "unified_query", None)
@@ -355,12 +390,23 @@ class RAGContextService:
                 try:
                     result = unified_query(query_text, strategy_weights)  # type: ignore[arg-type]
                     logger.info(f"✅ UDS3 unified_query (Fallback) erfolgreich aufgerufen")
+=======
+
+            # Fallback: answer_query für direkte Antworten
+            answer_query_method = getattr(self.uds3_strategy, "answer_query", None)
+            
+            if callable(answer_query_method):
+                try:
+                    logger.info(f"🔍 UDS3 answer_query (Fallback) aufrufen: query='{query_text[:50]}...'")
+                    result = answer_query_method(query_text)
+                    logger.info("✅ UDS3 answer_query (Fallback) erfolgreich aufgerufen")
+>>>>>>> Stashed changes
                     if asyncio.iscoroutine(result):
                         return await result
                     loop = asyncio.get_running_loop()
                     return await loop.run_in_executor(None, lambda: result)
                 except Exception as e:
-                    logger.error(f"❌ UDS3 unified_query (Fallback) fehlgeschlagen: {e}")
+                    logger.error(f"❌ UDS3 answer_query (Fallback) fehlgeschlagen: {e}")
 
         # 2) MultiDatabaseAPI als Fallback nutzen
         if self.database_api is not None:

@@ -655,11 +655,18 @@ class DatabaseAgent:
             schema_rows = cursor.fetchall()
             
             # Parse Schema
+<<<<<<< Updated upstream
             schema = {
                 'table_name': table_name,
                 'columns': []
             }
             
+=======
+            from typing import Any
+
+            schema: Dict[str, Any] = {"table_name": table_name, "columns": []}
+
+>>>>>>> Stashed changes
             for row in schema_rows:
                 # row: (cid, name, type, notnull, dflt_value, pk)
                 schema['columns'].append({
@@ -882,7 +889,11 @@ async def main():
         
         request = DatabaseQueryRequest(
             query_id=f"test_{i:03d}",
+<<<<<<< Updated upstream
             sql_query=test['sql'],
+=======
+            sql_query=str(test["sql"]),
+>>>>>>> Stashed changes
             database_path=test_db_path,
             include_schema=(i == 4)  # Schema nur bei Test 4
         )

@@ -1,7 +1,7 @@
 # IMMI API - Immissionsschutz Geodaten-Endpunkte
 
-**API-Präfix:** `/api/immi`  
-**Version:** 1.0.0  
+**API-Präfix:** `/api/immi`
+**Version:** 1.0.0
 **Datum:** 10. Oktober 2025
 
 ## 📋 Übersicht
@@ -399,5 +399,5 @@ scripts/
 
 ---
 
-**Autor:** VERITAS Agent System  
+**Autor:** VERITAS Agent System
 **Letzte Aktualisierung:** 10. Oktober 2025

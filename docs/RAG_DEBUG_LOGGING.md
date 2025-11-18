@@ -1,13 +1,13 @@
 # Debug-Logging für RAG-Integration
 
-**Datum:** 05.10.2025, 20:45 Uhr  
+**Datum:** 05.10.2025, 20:45 Uhr
 **Status:** 🔍 Debug-Logging hinzugefügt
 
 ## Problem
 
 Backend zeigt:
 ```
-WARNING: ⚠️ RAG Backend fehlgeschlagen – wechsle auf Mock-Daten: 
+WARNING: ⚠️ RAG Backend fehlgeschlagen – wechsle auf Mock-Daten:
 Keine ausführbare RAG-Schnittstelle gefunden
 ```
 
@@ -95,7 +95,7 @@ INFO: ✅ UDS3 unified_query (Fallback) erfolgreich aufgerufen
 ```
 INFO: 🔍 UDS3 query_across_databases: False
 INFO: 🔍 UDS3 unified_query (Fallback): False
-WARNING: ⚠️ RAG Backend fehlgeschlagen – wechsle auf Mock-Daten: 
+WARNING: ⚠️ RAG Backend fehlgeschlagen – wechsle auf Mock-Daten:
          Keine ausführbare RAG-Schnittstelle gefunden
 ```
 
@@ -106,7 +106,7 @@ INFO: 🔍 UDS3 query_across_databases: True
 INFO: 📊 UDS3 Query: vector=True, graph=True, relational=True
 ERROR: ❌ UDS3 query_across_databases fehlgeschlagen: [EXCEPTION DETAILS]
 INFO: 🔍 UDS3 unified_query (Fallback): False
-WARNING: ⚠️ RAG Backend fehlgeschlagen – wechsle auf Mock-Daten: 
+WARNING: ⚠️ RAG Backend fehlgeschlagen – wechsle auf Mock-Daten:
          Keine ausführbare RAG-Schnittstelle gefunden
 ```
 
@@ -186,6 +186,6 @@ Nach Backend-Neustart:
 
 ---
 
-**Status:** 🔍 Debug-Logging aktiv - Backend-Neustart erforderlich  
-**Ziel:** Identifizieren warum RAG-Integration fehlschlägt trotz UDS3-Verfügbarkeit  
+**Status:** 🔍 Debug-Logging aktiv - Backend-Neustart erforderlich
+**Ziel:** Identifizieren warum RAG-Integration fehlschlägt trotz UDS3-Verfügbarkeit
 **Next:** Backend neu starten und Logs analysieren

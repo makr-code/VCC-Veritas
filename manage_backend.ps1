@@ -50,7 +50,7 @@ function Get-BackendProcess {
     $processes = Get-Process -Name $ProcessName -ErrorAction SilentlyContinue | Where-Object {
         $_.CommandLine -like "*$BackendScript*"
     }
-    
+
     # Fallback: Prüfe über Port
     if (-not $processes) {
         $connection = Get-NetTCPConnection -LocalPort $BackendPort -State Listen -ErrorAction SilentlyContinue
@@ -58,31 +58,31 @@ function Get-BackendProcess {
             $processes = Get-Process -Id $connection.OwningProcess -ErrorAction SilentlyContinue
         }
     }
-    
+
     return $processes
 }
 
 # Starte Backend
 function Start-Backend {
     Write-Info "Prüfe Backend-Status..."
-    
+
     if (Test-BackendRunning) {
         Write-Warning "Backend läuft bereits auf Port $BackendPort"
         Show-BackendStatus
         return
     }
-    
+
     Write-Info "Starte Backend-Server..."
-    
+
     # Prüfe ob start_backend.py existiert
     if (-not (Test-Path $BackendScript)) {
         Write-Error "Script '$BackendScript' nicht gefunden!"
         return
     }
-    
+
     # Starte Backend als Background-Prozess
     $process = Start-Process -FilePath "python" -ArgumentList $BackendScript -NoNewWindow -PassThru -RedirectStandardOutput $LogFile
-    
+
     # Warte auf Start (max 10 Sekunden)
     Write-Info "Warte auf Backend-Start..."
     $timeout = 10
@@ -90,7 +90,7 @@ function Start-Backend {
     while ($elapsed -lt $timeout) {
         Start-Sleep -Seconds 1
         $elapsed++
-        
+
         if (Test-BackendRunning) {
             Write-Success "Backend erfolgreich gestartet!"
             Write-Info "PID: $($process.Id)"
@@ -99,10 +99,10 @@ function Start-Backend {
             Show-BackendStatus
             return
         }
-        
+
         Write-Host "." -NoNewline
     }
-    
+
     Write-Host ""
     Write-Error "Backend-Start fehlgeschlagen (Timeout nach ${timeout}s)"
     Write-Info "Prüfe Log-Datei: $LogFile"
@@ -111,14 +111,14 @@ function Start-Backend {
 # Stoppe Backend
 function Stop-Backend {
     Write-Info "Suche Backend-Prozess..."
-    
+
     $processes = Get-BackendProcess
-    
+
     if (-not $processes) {
         Write-Warning "Kein Backend-Prozess gefunden"
         return
     }
-    
+
     foreach ($proc in $processes) {
         Write-Info "Stoppe Prozess PID: $($proc.Id)"
         try {
@@ -129,10 +129,10 @@ function Stop-Backend {
             Write-Error "Fehler beim Stoppen: $_"
         }
     }
-    
+
     # Warte und verifiziere
     Start-Sleep -Seconds 2
-    
+
     if (Test-BackendRunning) {
         Write-Error "Backend läuft noch! Erzwinge Stopp..."
         # Erzwinge über Port
@@ -150,12 +150,12 @@ function Stop-Backend {
 function Show-BackendStatus {
     Write-Info "Backend-Status:"
     Write-Host ("=" * 50)
-    
+
     $isRunning = Test-BackendRunning
-    
+
     if ($isRunning) {
         Write-Success "Status: RUNNING"
-        
+
         $processes = Get-BackendProcess
         if ($processes) {
             foreach ($proc in $processes) {
@@ -166,12 +166,12 @@ function Show-BackendStatus {
                 Write-Host "  Started:    $($proc.StartTime)" -ForegroundColor White
             }
         }
-        
+
         Write-Host "  Port:       $BackendPort" -ForegroundColor White
         Write-Host "  URL:        http://localhost:$BackendPort" -ForegroundColor White
         Write-Host "  Health:     http://localhost:$BackendPort/health" -ForegroundColor White
         Write-Host "  API Docs:   http://localhost:$BackendPort/docs" -ForegroundColor White
-        
+
         # Teste Health Endpoint
         try {
             $health = Invoke-RestMethod -Uri "http://localhost:$BackendPort/health" -TimeoutSec 2
@@ -186,14 +186,14 @@ function Show-BackendStatus {
     }
     else {
         Write-Error "Status: STOPPED"
-        
+
         # Prüfe ob Port blockiert ist
         $connection = Get-NetTCPConnection -LocalPort $BackendPort -ErrorAction SilentlyContinue
         if ($connection) {
             Write-Warning "Port $BackendPort wird von Prozess $($connection.OwningProcess) blockiert"
         }
     }
-    
+
     Write-Host ("=" * 50)
 }
 

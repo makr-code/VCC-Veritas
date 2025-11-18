@@ -1,8 +1,8 @@
 # 🚀 VERITAS Option 2: Vollständige Implementierung
 
-**Projekt**: Code an Dokumentation anpassen  
-**Ziel**: Implementierung aller 25+ dokumentierten Workers, Processing Agents, und Features  
-**Umfang**: Enterprise-Grade Multi-Agent System  
+**Projekt**: Code an Dokumentation anpassen
+**Ziel**: Implementierung aller 25+ dokumentierten Workers, Processing Agents, und Features
+**Umfang**: Enterprise-Grade Multi-Agent System
 **Geschätzte Dauer**: **3-6 Monate** (bei 1 Vollzeit-Entwickler)
 
 ---
@@ -60,16 +60,16 @@ class QueryPreprocessor(BaseAgent):
     - Intent Classification
     - Domain Detection (ML-basiert statt Keywords)
     """
-    
+
     def __init__(self):
         self.nlp = spacy.load("de_core_news_lg")  # Deutsches NLP-Modell
         self.intent_classifier = IntentClassifier()  # Custom ML-Modell
         self.entity_extractor = EntityExtractor()
-    
+
     def process(self, query: str) -> PreprocessedQuery:
         # Sprachverarbeitung
         doc = self.nlp(query)
-        
+
         # Entities extrahieren
         entities = {
             'locations': [ent for ent in doc.ents if ent.label_ == 'LOC'],
@@ -77,17 +77,17 @@ class QueryPreprocessor(BaseAgent):
             'organizations': [ent for ent in doc.ents if ent.label_ == 'ORG'],
             'persons': [ent for ent in doc.ents if ent.label_ == 'PER']
         }
-        
+
         # Intent klassifizieren
         intent = self.intent_classifier.predict(query)
         # z.B. "information_request", "complaint", "application"
-        
+
         # Domain erkennen
         domain = self.detect_domain(doc, entities)
-        
+
         # Komplexität analysieren
         complexity = self.analyze_complexity(doc, entities)
-        
+
         return PreprocessedQuery(
             original=query,
             normalized=self.normalize(query),
@@ -110,25 +110,25 @@ class ResultPostprocessor(BaseAgent):
     - Result Deduplication
     - Conflict Resolution
     """
-    
+
     def process(self, agent_results: List[AgentResult]) -> AggregatedResult:
         # 1. Deduplizierung
         unique_results = self.deduplicate(agent_results)
-        
+
         # 2. Confidence-gewichtete Aggregation
         weighted_results = self.apply_weights(unique_results)
-        
+
         # 3. Konflikt-Erkennung
         conflicts = self.detect_conflicts(weighted_results)
-        
+
         # 4. Konflikt-Auflösung
         if conflicts:
             resolved = self.resolve_conflicts(conflicts)
             weighted_results.update(resolved)
-        
+
         # 5. Final Ranking
         ranked = self.rank_by_relevance(weighted_results)
-        
+
         return AggregatedResult(
             results=ranked,
             confidence=self.calculate_overall_confidence(ranked),
@@ -149,7 +149,7 @@ class QualityAssessor(BaseAgent):
     - Relevance (Relevanz)
     - Consistency (Konsistenz)
     """
-    
+
     def assess(self, query: str, result: AggregatedResult) -> QualityScore:
         metrics = {
             'completeness': self.assess_completeness(query, result),
@@ -157,36 +157,36 @@ class QualityAssessor(BaseAgent):
             'relevance': self.assess_relevance(query, result),
             'consistency': self.assess_consistency(result)
         }
-        
+
         overall = (
             metrics['completeness'] * 0.3 +
             metrics['accuracy'] * 0.3 +
             metrics['relevance'] * 0.25 +
             metrics['consistency'] * 0.15
         )
-        
+
         return QualityScore(
             overall=overall,
             metrics=metrics,
             passed=overall >= 0.7,
             recommendations=self.generate_recommendations(metrics)
         )
-    
+
     def assess_completeness(self, query: str, result: AggregatedResult) -> float:
         """Wurden alle Aspekte der Query beantwortet?"""
         required_aspects = self.extract_aspects(query)
         covered_aspects = self.find_covered_aspects(result, required_aspects)
         return len(covered_aspects) / len(required_aspects)
-    
+
     def assess_accuracy(self, result: AggregatedResult) -> float:
         """Stimmen die Fakten? Cross-Referencing von Sources."""
         verified_facts = 0
         total_facts = len(result.facts)
-        
+
         for fact in result.facts:
             if self.verify_fact(fact, result.sources):
                 verified_facts += 1
-        
+
         return verified_facts / total_facts if total_facts > 0 else 0.0
 ```
 
@@ -202,24 +202,24 @@ class ResultAggregator(BaseAgent):
     - Deduplication
     - Source-Attribution
     """
-    
+
     def aggregate(self, worker_results: Dict[str, WorkerResult]) -> AggregatedResult:
         # 1. Clustering
         clusters = self.cluster_results(worker_results)
-        
+
         # 2. Ranking
         ranked_clusters = self.rank_clusters(clusters)
-        
+
         # 3. Synthesis
         synthesized = []
         for cluster in ranked_clusters:
             synthesized.append(
                 self.synthesize_cluster(cluster)
             )
-        
+
         # 4. Source Attribution
         sources = self.collect_sources(worker_results)
-        
+
         return AggregatedResult(
             synthesized_information=synthesized,
             sources=sources,
@@ -253,7 +253,7 @@ class BaseWorker(ABC):
     """
     Basis-Klasse für alle spezialisierten Worker
     """
-    
+
     def __init__(self):
         self.name = self.__class__.__name__
         self.domain = None  # Wird in Subklassen gesetzt
@@ -261,29 +261,29 @@ class BaseWorker(ABC):
         self.rag_focus = []  # RAG-Schwerpunkt-Keywords
         self.external_apis = []  # Externe APIs die dieser Worker nutzt
         self.confidence_threshold = 0.6
-    
+
     @abstractmethod
     async def execute(self, query: PreprocessedQuery) -> WorkerResult:
         """Hauptlogik des Workers"""
         pass
-    
+
     @abstractmethod
     def is_relevant(self, query: PreprocessedQuery) -> float:
         """Gibt Relevanz-Score zurück (0.0 - 1.0)"""
         pass
-    
+
     async def _rag_search(self, keywords: List[str]) -> List[Document]:
         """RAG-Suche mit Worker-spezifischem Focus"""
         return await self.rag_service.search(
             keywords=keywords,
             filters={'domain': self.domain, 'focus': self.rag_focus}
         )
-    
+
     async def _call_external_api(self, api_name: str, params: dict):
         """Aufruf externer APIs mit Retry-Logic und Caching"""
         if api_name not in self.external_apis:
             raise ValueError(f"API {api_name} nicht für Worker {self.name} konfiguriert")
-        
+
         return await self.api_manager.call(api_name, params)
 ```
 
@@ -295,16 +295,16 @@ class WorkerRegistry:
     """
     Zentrales Register aller Worker mit Capability-Matching
     """
-    
+
     def __init__(self):
         self.workers: Dict[str, BaseWorker] = {}
         self._auto_discover_workers()
-    
+
     def register(self, worker: BaseWorker):
         """Worker registrieren"""
         self.workers[worker.name] = worker
         logger.info(f"✅ Worker registriert: {worker.name} (Domain: {worker.domain})")
-    
+
     def select_workers(self, query: PreprocessedQuery) -> List[BaseWorker]:
         """
         Intelligente Worker-Auswahl basierend auf:
@@ -314,16 +314,16 @@ class WorkerRegistry:
         - Relevanz-Scores
         """
         relevant_workers = []
-        
+
         for worker in self.workers.values():
             relevance = worker.is_relevant(query)
-            
+
             if relevance >= worker.confidence_threshold:
                 relevant_workers.append((worker, relevance))
-        
+
         # Sortiere nach Relevanz
         relevant_workers.sort(key=lambda x: x[1], reverse=True)
-        
+
         # Top 5-10 Worker
         return [w for w, score in relevant_workers[:10]]
 ```
@@ -350,7 +350,7 @@ class AirQualityWorker(EnvironmentalWorker):
     """
     Spezialisiert auf Luftqualität und Emissionen
     """
-    
+
     def __init__(self):
         super().__init__()
         self.domain = 'environmental'
@@ -372,13 +372,13 @@ class AirQualityWorker(EnvironmentalWorker):
             'landesumweltämter',
             'eea_air_quality'  # European Environment Agency
         ]
-    
+
     async def execute(self, query: PreprocessedQuery) -> WorkerResult:
         # 1. RAG-Suche nach relevanten Dokumenten
         documents = await self._rag_search(
             keywords=query.keywords + self.rag_focus
         )
-        
+
         # 2. Externe API: Aktuelle Messwerte
         location = query.entities.get('locations', [None])[0]
         if location:
@@ -388,17 +388,17 @@ class AirQualityWorker(EnvironmentalWorker):
             )
         else:
             current_data = None
-        
+
         # 3. Analyse der Grenzwerte
         legal_limits = await self._analyze_legal_limits(documents)
-        
+
         # 4. Synthesize
         summary = self._synthesize(
             documents=documents,
             current_data=current_data,
             legal_limits=legal_limits
         )
-        
+
         return WorkerResult(
             worker=self.name,
             summary=summary,
@@ -410,24 +410,24 @@ class AirQualityWorker(EnvironmentalWorker):
                 'measurement_timestamp': current_data.get('timestamp') if current_data else None
             }
         )
-    
+
     def is_relevant(self, query: PreprocessedQuery) -> float:
         """Relevanz-Berechnung"""
         score = 0.0
-        
+
         # Domain-Match
         if query.domain == 'environmental':
             score += 0.3
-        
+
         # Keyword-Match
         air_keywords = ['luft', 'emission', 'feinstaub', 'luftqualität', 'immission']
         matches = sum(1 for kw in air_keywords if kw in query.normalized.lower())
         score += min(matches * 0.15, 0.5)
-        
+
         # Intent-Match
         if query.intent in ['complaint', 'information_request']:
             score += 0.2
-        
+
         return min(score, 1.0)
 ```
 
@@ -439,7 +439,7 @@ class NoiseComplaintWorker(EnvironmentalWorker):
     """
     Spezialisiert auf Lärmschutz und Lärmbeschwerde
     """
-    
+
     def __init__(self):
         super().__init__()
         self.capabilities = ['noise_analysis', 'complaint_processing']
@@ -451,11 +451,11 @@ class NoiseComplaintWorker(EnvironmentalWorker):
             'ta lärm'
         ]
         self.external_apis = ['lärmkartierung', 'umweltbundesamt']
-    
+
     async def execute(self, query: PreprocessedQuery) -> WorkerResult:
         # 1. RAG: Rechtliche Grundlagen
         legal_docs = await self._rag_search(['lärmschutz', 'grenzwerte'])
-        
+
         # 2. Externe API: Lärmkartierung
         location = query.entities.get('locations', [None])[0]
         if location:
@@ -463,13 +463,13 @@ class NoiseComplaintWorker(EnvironmentalWorker):
                 'lärmkartierung',
                 {'location': location, 'type': 'all'}
             )
-        
+
         # 3. Analyse: Sind Grenzwerte überschritten?
         violation_analysis = self._analyze_violations(noise_map, legal_docs)
-        
+
         # 4. Prozess-Empfehlungen
         recommendations = self._generate_complaint_process(violation_analysis)
-        
+
         return WorkerResult(
             worker=self.name,
             summary=self._synthesize_noise_analysis(
@@ -509,7 +509,7 @@ class BuildingPermitWorker(ConstructionWorker):
     """
     Spezialisiert auf Baugenehmigungen
     """
-    
+
     def __init__(self):
         super().__init__()
         self.capabilities = [
@@ -528,7 +528,7 @@ class BuildingPermitWorker(ConstructionWorker):
             'bauaufsicht_muenchen',
             'stadtplanung_api'
         ]
-    
+
     async def execute(self, query: PreprocessedQuery) -> WorkerResult:
         # 1. RAG: Rechtliche Anforderungen
         legal_docs = await self._rag_search([
@@ -536,7 +536,7 @@ class BuildingPermitWorker(ConstructionWorker):
             'bauantrag',
             query.keywords
         ])
-        
+
         # 2. Externe API: Bebauungsplan-Prüfung
         location = query.entities.get('locations', [None])[0]
         zoning_info = None
@@ -545,20 +545,20 @@ class BuildingPermitWorker(ConstructionWorker):
                 'stadtplanung_api',
                 {'address': location, 'info': 'zoning'}
             )
-        
+
         # 3. Requirement-Analyse
         requirements = self._analyze_requirements(
             query=query,
             legal_docs=legal_docs,
             zoning=zoning_info
         )
-        
+
         # 4. Prozess-Anleitung
         process_steps = self._generate_process_guide(requirements)
-        
+
         # 5. Dokument-Checkliste
         required_documents = self._generate_document_checklist(requirements)
-        
+
         return WorkerResult(
             worker=self.name,
             summary=self._synthesize_permit_guidance(
@@ -574,7 +574,7 @@ class BuildingPermitWorker(ConstructionWorker):
                 'estimated_processing_time': self._estimate_processing_time(requirements)
             }
         )
-    
+
     def _analyze_requirements(self, query, legal_docs, zoning):
         """Analysiert welche Anforderungen gelten"""
         requirements = {
@@ -583,7 +583,7 @@ class BuildingPermitWorker(ConstructionWorker):
             'zoning_compliance': self._check_zoning_compliance(zoning),
             'special_requirements': []
         }
-        
+
         # Spezielle Anforderungen basierend auf Gebäudetyp
         building_type = query.entities.get('building_type')
         if building_type == 'residential':
@@ -591,7 +591,7 @@ class BuildingPermitWorker(ConstructionWorker):
         elif building_type == 'commercial':
             requirements['special_requirements'].append('Brandschutzkonzept')
             requirements['special_requirements'].append('Stellplatznachweis')
-        
+
         return requirements
 ```
 
@@ -652,13 +652,13 @@ class ExternalAPIManager:
     - Error Handling
     - API-Key Management
     """
-    
+
     def __init__(self):
         self.apis = {}
         self.cache = RedisCache()
         self.rate_limiters = {}
         self._register_apis()
-    
+
     def register_api(self, api_config: APIConfig):
         """API registrieren"""
         self.apis[api_config.name] = ExternalAPI(
@@ -667,42 +667,42 @@ class ExternalAPIManager:
             auth=api_config.auth,
             rate_limit=api_config.rate_limit
         )
-        
+
         # Rate Limiter einrichten
         self.rate_limiters[api_config.name] = RateLimiter(
             max_calls=api_config.rate_limit.max_calls,
             period=api_config.rate_limit.period
         )
-    
+
     async def call(self, api_name: str, endpoint: str, params: dict):
         """API aufrufen mit allen Safety-Features"""
         api = self.apis.get(api_name)
         if not api:
             raise ValueError(f"API {api_name} nicht registriert")
-        
+
         # 1. Cache-Check
         cache_key = f"{api_name}:{endpoint}:{hash(frozenset(params.items()))}"
         cached = await self.cache.get(cache_key)
         if cached:
             return cached
-        
+
         # 2. Rate Limiting
         await self.rate_limiters[api_name].acquire()
-        
+
         # 3. API-Call mit Retry
         for attempt in range(3):
             try:
                 response = await api.call(endpoint, params)
-                
+
                 # Cache speichern
                 await self.cache.set(
                     cache_key,
                     response,
                     ttl=api.cache_ttl
                 )
-                
+
                 return response
-                
+
             except Exception as e:
                 if attempt == 2:
                     raise
@@ -728,7 +728,7 @@ apis:
       - name: "air_quality"
         path: "/measures/json"
         params: ["station", "component", "date_from", "date_to"]
-  
+
   dwd_weather:
     base_url: "https://opendata.dwd.de/weather"
     auth:
@@ -737,7 +737,7 @@ apis:
       max_calls: 500
       period: 3600
     cache_ttl: 3600
-  
+
   stadtplanung_muenchen:
     base_url: "https://geoportal.muenchen.de/geoserver/wfs"
     auth:
@@ -801,14 +801,14 @@ class MultiWorkerOrchestrator:
     - Worker-zu-Worker Kommunikation
     - Dynamic Scheduling
     """
-    
+
     async def execute(self, query: PreprocessedQuery, workers: List[BaseWorker]):
         # 1. Dependency-Graph erstellen
         dependency_graph = self._build_dependency_graph(workers)
-        
+
         # 2. Execution-Plan
         execution_plan = self._create_execution_plan(dependency_graph)
-        
+
         # 3. Parallele Execution in Wellen
         results = {}
         for wave in execution_plan:
@@ -816,13 +816,13 @@ class MultiWorkerOrchestrator:
                 self._execute_worker(worker, query, results)
                 for worker in wave
             ])
-            
+
             # Worker-Results verfügbar machen für nächste Welle
             for worker, result in zip(wave, wave_results):
                 results[worker.name] = result
-        
+
         return results
-    
+
     def _build_dependency_graph(self, workers: List[BaseWorker]):
         """
         Beispiel:
@@ -851,22 +851,22 @@ class AdvancedNLPProcessor:
     - Sentiment Analysis
     - Topic Modeling
     """
-    
+
     async def process(self, query: str):
         # 1. NER mit Fine-tuned Model
         entities = await self.ner_model.extract(query)
-        
+
         # 2. Relation Extraction
         # "München" <located_in> "Bayern"
         # "Baugenehmigung" <requires> "Bauantrag"
         relations = await self.relation_extractor.extract(query, entities)
-        
+
         # 3. Sentiment (wichtig bei Beschwerden)
         sentiment = await self.sentiment_analyzer.analyze(query)
-        
+
         # 4. Topic Modeling
         topics = await self.topic_model.predict(query)
-        
+
         return NLPResult(
             entities=entities,
             relations=relations,
@@ -886,7 +886,7 @@ class AdvancedNLPProcessor:
 1. **Unit Tests** (alle Worker, Processing Agents)
    ```python
    # tests/workers/test_building_permit_worker.py
-   
+
    @pytest.mark.asyncio
    async def test_building_permit_worker_residential():
        worker = BuildingPermitWorker()
@@ -895,9 +895,9 @@ class AdvancedNLPProcessor:
            domain="construction",
            entities={'building_type': 'residential'}
        )
-       
+
        result = await worker.execute(query)
-       
+
        assert result.confidence > 0.8
        assert 'Bauantrag' in result.summary
        assert len(result.metadata['required_documents']) > 0
@@ -914,9 +914,9 @@ class AdvancedNLPProcessor:
            domain="environmental",
            entities={'locations': ['München']}
        )
-       
+
        result = await worker.execute(query)
-       
+
        assert result.metadata['pollutants_analyzed']
        assert result.sources  # Sollte UBA-API enthalten
    ```
@@ -945,7 +945,7 @@ class WorkerMetrics:
     - Cache Hit Rates
     - Confidence Distributions
     """
-    
+
     def track_worker_execution(self, worker_name: str, duration: float, success: bool):
         self.prometheus.histogram(
             'worker_execution_duration_seconds',

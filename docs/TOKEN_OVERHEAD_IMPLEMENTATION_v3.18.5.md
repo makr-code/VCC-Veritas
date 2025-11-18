@@ -1,8 +1,8 @@
 # Token-Overhead für strukturierte Antworten - v3.18.5
 
-**Status:** ✅ IMPLEMENTIERT (10.10.2025)  
-**Betroffene Dateien:** 2 Backend-Dateien, 1 Frontend-Datei  
-**Code-Änderungen:** ~45 LOC  
+**Status:** ✅ IMPLEMENTIERT (10.10.2025)
+**Betroffene Dateien:** 2 Backend-Dateien, 1 Frontend-Datei
+**Code-Änderungen:** ~45 LOC
 
 ---
 
@@ -17,7 +17,7 @@ Die `max_tokens` Einstellung des Users bezog sich auf die **gesamte LLM-Antwort*
 ```
 📋 Nächste Schritte:
 • Termin beim Bauordnungsamt vereinbaren
-• Vollständige Unterlagen zusammenstellen  
+• Vollständige Unterlagen zusammenstellen
 • Bei Fragen: Bauvoranfrage stellen
 
 💡 Vorschläge:
@@ -61,30 +61,30 @@ Struktur-Anhang: ~300 Tokens (Details/Nächste Schritte/Vorschläge)
 
 ### 1. Backend - veritas_api_module.py
 
-**Datei:** `backend/api/veritas_api_module.py`  
-**Funktion:** `_get_llm_instance()`  
-**Zeilen:** 94-130  
+**Datei:** `backend/api/veritas_api_module.py`
+**Funktion:** `_get_llm_instance()`
+**Zeilen:** 94-130
 
 ```python
-def _get_llm_instance(model_name: str = None, temperature: float = 0.7, 
+def _get_llm_instance(model_name: str = None, temperature: float = 0.7,
                       max_tokens: int = None, top_p: float = None):
     """Gibt eine native Ollama LLM-Instanz zurück (ersetzt LangChain ChatOllama)
-    
+
     WICHTIG: max_tokens wird um STRUCTURED_RESPONSE_OVERHEAD erweitert,
     da strukturierte Antworten zusätzliche Tokens für Formatierung benötigen:
     - 📋 Details: ~100-150 Tokens
-    - 🔄 Nächste Schritte: ~50-100 Tokens  
+    - 🔄 Nächste Schritte: ~50-100 Tokens
     - 💡 Vorschläge: ~50-100 Tokens
     - Strukturierungs-Markup: ~50 Tokens
-    
+
     Beispiel: User wählt 1200 Tokens → Ollama erhält 1500 Tokens
     → Hauptantwort nutzt ~1200, Struktur-Anhang ~300 Tokens
     """
     effective_model = model_name or LLM_MODEL
-    
+
     # ✨ STRUCTURED_RESPONSE_OVERHEAD: Tokens für Details/Nächste Schritte/Vorschläge
     STRUCTURED_RESPONSE_OVERHEAD = 300  # ~200-300 Tokens für Anhang-Struktur
-    
+
     # Erweitere max_tokens um Overhead (falls gesetzt)
     if max_tokens is not None:
         effective_max_tokens = max_tokens + STRUCTURED_RESPONSE_OVERHEAD
@@ -94,9 +94,9 @@ def _get_llm_instance(model_name: str = None, temperature: float = 0.7,
     else:
         effective_max_tokens = None
         logging.info(f"[TOKEN-BUDGET] Kein max_tokens Limit gesetzt (unbegrenzt)")
-    
+
     logging.info(f"[NATIVE] Lade LLM-Modell: {effective_model} (T={temperature})")
-    
+
     try:
         return DirectOllamaLLM(
             model=effective_model,
@@ -118,17 +118,17 @@ def _get_llm_instance(model_name: str = None, temperature: float = 0.7,
 
 ### 2. Backend - veritas_api_native.py
 
-**Datei:** `backend/api/veritas_api_native.py`  
-**Funktion:** `_get_llm_instance()`  
-**Zeilen:** 94-130  
+**Datei:** `backend/api/veritas_api_native.py`
+**Funktion:** `_get_llm_instance()`
+**Zeilen:** 94-130
 
 **Identische Implementierung** wie in `veritas_api_module.py` (DRY-Prinzip verletzt, aber beide Dateien aktiv genutzt).
 
 ### 3. Frontend - veritas_app.py
 
-**Datei:** `frontend/veritas_app.py`  
-**Tooltip:** Max Tokens Spinbox  
-**Zeilen:** 1240-1248  
+**Datei:** `frontend/veritas_app.py`
+**Tooltip:** Max Tokens Spinbox
+**Zeilen:** 1240-1248
 
 **VORHER:**
 ```python
@@ -164,8 +164,8 @@ def _get_llm_instance(model_name: str = None, temperature: float = 0.7,
 
 ### Rechtsauskunft-Preset (800 Tokens)
 
-**User-Einstellung:** 800 Tokens  
-**Ollama num_predict:** 1100 Tokens (+300)  
+**User-Einstellung:** 800 Tokens
+**Ollama num_predict:** 1100 Tokens (+300)
 
 **Erwartete Antwort-Struktur:**
 ```
@@ -177,7 +177,7 @@ Für eine Baugenehmigung in Brandenburg benötigen Sie folgende Unterlagen:
 • Statische Berechnungen
 • Baubeschreibung
 
-Der Bauantrag wird beim zuständigen Bauordnungsamt eingereicht. 
+Der Bauantrag wird beim zuständigen Bauordnungsamt eingereicht.
 Die Bearbeitungsdauer beträgt in der Regel 2-3 Monate.
 
 [~800 Tokens Haupt-Antwort ✅]
@@ -198,8 +198,8 @@ Total: ~950 Tokens (unter 1100 Limit ✅)
 
 ### Standard-Preset (1200 Tokens)
 
-**User-Einstellung:** 1200 Tokens  
-**Ollama num_predict:** 1500 Tokens (+300)  
+**User-Einstellung:** 1200 Tokens
+**Ollama num_predict:** 1500 Tokens (+300)
 
 **Erwartete Antwort-Struktur:**
 ```
@@ -220,8 +220,8 @@ Total: ~1450 Tokens (unter 1500 Limit ✅)
 
 ### Ausführlich-Preset (1800 Tokens)
 
-**User-Einstellung:** 1800 Tokens  
-**Ollama num_predict:** 2100 Tokens (+300)  
+**User-Einstellung:** 1800 Tokens
+**Ollama num_predict:** 2100 Tokens (+300)
 
 **Erwartete Antwort-Struktur:**
 ```
@@ -359,9 +359,9 @@ Ergebnis: Hauptantwort entspricht User-Erwartung!
 
 ### STRUCTURED_RESPONSE_OVERHEAD
 
-**Wert:** 300 Tokens  
-**Definiert in:** `_get_llm_instance()` (2x: module.py & native.py)  
-**Anpassbar:** Ja, zentral pro Datei  
+**Wert:** 300 Tokens
+**Definiert in:** `_get_llm_instance()` (2x: module.py & native.py)
+**Anpassbar:** Ja, zentral pro Datei
 
 **Tuning-Empfehlungen:**
 
@@ -376,7 +376,7 @@ Ergebnis: Hauptantwort entspricht User-Erwartung!
 
 ### Alternative Implementierung (dynamisch)
 
-**Aktuell:** Statischer Overhead von 300 Tokens  
+**Aktuell:** Statischer Overhead von 300 Tokens
 **Alternative:** Dynamischer Overhead basierend auf Preset
 
 ```python
@@ -397,26 +397,26 @@ effective_max_tokens = max_tokens + OVERHEAD_MAP.get(max_tokens, 300)
 ## 🐛 Bekannte Limitierungen
 
 ### 1. DRY-Verletzung
-**Problem:** Identischer Code in 2 Dateien (`module.py` & `native.py`)  
-**Grund:** Beide Implementierungen parallel aktiv  
+**Problem:** Identischer Code in 2 Dateien (`module.py` & `native.py`)
+**Grund:** Beide Implementierungen parallel aktiv
 **TODO:** Konsolidierung nach Migration auf eine Implementierung
 
 ### 2. Präzision des Overheads
-**Problem:** 300 Tokens sind **Schätzung**, reale Struktur variiert (200-350 Tokens)  
-**Impact:** Gering - Hauptantwort schwankt um ±50 Tokens (~4% Varianz)  
+**Problem:** 300 Tokens sind **Schätzung**, reale Struktur variiert (200-350 Tokens)
+**Impact:** Gering - Hauptantwort schwankt um ±50 Tokens (~4% Varianz)
 **Akzeptabel:** ✅ Ja, für User nicht merklich
 
 ### 3. Keine UI-Anpassung der Wortschätzung
-**Problem:** Token-Counter zeigt `"📘 ~900 Wörter"` für 1200 Tokens  
-**Realität:** Ollama erhält 1500 Tokens → tatsächlich ~1125 Wörter generiert  
-**Impact:** Gering - User-Erwartung bleibt korrekt (Hauptantwort = ~900 Wörter)  
+**Problem:** Token-Counter zeigt `"📘 ~900 Wörter"` für 1200 Tokens
+**Realität:** Ollama erhält 1500 Tokens → tatsächlich ~1125 Wörter generiert
+**Impact:** Gering - User-Erwartung bleibt korrekt (Hauptantwort = ~900 Wörter)
 **TODO:** Optional: Tooltip erweitern mit "(+~225 Wörter für Struktur)"
 
 ### 4. Keine Preset-spezifischen Tooltips aktualisiert
-**Problem:** Preset-Tooltips zeigen noch `"Tokens: 800"` statt `"Tokens: 800 (+300 Struktur)"`  
-**Grund:** String-Replacement fehlgeschlagen (Emoji-Encoding)  
-**Impact:** Mittel - User sieht nicht die tatsächliche Ollama-Token-Zahl  
-**Status:** ⏳ TEILWEISE (nur Haupt-Tooltip aktualisiert)  
+**Problem:** Preset-Tooltips zeigen noch `"Tokens: 800"` statt `"Tokens: 800 (+300 Struktur)"`
+**Grund:** String-Replacement fehlgeschlagen (Emoji-Encoding)
+**Impact:** Mittel - User sieht nicht die tatsächliche Ollama-Token-Zahl
+**Status:** ⏳ TEILWEISE (nur Haupt-Tooltip aktualisiert)
 **TODO:** Manuelle Anpassung der 4 Preset-Tooltips
 
 ---
@@ -498,7 +498,7 @@ effective_max_tokens = max_tokens + OVERHEAD_MAP.get(max_tokens, 300)
 
 ---
 
-**Version:** v3.18.5  
-**Datum:** 10. Oktober 2025  
-**Autor:** GitHub Copilot  
+**Version:** v3.18.5
+**Datum:** 10. Oktober 2025
+**Autor:** GitHub Copilot
 **Review:** ⏳ Pending User Testing

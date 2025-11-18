@@ -21,12 +21,22 @@ import asyncio
 import logging
 import sys
 from pathlib import Path
+<<<<<<< Updated upstream
+=======
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, cast
+>>>>>>> Stashed changes
 
-# Add project root to path
+# Add project root to path for runtime imports
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
+<<<<<<< Updated upstream
 try:
+=======
+if TYPE_CHECKING:
+    # Static type hints for mypy / IDEs
+    from backend.agents.agent_message_broker import AgentMessageBroker
+>>>>>>> Stashed changes
     from shared.protocols.agent_message import (
         AgentMessage,
         AgentIdentity,
@@ -37,6 +47,7 @@ try:
         create_broadcast_message,
         create_context_share_message
     )
+<<<<<<< Updated upstream
     from backend.agents.agent_message_broker import AgentMessageBroker
 except ModuleNotFoundError:
     # Fallback für direkte Imports
@@ -51,6 +62,28 @@ except ModuleNotFoundError:
         create_context_share_message
     )
     from agent_message_broker import AgentMessageBroker
+=======
+else:
+    # Runtime: import dynamically to avoid static duplicate-import issues
+    import importlib
+
+    try:
+        _broker_mod = importlib.import_module("backend.agents.agent_message_broker")
+        _proto_mod = importlib.import_module("shared.protocols.agent_message")
+    except Exception:
+        _broker_mod = importlib.import_module("agent_message_broker")
+        _proto_mod = importlib.import_module("protocols.agent_message")
+
+    AgentMessageBroker = getattr(_broker_mod, "AgentMessageBroker")
+    AgentIdentity = getattr(_proto_mod, "AgentIdentity")
+    AgentMessage = getattr(_proto_mod, "AgentMessage")
+    MessagePriority = getattr(_proto_mod, "MessagePriority")
+    MessageType = getattr(_proto_mod, "MessageType")
+    create_broadcast_message = getattr(_proto_mod, "create_broadcast_message")
+    create_context_share_message = getattr(_proto_mod, "create_context_share_message")
+    create_event_message = getattr(_proto_mod, "create_event_message")
+    create_request_message = getattr(_proto_mod, "create_request_message")
+>>>>>>> Stashed changes
 
 logger = logging.getLogger(__name__)
 
@@ -149,9 +182,11 @@ class AgentCommunicationMixin:
         if handler:
             try:
                 if asyncio.iscoroutinefunction(handler):
-                    return await handler(message)
+                    res = await handler(message)
+                    return cast(Optional[Dict[str, Any]], res)
                 else:
-                    return handler(message)
+                    res = handler(message)
+                    return cast(Optional[Dict[str, Any]], res)
             except Exception as e:
                 logger.error(f"❌ Fehler in Message-Handler ({message.message_type.value}): {e}", exc_info=True)
                 return {"error": str(e), "status": "failed"}

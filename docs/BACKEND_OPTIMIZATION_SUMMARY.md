@@ -1,5 +1,5 @@
 # VERITAS Backend - Analyse & Optimierung: Zusammenfassung
-**Datum:** 16. Oktober 2025  
+**Datum:** 16. Oktober 2025
 **Status:** Analyse abgeschlossen, Implementierung vorbereitet
 
 ---
@@ -69,25 +69,25 @@ Backend-Stop
 ```python
 class PipelineFactory:
     """Factory für Request-scoped Pipeline-Instanzen"""
-    
+
     def __init__(self, ollama_client, uds3_strategy, agent_registry):
         # Shared Resources (Singleton)
         self.ollama_client = ollama_client
         self.uds3_strategy = uds3_strategy
         self.agent_registry = agent_registry
-    
+
     async def create_pipeline(self, max_workers=5):
         """Erstellt neue Pipeline-Instanz für einen Request"""
         pipeline = IntelligentMultiAgentPipeline(max_workers=max_workers)
-        
+
         # Dependency Injection
         pipeline.ollama_client = self.ollama_client
         pipeline.uds3_strategy = self.uds3_strategy
         pipeline.agent_registry = self.agent_registry
-        
+
         # Request-scoped Ressourcen initialisieren
         await pipeline._initialize_request_scoped_resources()
-        
+
         return pipeline
 ```
 
@@ -102,27 +102,27 @@ class PipelineFactory:
 
 ```python
 class IntelligentMultiAgentPipeline:
-    
+
     async def _initialize_request_scoped_resources(self, enable_rag=True, enable_supervisor=False):
         """Initialisiert Request-spezifische Ressourcen"""
         # ThreadPool für diesen Request
         self.executor = ThreadPoolExecutor(max_workers=self.max_workers)
-        
+
         # RAG Context Service (falls benötigt)
         if enable_rag and self.uds3_strategy:
             self.rag_service = RAGContextService(...)
-    
+
     async def cleanup(self):
         """Räumt Pipeline-Ressourcen auf"""
         # ThreadPool beenden
         if self.executor:
             self.executor.shutdown(wait=False)
             self.executor = None
-        
+
         # State clearen
         self.active_pipelines.clear()
         self.pipeline_steps.clear()
-    
+
     async def process_intelligent_query(self, request):
         try:
             # ... Query verarbeiten ...
@@ -145,12 +145,12 @@ class IntelligentMultiAgentPipeline:
 @app.get("/capabilities")
 async def get_capabilities():
     # ... bestehender Code ...
-    
+
     # ✅ NEU: Agent Registry abfragen
     if intelligent_pipeline and intelligent_pipeline.agent_registry:
         agent_registry = intelligent_pipeline.agent_registry
         available_agents = agent_registry.list_available_agents()
-        
+
         pipeline_capabilities["agents"] = {
             "total_count": len(available_agents),
             "agents": available_agents,
@@ -250,24 +250,24 @@ else:
 @app.post("/v2/chat/simple")
 async def simple_chatbot_query(request: SimpleChatRequest):
     """Einfacher Chatbot (KEIN Multi-Agent-Overhead)"""
-    
+
     # ✅ DIREKT Ollama nutzen (kein Pipeline)
     if not ollama_client:
         raise HTTPException(...)
-    
+
     # Optional: RAG-Context holen
     context_docs = []
     if request.use_rag and uds3_strategy:
         rag_result = uds3_strategy.query_across_databases(...)
         context_docs = rag_result.get("documents", [])
-    
+
     # LLM-Antwort generieren
     response = await ollama_client.generate_response(
         query=request.query,
         context_documents=context_docs,
         chat_history=request.chat_history
     )
-    
+
     return {
         "answer": response.text,
         "sources": response.sources,

@@ -1,7 +1,7 @@
 # 🎨 Sprint 1 Visual Demo - LLM Parameter UI
 
-**Version:** v3.18.2  
-**Features:** Preset-Buttons, Token-Counter, Antwortzeit-Prädiktion  
+**Version:** v3.18.2
+**Features:** Preset-Buttons, Token-Counter, Antwortzeit-Prädiktion
 **Status:** 🟢 LIVE
 
 ---
@@ -208,7 +208,7 @@ AFTER (in <100ms):
 
 ### Story 1: Der eilige Sachbearbeiter
 
-**Persona:** Klaus, 45, Bauamt-Mitarbeiter  
+**Persona:** Klaus, 45, Bauamt-Mitarbeiter
 **Bedarf:** Schnelle, präzise Fakten für Bürgeranfragen
 
 **Workflow:**
@@ -219,14 +219,14 @@ AFTER (in <100ms):
 5. Tippt: "Paragraph für Garagenbau?"
 6. Bekommt in 2.5s präzise Antwort mit Paragraph-Nummer
 
-**Vorher:** 3 manuelle Einstellungen, Wartezeit unbekannt  
+**Vorher:** 3 manuelle Einstellungen, Wartezeit unbekannt
 **Nachher:** 1 Klick, klare Erwartung ✅
 
 ---
 
 ### Story 2: Die gründliche Juristin
 
-**Persona:** Dr. Müller, 38, Rechtsprüfung  
+**Persona:** Dr. Müller, 38, Rechtsprüfung
 **Bedarf:** Detaillierte Analysen mit Quellen
 
 **Workflow:**
@@ -236,14 +236,14 @@ AFTER (in <100ms):
 4. Stellt komplexe Frage
 5. Bekommt umfassende 800-Wörter-Analyse
 
-**Vorher:** Überraschung bei langer Wartezeit  
+**Vorher:** Überraschung bei langer Wartezeit
 **Nachher:** Erwartung klar gesetzt ✅
 
 ---
 
 ### Story 3: Der experimentierfreudige Admin
 
-**Persona:** Lukas, 29, IT-Administrator  
+**Persona:** Lukas, 29, IT-Administrator
 **Bedarf:** Testet verschiedene LLM-Modelle
 
 **Workflow:**
@@ -254,7 +254,7 @@ AFTER (in <100ms):
    - mixtral: **🐌 ~6-9s** (rot)
 3. Entscheidet: "phi3 ist am schnellsten für Prod!"
 
-**Vorher:** Trial-and-error, keine Daten  
+**Vorher:** Trial-and-error, keine Daten
 **Nachher:** Datenbasierte Entscheidung ✅
 
 ---
@@ -389,6 +389,6 @@ Für Marketing/Dokumentation:
 
 ---
 
-**Status:** 🟢 READY FOR DEMO  
-**Version:** v3.18.2  
+**Status:** 🟢 READY FOR DEMO
+**Version:** v3.18.2
 **Erstellt:** 10.10.2025

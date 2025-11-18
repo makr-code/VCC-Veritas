@@ -93,9 +93,15 @@ class CoordinateTransformer:
             "EPSG:4326",   # WGS84 (lat/lon)
             always_xy=True
         )
+<<<<<<< Updated upstream
         self._cache = {}  # Simple in-memory cache
     
     def transform(self, ostwert: float, nordwert: float) -> tuple[float, float]:
+=======
+        self._cache: Dict[str, tuple[Optional[float], Optional[float]]] = {}  # Simple in-memory cache
+
+    def transform(self, ostwert: float, nordwert: float) -> tuple[Optional[float], Optional[float]]:
+>>>>>>> Stashed changes
         """
         Transformiert UTM → WGS84
         
@@ -200,8 +206,13 @@ async def get_bimschg_markers(
     Example:
         GET /api/immi/markers/bimschg?bounds=52.0,12.0,53.0,14.0&nr_4bv=8.12.2V&limit=500
     """
+<<<<<<< Updated upstream
     markers = []
     
+=======
+    markers: List[MapMarker] = []
+
+>>>>>>> Stashed changes
     try:
         conn = get_bimschg_connection()
         cursor = conn.cursor()
@@ -222,9 +233,15 @@ async def get_bimschg_markers(
             FROM BImSchG
             WHERE ostwert IS NOT NULL AND nordwert IS NOT NULL
         """
+<<<<<<< Updated upstream
         
         params = []
         
+=======
+
+        params: List[Any] = []
+
+>>>>>>> Stashed changes
         if nr_4bv:
             query += " AND nr_4bv = ?"
             params.append(nr_4bv)
@@ -306,8 +323,13 @@ async def get_wka_markers(
     Example:
         GET /api/immi/markers/wka?bounds=52.0,12.0,53.0,14.0&status=In%20Betrieb&min_leistung=2.0
     """
+<<<<<<< Updated upstream
     markers = []
     
+=======
+    markers: List[MapMarker] = []
+
+>>>>>>> Stashed changes
     try:
         conn = get_wka_connection()
         cursor = conn.cursor()
@@ -328,9 +350,15 @@ async def get_wka_markers(
             FROM wka
             WHERE ostwert IS NOT NULL AND nordwert IS NOT NULL
         """
+<<<<<<< Updated upstream
         
         params = []
         
+=======
+
+        params: List[Any] = []
+
+>>>>>>> Stashed changes
         if betreiber:
             query += " AND betreiber LIKE ?"
             params.append(f"%{betreiber}%")
@@ -405,8 +433,13 @@ async def get_bimschg_heatmap(
     Returns:
         Liste von Heatmap-Punkten mit Intensität (Anzahl Anlagen pro Ort)
     """
+<<<<<<< Updated upstream
     points = []
     
+=======
+    points: List[HeatmapPoint] = []
+
+>>>>>>> Stashed changes
     try:
         conn = get_bimschg_connection()
         cursor = conn.cursor()
@@ -462,8 +495,13 @@ async def search_location(
     Example:
         GET /api/immi/search?query=Schwedt&limit=10
     """
+<<<<<<< Updated upstream
     results = []
     
+=======
+    results: List[SearchResult] = []
+
+>>>>>>> Stashed changes
     try:
         # BImSchG durchsuchen
         conn_bimschg = get_bimschg_connection()
@@ -555,9 +593,15 @@ async def get_region_statistics(
         Anzahl BImSchG/WKA-Anlagen, Gesamtleistung, Kategorien
     """
     try:
+<<<<<<< Updated upstream
         min_lat, min_lon, max_lat, max_lon = map(float, bounds.split(','))
         
         stats = {
+=======
+        min_lat, min_lon, max_lat, max_lon = map(float, bounds.split(","))
+
+        stats: Dict[str, Any] = {
+>>>>>>> Stashed changes
             "bimschg_count": 0,
             "wka_count": 0,
             "total_power_mw": 0.0,

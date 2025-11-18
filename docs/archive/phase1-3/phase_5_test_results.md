@@ -1,6 +1,6 @@
 # Phase 5 - Test Results Summary
 
-**Datum:** 7. Oktober 2025  
+**Datum:** 7. Oktober 2025
 **Test-Suite:** Phase 5 Hybrid Search Unit Tests
 
 ---
@@ -218,6 +218,6 @@ python start_backend.py
 
 ---
 
-**Getestet von:** GitHub Copilot  
-**Test-Command:** `pytest tests/test_phase5_hybrid_search.py -v`  
+**Getestet von:** GitHub Copilot
+**Test-Command:** `pytest tests/test_phase5_hybrid_search.py -v`
 **Datum:** 7. Oktober 2025

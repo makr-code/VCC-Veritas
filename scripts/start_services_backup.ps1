@@ -110,12 +110,12 @@ if (-not $FrontendOnly) {
 # Frontend starten
 if (-not $BackendOnly) {
     Write-Step "Starte Frontend (GUI)..."
-    
+
     $frontendJob = Start-Job -ScriptBlock {
         Set-Location $using:PWD
         python frontend\veritas_app.py
     }
-    
+
     Write-Success "Frontend gestartet (Job ID: $($frontendJob.Id))"
     Write-Info "GUI sollte sich öffnen..."
 }
@@ -148,4 +148,3 @@ Write-Host "  • Backend stoppen:  .\\scripts\\stop_services.ps1 -BackendOnly" 
 Write-Host "  • Status prüfen:    Get-Job" -ForegroundColor White
 
 Write-Host "`n✅ Services laufen im Hintergrund!`n" -ForegroundColor Green
-

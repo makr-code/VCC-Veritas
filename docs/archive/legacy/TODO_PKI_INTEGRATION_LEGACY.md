@@ -1,8 +1,8 @@
 # TODO: PKI/CA Integration in VERITAS Framework
 
-**Datum**: 8. Oktober 2025  
-**Status**: 📋 Geplant  
-**Priorität**: Mittel  
+**Datum**: 8. Oktober 2025
+**Status**: 📋 Geplant
+**Priorität**: Mittel
 **Geschätzter Aufwand**: 4-6 Stunden
 
 ---
@@ -118,11 +118,11 @@ import uuid
 
 class CertificateManager:
     """Mock Certificate Manager"""
-    
+
     def __init__(self, mock_mode: bool = True):
         self.mock_mode = mock_mode
         self._mock_certs: Dict[str, Dict[str, Any]] = {}
-    
+
     def create_certificate(
         self,
         common_name: str,
@@ -131,7 +131,7 @@ class CertificateManager:
     ) -> Dict[str, Any]:
         """
         Erstellt ein neues Zertifikat (Mock)
-        
+
         Returns:
             {
                 'cert_id': str,
@@ -143,19 +143,19 @@ class CertificateManager:
             }
         """
         pass
-    
+
     def revoke_certificate(self, cert_id: str) -> bool:
         """Widerruft ein Zertifikat (Mock)"""
         pass
-    
+
     def get_certificate(self, cert_id: str) -> Optional[Dict[str, Any]]:
         """Ruft Zertifikat-Details ab (Mock)"""
         pass
-    
+
     def list_certificates(self, status: str = "valid") -> list:
         """Listet Zertifikate (Mock)"""
         pass
-    
+
     def verify_certificate(self, cert_pem: str) -> bool:
         """Verifiziert ein Zertifikat (Mock)"""
         pass
@@ -183,27 +183,27 @@ from typing import Dict, Any, Optional
 
 class CAService:
     """Mock Certificate Authority Service"""
-    
+
     def __init__(self, ca_name: str = "VERITAS CA"):
         self.ca_name = ca_name
         self.ca_initialized = False
-    
+
     def initialize_ca(self) -> bool:
         """Initialisiert die CA (Mock)"""
         pass
-    
+
     def sign_csr(self, csr_pem: str) -> Dict[str, Any]:
         """Signiert einen CSR (Mock)"""
         pass
-    
+
     def get_ca_certificate(self) -> str:
         """Ruft CA-Zertifikat ab (Mock)"""
         pass
-    
+
     def get_crl(self) -> str:
         """Ruft Certificate Revocation List ab (Mock)"""
         pass
-    
+
     def verify_chain(self, cert_pem: str) -> bool:
         """Verifiziert Zertifikatskette (Mock)"""
         pass
@@ -363,7 +363,7 @@ __all__ = [
     # Classes
     "CertificateManager",
     "CAService",
-    
+
     # Functions
     "generate_key_pair",
     "generate_csr",
@@ -372,7 +372,7 @@ __all__ = [
     "decrypt_data",
     "sign_data",
     "verify_signature",
-    
+
     # Exceptions
     "PKIException",
     "CertificateNotFoundError",
@@ -381,7 +381,7 @@ __all__ = [
     "InvalidCSRError",
     "CANotInitializedError",
     "SignatureVerificationError",
-    
+
     # Config
     "PKI_BASE_PATH",
     "PKI_MOCK_MODE",
@@ -485,7 +485,7 @@ def test_create_certificate():
     """Test: Zertifikat erstellen"""
     manager = CertificateManager(mock_mode=True)
     cert = manager.create_certificate("test.veritas.local")
-    
+
     assert cert is not None
     assert cert['common_name'] == "test.veritas.local"
     assert 'cert_id' in cert
@@ -495,14 +495,14 @@ def test_list_certificates():
     """Test: Zertifikate auflisten"""
     manager = CertificateManager(mock_mode=True)
     certs = manager.list_certificates()
-    
+
     assert isinstance(certs, list)
 
 def test_revoke_certificate():
     """Test: Zertifikat widerrufen"""
     manager = CertificateManager(mock_mode=True)
     cert = manager.create_certificate("revoke.test")
-    
+
     result = manager.revoke_certificate(cert['cert_id'])
     assert result is True
 ```
@@ -525,7 +525,7 @@ def test_revoke_certificate():
 
 ## Übersicht
 
-Die PKI (Public Key Infrastructure) Integration ermöglicht 
+Die PKI (Public Key Infrastructure) Integration ermöglicht
 Zertifikatsverwaltung, Signierung und Verschlüsselung im VERITAS Framework.
 
 ## Architektur
@@ -804,7 +804,7 @@ C:\VCC\
 
 ---
 
-**Erstellt**: 8. Oktober 2025  
-**Status**: 📋 Bereit zur Implementierung  
-**Geschätzte Zeit**: 4-6 Stunden (Mock/Vorbereitung)  
+**Erstellt**: 8. Oktober 2025
+**Status**: 📋 Bereit zur Implementierung
+**Geschätzte Zeit**: 4-6 Stunden (Mock/Vorbereitung)
 **Ziel**: PKI-Integration vorbereitet, Mock lauffähig

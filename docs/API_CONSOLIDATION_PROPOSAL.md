@@ -1,7 +1,7 @@
 # 🔄 API Endpoint Konsolidierung - Vorschlag
 
-**Datum:** 17. Oktober 2025, 21:35 Uhr  
-**Status:** 📋 Planung  
+**Datum:** 17. Oktober 2025, 21:35 Uhr
+**Status:** 📋 Planung
 **Ziel:** Einheitliche, strukturierte API-Endpoints für Frontend/Backend
 
 ---
@@ -1034,72 +1034,72 @@ GET  /api/v3/governance/retention # Data Retention Policies
 
 class VeritasAPIClient:
     """Unified API Client für VERITAS v3"""
-    
+
     def __init__(self, base_url="http://localhost:5000/api/v3"):
         self.base_url = base_url
-    
+
     # Query Operations
     async def query_standard(self, query: str, options: dict = None):
         """Standard Query (non-streaming)"""
         endpoint = f"{self.base_url}/query/standard"
         return await self._post(endpoint, {"query": query, "options": options})
-    
+
     async def query_stream(self, query: str, options: dict = None):
         """Streaming Query (SSE)"""
         endpoint = f"{self.base_url}/query/stream"
         async for chunk in self._stream(endpoint, {"query": query, "options": options}):
             yield chunk
-    
+
     async def query_intelligent(self, query: str, agent_options: dict = None):
         """Intelligent Multi-Agent Query"""
         endpoint = f"{self.base_url}/query/intelligent"
         return await self._post(endpoint, {"query": query, "options": agent_options})
-    
+
     # Agent Operations
     async def list_agents(self):
         """Liste aller Agents"""
         endpoint = f"{self.base_url}/agent/list"
         return await self._get(endpoint)
-    
+
     async def execute_agent(self, agent_id: str, query: str):
         """Agent direkt ausführen"""
         endpoint = f"{self.base_url}/agent/{agent_id}/execute"
         return await self._post(endpoint, {"query": query})
-    
+
     # Module-spezifische Queries
     async def vpb_query(self, query: str):
         endpoint = f"{self.base_url}/vpb/query"
         return await self._post(endpoint, {"query": query})
-    
+
     async def covina_query(self, query: str):
         endpoint = f"{self.base_url}/covina/query"
         return await self._post(endpoint, {"query": query})
-    
+
     async def pki_query(self, query: str):
         endpoint = f"{self.base_url}/pki/query"
         return await self._post(endpoint, {"query": query})
-    
+
     async def immi_query(self, query: str):
         endpoint = f"{self.base_url}/immi/query"
         return await self._post(endpoint, {"query": query})
-    
+
     # SAGA Operations
     async def saga_orchestrate(self, saga_name: str, steps: list):
         endpoint = f"{self.base_url}/saga/orchestrate"
         return await self._post(endpoint, {"saga_name": saga_name, "steps": steps})
-    
+
     async def saga_status(self, saga_id: str):
         endpoint = f"{self.base_url}/saga/{saga_id}/status"
         return await self._get(endpoint)
-    
+
     async def saga_compensate(self, saga_id: str):
         endpoint = f"{self.base_url}/saga/{saga_id}/compensate"
         return await self._post(endpoint, {})
-    
+
     async def saga_history(self, saga_id: str):
         endpoint = f"{self.base_url}/saga/{saga_id}/history"
         return await self._get(endpoint)
-    
+
     # Compliance Operations
     async def compliance_check(self, entity_type: str, entity_id: str, rules: list):
         endpoint = f"{self.base_url}/compliance/check"
@@ -1108,16 +1108,16 @@ class VeritasAPIClient:
             "entity_id": entity_id,
             "rules": rules
         })
-    
+
     async def compliance_rules(self):
         endpoint = f"{self.base_url}/compliance/rules"
         return await self._get(endpoint)
-    
+
     async def compliance_violations(self, status: str = None):
         endpoint = f"{self.base_url}/compliance/violations"
         params = {"status": status} if status else {}
         return await self._get(endpoint, params=params)
-    
+
     async def compliance_remediate(self, violation_id: str, action: str, parameters: dict):
         endpoint = f"{self.base_url}/compliance/remediate"
         return await self._post(endpoint, {
@@ -1125,28 +1125,28 @@ class VeritasAPIClient:
             "action": action,
             "parameters": parameters
         })
-    
+
     # Governance Operations
     async def governance_policies(self):
         endpoint = f"{self.base_url}/governance/policies"
         return await self._get(endpoint)
-    
+
     async def governance_validate(self, policy_id: str, entity_id: str):
         endpoint = f"{self.base_url}/governance/validate"
         return await self._post(endpoint, {
             "policy_id": policy_id,
             "entity_id": entity_id
         })
-    
+
     async def governance_lineage(self, entity_id: str, depth: int = 3, direction: str = "both"):
         endpoint = f"{self.base_url}/governance/lineage"
         params = {"entity_id": entity_id, "depth": depth, "direction": direction}
         return await self._get(endpoint, params=params)
-    
+
     async def governance_catalog(self, filters: dict = None):
         endpoint = f"{self.base_url}/governance/catalog"
         return await self._get(endpoint, params=filters)
-    
+
     async def governance_access_grant(self, resource_id: str, user_id: str, access_level: str):
         endpoint = f"{self.base_url}/governance/access"
         return await self._post(endpoint, {
@@ -1155,12 +1155,12 @@ class VeritasAPIClient:
             "user_id": user_id,
             "access_level": access_level
         })
-    
+
     # UDS3 Operations
     async def uds3_vector_search(self, query: str, top_k: int = 10):
         endpoint = f"{self.base_url}/uds3/vector/search"
         return await self._post(endpoint, {"query": query, "top_k": top_k})
-    
+
     # User Operations
     async def submit_feedback(self, query_id: str, rating: str, comment: str = None):
         endpoint = f"{self.base_url}/user/feedback"
@@ -1169,20 +1169,20 @@ class VeritasAPIClient:
             "rating": rating,
             "comment": comment
         })
-    
+
     async def get_history(self, page: int = 1, limit: int = 20):
         endpoint = f"{self.base_url}/user/history"
         return await self._get(endpoint, params={"page": page, "limit": limit})
-    
+
     # System Operations
     async def health_check(self):
         endpoint = f"{self.base_url}/system/health"
         return await self._get(endpoint)
-    
+
     async def get_capabilities(self):
         endpoint = f"{self.base_url}/system/capabilities"
         return await self._get(endpoint)
-    
+
     async def get_modes(self):
         endpoint = f"{self.base_url}/system/modes"
         return await self._get(endpoint)
@@ -1271,6 +1271,6 @@ class VeritasAPIClient:
 
 ---
 
-**Erstellt:** 17. Oktober 2025, 21:35 Uhr  
-**Status:** 📋 Proposal - Awaiting Approval  
+**Erstellt:** 17. Oktober 2025, 21:35 Uhr
+**Status:** 📋 Proposal - Awaiting Approval
 **Version:** 1.0

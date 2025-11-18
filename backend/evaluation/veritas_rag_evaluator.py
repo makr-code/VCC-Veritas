@@ -30,9 +30,13 @@ import time
 from dataclasses import dataclass, field, asdict
 from datetime import datetime
 from pathlib import Path
+<<<<<<< Updated upstream
 from typing import Any, Dict, List, Optional, Set, Tuple
 from collections import defaultdict
 import math
+=======
+from typing import Any, Dict, List, Optional, Set, Tuple, DefaultDict
+>>>>>>> Stashed changes
 
 logger = logging.getLogger(__name__)
 
@@ -642,9 +646,15 @@ class RAGEvaluator:
         summary.avg_duration_ms = sum(r.duration_ms for r in self.results) / len(self.results) if self.results else 0.0
         
         # Kategorie-Performance
+<<<<<<< Updated upstream
         category_stats = defaultdict(lambda: {'passed': 0, 'total': 0})
         complexity_stats = defaultdict(lambda: {'passed': 0, 'total': 0})
         
+=======
+        category_stats: DefaultDict[str, Dict[str, int]] = defaultdict(lambda: {"passed": 0, "total": 0})
+        complexity_stats: DefaultDict[str, Dict[str, int]] = defaultdict(lambda: {"passed": 0, "total": 0})
+
+>>>>>>> Stashed changes
         for i, result in enumerate(self.results):
             test_case = self.test_cases[i]
             category = test_case.get('category', 'unknown')

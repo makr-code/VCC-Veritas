@@ -108,7 +108,7 @@ template = """Beispiel:
 template.format(query="Test")  # ❌ KeyError: '\n  "next_steps"'
 ```
 
-**Ursache:**  
+**Ursache:**
 Python `.format()` interpretiert `{` als Platzhalter-Start. Der Fehlertext ist **das was nach dem `{` kommt**.
 
 **Lösung:**
@@ -123,8 +123,8 @@ template = """Beispiel:
 template.format(query="Test")  # ✅ Funktioniert!
 ```
 
-**Validierung:**  
-Test `test_original_bug_newline_in_key` reproduziert den Bug.  
+**Validierung:**
+Test `test_original_bug_newline_in_key` reproduziert den Bug.
 Test `test_fixed_version_with_escaping` validiert den Fix.
 
 ## Dependencies
@@ -166,10 +166,10 @@ def test_new_feature(self):
     """Test: Beschreibung der neuen Funktion"""
     # Arrange
     input_data = "..."
-    
+
     # Act
     result = function_to_test(input_data)
-    
+
     # Assert
     assert result == expected_output
 ```

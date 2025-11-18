@@ -9,14 +9,14 @@ Test Structure:
 Usage:
     # Run all tests
     pytest tests/
-    
+
     # Run specific category
     pytest tests/backend/
     pytest tests/frontend/
-    
+
     # Run with coverage
     pytest tests/ --cov=backend --cov=frontend --cov-report=html
-    
+
     # Run specific test
     pytest tests/backend/test_feedback_api.py::test_submit_feedback
 """

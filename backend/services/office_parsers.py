@@ -152,12 +152,21 @@ def parse_excel_document(content: bytes, filename: str = "spreadsheet.xlsx") -> 
     doc_hash = hashlib.md5(content).hexdigest()[:8]
     
     # STUB: Simuliere Sheet-Daten
+<<<<<<< Updated upstream
     stub_sheets = {
         'Sheet1': [
             ['Name', 'Value', 'Status'],
             ['STUB Row 1', 100, 'Active'],
             ['STUB Row 2', 200, 'Inactive'],
             ['STUB Row 3', 300, 'Active']
+=======
+    stub_sheets: Dict[str, List[List[Any]]] = {
+        "Sheet1": [
+            ["Name", "Value", "Status"],
+            ["STUB Row 1", 100, "Active"],
+            ["STUB Row 2", 200, "Inactive"],
+            ["STUB Row 3", 300, "Active"],
+>>>>>>> Stashed changes
         ],
         'Metadata': [
             ['Key', 'Value'],
@@ -167,7 +176,7 @@ def parse_excel_document(content: bytes, filename: str = "spreadsheet.xlsx") -> 
     }
     
     # Text representation (für RAG)
-    text_lines = []
+    text_lines: List[str] = []
     for sheet_name, data in stub_sheets.items():
         text_lines.append(f'## {sheet_name}')
         for row in data:
@@ -260,7 +269,7 @@ def parse_powerpoint_document(content: bytes, filename: str = "presentation.pptx
     doc_hash = hashlib.md5(content).hexdigest()[:8]
     
     # STUB: Simuliere Folien
-    stub_slides = [
+    stub_slides: List[Dict[str, Any]] = [
         {
             'slide_number': 1,
             'title': 'STUB: Einführung',
@@ -288,8 +297,12 @@ def parse_powerpoint_document(content: bytes, filename: str = "presentation.pptx
         }
     ]
     
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
     # Text representation (für RAG)
-    text_lines = []
+    text_lines: List[str] = []
     for slide in stub_slides:
         text_lines.append(f'## Folie {slide["slide_number"]}: {slide["title"]}')
         text_lines.extend(slide['content'])

@@ -1,8 +1,8 @@
 # ✅ DUAL-PROMPT SYSTEM - IMPLEMENTIERUNGS-ABSCHLUSS
 
-**Datum:** 2025-01-07  
-**Version:** v3.18.0  
-**Status:** ✅ PRODUKTIONSBEREIT  
+**Datum:** 2025-01-07
+**Version:** v3.18.0
+**Status:** ✅ PRODUKTIONSBEREIT
 
 ---
 
@@ -57,7 +57,7 @@ USER_FACING_RESPONSE = {
     VERBOTEN:
     - "Antwort auf die Frage..."
     - "Basierend auf den bereitgestellten Informationen..."
-    
+
     ERLAUBT:
     - Direkte Antworten: "Für eine Baugenehmigung benötigen Sie..."
     - Persönlich: "Das hängt von Ihrem konkreten Fall ab..."
@@ -83,7 +83,7 @@ async def enrich_query_for_rag(self,
                                user_context: Dict[str, Any] = None) -> Dict[str, Any]:
     """
     🔍 Erweitert User-Query mit Fachbegriffen für RAG-Retrieval
-    
+
     Returns: {keywords, synonyms, context, search_terms}
     """
 ```
@@ -177,7 +177,7 @@ Total Tests: 6
 **Query 2: "Welche Emissionsgrenzwerte gelten für Industrieanlagen?"**
 
 ```markdown
-Für Industrieanlagen gelten bestimmte Emissionsgrenzwerte, um die Umwelt 
+Für Industrieanlagen gelten bestimmte Emissionsgrenzwerte, um die Umwelt
 zu schützen. Hier sind die wichtigsten Grenzwerte:
 
 • Immissionsschutzgesetz (BImSchG): ...
@@ -300,7 +300,7 @@ async with VeritasOllamaClient() as client:
         domain="building"
     )
     print(f"Search-Terms: {enriched['search_terms']}")
-    
+
     # PHASE 2: User-Response (External)
     response = await client.synthesize_agent_results(
         query="Was brauche ich für eine Baugenehmigung?",
@@ -380,10 +380,10 @@ async with VeritasOllamaClient() as client:
 
 ---
 
-**Status:** ✅ PRODUKTIONSBEREIT  
-**Version:** v3.18.0  
-**Autor:** VERITAS System  
-**Datum:** 2025-01-07  
+**Status:** ✅ PRODUKTIONSBEREIT
+**Version:** v3.18.0
+**Autor:** VERITAS System
+**Datum:** 2025-01-07
 
 ---
 

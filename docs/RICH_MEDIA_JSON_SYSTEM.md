@@ -174,13 +174,13 @@ export const JSONResponseRenderer = ({ data }: { data: ResponseData }) => {
     <>
       <DirectAnswer text={data.direct_answer} />
       <Details items={data.details} citations={data.citations} />
-      
+
       {data.tables && <TablesSection tables={data.tables} />}
       {data.charts && <ChartsSection charts={data.charts} />}
       {data.maps && <MapsSection maps={data.maps} />}
       {data.images && <ImagesSection images={data.images} />}
       {data.documents && <DocumentsSection docs={data.documents} />}
-      
+
       <Sources sources={data.sources} />
       <FollowUps questions={data.follow_ups} />
     </>
@@ -214,7 +214,7 @@ export const ChartRenderer = ({ chartData }) => {
     line: Line,
     pie: Pie
   }[chartData.chart_type];
-  
+
   return (
     <ResponsiveContainer width="100%" height={300}>
       <ChartComponent data={chartData.data} />
@@ -406,6 +406,6 @@ Bei Fragen oder Problemen:
 
 ---
 
-**Status:** ✅ Production Ready  
-**Version:** 2.0 (JSON Citation + Rich Media)  
+**Status:** ✅ Production Ready
+**Version:** 2.0 (JSON Citation + Rich Media)
 **Last Updated:** 2025-10-10

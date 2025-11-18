@@ -1,6 +1,6 @@
 # Kritischer Bugfix: RAG Integration verwendet Mock-Daten
 
-**Datum:** 05.10.2025, 20:40 Uhr  
+**Datum:** 05.10.2025, 20:40 Uhr
 **Severity:** 🔴 CRITICAL - System liefert falsche/halluzinierte Antworten
 
 ## Problem-Symptom
@@ -12,12 +12,12 @@
 
 ### System-Antwort (FALSCH):
 ```
-Die Analyse von 10 verschiedenen Agenten hat ergeben, dass das Taschengeldparagraphen 
+Die Analyse von 10 verschiedenen Agenten hat ergeben, dass das Taschengeldparagraphen
 eine Vielzahl von Aspekten umfasst...
 
-* Die **transport**-Analyse hat gezeigt, dass das Taschengeldparagraphen speziell 
+* Die **transport**-Analyse hat gezeigt, dass das Taschengeldparagraphen speziell
   auf den Transport von Geldern ausgerichtet ist.
-* Die **geo_context**-Analyse hat ergeben, dass die Paragraphen sich auf die 
+* Die **geo_context**-Analyse hat ergeben, dass die Paragraphen sich auf die
   räumliche Dimension des Geldtransports beziehen.
 
 Quellen:
@@ -27,7 +27,7 @@ Quellen:
 ...
 ```
 
-**Reality Check:** Der Taschengeldparagraph (§ 110 BGB) regelt Verträge von Minderjährigen 
+**Reality Check:** Der Taschengeldparagraph (§ 110 BGB) regelt Verträge von Minderjährigen
 mit ihrem Taschengeld - **NICHTS** mit "Geldtransport" oder "räumlicher Dimension"!
 
 ## Root Cause Analysis
@@ -46,7 +46,7 @@ except ImportError:
     RAG_INTEGRATION_AVAILABLE = False
 ```
 
-**Problem:** 
+**Problem:**
 - `from database.database_api` existiert NICHT (Datei liegt in `uds3/database/database_api.py`)
 - Import schlägt fehl → `RAG_INTEGRATION_AVAILABLE = False`
 - Keine Fehlermeldung im Log (nur "ℹ️ RAG Integration läuft im Mock-Modus")
@@ -107,7 +107,7 @@ for idx in range(opts.limit_documents):
 
 ### 5. Agenten halluzinieren basierend auf Mock-Daten
 
-Da keine echten Dokumente vorhanden sind, **halluziniert das LLM** komplett 
+Da keine echten Dokumente vorhanden sind, **halluziniert das LLM** komplett
 falsche Informationen:
 - "Geldtransport" (erfunden)
 - "räumliche Dimension" (erfunden)
@@ -302,6 +302,6 @@ curl http://localhost:5000/capabilities | jq '.features.uds3'
 
 ---
 
-**Status:** ✅ Fix implementiert - Backend-Neustart erforderlich  
-**Priority:** 🔴 P0 - Kritischer Production-Blocker  
+**Status:** ✅ Fix implementiert - Backend-Neustart erforderlich
+**Priority:** 🔴 P0 - Kritischer Production-Blocker
 **Next Step:** Backend neu starten und Tests durchführen

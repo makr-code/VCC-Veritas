@@ -11,8 +11,8 @@ Steps:
 """
 
 import subprocess
-import time
 import sys
+import time
 
 print("🧪 Frontend Display Test")
 print("=" * 80)

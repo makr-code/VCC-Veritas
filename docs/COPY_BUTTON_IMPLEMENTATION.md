@@ -1,9 +1,9 @@
 # Copy-Button für Code - Implementierungsdokumentation
 
-**Feature**: #6 aus Rich-Text Enhancements TODO  
-**Version**: v3.8.0  
-**Datum**: 2025-10-09  
-**Status**: ✅ Implementiert  
+**Feature**: #6 aus Rich-Text Enhancements TODO
+**Version**: v3.8.0
+**Datum**: 2025-10-09
+**Status**: ✅ Implementiert
 
 ---
 
@@ -86,7 +86,7 @@ class MarkdownRenderer:
 def _render_code(self, part: str) -> bool:
     code_pattern = r'`([^`]+)`'
     code_match = re.match(code_pattern, part)
-    
+
     if code_match:
         code_text = code_match.group(1)
         self.text_widget.insert(tk.END, code_text, "md_code")
@@ -99,19 +99,19 @@ def _render_code(self, part: str) -> bool:
 def _render_code(self, part: str, add_copy_button: bool = True) -> bool:
     code_pattern = r'`([^`]+)`'
     code_match = re.match(code_pattern, part)
-    
+
     if code_match:
         code_text = code_match.group(1)
-        
+
         # Code-Text einfügen
         code_start = self.text_widget.index(tk.END)
         self.text_widget.insert(tk.END, code_text, "md_code")
         code_end = self.text_widget.index(tk.END)
-        
+
         # ✨ NEU: Copy-Button hinzufügen
         if add_copy_button and len(code_text.strip()) > 3:
             self._add_copy_button(code_text, code_start)
-        
+
         return True
     return False
 ```
@@ -137,29 +137,29 @@ def _add_copy_button(self, code_text: str, position: str) -> None:
             padx=2,
             pady=0
         )
-        
+
         # Hover-Effekt
         def on_enter(e):
             copy_btn.config(foreground="#0066CC")
         def on_leave(e):
             copy_btn.config(foreground="#666")
-        
+
         copy_btn.bind("<Enter>", on_enter)
         copy_btn.bind("<Leave>", on_leave)
-        
+
         # Click-Handler
         def on_click(e):
             self._copy_to_clipboard(code_text, copy_btn)
-        
+
         copy_btn.bind("<Button-1>", on_click)
-        
+
         # Button in Text-Widget einbetten
         self.text_widget.window_create(position, window=copy_btn)
         self.text_widget.insert(tk.END, " ")  # Leerzeichen
-        
+
         # Referenz speichern
         self.copy_buttons.append(copy_btn)
-        
+
     except Exception as e:
         logger.debug(f"Copy-Button Fehler: {e}")
 ```
@@ -180,13 +180,13 @@ def _copy_to_clipboard(self, text: str, button: tk.Label) -> None:
         # In Zwischenablage kopieren
         self.text_widget.clipboard_clear()
         self.text_widget.clipboard_append(text)
-        
+
         # Visual Feedback: ✓ Checkmark
         original_text = button.cget("text")
         original_fg = button.cget("foreground")
-        
+
         button.config(text="✓", foreground="#27ae60")
-        
+
         # Nach 1.5s zurücksetzen
         def reset_button():
             try:
@@ -194,12 +194,12 @@ def _copy_to_clipboard(self, text: str, button: tk.Label) -> None:
                     button.config(text=original_text, foreground=original_fg)
             except:
                 pass
-        
+
         if hasattr(self.text_widget, 'after'):
             self.text_widget.after(1500, reset_button)
-        
+
         logger.debug(f"Code kopiert: {text[:30]}...")
-        
+
     except Exception as e:
         logger.error(f"Clipboard-Fehler: {e}")
         # Fehler-Feedback
@@ -407,7 +407,7 @@ code_text = "`print('Hallöchen 世界')`"
    ```python
    # Ohne Copy-Button (vor v3.8.0)
    renderer._render_code("`code`")
-   
+
    # Mit Copy-Button (ab v3.8.0)
    renderer._render_code("`code`", add_copy_button=True)  # Default
    ```

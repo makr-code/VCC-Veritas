@@ -1,7 +1,7 @@
 # ✅ SESSION COMPLETE - Phase 1 & 2 Progress Report
 
-**Datum:** 14. Oktober 2025, 08:00 Uhr  
-**Session-Dauer:** ~25 Minuten  
+**Datum:** 14. Oktober 2025, 08:00 Uhr
+**Session-Dauer:** ~25 Minuten
 **Gesamtfortschritt:** 30% (Phase 1 ✅ | Phase 2 40%)
 
 ---
@@ -369,8 +369,8 @@ curl -X POST http://127.0.0.1:5000/ask `
 
 ---
 
-**Version:** 1.0  
-**Erstellt:** 14. Oktober 2025, 08:00 Uhr  
-**Session:** Phase 1 & 2 (25 Minuten)  
-**Nächster Schritt:** Query-Debugging oder Frontend-Sync-Modus  
+**Version:** 1.0
+**Erstellt:** 14. Oktober 2025, 08:00 Uhr
+**Session:** Phase 1 & 2 (25 Minuten)
+**Nächster Schritt:** Query-Debugging oder Frontend-Sync-Modus
 **Gesamtfortschritt:** 30% (1.5/5 Phasen)

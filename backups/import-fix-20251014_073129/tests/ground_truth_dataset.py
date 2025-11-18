@@ -3,12 +3,13 @@ Ground-Truth Dataset für Phase 5 Hybrid Search Evaluation
 Enthält 25 Test-Queries mit expected results und relevance scores
 """
 from dataclasses import dataclass, field
-from typing import List, Dict, Any
 from enum import Enum
+from typing import Any, Dict, List
 
 
 class QueryCategory(str, Enum):
     """Query-Kategorien für verschiedene Use-Cases"""
+
     LEGAL_SPECIFIC = "legal_specific"  # Spezifische Rechtsnormen
     LEGAL_GENERAL = "legal_general"  # Allgemeine Rechtsthemen
     ADMINISTRATIVE = "administrative"  # Verwaltungsrecht
@@ -21,6 +22,7 @@ class QueryCategory(str, Enum):
 @dataclass
 class RelevantDocument:
     """Ein relevantes Dokument für eine Query"""
+
     doc_id: str
     relevance_score: float  # 0.0 = nicht relevant, 1.0 = perfekt relevant
     explanation: str = ""  # Warum ist dieses Dokument relevant?
@@ -29,6 +31,7 @@ class RelevantDocument:
 @dataclass
 class GroundTruthQuery:
     """Eine Test-Query mit erwarteten Ergebnissen"""
+
     query_id: str
     query_text: str
     category: QueryCategory
@@ -36,14 +39,14 @@ class GroundTruthQuery:
     expected_top1: str = ""  # Expected Top-1 Result (doc_id)
     expected_top3: List[str] = field(default_factory=list)  # Expected Top-3 Results
     description: str = ""  # Was testet diese Query?
-    
+
     def get_relevance_score(self, doc_id: str) -> float:
         """Get relevance score for a document"""
         for doc in self.relevant_docs:
             if doc.doc_id == doc_id:
                 return doc.relevance_score
         return 0.0
-    
+
     def get_dcg_weights(self) -> Dict[str, float]:
         """Get DCG weights for all documents"""
         return {doc.doc_id: doc.relevance_score for doc in self.relevant_docs}
@@ -54,11 +57,9 @@ class GroundTruthQuery:
 # =============================================================================
 
 GROUND_TRUTH_DATASET = [
-    
     # -------------------------------------------------------------------------
     # LEGAL_SPECIFIC: Spezifische Rechtsnormen
     # -------------------------------------------------------------------------
-    
     GroundTruthQuery(
         query_id="legal_001",
         query_text="BGB Taschengeldparagraph Minderjährige",
@@ -71,9 +72,8 @@ GROUND_TRUTH_DATASET = [
             RelevantDocument("bgb_108", 0.7, "Minderjährige ohne Einwilligung (Kontext)"),
             RelevantDocument("bgb_433", 0.3, "Kaufvertrag allgemein (schwach relevant)"),
         ],
-        description="Test: Findet spezifische Rechtsnorm mit Synonym (Taschengeldparagraph = § 110 BGB)"
+        description="Test: Findet spezifische Rechtsnorm mit Synonym (Taschengeldparagraph = § 110 BGB)",
     ),
-    
     GroundTruthQuery(
         query_id="legal_002",
         query_text="§ 433 BGB Kaufvertrag Pflichten",
@@ -86,9 +86,8 @@ GROUND_TRUTH_DATASET = [
             RelevantDocument("bgb_437", 0.8, "Mängelrechte des Käufers"),
             RelevantDocument("bgb_311", 0.5, "Vertragsschluss allgemein"),
         ],
-        description="Test: Paragraph-Suche mit § Zeichen"
+        description="Test: Paragraph-Suche mit § Zeichen",
     ),
-    
     GroundTruthQuery(
         query_id="legal_003",
         query_text="Verwaltungsakt Definition VwVfG",
@@ -101,13 +100,11 @@ GROUND_TRUTH_DATASET = [
             RelevantDocument("vwvfg_48", 0.7, "Rücknahme des Verwaltungsaktes"),
             RelevantDocument("vwvfg_24", 0.5, "Anhörung (prozeduraler Kontext)"),
         ],
-        description="Test: Verwaltungsrecht Definition-Query"
+        description="Test: Verwaltungsrecht Definition-Query",
     ),
-    
     # -------------------------------------------------------------------------
     # LEGAL_GENERAL: Allgemeine Rechtsthemen
     # -------------------------------------------------------------------------
-    
     GroundTruthQuery(
         query_id="legal_004",
         query_text="Kaufvertrag Rechtsmängel Gewährleistung",
@@ -120,9 +117,8 @@ GROUND_TRUTH_DATASET = [
             RelevantDocument("bgb_433", 0.7, "Kaufvertrag Pflichten"),
             RelevantDocument("bgb_311", 0.4, "Vertragsschluss"),
         ],
-        description="Test: Thematische Suche ohne Paragraphen-Nummer"
+        description="Test: Thematische Suche ohne Paragraphen-Nummer",
     ),
-    
     GroundTruthQuery(
         query_id="legal_005",
         query_text="Vertragsschluss Rechtsgeschäft Willenserklärung",
@@ -135,13 +131,11 @@ GROUND_TRUTH_DATASET = [
             RelevantDocument("bgb_311", 0.8, "Vertragsschluss allgemein"),
             RelevantDocument("bgb_433", 0.5, "Kaufvertrag als Beispiel"),
         ],
-        description="Test: Multi-Konzept Query (3 verwandte Begriffe)"
+        description="Test: Multi-Konzept Query (3 verwandte Begriffe)",
     ),
-    
     # -------------------------------------------------------------------------
     # ADMINISTRATIVE: Verwaltungsrecht
     # -------------------------------------------------------------------------
-    
     GroundTruthQuery(
         query_id="admin_001",
         query_text="Anhörung Verwaltungsverfahren Beteiligung",
@@ -154,9 +148,8 @@ GROUND_TRUTH_DATASET = [
             RelevantDocument("vwvfg_13", 0.6, "Beteiligte im Verfahren"),
             RelevantDocument("vwvfg_35", 0.4, "Verwaltungsakt Definition"),
         ],
-        description="Test: Prozedurales Verwaltungsrecht"
+        description="Test: Prozedurales Verwaltungsrecht",
     ),
-    
     GroundTruthQuery(
         query_id="admin_002",
         query_text="Rücknahme rechtswidriger Verwaltungsakt",
@@ -169,13 +162,11 @@ GROUND_TRUTH_DATASET = [
             RelevantDocument("vwvfg_35", 0.5, "VA Definition (Kontext)"),
             RelevantDocument("vwvfg_28", 0.3, "Bekanntgabe"),
         ],
-        description="Test: Spezifisches Verwaltungsakt-Thema"
+        description="Test: Spezifisches Verwaltungsakt-Thema",
     ),
-    
     # -------------------------------------------------------------------------
     # ENVIRONMENTAL: Umweltrecht
     # -------------------------------------------------------------------------
-    
     GroundTruthQuery(
         query_id="env_001",
         query_text="Emissionsschutz Luftreinhaltung Grenzwerte",
@@ -188,9 +179,8 @@ GROUND_TRUTH_DATASET = [
             RelevantDocument("ta_luft_4", 0.8, "Technische Anleitung Luft"),
             RelevantDocument("umweltvertraeglichkeitspruefungsgesetz_3", 0.5, "UVP allgemein"),
         ],
-        description="Test: Umweltrecht Emissionen"
+        description="Test: Umweltrecht Emissionen",
     ),
-    
     GroundTruthQuery(
         query_id="env_002",
         query_text="Umweltverträglichkeitsprüfung UVP Voraussetzungen",
@@ -202,13 +192,11 @@ GROUND_TRUTH_DATASET = [
             RelevantDocument("uvpg_7", 0.9, "Verfahrensschritte UVP"),
             RelevantDocument("uvpg_2", 0.7, "Anwendungsbereich"),
         ],
-        description="Test: UVP-Recht"
+        description="Test: UVP-Recht",
     ),
-    
     # -------------------------------------------------------------------------
     # SOCIAL: Sozialrecht
     # -------------------------------------------------------------------------
-    
     GroundTruthQuery(
         query_id="social_001",
         query_text="Arbeitslosengeld Anspruch Voraussetzungen",
@@ -221,9 +209,8 @@ GROUND_TRUTH_DATASET = [
             RelevantDocument("sgb_iii_142", 0.7, "Höhe des Arbeitslosengeldes"),
             RelevantDocument("sgb_i_11", 0.4, "Sozialleistungen allgemein"),
         ],
-        description="Test: Sozialrecht Arbeitslosengeld"
+        description="Test: Sozialrecht Arbeitslosengeld",
     ),
-    
     GroundTruthQuery(
         query_id="social_002",
         query_text="Kindergeld Anspruch Familie",
@@ -235,13 +222,11 @@ GROUND_TRUTH_DATASET = [
             RelevantDocument("estg_63", 0.9, "Höhe des Kindergeldes"),
             RelevantDocument("estg_66", 0.7, "Zahlung des Kindergeldes"),
         ],
-        description="Test: Familienrecht Kindergeld"
+        description="Test: Familienrecht Kindergeld",
     ),
-    
     # -------------------------------------------------------------------------
     # TRAFFIC: Verkehrsrecht
     # -------------------------------------------------------------------------
-    
     GroundTruthQuery(
         query_id="traffic_001",
         query_text="Geschwindigkeitsüberschreitung Bußgeld Fahrverbot",
@@ -253,9 +238,8 @@ GROUND_TRUTH_DATASET = [
             RelevantDocument("bukat_11", 0.9, "Bußgeldkatalog Geschwindigkeit"),
             RelevantDocument("stvo_49", 0.7, "Ordnungswidrigkeiten"),
         ],
-        description="Test: Verkehrsrecht Geschwindigkeit"
+        description="Test: Verkehrsrecht Geschwindigkeit",
     ),
-    
     GroundTruthQuery(
         query_id="traffic_002",
         query_text="Verkehrsunfall Haftung Schadensersatz",
@@ -267,13 +251,11 @@ GROUND_TRUTH_DATASET = [
             RelevantDocument("bgb_823", 0.8, "Schadensersatzpflicht allgemein"),
             RelevantDocument("strassenverkehrsgesetz_18", 0.7, "Versicherungspflicht"),
         ],
-        description="Test: Verkehrsunfall Haftung"
+        description="Test: Verkehrsunfall Haftung",
     ),
-    
     # -------------------------------------------------------------------------
     # CONSTRUCTION: Baurecht
     # -------------------------------------------------------------------------
-    
     GroundTruthQuery(
         query_id="construction_001",
         query_text="Baugenehmigung Voraussetzungen Bauantrag",
@@ -285,13 +267,11 @@ GROUND_TRUTH_DATASET = [
             RelevantDocument("bauo_59", 0.9, "Bauantrag"),
             RelevantDocument("bauo_63", 0.7, "Genehmigungsfreistellung"),
         ],
-        description="Test: Baurecht Genehmigung"
+        description="Test: Baurecht Genehmigung",
     ),
-    
     # -------------------------------------------------------------------------
     # COMPLEX QUERIES: Multi-Themen
     # -------------------------------------------------------------------------
-    
     GroundTruthQuery(
         query_id="complex_001",
         query_text="Menschenwürde Grundrechte Verfassung",
@@ -303,9 +283,8 @@ GROUND_TRUTH_DATASET = [
             RelevantDocument("gg_2", 0.8, "Persönliche Freiheitsrechte"),
             RelevantDocument("gg_19", 0.6, "Einschränkung von Grundrechten"),
         ],
-        description="Test: Verfassungsrecht Grundrechte"
+        description="Test: Verfassungsrecht Grundrechte",
     ),
-    
     GroundTruthQuery(
         query_id="complex_002",
         query_text="Diebstahl § 242 StGB Straftat",
@@ -317,13 +296,11 @@ GROUND_TRUTH_DATASET = [
             RelevantDocument("stgb_243", 0.8, "Besonders schwerer Diebstahl"),
             RelevantDocument("stgb_249", 0.7, "Raub (verwandte Straftat)"),
         ],
-        description="Test: Strafrecht Diebstahl"
+        description="Test: Strafrecht Diebstahl",
     ),
-    
     # -------------------------------------------------------------------------
     # EDGE CASES: Spezialfälle
     # -------------------------------------------------------------------------
-    
     GroundTruthQuery(
         query_id="edge_001",
         query_text="110",
@@ -335,9 +312,8 @@ GROUND_TRUTH_DATASET = [
             RelevantDocument("stgb_110", 0.5, "Könnte auch StGB sein"),
             RelevantDocument("vwvfg_110", 0.3, "Oder VwVfG"),
         ],
-        description="Test: Nur Paragraph-Nummer (Ambiguität)"
+        description="Test: Nur Paragraph-Nummer (Ambiguität)",
     ),
-    
     GroundTruthQuery(
         query_id="edge_002",
         query_text="Paragraph 433",
@@ -348,9 +324,8 @@ GROUND_TRUTH_DATASET = [
             RelevantDocument("bgb_433", 1.0, "Kaufvertrag BGB häufigste Bedeutung"),
             RelevantDocument("stgb_433", 0.4, "Weniger wahrscheinlich"),
         ],
-        description="Test: 'Paragraph' statt '§' Symbol"
+        description="Test: 'Paragraph' statt '§' Symbol",
     ),
-    
     GroundTruthQuery(
         query_id="edge_003",
         query_text="BGB Vertragsrecht",
@@ -363,13 +338,11 @@ GROUND_TRUTH_DATASET = [
             RelevantDocument("bgb_434", 0.7, "Sachmängel (Vertragsrecht)"),
             RelevantDocument("bgb_145", 0.8, "Angebot (Vertragsschluss)"),
         ],
-        description="Test: Sehr allgemeine Query (breite Relevanz)"
+        description="Test: Sehr allgemeine Query (breite Relevanz)",
     ),
-    
     # -------------------------------------------------------------------------
     # SYNONYME & UMGANGSSPRACHE
     # -------------------------------------------------------------------------
-    
     GroundTruthQuery(
         query_id="synonym_001",
         query_text="Jugendlicher Vertrag Taschengeld",
@@ -380,9 +353,8 @@ GROUND_TRUTH_DATASET = [
             RelevantDocument("bgb_110", 1.0, "Jugendlicher = Minderjähriger, Taschengeld"),
             RelevantDocument("bgb_107", 0.8, "Minderjährige Verträge"),
         ],
-        description="Test: Synonyme (Jugendlicher statt Minderjähriger)"
+        description="Test: Synonyme (Jugendlicher statt Minderjähriger)",
     ),
-    
     GroundTruthQuery(
         query_id="synonym_002",
         query_text="Kauf verkaufen Gewährleistung Mangel",
@@ -394,13 +366,11 @@ GROUND_TRUTH_DATASET = [
             RelevantDocument("bgb_434", 1.0, "Sachmängel"),
             RelevantDocument("bgb_437", 0.9, "Gewährleistungsrechte"),
         ],
-        description="Test: Umgangssprache statt Fachbegriffe"
+        description="Test: Umgangssprache statt Fachbegriffe",
     ),
-    
     # -------------------------------------------------------------------------
     # LONG-TAIL QUERIES
     # -------------------------------------------------------------------------
-    
     GroundTruthQuery(
         query_id="longtail_001",
         query_text="Was muss ich beachten wenn ich als Minderjähriger etwas kaufen möchte mit meinem Taschengeld",
@@ -412,9 +382,8 @@ GROUND_TRUTH_DATASET = [
             RelevantDocument("bgb_107", 0.7, "Minderjährige allgemein"),
             RelevantDocument("bgb_433", 0.5, "Kaufvertrag"),
         ],
-        description="Test: Natürlichsprachige Frage (long-tail)"
+        description="Test: Natürlichsprachige Frage (long-tail)",
     ),
-    
     GroundTruthQuery(
         query_id="longtail_002",
         query_text="Wie funktioniert das Verwaltungsverfahren wenn eine Behörde eine Entscheidung gegen mich treffen will",
@@ -426,7 +395,7 @@ GROUND_TRUTH_DATASET = [
             RelevantDocument("vwvfg_28", 0.8, "Bekanntgabe"),
             RelevantDocument("vwvfg_35", 0.7, "Was ist ein Verwaltungsakt"),
         ],
-        description="Test: Natürlichsprachige Frage Verwaltungsrecht"
+        description="Test: Natürlichsprachige Frage Verwaltungsrecht",
     ),
 ]
 
@@ -439,14 +408,14 @@ def get_dataset_statistics():
         "avg_relevant_docs": 0,
         "total_relevant_docs": 0,
     }
-    
+
     for query in GROUND_TRUTH_DATASET:
         category = query.category.value
         stats["by_category"][category] = stats["by_category"].get(category, 0) + 1
         stats["total_relevant_docs"] += len(query.relevant_docs)
-    
+
     stats["avg_relevant_docs"] = stats["total_relevant_docs"] / stats["total_queries"]
-    
+
     return stats
 
 
@@ -456,18 +425,18 @@ def print_dataset_info():
     print("GROUND-TRUTH DATASET INFORMATION")
     print("=" * 80)
     print()
-    
+
     stats = get_dataset_statistics()
-    
+
     print(f"Total Queries: {stats['total_queries']}")
     print(f"Avg Relevant Docs per Query: {stats['avg_relevant_docs']:.1f}")
     print()
-    
+
     print("Queries by Category:")
-    for category, count in sorted(stats['by_category'].items()):
+    for category, count in sorted(stats["by_category"].items()):
         print(f"   {category}: {count}")
     print()
-    
+
     print("Sample Queries:")
     for i, query in enumerate(GROUND_TRUTH_DATASET[:5], 1):
         print(f"   {i}. [{query.category.value}] {query.query_text}")
@@ -478,7 +447,7 @@ def print_dataset_info():
 
 if __name__ == "__main__":
     print_dataset_info()
-    
+
     print("=" * 80)
     print("DATASET READY FOR EVALUATION")
     print("=" * 80)

@@ -1,8 +1,8 @@
 # Phase 5: Advanced RAG Pipeline - Design-Dokument
 
-**Version:** 1.0  
-**Datum:** 6. Oktober 2025  
-**Status:** 🔄 In Planung  
+**Version:** 1.0
+**Datum:** 6. Oktober 2025
+**Status:** 🔄 In Planung
 **Autor:** VERITAS Development Team
 
 ---
@@ -103,36 +103,36 @@ Die aktuelle RAG-Pipeline nutzt **Dense Retrieval** (Embeddings + Cosine-Similar
 ```python
 class QueryExpander:
     """LLM-basierte Query-Expansion für besseren Recall"""
-    
+
     def __init__(self, llm_client: OllamaClient):
         self.llm = llm_client
-        
+
     async def expand_query(
-        self, 
+        self,
         query: str,
         num_expansions: int = 3
     ) -> List[str]:
         """
         Generiert erweiterte Query-Varianten
-        
+
         Returns:
             [original_query, expansion_1, expansion_2, ...]
         """
         prompt = f"""
         Original Query: "{query}"
-        
+
         Generiere {num_expansions} semantisch ähnliche Umformulierungen:
         1. Verwende Synonyme
         2. Füge relevante Kontextbegriffe hinzu
         3. Behalte die Kernintention bei
-        
+
         Format: Eine Umformulierung pro Zeile
         """
-        
+
         response = await self.llm.generate_response(prompt)
         expansions = [query]  # Original immer dabei
         expansions.extend(response.strip().split('\n'))
-        
+
         return expansions[:num_expansions + 1]
 ```
 
@@ -153,7 +153,7 @@ Expansion 3: "Ökologische Auflagen Hochbau Berlin-Mitte"
 ```python
 class MultiQueryGenerator:
     """Generiert multiple Query-Perspektiven"""
-    
+
     async def generate_multi_queries(
         self,
         query: str,
@@ -161,25 +161,25 @@ class MultiQueryGenerator:
     ) -> List[str]:
         """
         Generiert verschiedene Perspektiven/Aspekte der Query
-        
+
         Returns:
             Liste von Queries aus verschiedenen Perspektiven
         """
         prompt = f"""
         User-Query: "{query}"
-        
+
         Generiere {num_queries} verschiedene Such-Perspektiven:
         1. Rechtliche Perspektive
-        2. Technische Perspektive  
+        2. Technische Perspektive
         3. Prozessuale Perspektive
-        
+
         Jede Perspektive als separate Query.
         """
-        
+
         response = await self.llm.generate_response(prompt)
         queries = [query]  # Original
         queries.extend(response.strip().split('\n'))
-        
+
         return queries[:num_queries + 1]
 ```
 
@@ -188,14 +188,14 @@ class MultiQueryGenerator:
 ### 2. Hybrid Retrieval Layer
 
 #### 2.1 Dense Retrieval (Embeddings)
-**Aktuell:** Sentence-Transformers Embeddings + Cosine-Similarity  
+**Aktuell:** Sentence-Transformers Embeddings + Cosine-Similarity
 **Neu:** Erweitert um Multi-Query Support
 
 **Komponenten:**
 ```python
 class DenseRetriever:
     """Embedding-basierte Dense Retrieval"""
-    
+
     def __init__(
         self,
         embedding_model: str = "all-MiniLM-L6-v2",
@@ -203,7 +203,7 @@ class DenseRetriever:
     ):
         self.model = SentenceTransformer(embedding_model)
         self.vector_store = vector_store
-        
+
     async def retrieve(
         self,
         queries: List[str],  # Multi-Query Support
@@ -211,12 +211,12 @@ class DenseRetriever:
     ) -> List[ScoredChunk]:
         """
         Dense Retrieval für multiple Queries
-        
+
         Returns:
             Top-K Chunks mit Dense-Scores
         """
         all_results = []
-        
+
         for query in queries:
             query_embedding = self.model.encode(query)
             results = await self.vector_store.similarity_search(
@@ -224,7 +224,7 @@ class DenseRetriever:
                 k=top_k
             )
             all_results.extend(results)
-        
+
         # Dedupliziere & merge Scores
         return self._merge_results(all_results, top_k)
 ```
@@ -240,7 +240,7 @@ from rank_bm25 import BM25Okapi
 
 class SparseRetriever:
     """BM25-basierte Sparse Retrieval"""
-    
+
     def __init__(self, corpus: List[str]):
         # Tokenize Corpus
         self.tokenized_corpus = [
@@ -248,11 +248,11 @@ class SparseRetriever:
         ]
         self.bm25 = BM25Okapi(self.tokenized_corpus)
         self.corpus = corpus
-        
+
     def _tokenize(self, text: str) -> List[str]:
         """Einfache Tokenization (kann erweitert werden)"""
         return text.lower().split()
-        
+
     async def retrieve(
         self,
         queries: List[str],
@@ -260,23 +260,23 @@ class SparseRetriever:
     ) -> List[ScoredChunk]:
         """
         BM25 Retrieval für multiple Queries
-        
+
         Returns:
             Top-K Chunks mit BM25-Scores
         """
         all_scores = []
-        
+
         for query in queries:
             tokenized_query = self._tokenize(query)
             scores = self.bm25.get_scores(tokenized_query)
             all_scores.append(scores)
-        
+
         # Merge Scores (Max, Sum, oder Average)
         merged_scores = np.max(all_scores, axis=0)
-        
+
         # Top-K Indizes
         top_indices = np.argsort(merged_scores)[-top_k:][::-1]
-        
+
         return [
             ScoredChunk(
                 chunk=self.corpus[idx],
@@ -312,10 +312,10 @@ Wobei:
 ```python
 class ReciprocalRankFusion:
     """Reciprocal Rank Fusion für Hybrid-Results"""
-    
+
     def __init__(self, k: int = 60):
         self.k = k
-        
+
     def fuse(
         self,
         dense_results: List[ScoredChunk],
@@ -324,32 +324,32 @@ class ReciprocalRankFusion:
     ) -> List[ScoredChunk]:
         """
         Fusioniert Dense + Sparse Results via RRF
-        
+
         Returns:
             Top-K fusionierte Results mit RRF-Scores
         """
         # Chunk-ID → RRF-Score Mapping
         rrf_scores = {}
-        
+
         # Dense Results
         for rank, chunk in enumerate(dense_results):
             chunk_id = chunk.chunk_id
             rrf_scores[chunk_id] = rrf_scores.get(chunk_id, 0) + \
                 1 / (self.k + rank + 1)
-        
+
         # Sparse Results
         for rank, chunk in enumerate(sparse_results):
             chunk_id = chunk.chunk_id
             rrf_scores[chunk_id] = rrf_scores.get(chunk_id, 0) + \
                 1 / (self.k + rank + 1)
-        
+
         # Sortiere nach RRF-Score
         sorted_chunks = sorted(
             rrf_scores.items(),
             key=lambda x: x[1],
             reverse=True
         )
-        
+
         return [
             ScoredChunk(
                 chunk_id=chunk_id,
@@ -380,13 +380,13 @@ from sentence_transformers import CrossEncoder
 
 class CrossEncoderReranker:
     """Cross-Encoder basiertes Re-Ranking"""
-    
+
     def __init__(
         self,
         model_name: str = "cross-encoder/ms-marco-MiniLM-L-6-v2"
     ):
         self.model = CrossEncoder(model_name)
-        
+
     async def rerank(
         self,
         query: str,
@@ -395,7 +395,7 @@ class CrossEncoderReranker:
     ) -> List[ScoredChunk]:
         """
         Re-rankt Kandidaten via Cross-Encoder
-        
+
         Returns:
             Top-K re-ranked Chunks
         """
@@ -404,21 +404,21 @@ class CrossEncoderReranker:
             [query, candidate.chunk_text]
             for candidate in candidates
         ]
-        
+
         # Cross-Encoder Scores
         scores = self.model.predict(pairs)
-        
+
         # Merge mit Original-Candidates
         for candidate, score in zip(candidates, scores):
             candidate.rerank_score = score
-        
+
         # Sortiere nach Rerank-Score
         reranked = sorted(
             candidates,
             key=lambda x: x.rerank_score,
             reverse=True
         )
-        
+
         return reranked[:top_k]
 ```
 
@@ -448,10 +448,10 @@ Wobei:
 ```python
 class MaximalMarginalRelevance:
     """MMR-basierte Diversity Re-Ranking"""
-    
+
     def __init__(self, lambda_param: float = 0.5):
         self.lambda_param = lambda_param
-        
+
     async def rerank(
         self,
         query_embedding: np.ndarray,
@@ -460,24 +460,24 @@ class MaximalMarginalRelevance:
     ) -> List[ScoredChunk]:
         """
         MMR Re-Ranking für Diversity
-        
+
         Returns:
             Top-K diverse Chunks
         """
         selected = []
         remaining = candidates.copy()
-        
+
         # Iterativ auswählen
         for _ in range(min(top_k, len(remaining))):
             mmr_scores = []
-            
+
             for candidate in remaining:
                 # Relevanz-Score
                 relevance = self._cosine_similarity(
                     query_embedding,
                     candidate.embedding
                 )
-                
+
                 # Diversity-Score (max similarity zu bereits gewählten)
                 if selected:
                     diversity = max([
@@ -489,22 +489,22 @@ class MaximalMarginalRelevance:
                     ])
                 else:
                     diversity = 0
-                
+
                 # MMR Score
                 mmr = self.lambda_param * relevance - \
                       (1 - self.lambda_param) * diversity
-                
+
                 mmr_scores.append((candidate, mmr))
-            
+
             # Wähle besten MMR-Score
             best_candidate, best_score = max(
                 mmr_scores,
                 key=lambda x: x[1]
             )
-            
+
             selected.append(best_candidate)
             remaining.remove(best_candidate)
-        
+
         return selected
 ```
 
@@ -522,7 +522,7 @@ class MaximalMarginalRelevance:
 ```python
 class SemanticChunker:
     """Semantic-basiertes Chunking (nicht fixed-size)"""
-    
+
     def __init__(
         self,
         embedding_model: SentenceTransformer,
@@ -530,7 +530,7 @@ class SemanticChunker:
     ):
         self.model = embedding_model
         self.threshold = similarity_threshold
-        
+
     async def chunk_document(
         self,
         text: str,
@@ -539,32 +539,32 @@ class SemanticChunker:
     ) -> List[str]:
         """
         Chunked Dokument semantisch
-        
+
         Returns:
             Liste semantisch kohärenter Chunks
         """
         # Split in Sätze
         sentences = self._split_sentences(text)
-        
+
         # Embed Sentences
         embeddings = self.model.encode(sentences)
-        
+
         chunks = []
         current_chunk = [sentences[0]]
         current_embedding = embeddings[0]
-        
+
         for i in range(1, len(sentences)):
             sentence = sentences[i]
             embedding = embeddings[i]
-            
+
             # Similarity zum aktuellen Chunk
             similarity = self._cosine_similarity(
                 current_embedding,
                 embedding
             )
-            
+
             # Wenn ähnlich & nicht zu groß → hinzufügen
-            if (similarity >= self.threshold and 
+            if (similarity >= self.threshold and
                 len(' '.join(current_chunk)) < max_chunk_size):
                 current_chunk.append(sentence)
                 # Update Chunk-Embedding (Mean)
@@ -574,11 +574,11 @@ class SemanticChunker:
                 chunks.append(' '.join(current_chunk))
                 current_chunk = [sentence]
                 current_embedding = embedding
-        
+
         # Letzter Chunk
         if current_chunk:
             chunks.append(' '.join(current_chunk))
-        
+
         return chunks
 ```
 
@@ -596,14 +596,14 @@ class SemanticChunker:
 ```python
 class HierarchicalChunker:
     """Hierarchical Chunking mit Parent-Child-Relationen"""
-    
+
     async def chunk_hierarchical(
         self,
         text: str
     ) -> List[HierarchicalChunk]:
         """
         Erstellt hierarchische Chunk-Struktur
-        
+
         Returns:
             Liste von Chunks mit Parent-Child-Links
         """
@@ -613,11 +613,11 @@ class HierarchicalChunker:
             level=1,
             parent_id=None
         )
-        
+
         # Level 2: Sections (via Headers)
         sections = self._split_by_headers(text)
         section_chunks = []
-        
+
         for section in sections:
             section_chunk = HierarchicalChunk(
                 text=section,
@@ -625,7 +625,7 @@ class HierarchicalChunker:
                 parent_id=doc_chunk.chunk_id
             )
             section_chunks.append(section_chunk)
-            
+
             # Level 3: Paragraphs
             paragraphs = self._split_paragraphs(section)
             for para in paragraphs:
@@ -635,7 +635,7 @@ class HierarchicalChunker:
                     parent_id=section_chunk.chunk_id
                 )
                 section_chunks.append(para_chunk)
-        
+
         return [doc_chunk] + section_chunks
 ```
 
@@ -659,21 +659,21 @@ def ndcg_at_k(
 ) -> float:
     """
     NDCG@K: Misst Ranking-Qualität mit Position-Discount
-    
+
     Returns:
         NDCG Score (0.0 - 1.0)
     """
     dcg = sum([
-        1 / np.log2(i + 2) 
-        for i, doc in enumerate(retrieved_docs[:k]) 
+        1 / np.log2(i + 2)
+        for i, doc in enumerate(retrieved_docs[:k])
         if doc in relevant_docs
     ])
-    
+
     idcg = sum([
-        1 / np.log2(i + 2) 
+        1 / np.log2(i + 2)
         for i in range(min(k, len(relevant_docs)))
     ])
-    
+
     return dcg / idcg if idcg > 0 else 0.0
 ```
 
@@ -687,7 +687,7 @@ def mean_reciprocal_rank(
 ) -> float:
     """
     MRR: Position des ersten relevanten Dokuments
-    
+
     Returns:
         MRR Score (0.0 - 1.0)
     """
@@ -708,16 +708,16 @@ def recall_at_k(
 ) -> float:
     """
     Recall@K: Anteil relevanter Docs in Top-K
-    
+
     Returns:
         Recall (0.0 - 1.0)
     """
     retrieved_set = set(retrieved_docs[:k])
     relevant_set = set(relevant_docs)
-    
+
     if not relevant_set:
         return 0.0
-    
+
     return len(retrieved_set & relevant_set) / len(relevant_set)
 ```
 
@@ -729,7 +729,7 @@ def recall_at_k(
 ```python
 class RAGBenchmark:
     """Benchmark für RAG-Evaluation"""
-    
+
     def __init__(self):
         self.test_queries = [
             {
@@ -739,34 +739,34 @@ class RAGBenchmark:
             },
             # ... mehr Test-Queries
         ]
-    
+
     async def evaluate_pipeline(
         self,
         pipeline: RAGPipeline
     ) -> Dict[str, float]:
         """
         Evaluiert RAG-Pipeline auf Test-Set
-        
+
         Returns:
             {"ndcg@10": 0.78, "mrr": 0.65, "recall@10": 0.82}
         """
         ndcg_scores = []
         mrr_scores = []
         recall_scores = []
-        
+
         for test_case in self.test_queries:
             query = test_case["query"]
             relevant = test_case["relevant_chunks"]
-            
+
             # Retrieve
             results = await pipeline.retrieve(query, top_k=10)
             retrieved = [r.chunk_id for r in results]
-            
+
             # Metriken
             ndcg_scores.append(ndcg_at_k(relevant, retrieved, k=10))
             mrr_scores.append(mean_reciprocal_rank(relevant, retrieved))
             recall_scores.append(recall_at_k(relevant, retrieved, k=10))
-        
+
         return {
             "ndcg@10": np.mean(ndcg_scores),
             "mrr": np.mean(mrr_scores),

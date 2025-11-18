@@ -126,7 +126,7 @@ Empfohlen vor Deployment:
 ## 🚀 Migration Path
 
 **Für Nutzer**: Keine Änderungen erforderlich
-**Für Entwickler**: 
+**Für Entwickler**:
 - Neue Features in UI-Modulen implementieren
 - veritas_app.py nur für Koordination verwenden
 - Tests für UI-Module schreiben

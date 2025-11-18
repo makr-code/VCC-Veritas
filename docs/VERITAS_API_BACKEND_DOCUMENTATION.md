@@ -11,7 +11,7 @@
 ## 📋 Inhaltsverzeichnis
 
 1. [System-Übersicht](#system-übersicht)
-2. [Agenten-Architektur](#agenten-architektur) 
+2. [Agenten-Architektur](#agenten-architektur)
 3. [API-Endpoints](#api-endpoints)
 4. [Streaming-System](#streaming-system)
 5. [Agenten-Typen](#agenten-typen)
@@ -32,7 +32,7 @@
 
 **VERITAS API Backend** ist ein hochmodernes, agent-basiertes Backend-System für die Verarbeitung komplexer Verwaltungsanfragen.
 
-- In einfachen Worten: Mehrere digitale Fachkräfte (Agenten) arbeiten gleichzeitig an Ihrer Frage – jede mit eigener Spezialisierung (z. B. Bauen, Umwelt, Verkehr). 
+- In einfachen Worten: Mehrere digitale Fachkräfte (Agenten) arbeiten gleichzeitig an Ihrer Frage – jede mit eigener Spezialisierung (z. B. Bauen, Umwelt, Verkehr).
 - Sie bekommen bereits während der Bearbeitung Einblicke in den Fortschritt (Streaming), ohne erst auf das Endergebnis warten zu müssen.
 
 - **🤖 Multi-Agent-Architektur**: Spezialisierte Agenten für verschiedene Domänen
@@ -156,7 +156,7 @@ DOMAIN_AGENTS = {
     "environmental": {
         "workers": [
             "air_quality_worker",           # Luftqualität und Emissionen
-            "noise_complaint_worker",       # Lärmbeschwerde und Schallschutz  
+            "noise_complaint_worker",       # Lärmbeschwerde und Schallschutz
             "waste_management_worker",      # Abfallentsorgung und Recycling
             "water_protection_worker",      # Gewässerschutz und Wasserwirtschaft
             "nature_conservation_worker"    # Naturschutz und Biodiversität
@@ -165,7 +165,7 @@ DOMAIN_AGENTS = {
         "external_apis": ["umweltbundesamt", "landesumweltämter"],
         "complexity_handling": "environmental_regulations"
     },
-    
+
     "construction": {
         "workers": [
             "building_permit_worker",       # Baugenehmigungen und Baurecht
@@ -178,7 +178,7 @@ DOMAIN_AGENTS = {
         "external_apis": ["bauaufsicht", "stadtplanung", "denkmalschutz"],
         "complexity_handling": "multi_authority_coordination"
     },
-    
+
     "traffic": {
         "workers": [
             "traffic_management_worker",    # Verkehrsmanagement und -planung
@@ -191,7 +191,7 @@ DOMAIN_AGENTS = {
         "external_apis": ["verkehrsbetriebe", "straßenbauamt", "verkehrsüberwachung"],
         "complexity_handling": "multi_modal_transport"
     },
-    
+
     "financial": {
         "workers": [
             "tax_assessment_worker",        # Steuerveranlagung und Steuerbescheide
@@ -204,7 +204,7 @@ DOMAIN_AGENTS = {
         "external_apis": ["finanzämter", "förderbanken", "ihk"],
         "complexity_handling": "multi_jurisdiction_tax"
     },
-    
+
     "social": {
         "workers": [
             "social_benefits_worker",       # Sozialleistungen und Anspruchsprüfung
@@ -253,27 +253,27 @@ class AgentOrchestrator:
     """
     Zentrale Koordination aller Agenten
     """
-    
+
     async def process_query(self, query: str, domain: str) -> AgentResponse:
         # 1. Preprocessor Stage
         preprocessed = await self.preprocessor.analyze(query)
-        
+
         # 2. Agent Selection
         selected_agents = self.select_agents(domain, preprocessed.complexity)
-        
+
         # 3. Parallel Execution
         tasks = [agent.process(query, preprocessed) for agent in selected_agents]
         results = await asyncio.gather(*tasks)
-        
+
         # 4. Aggregation
         aggregated = await self.aggregator.combine(results)
-        
-        # 5. Quality Assessment  
+
+        # 5. Quality Assessment
         quality_score = await self.quality_assessor.evaluate(aggregated)
-        
+
         # 6. Response Generation
         final_response = await self.llm_generator.generate(aggregated)
-        
+
         return AgentResponse(
             content=final_response,
             quality_score=quality_score,
@@ -327,12 +327,12 @@ GET /agents/types
 Response: {
     "agent_types": [
         "legal_framework", "document_retrieval", "geo_context",
-        "environmental", "construction", "traffic", 
+        "environmental", "construction", "traffic",
         "financial", "social", "external_api"
     ],
     "streaming_features": {
         "progress_updates": true,
-        "intermediate_results": true, 
+        "intermediate_results": true,
         "llm_thinking": true
     }
 }
@@ -407,7 +407,7 @@ data: {
     "message": "Environmental worker analyzing emission requirements"
 }
 
-event: intermediate_result  
+event: intermediate_result
 data: {
     "agent_type": "environmental",
     "result": "BImSchG requirements identified",
@@ -511,12 +511,12 @@ class VeritasProgressManager:
     """
     Verwaltet Real-time Progress für Streaming-Queries
     """
-    
+
     def __init__(self):
         self.active_sessions = {}
         self.cancelled_sessions = set()
         self.progress_streamer = VeritasProgressStreamer()
-    
+
     async def update_stage(self, session_id: str, stage: ProgressStage):
         """Aktualisiert Verarbeitungsstage"""
         progress_data = {
@@ -526,7 +526,7 @@ class VeritasProgressManager:
             "message": f"Stage {stage.value} started"
         }
         await self.progress_streamer.send_update(session_id, progress_data)
-    
+
     async def add_intermediate_result(self, session_id: str, agent_type: str, result: Dict):
         """Fügt Zwischenergebnis hinzu"""
         progress_data = {
@@ -559,14 +559,14 @@ async def get_progress_stream(session_id: str):
             if progress_manager.is_session_cancelled(session_id):
                 yield f"event: cancelled\ndata: {{\"message\": \"Session cancelled\"}}\n\n"
                 break
-            
+
             # Get latest progress
             progress = await progress_manager.get_latest_progress(session_id)
             if progress:
                 yield f"event: {progress['type']}\ndata: {json.dumps(progress)}\n\n"
-            
+
             await asyncio.sleep(0.5)  # 500ms polling
-    
+
     return StreamingResponse(
         event_generator(),
         media_type="text/event-stream",
@@ -593,16 +593,16 @@ async def cancel_streaming_session(session_id: str, cancel_request: dict):
     """
     if session_id not in progress_manager.active_sessions:
         raise HTTPException(404, "Session not found")
-    
+
     # Mark as cancelled
     progress_manager.cancel_session(session_id)
-    
+
     # Notify agents to stop processing
     await agent_orchestrator.cancel_session(session_id)
-    
+
     # Send cancellation event
     await progress_manager.send_cancellation_event(session_id)
-    
+
     return {
         "success": True,
         "message": "Session successfully cancelled",
@@ -632,11 +632,11 @@ ENVIRONMENTAL_AGENTS = {
         "legal_framework": ["BImSchG", "39. BImSchV", "EU-Luftqualitätsrichtlinie"],
         "typical_queries": [
             "Luftqualität in meiner Stadt",
-            "Grenzwerte für Stickstoffdioxid", 
+            "Grenzwerte für Stickstoffdioxid",
             "Emissionsberichte für Industrieanlagen"
         ]
     },
-    
+
     "noise_complaint_worker": {
         "expertise": "Lärmschutz und Schallimmissionen",
         "data_sources": ["Lärmkarten", "Messdaten", "Rechtsprechung"],
@@ -659,7 +659,7 @@ CONSTRUCTION_AGENTS = {
         "data_sources": ["Bauordnungen", "Bebauungspläne", "Formulare"],
         "legal_framework": ["BauGB", "LBO", "BauNVO"],
         "process_steps": [
-            "Bauvoranfrage", "Bauantrag", "Prüfung", 
+            "Bauvoranfrage", "Bauantrag", "Prüfung",
             "Genehmigung", "Bauabnahme"
         ],
         "typical_queries": [
@@ -668,7 +668,7 @@ CONSTRUCTION_AGENTS = {
             "Bauvoranfrage stellen"
         ]
     },
-    
+
     "urban_planning_worker": {
         "expertise": "Stadtplanung und Flächennutzung",
         "data_sources": ["FNP", "Bebauungspläne", "Landschaftspläne"],
@@ -693,22 +693,22 @@ async def process_domain_query(domain: str, query: str) -> DomainResult:
     # 1. Domain Agent Selection
     domain_agents = DOMAIN_AGENTS[domain]["workers"]
     selected_agents = await select_relevant_agents(query, domain_agents)
-    
+
     # 2. Parallel Agent Execution
     agent_tasks = []
     for agent_name in selected_agents:
         agent = get_agent_instance(agent_name)
         task = agent.process_query(query)
         agent_tasks.append(task)
-    
+
     # 3. Gather Results
     agent_results = await asyncio.gather(*agent_tasks)
-    
+
     # 4. Domain-specific Aggregation
     aggregated_result = await aggregate_domain_results(
         domain, agent_results
     )
-    
+
     return DomainResult(
         domain=domain,
         agent_results=agent_results,
@@ -729,7 +729,7 @@ async def process_domain_query(domain: str, query: str) -> DomainResult:
 
 ## 6. RAG-Integration
 
-> RAG („Retrieval Augmented Generation“) heißt: Erst recherchieren, dann antworten. 
+> RAG („Retrieval Augmented Generation“) heißt: Erst recherchieren, dann antworten.
 > Analogie: Bevor ein Gutachten erstellt wird, werden Akten gesichtet (Recherche). Danach wird die Bewertung geschrieben (Antwort). So wird’s fundiert statt geraten.
 
 ### 🔍 Tri-Database-Strategie
@@ -741,25 +741,25 @@ class TriDatabaseRAGStrategy:
     """
     Vector + Graph + Relational Database Integration
     """
-    
+
     def __init__(self):
         self.vector_db = ChromaDB()      # Semantic Search
-        self.graph_db = Neo4j()          # Relationship Analysis  
+        self.graph_db = Neo4j()          # Relationship Analysis
         self.relational_db = PostgreSQL() # Metadata & Structure
-    
+
     async def query_rag_pipeline(self, query: str) -> RAGResult:
         # 1. Vector Search - Semantic Similarity
         vector_results = await self.vector_db.similarity_search(
             query, k=50, threshold=0.7
         )
-        
+
         # 2. Graph Traversal - Relationship Analysis
         graph_results = await self.graph_db.traverse_relationships(
             entities=extract_entities(query),
             max_depth=3,
             relationship_types=["CITES", "REFERENCES", "CONTAINS"]
         )
-        
+
         # 3. Relational Filter - Metadata Filtering
         relational_results = await self.relational_db.filter_metadata(
             candidates=vector_results + graph_results,
@@ -769,12 +769,12 @@ class TriDatabaseRAGStrategy:
                 "jurisdiction": infer_jurisdiction(query)
             }
         )
-        
+
         # 4. Result Combination & Ranking
         combined_results = await self.combine_and_rank(
             vector_results, graph_results, relational_results
         )
-        
+
         return RAGResult(
             documents=combined_results,
             retrieval_strategy="tri_database",
@@ -817,29 +817,29 @@ class RAGIntegratedAgent:
     """
     Agent mit integrierter RAG-Pipeline
     """
-    
+
     def __init__(self, agent_type: str):
         self.agent_type = agent_type
         self.rag_strategy = TriDatabaseRAGStrategy()
         self.domain_focus = DOMAIN_AGENTS[agent_type]["rag_focus"]
-    
+
     async def process_with_rag(self, query: str) -> AgentResult:
         # 1. Domain-focused RAG Query
         rag_context = await self.rag_strategy.query_with_domain_focus(
             query, self.domain_focus
         )
-        
+
         # 2. Agent-specific Processing
         agent_analysis = await self.analyze_with_context(
             query, rag_context
         )
-        
+
         # 3. Confidence Assessment
         confidence = self.calculate_confidence(
             rag_context.confidence_score,
             agent_analysis.certainty
         )
-        
+
         return AgentResult(
             agent_type=self.agent_type,
             analysis=agent_analysis,
@@ -860,33 +860,33 @@ class OptimizedUnifiedDatabaseStrategy:
     """
     Unified Database Strategy v3.0 mit Quality Framework
     """
-    
+
     def __init__(self):
         self.strategies = {
             "vector": VectorDatabaseAPI(),
-            "graph": GraphDatabaseAPI(), 
+            "graph": GraphDatabaseAPI(),
             "relational": RelationalDatabaseAPI(),
             "document": DocumentDatabaseAPI()
         }
         self.quality_manager = QualityManager()
         self.security_manager = SecurityManager()
-    
+
     async def unified_query(self, query: str, strategy_weights: Dict[str, float]) -> UnifiedResult:
         """
         Parallelisierte Multi-Database-Query mit Quality Assessment
         """
         # 1. Security Check
         security_level = await self.security_manager.assess_query_security(query)
-        
+
         # 2. Parallel Database Queries
         tasks = {}
         for strategy_name, weight in strategy_weights.items():
             if weight > 0:
                 strategy = self.strategies[strategy_name]
                 tasks[strategy_name] = strategy.query(query)
-        
+
         results = await asyncio.gather(*tasks.values(), return_exceptions=True)
-        
+
         # 3. Quality Assessment per Strategy
         quality_scores = {}
         for strategy_name, result in zip(tasks.keys(), results):
@@ -894,14 +894,14 @@ class OptimizedUnifiedDatabaseStrategy:
                 quality_scores[strategy_name] = await self.quality_manager.assess_result_quality(
                     result, strategy_name
                 )
-        
+
         # 4. Weighted Result Combination
         unified_result = await self.combine_weighted_results(
             dict(zip(tasks.keys(), results)),
             strategy_weights,
             quality_scores
         )
-        
+
         return UnifiedResult(
             content=unified_result,
             strategy_contributions=quality_scores,
@@ -919,13 +919,13 @@ DATABASE_PERFORMANCE_CONFIG = {
         "graph_db": {"pool_size": 15, "max_overflow": 5},
         "relational_db": {"pool_size": 25, "max_overflow": 15}
     },
-    
+
     "caching_strategy": {
         "query_cache_ttl": 300,  # 5 minutes
         "result_cache_ttl": 900,  # 15 minutes
         "metadata_cache_ttl": 3600  # 1 hour
     },
-    
+
     "parallel_execution": {
         "max_concurrent_queries": 50,
         "query_timeout": 30,  # seconds
@@ -947,35 +947,35 @@ class ExternalAPIManager:
     """
     Zentrale Verwaltung externer API-Integrationen
     """
-    
+
     def __init__(self):
         self.api_registry = {
             # Governmental APIs
             "umweltbundesamt": UmweltbundesamtAPI(),
             "destatis": DestatisAPI(),
             "geoportal": GeoportalAPI(),
-            
-            # Municipal APIs  
+
+            # Municipal APIs
             "kommune_api": KommunaleAPI(),
             "stadtplanung": StadtplanungsAPI(),
             "bauaufsicht": BauaufsichtAPI(),
-            
+
             # Legal APIs
             "gesetze_im_internet": GesetzeImInternetAPI(),
             "rechtsprechung": RechtsprechungsAPI(),
             "verwaltungsportal": VerwaltungsportalAPI(),
-            
+
             # Business APIs
             "unternehmensregister": UnternehmensregisterAPI(),
             "ihk": IHKAPI(),
             "handwerkskammer": HandwerkskammerAPI()
         }
-        
+
         self.rate_limiter = RateLimiter()
         self.circuit_breaker = CircuitBreaker()
-    
-    async def query_external_sources(self, 
-                                   query: str, 
+
+    async def query_external_sources(self,
+                                   query: str,
                                    agent_type: str,
                                    max_sources: int = 5) -> List[ExternalResult]:
         """
@@ -983,28 +983,28 @@ class ExternalAPIManager:
         """
         # Select relevant APIs for agent type
         relevant_apis = self.get_relevant_apis(agent_type)
-        
+
         # Rate limiting and circuit breaker checks
         available_apis = []
         for api_name, api_instance in relevant_apis.items():
-            if (await self.rate_limiter.can_call(api_name) and 
+            if (await self.rate_limiter.can_call(api_name) and
                 self.circuit_breaker.is_available(api_name)):
                 available_apis.append((api_name, api_instance))
-        
+
         # Parallel API calls
         tasks = [
             self.call_external_api(api_name, api_instance, query)
             for api_name, api_instance in available_apis[:max_sources]
         ]
-        
+
         results = await asyncio.gather(*tasks, return_exceptions=True)
-        
+
         # Filter successful results
         successful_results = [
-            result for result in results 
+            result for result in results
             if not isinstance(result, Exception)
         ]
-        
+
         return successful_results
 ```
 
@@ -1022,7 +1022,7 @@ GOVERNMENTAL_APIS = {
         "rate_limit": "100/hour",
         "authentication": "api_key"
     },
-    
+
     "destatis": {
         "base_url": "https://api.destatis.de/",
         "endpoints": {
@@ -1033,12 +1033,12 @@ GOVERNMENTAL_APIS = {
         "rate_limit": "200/hour",
         "authentication": "oauth2"
     },
-    
+
     "geoportal": {
         "base_url": "https://api.geoportal.de/",
         "endpoints": {
             "cadastre": "/liegenschaftskarte",
-            "zoning": "/bebauungsplan", 
+            "zoning": "/bebauungsplan",
             "environmental_zones": "/umweltzonen"
         },
         "rate_limit": "300/hour",
@@ -1054,7 +1054,7 @@ class APIResilienceManager:
     """
     Fehlertoleranz und Fallback-Strategien für externe APIs
     """
-    
+
     def __init__(self):
         self.retry_config = {
             "max_retries": 3,
@@ -1063,10 +1063,10 @@ class APIResilienceManager:
         }
         self.fallback_sources = {}
         self.cache_manager = CacheManager()
-    
-    async def resilient_api_call(self, 
-                                api_name: str, 
-                                endpoint: str, 
+
+    async def resilient_api_call(self,
+                                api_name: str,
+                                endpoint: str,
                                 params: Dict) -> APIResult:
         """
         Resilient API call with retries and fallbacks
@@ -1076,19 +1076,19 @@ class APIResilienceManager:
         cached_result = await self.cache_manager.get(cache_key)
         if cached_result:
             return cached_result
-        
+
         # Attempt primary API call with retries
         for attempt in range(self.retry_config["max_retries"]):
             try:
                 result = await self.make_api_call(api_name, endpoint, params)
-                
+
                 # Cache successful result
                 await self.cache_manager.set(
                     cache_key, result, ttl=900  # 15 minutes
                 )
-                
+
                 return result
-                
+
             except APIException as e:
                 if attempt < self.retry_config["max_retries"] - 1:
                     delay = self.calculate_backoff_delay(attempt)
@@ -1101,7 +1101,7 @@ class APIResilienceManager:
                     )
                     if fallback_result:
                         return fallback_result
-                    
+
                     raise e
 ```
 
@@ -1116,7 +1116,7 @@ class APIResilienceManager:
 
 ## 9. Quality-Management
 
-> Qualität heißt: vollständig, korrekt, relevant, konsistent – und mit seriösen Quellen belegt. 
+> Qualität heißt: vollständig, korrekt, relevant, konsistent – und mit seriösen Quellen belegt.
 > Denken Sie an ein Vier-Augen-Prinzip plus Checkliste: Ergebnisse durchlaufen feste Qualitätskriterien.
 
 ### 📊 Quality Assessment Framework
@@ -1126,25 +1126,25 @@ class QualityAssessmentFramework:
     """
     Umfassendes Quality Assessment für Agent-Responses
     """
-    
+
     def __init__(self):
         self.metrics = {
             "completeness": CompletenessAssessor(),
             "accuracy": AccuracyAssessor(),
-            "relevance": RelevanceAssessor(), 
+            "relevance": RelevanceAssessor(),
             "consistency": ConsistencyAssessor(),
             "timeliness": TimelinessAssessor(),
             "authority": AuthorityAssessor()
         }
-        
+
         self.quality_thresholds = {
             "excellent": 0.9,
             "good": 0.8,
             "satisfactory": 0.7,
             "needs_improvement": 0.6
         }
-    
-    async def assess_response_quality(self, 
+
+    async def assess_response_quality(self,
                                     response: AgentResponse,
                                     original_query: str) -> QualityReport:
         """
@@ -1155,30 +1155,30 @@ class QualityAssessmentFramework:
         for metric_name, assessor in self.metrics.items():
             score = await assessor.assess(response, original_query)
             metric_scores[metric_name] = score
-        
+
         # 2. Weighted Overall Score
         weights = {
             "completeness": 0.25,
-            "accuracy": 0.25,  
+            "accuracy": 0.25,
             "relevance": 0.20,
             "consistency": 0.15,
             "timeliness": 0.10,
             "authority": 0.05
         }
-        
+
         overall_score = sum(
             metric_scores[metric] * weights[metric]
             for metric in metric_scores
         )
-        
+
         # 3. Quality Classification
         quality_level = self.classify_quality(overall_score)
-        
+
         # 4. Improvement Recommendations
         recommendations = await self.generate_recommendations(
             metric_scores, quality_level
         )
-        
+
         return QualityReport(
             overall_score=overall_score,
             metric_scores=metric_scores,
@@ -1209,7 +1209,7 @@ QUALITY_METRICS = {
         ],
         "calculation": "ratio_of_addressed_aspects / total_query_aspects"
     },
-    
+
     "accuracy": {
         "description": "Faktische Korrektheit der bereitgestellten Informationen",
         "factors": [
@@ -1219,7 +1219,7 @@ QUALITY_METRICS = {
         ],
         "calculation": "verified_facts / total_factual_claims"
     },
-    
+
     "relevance": {
         "description": "Relevanz der Antwort für die spezifische Fragestellung",
         "factors": [
@@ -1229,7 +1229,7 @@ QUALITY_METRICS = {
         ],
         "calculation": "relevant_content_ratio"
     },
-    
+
     "consistency": {
         "description": "Interne Konsistenz und Widerspruchsfreiheit",
         "factors": [
@@ -1239,7 +1239,7 @@ QUALITY_METRICS = {
         ],
         "calculation": "1 - contradiction_penalty"
     },
-    
+
     "authority": {
         "description": "Autorität und Zuverlässigkeit der Quellen",
         "factors": [
@@ -1259,13 +1259,13 @@ class QualityImprovementLoop:
     """
     Kontinuierliche Qualitätsverbesserung durch Feedback-Integration
     """
-    
+
     def __init__(self):
         self.feedback_collector = FeedbackCollector()
         self.pattern_analyzer = PatternAnalyzer()
         self.model_updater = ModelUpdater()
-    
-    async def process_quality_feedback(self, 
+
+    async def process_quality_feedback(self,
                                      session_id: str,
                                      quality_feedback: Dict) -> None:
         """
@@ -1275,21 +1275,21 @@ class QualityImprovementLoop:
         await self.feedback_collector.store_feedback(
             session_id, quality_feedback
         )
-        
+
         # 2. Pattern Analysis
         patterns = await self.pattern_analyzer.analyze_quality_patterns(
             feedback_data=quality_feedback,
             timeframe="last_7_days"
         )
-        
+
         # 3. Agent Performance Updates
         if patterns.significant_changes_detected:
             await self.update_agent_performance_weights(patterns)
-        
+
         # 4. Model Fine-tuning Triggers
         if patterns.quality_drift_detected:
             await self.trigger_model_retraining(patterns)
-        
+
         # 5. Quality Threshold Adjustments
         await self.adjust_quality_thresholds_if_needed(patterns)
 ```
@@ -1372,7 +1372,7 @@ services:
     volumes:
       - ./logs:/app/logs
     restart: unless-stopped
-    
+
   postgres:
     image: postgres:15
     environment:
@@ -1383,28 +1383,28 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-      
+
   redis:
     image: redis:7-alpine
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
-      
+
   ollama:
     image: ollama/ollama:latest
     ports:
       - "11434:11434"
     volumes:
       - ollama_data:/root/.ollama
-    
+
   chromadb:
     image: chromadb/chroma:latest
     ports:
       - "8000:8000"
     volumes:
       - chroma_data:/chroma/chroma
-      
+
 volumes:
   postgres_data:
   redis_data:
@@ -1502,9 +1502,9 @@ logger = structlog.get_logger()
 @app.middleware("http")
 async def metrics_middleware(request: Request, call_next):
     start_time = time.time()
-    
+
     response = await call_next(request)
-    
+
     duration = time.time() - start_time
     REQUEST_DURATION.observe(duration)
     REQUEST_COUNT.labels(
@@ -1512,7 +1512,7 @@ async def metrics_middleware(request: Request, call_next):
         endpoint=request.url.path,
         status=response.status_code
     ).inc()
-    
+
     logger.info(
         "request_processed",
         method=request.method,
@@ -1520,7 +1520,7 @@ async def metrics_middleware(request: Request, call_next):
         duration=duration,
         status_code=response.status_code
     )
-    
+
     return response
 ```
 
@@ -1543,19 +1543,19 @@ SECURITY_CONFIG = {
         "allow_headers": ["*"],
         "allow_credentials": True
     },
-    
+
     "rate_limiting": {
         "requests_per_minute": 60,
         "burst_limit": 10,
         "sliding_window": True
     },
-    
+
     "authentication": {
         "jwt_secret_key": "${JWT_SECRET_KEY}",
         "jwt_algorithm": "HS256",
         "jwt_expiration": 3600  # 1 hour
     },
-    
+
     "input_validation": {
         "max_query_length": 5000,
         "allowed_file_types": [".pdf", ".txt", ".docx"],
@@ -1691,22 +1691,22 @@ ROADMAP_SUCCESS_METRICS = {
         "availability": "> 99.9%",
         "concurrent_users": "> 1000"
     },
-    
+
     "quality": {
         "avg_quality_score": "> 0.85",
         "user_satisfaction": "> 90%",
         "accuracy_rate": "> 95%"
     },
-    
+
     "adoption": {
         "daily_active_users": "> 5000",
         "query_volume": "> 10000/day",
         "api_integrations": "> 100"
     },
-    
+
     "innovation": {
         "new_agent_types": "2 per quarter",
-        "api_integrations": "10 per quarter", 
+        "api_integrations": "10 per quarter",
         "feature_releases": "1 per month"
     }
 }

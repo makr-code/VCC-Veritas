@@ -1,7 +1,7 @@
 # 🔄 Prompt Improvement System - Selbstverbesserung
 
-**Version:** 1.0  
-**Erstellt:** 12. Oktober 2025, 21:45 Uhr  
+**Version:** 1.0
+**Erstellt:** 12. Oktober 2025, 21:45 Uhr
 **Status:** 📋 DESIGN - Iteratives Prompt-Tuning
 
 ---
@@ -213,7 +213,7 @@
 class PromptImprovementEngine:
     """
     Engine für iterative Verbesserung von scientific_foundation.json
-    
+
     WORKFLOW:
     1. Collect Metrics von jeder Query
     2. Aggregate Metrics über N Queries (default: 10)
@@ -221,13 +221,13 @@ class PromptImprovementEngine:
     4. Generate Improvement Suggestions
     5. Apply Improvements → New Version
     """
-    
+
     def record_query_metrics(self, metrics: QualityMetrics):
         """Record Metrics von einer Query-Execution"""
-        
+
     def analyze_and_improve(self) -> Dict[str, Any]:
         """Analyze Metrics + Generate Improvement Suggestions"""
-        
+
     def apply_improvements(self, suggestions: List[Dict]) -> str:
         """Apply Improvements → New Version (v1.0 → v1.1)"""
 ```
@@ -241,27 +241,27 @@ class PromptImprovementEngine:
 class QualityMetrics:
     query_id: str
     timestamp: str
-    
+
     # JSON Validity
     json_valid: bool
     json_parse_error: Optional[str]
-    
+
     # Schema Compliance
     schema_valid: bool
     missing_fields: List[str]
-    
+
     # Confidence Calibration
     predicted_confidence: float  # LLM prediction
     actual_confidence: float     # User rating (1-5 → 0.0-1.0)
-    
+
     # Required Criteria Quality
     num_criteria: int
     vague_criteria: List[str]  # Zu vage formulierte Kriterien
-    
+
     # Source Citation
     citations_found: int
     citations_expected: int
-    
+
     # Metacognition
     improvement_suggestions: List[str]  # Aus Phase 6
 ```
@@ -296,7 +296,7 @@ improvement_engine.record_query_metrics(metrics)
 def _aggregate_metrics(self) -> Dict[str, Any]:
     """
     Aggregate über N Queries
-    
+
     Returns:
         {
             "json_validity_rate": 0.95,
@@ -401,7 +401,7 @@ suggestions = [
 def apply_improvements(self, suggestions: List[Dict]) -> str:
     """
     Apply Improvements zu scientific_foundation.json
-    
+
     Workflow:
     1. Create Backup (scientific_foundation.json.bak)
     2. Increment Version (1.0.0 → 1.1.0)
@@ -409,30 +409,30 @@ def apply_improvements(self, suggestions: List[Dict]) -> str:
     4. Update Metadata (version, last_updated, improvement_iteration)
     5. Add to version_history
     6. Save to Disk
-    
+
     Returns:
         "1.1.0"  # New version
     """
-    
+
     # Example: Apply "add_negative_examples"
     if suggestion["change_type"] == "add_negative_examples":
         target_section = self._navigate_to_section(
             self.foundation,
             suggestion["target_section"]
         )
-        
+
         for new_example in suggestion["specific_changes"]["examples"]:
             if new_example.startswith("ADD: "):
                 example_text = new_example[5:]  # Remove "ADD: "
                 target_section["examples"].append(example_text)
-    
+
     # Increment version
     new_version = self._increment_version(current_version)  # 1.0.0 → 1.1.0
-    
+
     # Update metadata
     self.foundation["scientific_foundation"]["version"] = new_version
     self.foundation["scientific_foundation"]["improvement_iteration"] += 1
-    
+
     # Add to version history
     version_entry = {
         "version": new_version,
@@ -442,11 +442,11 @@ def apply_improvements(self, suggestions: List[Dict]) -> str:
         "tested_queries": 0
     }
     self.foundation["scientific_foundation"]["prompt_improvement"]["version_history"].append(version_entry)
-    
+
     # Save
     with open(self.foundation_path, 'w', encoding='utf-8') as f:
         json.dump(self.foundation, f, indent=2, ensure_ascii=False)
-    
+
     return new_version
 ```
 
@@ -459,62 +459,62 @@ class UnifiedOrchestratorV7:
     def __init__(self, ...):
         # Existing
         self.scientific_executor = ScientificPhaseExecutor(...)
-        
+
         # NEW: Prompt Improvement Engine
         self.improvement_engine = PromptImprovementEngine(
             foundation_path="config/prompts/scientific_foundation.json",
             metrics_db_path="data/prompt_metrics.json"
         )
-    
+
     async def process_query(self, user_query: str, user_id: str) -> Dict:
         # ... existing scientific processing ...
-        
+
         # Collect Metrics
         metrics = self._collect_quality_metrics(
             query_id=query_id,
             scientific_results=scientific_results,
             user_feedback=None  # Later: User-Rating
         )
-        
+
         # Record Metrics (triggers improvement after 10 queries)
         self.improvement_engine.record_query_metrics(metrics)
-        
+
         return result
-    
+
     def _collect_quality_metrics(self, query_id, scientific_results, user_feedback) -> QualityMetrics:
         """Extract Quality Metrics from Scientific Results"""
-        
+
         return QualityMetrics(
             query_id=query_id,
             timestamp=datetime.now().isoformat(),
-            
+
             # JSON Validity
             json_valid=all(p["status"] == "success" for p in scientific_results.values()),
             json_parse_error=None,
-            
+
             # Schema Compliance
             schema_valid=True,
             missing_fields=[],
-            
+
             # Confidence Calibration
             predicted_confidence=scientific_results["metacognition"]["output"]["metacognitive_assessment"]["overall_confidence"],
             actual_confidence=user_feedback.get("confidence_rating") if user_feedback else None,
-            
+
             # Required Criteria Quality
             num_criteria=len(scientific_results["hypothesis"]["output"]["required_criteria"]),
             vague_criteria=self._detect_vague_criteria(scientific_results["hypothesis"]["output"]["required_criteria"]),
-            
+
             # Source Citation
             citations_found=self._count_citations(scientific_results["synthesis"]["output"]),
             citations_expected=len(scientific_results["synthesis"]["output"]["evidence_clusters"]),
-            
+
             # Metacognition
             improvement_suggestions=scientific_results["metacognition"]["output"]["metacognitive_assessment"]["improvement_suggestions"]
         )
-    
+
     def _detect_vague_criteria(self, criteria: List[str]) -> List[str]:
         """Detect vage formulierte Kriterien"""
-        
+
         vague_keywords = [
             "rahmenbedingungen",
             "vorschriften",
@@ -523,21 +523,21 @@ class UnifiedOrchestratorV7:
             "aspekte",
             "faktoren"
         ]
-        
+
         vague = []
         for criterion in criteria:
             if any(keyword in criterion.lower() for keyword in vague_keywords):
                 vague.append(criterion)
-        
+
         return vague
-    
+
     def _count_citations(self, synthesis_output: Dict) -> int:
         """Count Source Citations in Evidence Clusters"""
-        
+
         count = 0
         for cluster in synthesis_output["evidence_clusters"]:
             count += len(cluster.get("sources", []))
-        
+
         return count
 ```
 
@@ -754,7 +754,7 @@ llm_suggestion = await ollama_client.generate(
     Current Prompt Performance:
     - Confidence Calibration Error: 22%
     - Target: 15%
-    
+
     Suggest 3 concrete improvements to the confidence_calibration criteria.
     """,
     model="llama3.1:latest"

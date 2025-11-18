@@ -1,7 +1,7 @@
 # VERITAS UI-Komponenten Auslagerungs-Report
 
-**Datum**: 9. Oktober 2025  
-**Ziel**: Verkleinerung von `veritas_app.py` durch Modularisierung  
+**Datum**: 9. Oktober 2025
+**Ziel**: Verkleinerung von `veritas_app.py` durch Modularisierung
 **Status**: ✅ 4/5 Schritte abgeschlossen
 
 ---
@@ -157,9 +157,9 @@ from frontend.ui.veritas_ui_dialogs import DialogManager
 ```python
 def create_gui(self):
     # ... bestehender Code ...
-    
+
     # NACH self._create_chat_display():
-    
+
     # UI-Module initialisieren
     self.markdown_renderer = MarkdownRenderer(self.chat_text)
     self.source_link_handler = SourceLinkHandler(self.window, self.status_var)
@@ -175,10 +175,10 @@ def create_gui(self):
         status_var=self.status_var,
         update_chat_callback=lambda: self.chat_formatter.update_chat_display(self.chat_messages)
     )
-    
+
     # Link-Callback setzen
     self.markdown_renderer.set_link_callback(self.source_link_handler.open_source_link)
-    
+
     # Tags konfigurieren
     setup_markdown_tags(self.chat_text)
     setup_chat_tags(self.chat_text)
@@ -351,18 +351,18 @@ def update_chat_display(self):
     if not self.window or not hasattr(self.window, 'winfo_exists') or not self.window.winfo_exists():
         logger.warning(f"⚠️ Window existiert nicht für update_chat_display")
         return
-        
+
     self.chat_text.config(state='normal')
     self.chat_text.delete('1.0', tk.END)
-    
+
     for idx, msg in enumerate(self.chat_messages):
         role = msg.get('role', 'unknown')
         content = msg.get('content', '')
         timestamp = msg.get('timestamp', '')
         tag = msg.get('tag', role)
-        
+
         # ... 150+ Zeilen Code ...
-    
+
     self.chat_text.config(state='disabled')
     self.chat_text.see(tk.END)
 ```
@@ -389,7 +389,7 @@ def update_chat_display(self):
 
 ---
 
-**Erstellt**: 9. Oktober 2025  
-**Autor**: GitHub Copilot  
-**Projekt**: VERITAS 3.6.0  
+**Erstellt**: 9. Oktober 2025
+**Autor**: GitHub Copilot
+**Projekt**: VERITAS 3.6.0
 **Status**: ✅ 80% abgeschlossen (Integration ausstehend)

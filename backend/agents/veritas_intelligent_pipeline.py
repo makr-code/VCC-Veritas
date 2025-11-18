@@ -32,8 +32,12 @@ from collections import Counter, deque
 from typing import Dict, List, Any, Optional, AsyncGenerator, Tuple
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
+<<<<<<< Updated upstream
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import asynccontextmanager
+=======
+from typing import Any, AsyncGenerator, Dict, List, Optional, Tuple, Set, cast
+>>>>>>> Stashed changes
 
 # Sicherstellen, dass das Projekt-Root im Python-Pfad liegt
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
@@ -117,6 +121,13 @@ logger = logging.getLogger(__name__)
 # INTELLIGENT PIPELINE DATASTRUKTUREN
 # ============================================================================
 
+<<<<<<< Updated upstream
+=======
+# Provide a permissive fallback for optional database API type used in some configs
+MultiDatabaseAPI: Any = None
+
+
+>>>>>>> Stashed changes
 @dataclass
 class IntelligentPipelineRequest:
     """Request für intelligente Multi-Agent-Pipeline"""
@@ -132,6 +143,10 @@ class IntelligentPipelineRequest:
     max_parallel_agents: int = 5
     timeout: int = 60
     metadata: Dict[str, Any] = field(default_factory=dict)
+    # Dynamic runtime fields populated during pipeline execution
+    token_budget: Optional[int] = None
+    budget_breakdown: Optional[Dict[str, Any]] = None
+    intent_prediction: Optional[Dict[str, Any]] = None
 
 @dataclass
 class IntelligentPipelineResponse:
@@ -228,10 +243,17 @@ class IntelligentMultiAgentPipeline:
         self.rag_service: Optional[RAGContextService] = None
         
         # Token Budget & Intent Classification
+<<<<<<< Updated upstream
         self.token_calculator = None  # Wird in initialize() geladen
         self.intent_classifier = None  # Wird in initialize() geladen
         self.context_window_manager = None  # Wird in initialize() geladen
         
+=======
+        self.token_calculator: Optional[Any] = None  # Wird in initialize() geladen
+        self.intent_classifier: Optional[Any] = None  # Wird in initialize() geladen
+        self.context_window_manager: Optional[Any] = None  # Wird in initialize() geladen
+
+>>>>>>> Stashed changes
         # Threading
         self.executor = ThreadPoolExecutor(max_workers=max_workers)
         self.agent_task_queue: "queue.Queue[AgentExecutionTask]" = queue.Queue()
@@ -242,6 +264,7 @@ class IntelligentMultiAgentPipeline:
         self.pipeline_steps: Dict[str, List[PipelineStep]] = {}
         
         # Statistics
+<<<<<<< Updated upstream
         self.stats = {
             'pipelines_processed': 0,
             'successful_pipelines': 0,
@@ -264,6 +287,26 @@ class IntelligentMultiAgentPipeline:
                 'avg_processing_time_by_complexity': {}
             },
             'last_error': None
+=======
+        self.stats: Dict[str, Any] = {
+            "pipelines_processed": 0,
+            "successful_pipelines": 0,
+            "failed_pipelines": 0,
+            "total_processing_time": 0.0,
+            "average_processing_time": 0.0,
+            "llm_comments_generated": 0,
+            "agents_executed": 0,
+            "agent_timeouts": 0,
+            "rag_queries_executed": 0,
+            "agent_priority_updates": 0,
+            "orchestrator_usage": 0,
+            "supervisor_usage": 0,  # 🆕 Supervisor - Statistik
+            "agent_registry_usage": 0,  # 🆕 Agent Registry - Statistik
+            "stage_duration_stats": {},
+            "agent_metrics": {},
+            "query_metrics": {"complexity_counts": {}, "domain_counts": {}, "avg_processing_time_by_complexity": {}},
+            "last_error": None,
+>>>>>>> Stashed changes
         }
 
         self.recent_pipeline_metrics: deque = deque(maxlen=20)
@@ -784,9 +827,15 @@ class IntelligentMultiAgentPipeline:
             step.progress_percentage = 100.0
             duration = step.end_time - step.start_time
             self._record_stage_duration(step_id, duration)
+<<<<<<< Updated upstream
             
             return result
             
+=======
+
+            return cast(Dict[str, Any], result)
+
+>>>>>>> Stashed changes
         except Exception as e:
             # Step fehlgeschlagen
             step.status = "failed"
@@ -1126,8 +1175,13 @@ class IntelligentMultiAgentPipeline:
             
             # Phase 1: Text-Search basierend auf Query
             query_text = request.query_text.lower()
+<<<<<<< Updated upstream
             text_search_workers = self.agent_registry.search_workers(query_text)
             
+=======
+            text_search_workers = self.agent_registry.search_agents(query_text) if self.agent_registry else []
+
+>>>>>>> Stashed changes
             if text_search_workers:
                 logger.info(f"📝 Text-Search: {len(text_search_workers)} workers gefunden")
                 registry_insights.append(f"Text-Search matched {len(text_search_workers)} workers")
@@ -1156,7 +1210,7 @@ class IntelligentMultiAgentPipeline:
             }
             
             if domain in domain_mapping:
-                domain_workers = self.agent_registry.get_workers_by_domain(domain_mapping[domain])
+                domain_workers = self.agent_registry.get_agents_by_domain(domain_mapping[domain]) if self.agent_registry else []
                 logger.info(f"🏢 Domain '{domain}': {len(domain_workers)} workers")
                 registry_insights.append(f"Domain {domain} matched {len(domain_workers)} workers")
                 
@@ -1178,7 +1232,7 @@ class IntelligentMultiAgentPipeline:
             documents = rag.get("documents", []) or []
             if documents:
                 # Extrahiere relevante Keywords aus RAG-Dokumenten
-                keywords = set()
+                keywords: Set[str] = set()
                 for doc in documents[:5]:  # Top 5 Dokumente
                     tags = doc.get("domain_tags", []) or []
                     keywords.update(tag.lower() for tag in tags if isinstance(tag, str))
@@ -2019,11 +2073,20 @@ class IntelligentMultiAgentPipeline:
                         f"(Context-Window-Limit für {model_name})"
                     )
                     max_tokens = adjusted_tokens
+<<<<<<< Updated upstream
                 
                 if context.needs_model_upgrade and context.recommended_model:
                     logger.info(
                         f"💡 Model-Upgrade empfohlen: {model_name} → {context.recommended_model} "
                         f"für {max_tokens} tokens"
+=======
+
+                # `context` kann ein dict sein; sichere Key-Lookups verwenden
+                if isinstance(context, dict) and context.get("needs_model_upgrade") and context.get("recommended_model"):
+                    recommended = context.get("recommended_model")
+                    logger.info(
+                        f"💡 Model-Upgrade empfohlen: {model_name} → {recommended} für {max_tokens} tokens"
+>>>>>>> Stashed changes
                     )
                     # TODO: Implementiere automatisches Model-Switching
                     

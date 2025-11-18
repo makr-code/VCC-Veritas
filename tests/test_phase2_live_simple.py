@@ -10,20 +10,20 @@ Expected:
 - Confidence > 0.75
 - Execution time: 44-62s (estimated without real LLM)
 """
-import sys
-import os
-import json
-import time
 import asyncio
-from pathlib import Path
+import json
+import os
+import sys
+import time
 from datetime import datetime
+from pathlib import Path
 
 # Setup paths
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
-sys.path.insert(0, str(project_root / 'backend'))
-sys.path.insert(0, str(project_root / 'backend' / 'orchestration'))
-sys.path.insert(0, str(project_root / 'uds3'))
+sys.path.insert(0, str(project_root / "backend"))
+sys.path.insert(0, str(project_root / "backend" / "orchestration"))
+sys.path.insert(0, str(project_root / "uds3"))
 
 print("=" * 80)
 print("PHASE 2 LIVE TEST - Simple Query (Direct Orchestrator)")
@@ -40,11 +40,11 @@ project_root = Path(__file__).parent.parent
 print("[Test 1/3] Verify Supervisor Configuration...")
 config_path = project_root / "config" / "scientific_methods" / "default_method.json"
 
-with open(config_path, 'r', encoding='utf-8') as f:
+with open(config_path, "r", encoding="utf-8") as f:
     config = json.load(f)
 
-supervisor_enabled = config.get('supervisor_enabled')
-total_phases = len(config.get('phases', []))
+supervisor_enabled = config.get("supervisor_enabled")
+total_phases = len(config.get("phases", []))
 
 print(f"  Config Version: {config.get('version')}")
 print(f"  Supervisor Enabled: {supervisor_enabled}")
@@ -60,32 +60,33 @@ else:
 print("\n[Test 2/3] Initialize UnifiedOrchestratorV7...")
 try:
     from unified_orchestrator_v7 import UnifiedOrchestratorV7
-    
+
     orchestrator = UnifiedOrchestratorV7(
         config_dir="config",
         method_id="default_method",
         uds3_strategy=None,  # Mock
         ollama_client=None,  # Mock (will skip actual LLM calls)
         agent_orchestrator=None,  # Mock agents (Phase 2)
-        enable_streaming=False
+        enable_streaming=False,
     )
     print("  ✅ Orchestrator initialized successfully")
     print(f"  ✅ Supervisor Enabled (Runtime): {orchestrator._is_supervisor_enabled()}")
-    
+
 except Exception as e:
     print(f"  ❌ Initialization failed: {e}")
     import traceback
+
     traceback.print_exc()
     sys.exit(1)
 
 # Test 3: Execute Query (Dry Run - Phase Flow Only)
 print("\n[Test 3/3] Test Phase Execution Flow...")
-print(f"  Query: \"{QUERY}\"")
+print(f'  Query: "{QUERY}"')
 print("  Mode: Dry Run (checking which phases would execute)")
 print()
 
 # Get phase configuration
-phases = config.get('phases', [])
+phases = config.get("phases", [])
 print(f"  📋 Phase Execution Plan (9 phases):")
 print()
 
@@ -93,11 +94,11 @@ supervisor_phase_count = 0
 llm_phase_count = 0
 
 for phase in phases:
-    phase_num = phase.get('phase_number')
-    phase_id = phase.get('phase_id')
-    executor = phase.get('execution', {}).get('executor', 'llm')
-    
-    if executor in ['supervisor', 'agent_coordinator']:
+    phase_num = phase.get("phase_number")
+    phase_id = phase.get("phase_id")
+    executor = phase.get("execution", {}).get("executor", "llm")
+
+    if executor in ["supervisor", "agent_coordinator"]:
         supervisor_phase_count += 1
         print(f"    ✅ Phase {phase_num}: {phase_id}")
         print(f"       └─ Executor: {executor} (SUPERVISOR)")
@@ -152,30 +153,36 @@ if supervisor_phase_count == 3 and llm_phase_count == 6:
 else:
     print("⚠️  CONFIGURATION ISSUE DETECTED")
     print(f"   Expected: 6 LLM phases + 3 Supervisor phases = 9 total")
-    print(f"   Got: {llm_phase_count} LLM + {supervisor_phase_count} Supervisor = {llm_phase_count + supervisor_phase_count} total")
+    print(
+        f"   Got: {llm_phase_count} LLM + {supervisor_phase_count} Supervisor = {llm_phase_count + supervisor_phase_count} total"
+    )
 
 print("=" * 80)
 
 # Save results
 results_file = f"phase2_config_validation_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-with open(results_file, 'w', encoding='utf-8') as f:
-    json.dump({
-        'timestamp': datetime.now().isoformat(),
-        'config_version': config.get('version'),
-        'supervisor_enabled': supervisor_enabled,
-        'total_phases': total_phases,
-        'llm_phases': llm_phase_count,
-        'supervisor_phases': supervisor_phase_count,
-        'validation_passed': (supervisor_phase_count == 3 and llm_phase_count == 6),
-        'phases': [
-            {
-                'phase_number': p.get('phase_number'),
-                'phase_id': p.get('phase_id'),
-                'executor': p.get('execution', {}).get('executor', 'llm')
-            }
-            for p in phases
-        ]
-    }, f, indent=2, ensure_ascii=False)
+with open(results_file, "w", encoding="utf-8") as f:
+    json.dump(
+        {
+            "timestamp": datetime.now().isoformat(),
+            "config_version": config.get("version"),
+            "supervisor_enabled": supervisor_enabled,
+            "total_phases": total_phases,
+            "llm_phases": llm_phase_count,
+            "supervisor_phases": supervisor_phase_count,
+            "validation_passed": (supervisor_phase_count == 3 and llm_phase_count == 6),
+            "phases": [
+                {
+                    "phase_number": p.get("phase_number"),
+                    "phase_id": p.get("phase_id"),
+                    "executor": p.get("execution", {}).get("executor", "llm"),
+                }
+                for p in phases
+            ],
+        },
+        f,
+        indent=2,
+        ensure_ascii=False,
+    )
 
 print(f"\nValidation results saved to: {results_file}")
-

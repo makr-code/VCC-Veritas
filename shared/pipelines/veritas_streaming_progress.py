@@ -656,7 +656,7 @@ class VeritasProgressStreamer:
         """Erstellt Progress-Stream für Session"""
         
         # Queue für diese Session
-        progress_queue = asyncio.Queue()
+        progress_queue: asyncio.Queue[ProgressUpdate] = asyncio.Queue()
         self.active_streams[session_id] = progress_queue
         
         # Progress Callback registrieren
@@ -691,6 +691,7 @@ class VeritasProgressStreamer:
                     update = await asyncio.wait_for(progress_queue.get(), timeout=30.0)
                     
                     # SSE-Format für Frontend
+<<<<<<< Updated upstream
                     sse_data = {
                         'type': update.update_type.value,
                         'stage': update.stage.value,
@@ -698,6 +699,17 @@ class VeritasProgressStreamer:
                         'progress': update.progress_percent,
                         'timestamp': update.timestamp,
                         'details': update.details
+=======
+                    from typing import Any, Dict
+
+                    sse_data: Dict[str, Any] = {
+                        "type": update.update_type.value,
+                        "stage": update.stage.value,
+                        "message": update.message,
+                        "progress": update.progress_percent,
+                        "timestamp": update.timestamp,
+                        "details": update.details,
+>>>>>>> Stashed changes
                     }
                     
                     # Optional: Agent/LLM spezifische Daten

@@ -1,7 +1,7 @@
 # Frontend Integration Guide - Backend v4.0.0
 
-**Version:** 4.0.0  
-**Date:** 19. Oktober 2025  
+**Version:** 4.0.0
+**Date:** 19. Oktober 2025
 **Status:** Migration Guide
 
 ---
@@ -136,16 +136,16 @@ try:
         top_k=5,
         conversation_history=self._get_conversation_history()
     )
-    
+
     # Response verarbeiten
     answer = unified_response.content
     sources = unified_response.sources  # List[SourceMetadata]
-    
+
     # Metadata
     duration = unified_response.metadata.duration
     tokens_used = unified_response.metadata.tokens_used
     agents = unified_response.metadata.agents_involved
-    
+
 except Exception as e:
     logger.error(f"API Error: {e}")
     self.add_error_message(f"API-Fehler: {str(e)}")
@@ -179,26 +179,26 @@ for src in sources:
     # Basis
     src_id = src.id           # Numeric: "1", "2", "3"
     title = src.title
-    
+
     # IEEE Extended
     authors = src.authors
     ieee_citation = src.ieee_citation
     year = src.year
     publisher = src.publisher
-    
+
     # Scoring
     similarity = src.similarity_score
     rerank = src.rerank_score
     quality = src.quality_score
-    
+
     # Legal Domain
     rechtsgebiet = src.rechtsgebiet
     behörde = src.behörde
-    
+
     # Assessment
     impact = src.impact          # "High", "Medium", "Low"
     relevance = src.relevance    # "Very High", "High", ...
-    
+
     # Extra fields
     extra = src.extra  # Dict mit weiteren Feldern
 ```
@@ -312,12 +312,12 @@ def send_message_v4(self, message: str, llm: str = "llama3.2"):
     mode = "rag"
     if hasattr(self, 'current_question_mode'):
         mode = self.current_question_mode.get('key', 'rag')
-    
+
     logger.info(f"📤 Query: mode={mode}, llm={llm}")
-    
+
     # Conversation History (optional)
     history = self._get_conversation_history() if hasattr(self, 'chat_session') else None
-    
+
     try:
         # API Query via Client
         response: UnifiedResponse = self.api_client.query(
@@ -329,10 +329,10 @@ def send_message_v4(self, message: str, llm: str = "llama3.2"):
             top_k=5,
             conversation_history=history
         )
-        
+
         # Verarbeite Response
         self._process_unified_response(response)
-        
+
     except requests.HTTPError as e:
         logger.error(f"❌ API HTTP Error: {e}")
         self.add_error_message(f"API-Fehler: {e.response.status_code}")
@@ -347,25 +347,25 @@ def _process_unified_response(self, response: UnifiedResponse):
     """
     # Content
     content = response.content
-    
+
     # Sources
     sources = response.sources
-    
+
     # Metadata
     metadata = response.metadata
-    
+
     logger.info(f"✅ Response: {len(sources)} sources, {metadata.duration:.2f}s")
-    
+
     # Add to Chat
     self.add_assistant_message(
         content=content,
         sources=sources,
         metadata=metadata
     )
-    
+
     # Update UI
     self.status_var.set(f"✅ Antwort erhalten ({metadata.duration:.2f}s)")
-    
+
     # Show Source Details
     if sources:
         self._show_source_details(sources)
@@ -377,16 +377,16 @@ def _show_source_details(self, sources: List[SourceMetadata]):
     """
     for idx, src in enumerate(sources, 1):
         logger.info(f"[{src.id}] {src.title}")
-        
+
         if src.ieee_citation:
             logger.info(f"   IEEE: {src.ieee_citation}")
-        
+
         if src.similarity_score:
             logger.info(f"   Similarity: {src.similarity_score:.2f}")
-        
+
         if src.impact:
             logger.info(f"   Impact: {src.impact}")
-        
+
         if src.rechtsgebiet:
             logger.info(f"   Rechtsgebiet: {src.rechtsgebiet}")
 
@@ -397,13 +397,13 @@ def _get_conversation_history(self) -> Optional[List[Dict[str, str]]]:
     """
     if not hasattr(self, 'chat_session') or not self.chat_session:
         return None
-    
+
     if not hasattr(self.chat_session, 'messages'):
         return None
-    
+
     # Letzte 10 Messages
     recent = self.chat_session.messages[-10:]
-    
+
     return [
         {
             'role': msg.role,

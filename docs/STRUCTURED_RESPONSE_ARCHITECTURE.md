@@ -1,6 +1,6 @@
 # 🏗️ VERITAS Structured Response System - Architecture Diagrams
 
-**Version:** v4.1.0  
+**Version:** v4.1.0
 **Date:** 12. Oktober 2025
 
 ---

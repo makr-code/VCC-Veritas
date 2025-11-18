@@ -1033,7 +1033,7 @@
 2025-10-18 23:35:51,109 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - content type: <class 'str'>, length: 982
 2025-10-18 23:35:51,110 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - content preview: Das BImSchG!
 
-Das Bauliche Vorhabenmeldegesetz (BImSchG) ist ein deutsches Gesetz, das am 1. Januar 2018 in Kraft getreten ist. Es regelt die Meldepflicht für bauliche Vorhaben und soll die Planungs- 
+Das Bauliche Vorhabenmeldegesetz (BImSchG) ist ein deutsches Gesetz, das am 1. Januar 2018 in Kraft getreten ist. Es regelt die Meldepflicht für bauliche Vorhaben und soll die Planungs-
 2025-10-18 23:35:51,110 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - metadata type: <class 'dict'>
 2025-10-18 23:35:51,110 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - metadata keys: ['model', 'mode', 'duration', 'tokens_used', 'sources_count', 'sources_metadata', 'complexity', 'agents_involved', 'suggestions']
 2025-10-18 23:35:51,110 - INFO [frontend.ui.veritas_ui_chat_formatter] -   - sources count: 8

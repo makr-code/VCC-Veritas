@@ -35,9 +35,22 @@ import asyncio
 from typing import Dict, List, Any, Optional, Union, Callable
 from dataclasses import dataclass, field
 from enum import Enum
+<<<<<<< Updated upstream
 from datetime import datetime, timedelta
 import traceback
 from abc import ABC, abstractmethod
+=======
+from typing import Any, Callable, Dict, List, Optional, Union, TYPE_CHECKING, cast
+
+# Conservative runtime defaults so modules can be analyzed by mypy and imported
+# in environments where optional components are not available.
+DATABASE_AVAILABLE: bool = False
+MultiDatabaseAPI: Any = None
+
+if TYPE_CHECKING:
+    # Type-only imports for static checking
+    from backend.agents.veritas_api_agent_registry import AgentCapability, AgentLifecycleType, AgentStatus
+>>>>>>> Stashed changes
 
 # VERITAS Core Imports
 try:
@@ -199,7 +212,14 @@ class BaseEnvironmentalAgent(ABC):
             except Exception as e:
                 self.logger.warning(f"⚠️ Database API init fehler: {e}")
                 self.database = None
+<<<<<<< Updated upstream
         
+=======
+        else:
+            # Ensure attribute exists for static analysis and runtime safety
+            self.database = None
+
+>>>>>>> Stashed changes
         if UDS3_AVAILABLE:
             try:
                 # ✨ NEU: UDS3 v2.0.0 Polyglot Manager
@@ -223,6 +243,7 @@ class BaseEnvironmentalAgent(ABC):
         if not AGENT_SYSTEM_AVAILABLE:
             self.logger.warning("⚠️ Agent Registry nicht verfügbar")
             return
+<<<<<<< Updated upstream
             
         try:
             registry = get_agent_registry()
@@ -238,6 +259,50 @@ class BaseEnvironmentalAgent(ABC):
                 }
             )
             self.logger.info(f"✅ Agent registriert: {self.agent_id}")
+=======
+        try:
+            registry = get_agent_registry()
+
+            # Try best-effort register using the registry's internal API.
+            # Some registries expose `_register_agent`, others `register_agent`.
+            if hasattr(registry, "_register_agent"):
+                try:
+                    registry._register_agent(
+                        agent_id=self.agent_id,
+                        domain=AGENT_DOMAIN,
+                        capabilities=AGENT_CAPABILITIES,
+                        class_reference=type(self),
+                        requires_db=False,
+                        requires_api=False,
+                        description=f"{AGENT_NAME}",
+                    )
+                    self.logger.info(f"✅ Agent registriert (via _register_agent): {self.agent_id}")
+                    return
+                except Exception:
+                    # Fall back to other signatures
+                    pass
+
+            if hasattr(registry, "register_agent"):
+                try:
+                    from typing import cast
+
+                    reg_register = cast(Any, getattr(registry, "register_agent", None))
+                    if reg_register:
+                        reg_register(
+                            agent_id=self.agent_id,
+                            agent_name=AGENT_NAME,
+                            capabilities=AGENT_CAPABILITIES,
+                            lifecycle_type=getattr(AgentLifecycleType, "PERSISTENT", None),
+                            metadata={"version": AGENT_VERSION, "domain": AGENT_DOMAIN, "config": self.config.__dict__},
+                        )
+                        self.logger.info(f"✅ Agent registriert (via register_agent): {self.agent_id}")
+                        return
+                except Exception:
+                    pass
+
+            # If registry API is incompatible, skip registration gracefully.
+            self.logger.info("ℹ️ Agent-Registrierung übersprungen (Registry API inkompatibel)")
+>>>>>>> Stashed changes
         except Exception as e:
             self.logger.error(f"❌ Agent-Registrierung fehlgeschlagen: {e}")
     
@@ -403,7 +468,6 @@ class BaseEnvironmentalAgent(ABC):
     
     def shutdown(self):
         """Graceful Agent Shutdown"""
-        self.status = AgentStatus.TERMINATING
         self.logger.info(f"🔄 Shutting down agent: {self.agent_id}")
         
         # [ENVIRONMENTAL] Füge cleanup-Logic hinzu

@@ -1,6 +1,6 @@
 # Bugfix: LLM-Modelle aus Capabilities laden
 
-**Datum:** 05.10.2025, 20:36 Uhr  
+**Datum:** 05.10.2025, 20:36 Uhr
 **Problem:** Frontend lud LLM-Modelle vom alten `/get_models` Endpoint statt aus Capabilities
 
 ## Problem-Diagnose
@@ -9,7 +9,7 @@
 ```
 ✅ Backend Capabilities geladen:
    Ollama: 10 Modelle verfügbar
-   
+
 ABER:
 ✅ 4 LLM-Modelle vom API abgerufen  ❌ (sollten 10 aus Capabilities sein!)
 ```
@@ -46,15 +46,15 @@ class ModernVeritasApp:
     def _init_gui_state(self):
         # ...
         self.capabilities: Dict[str, Any] = {}  # ✅ Hinzugefügt
-    
+
     def _load_backend_capabilities(self):
         """Lädt /capabilities Endpoint"""
         # ...
-    
+
     def is_feature_available(self, feature_path: str) -> bool:
         """Prüft Feature-Verfügbarkeit"""
         # ...
-    
+
     def get_capability_value(self, path: str, default: Any = None) -> Any:
         """Holt Wert aus Capabilities"""
         # ...
@@ -95,7 +95,7 @@ def _get_available_models(self):
                 return models
         except Exception as e:
             logger.error(f"❌ Parent-App Capabilities Fehler: {e}")
-    
+
     # Fallback: Direkter API-Call
     # ...
 ```
@@ -161,12 +161,12 @@ Parent-App wurde nicht an Chat-Fenster übergeben, daher kein Zugriff auf Capabi
 4. Beide App-Typen nutzen jetzt Capabilities primär, API als Fallback
 
 ### Ergebnis
-✅ **10 Modelle aus Capabilities korrekt geladen**  
-✅ Fallback-Mechanismus funktioniert  
-✅ Beide App-Typen (`VeritasApp`, `ModernVeritasApp`) unterstützt  
+✅ **10 Modelle aus Capabilities korrekt geladen**
+✅ Fallback-Mechanismus funktioniert
+✅ Beide App-Typen (`VeritasApp`, `ModernVeritasApp`) unterstützt
 ✅ Logging zeigt klare Quelle der Modelle
 
 ---
 
-**Status:** ✅ Behoben und getestet  
+**Status:** ✅ Behoben und getestet
 **Commit-Message:** `fix: Load LLM models from capabilities instead of /get_models endpoint. Pass parent to ChatWindowBase in MainChatWindow and ChildChatWindow.`

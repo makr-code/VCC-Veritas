@@ -2,21 +2,19 @@
 """
 Test ob Pipeline wirklich genutzt wird - Check Backend Logs
 """
-import requests
 import time
+
+import requests
 
 query = "Test: Nutzt das System die Intelligent Pipeline?"
 
-print("="*80)
+print("=" * 80)
 print("PIPELINE USAGE TEST")
-print("="*80)
+print("=" * 80)
 
 # 1. Query starten
 print("\n1. Starte Test-Query...")
-resp = requests.post(
-    "http://localhost:5000/v2/query/stream",
-    json={"query": query}
-).json()
+resp = requests.post("http://localhost:5000/v2/query/stream", json={"query": query}).json()
 
 session_id = resp["session_id"]
 print(f"   Session ID: {session_id}")
@@ -51,36 +49,33 @@ import json
 
 try:
     r = requests.get(
-        f"http://localhost:5000/progress/{session_id}",
-        headers={"Accept": "text/event-stream"},
-        stream=True,
-        timeout=30
+        f"http://localhost:5000/progress/{session_id}", headers={"Accept": "text/event-stream"}, stream=True, timeout=30
     )
-    
+
     stages = []
     for line in r.iter_lines():
-        if line and line.startswith(b'data: '):
+        if line and line.startswith(b"data: "):
             try:
-                event = json.loads(line.decode('utf-8')[6:])
-                if event.get('type') == 'stage_start':
-                    stages.append(event.get('stage'))
+                event = json.loads(line.decode("utf-8")[6:])
+                if event.get("type") == "stage_start":
+                    stages.append(event.get("stage"))
                     print(f"   Stage: {event.get('stage')}")
-                elif event.get('type') == 'stage_complete' and event.get('stage') == 'completed':
+                elif event.get("type") == "stage_complete" and event.get("stage") == "completed":
                     break
             except:
                 pass
-    
+
     print(f"\n   Stages gesehen: {stages}")
-    
+
     # Analyse
     print("\n6. ANALYSE:")
-    
+
     # Wenn Pipeline läuft: gathering_context, llm_reasoning
     # Wenn Mock läuft: Nur synthesizing
-    
-    has_gathering = 'gathering_context' in stages
-    has_llm = 'llm_reasoning' in stages
-    
+
+    has_gathering = "gathering_context" in stages
+    has_llm = "llm_reasoning" in stages
+
     if has_gathering and has_llm:
         print("   [OK] 'gathering_context' + 'llm_reasoning' gefunden")
         print("   [OK] Das deutet auf INTELLIGENT PIPELINE hin!")

@@ -7,7 +7,7 @@ backend/
 │
 ├── backend.py                        # 🎯 HAUPT-BACKEND (385 Zeilen)
 │   ├── UDS3 v2.0.0 Integration
-│   ├── Intelligent Pipeline Integration  
+│   ├── Intelligent Pipeline Integration
 │   ├── Streaming Progress System
 │   ├── QueryService Initialization
 │   └── FastAPI App mit Lifespan
@@ -200,7 +200,7 @@ backend/
   "id": "1",                        // ✅ Numeric ID (1, 2, 3 NOT "src_1")
   "title": "Bundes-Immissionsschutzgesetz",
   "type": "document",
-  
+
   // IEEE Extended (✨ 30+ zusätzliche Felder via extra="allow")
   "authors": "Deutscher Bundestag",
   "ieee_citation": "Deutscher Bundestag, 'Bundes-Immissionsschutzgesetz', BGBl. I S. 1193, 2024.",
@@ -208,14 +208,14 @@ backend/
   "year": 2024,
   "publisher": "Bundesanzeiger Verlag",
   "original_source": "BGBl. I",
-  
+
   // Scoring
   "similarity_score": 0.92,
   "rerank_score": 0.95,
   "quality_score": 0.90,
   "score": 0.93,
   "confidence": 0.91,
-  
+
   // Legal Domain
   "rechtsgebiet": "Umweltrecht",
   "behörde": "Bundesumweltministerium",
@@ -223,14 +223,14 @@ backend/
   "gericht": null,
   "normtyp": "Gesetz",
   "fundstelle": "BGBl. I S. 1193",
-  
+
   // Assessment
   "impact": "High",
   "relevance": "Very High",
-  
+
   // Agent Info
   "agent": "document_retrieval",
-  
+
   // ... weitere 10+ Felder möglich
 }
 ```

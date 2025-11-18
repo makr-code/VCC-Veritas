@@ -1,7 +1,7 @@
 # 📊 Datensammlung Session Guide
 
-**Datum:** 17. Oktober 2025  
-**Ziel:** 15-20 diverse Test-Queries zur Validierung des Token-Management-Systems  
+**Datum:** 17. Oktober 2025
+**Ziel:** 15-20 diverse Test-Queries zur Validierung des Token-Management-Systems
 **Session-Dauer:** 30-45 Minuten
 
 ---
@@ -193,8 +193,8 @@ python dashboard_token_budgets.py
 ```markdown
 ## Test Session - [Datum]
 
-**Durchgeführt:** [Zeit]  
-**Queries getestet:** [Anzahl]  
+**Durchgeführt:** [Zeit]
+**Queries getestet:** [Anzahl]
 **Backend:** http://localhost:5000
 
 ### Quick Stats
@@ -260,12 +260,12 @@ python start_backend.py
 
 **Session ist erfolgreich wenn:**
 
-✅ **Mindestens 15 Queries** getrackt  
-✅ **Alle 3 Complexity-Level** abgedeckt (Simple, Medium, Complex)  
-✅ **Mindestens 3 Domänen** getestet  
-✅ **Intent Unknown Rate <10%**  
-✅ **Keine Backend-Errors**  
-✅ **CSV/JSON Export erfolgreich**  
+✅ **Mindestens 15 Queries** getrackt
+✅ **Alle 3 Complexity-Level** abgedeckt (Simple, Medium, Complex)
+✅ **Mindestens 3 Domänen** getestet
+✅ **Intent Unknown Rate <10%**
+✅ **Keine Backend-Errors**
+✅ **CSV/JSON Export erfolgreich**
 ✅ **Dashboard zeigt sinnvolle Daten**
 
 ---

@@ -1,6 +1,6 @@
 # ThemisDB WebSocket Support - Schnellstart
 
-**Erstellt:** 7. November 2025  
+**Erstellt:** 7. November 2025
 **Status:** ✅ Production-Ready
 
 ---
@@ -215,7 +215,7 @@ const ws = new WebSocket('ws://localhost:8000/api/v3/ws/search?client_id=my_app'
 
 ws.onopen = () => {
   console.log('Connected');
-  
+
   // Send search
   ws.send(JSON.stringify({
     action: 'search',
@@ -226,7 +226,7 @@ ws.onopen = () => {
 
 ws.onmessage = (event) => {
   const message = JSON.parse(event.data);
-  
+
   switch (message.type) {
     case 'result':
       console.log('Result:', message.data);
@@ -344,7 +344,7 @@ const maxReconnectAttempts = 5;
 
 function connect() {
   const ws = new WebSocket(url);
-  
+
   ws.onclose = () => {
     if (reconnectAttempts < maxReconnectAttempts) {
       reconnectAttempts++;
@@ -352,7 +352,7 @@ function connect() {
       setTimeout(() => connect(), delay);
     }
   };
-  
+
   ws.onopen = () => {
     reconnectAttempts = 0; // Reset
   };
@@ -438,7 +438,7 @@ location /api/v3/ws/ {
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header X-Forwarded-Proto $scheme;
-    
+
     # Timeouts
     proxy_read_timeout 3600s;
     proxy_send_timeout 3600s;
@@ -462,23 +462,23 @@ services:
 
 ## FAQ
 
-**Q: WebSocket vs SSE - Wann was verwenden?**  
+**Q: WebSocket vs SSE - Wann was verwenden?**
 A: WebSocket für bidirektionale Kommunikation (Chat, Interactive Search), SSE für unidirektionale Updates (Logs, Metrics).
 
-**Q: Wie viele gleichzeitige Verbindungen sind möglich?**  
+**Q: Wie viele gleichzeitige Verbindungen sind möglich?**
 A: 1000+ pro Worker (mit uvicorn). Skalierung via Load Balancer.
 
-**Q: Funktioniert WebSocket mit HTTPS?**  
+**Q: Funktioniert WebSocket mit HTTPS?**
 A: Ja, verwende `wss://` statt `ws://` für sichere Verbindungen.
 
-**Q: Wie funktioniert Reconnect?**  
+**Q: Wie funktioniert Reconnect?**
 A: Client muss Reconnect selbst implementieren (siehe Best Practices).
 
-**Q: Kann ich WebSocket mit REST mischen?**  
+**Q: Kann ich WebSocket mit REST mischen?**
 A: Ja, WebSocket-Endpoints laufen parallel zu REST-Endpoints.
 
 ---
 
-**Status:** ✅ Production-Ready  
-**Tested:** Python 3.10+, Chrome 90+, Firefox 88+  
+**Status:** ✅ Production-Ready
+**Tested:** Python 3.10+, Chrome 90+, Firefox 88+
 **Dependencies:** FastAPI (native WebSocket support)

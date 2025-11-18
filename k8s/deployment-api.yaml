@@ -38,17 +38,17 @@ spec:
         runAsNonRoot: true
         runAsUser: 1000
         fsGroup: 1000
-      
+
       containers:
       - name: api
         image: veritas/api:latest
         imagePullPolicy: Always
-        
+
         ports:
         - name: http
           containerPort: 8000
           protocol: TCP
-        
+
         env:
         - name: VERITAS_ENV
           valueFrom:
@@ -85,11 +85,11 @@ spec:
             secretKeyRef:
               name: veritas-secrets
               key: JWT_SECRET_KEY
-        
+
         envFrom:
         - configMapRef:
             name: veritas-config
-        
+
         resources:
           requests:
             cpu: 500m
@@ -97,7 +97,7 @@ spec:
           limits:
             cpu: 2000m
             memory: 2Gi
-        
+
         livenessProbe:
           httpGet:
             path: /api/v1/health
@@ -106,7 +106,7 @@ spec:
           periodSeconds: 10
           timeoutSeconds: 5
           failureThreshold: 3
-        
+
         readinessProbe:
           httpGet:
             path: /api/v1/health
@@ -115,27 +115,27 @@ spec:
           periodSeconds: 5
           timeoutSeconds: 3
           failureThreshold: 3
-        
+
         volumeMounts:
         - name: logs
           mountPath: /app/logs
         - name: uploads
           mountPath: /app/uploads
-        
+
         securityContext:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: false
           capabilities:
             drop:
             - ALL
-      
+
       volumes:
       - name: logs
         emptyDir: {}
       - name: uploads
         persistentVolumeClaim:
           claimName: veritas-uploads-pvc
-      
+
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -189,29 +189,29 @@ spec:
         runAsNonRoot: true
         runAsUser: 1000
         fsGroup: 1000
-      
+
       containers:
       - name: api
         image: veritas/api:staging
         imagePullPolicy: Always
-        
+
         ports:
         - name: http
           containerPort: 8000
           protocol: TCP
-        
+
         env:
         - name: VERITAS_ENV
           value: "staging"
         - name: LOG_LEVEL
           value: "DEBUG"
-        
+
         envFrom:
         - configMapRef:
             name: veritas-config
         - secretRef:
             name: veritas-secrets
-        
+
         resources:
           requests:
             cpu: 250m
@@ -219,7 +219,7 @@ spec:
           limits:
             cpu: 1000m
             memory: 1Gi
-        
+
         livenessProbe:
           httpGet:
             path: /api/v1/health
@@ -228,7 +228,7 @@ spec:
           periodSeconds: 10
           timeoutSeconds: 5
           failureThreshold: 3
-        
+
         readinessProbe:
           httpGet:
             path: /api/v1/health
@@ -237,13 +237,13 @@ spec:
           periodSeconds: 5
           timeoutSeconds: 3
           failureThreshold: 3
-        
+
         volumeMounts:
         - name: logs
           mountPath: /app/logs
         - name: uploads
           mountPath: /app/uploads
-      
+
       volumes:
       - name: logs
         emptyDir: {}

@@ -1,6 +1,6 @@
 # 🎯 VERITAS Agent-System: Implementierungsstrategie
 
-**Datum**: 16. Oktober 2025  
+**Datum**: 16. Oktober 2025
 **Strategie**: Zweistufiger Ansatz - Option 3 → Option 2
 
 ---
@@ -306,7 +306,7 @@ class AirQualityWorker(DomainWorker):
    - Emissionsregister
    - Status: Öffentlich, kostenlos
    - Auth: API Key
-   
+
 2. **Landesumweltämter**
    - Bundesland-spezifische Daten
    - Status: Je nach Bundesland
@@ -364,11 +364,11 @@ class ExternalAPIClient(ABC):
     def __init__(self, api_key: str = None):
         self.api_key = api_key
         self.rate_limiter = RateLimiter(requests_per_minute=60)
-    
+
     @abstractmethod
     async def query(self, params: dict) -> dict:
         pass
-    
+
     async def _handle_errors(self, response):
         # Retry logic
         # Error logging
@@ -419,11 +419,11 @@ class WorkerOrchestrator:
         self.dependency_graph = DependencyGraph()
         self.execution_planner = ExecutionPlanner()
         self.conflict_resolver = ConflictResolver()
-    
+
     async def orchestrate(self, query: str, selected_workers: List[str]):
         # 1. Build Dependency Graph
         plan = self.execution_planner.create_plan(selected_workers)
-        
+
         # 2. Execute in Waves (parallel within wave)
         results = {}
         for wave in plan.waves:
@@ -431,10 +431,10 @@ class WorkerOrchestrator:
                 worker.execute(query, results) for worker in wave
             ])
             results.update(wave_results)
-        
+
         # 3. Resolve Conflicts
         resolved = self.conflict_resolver.resolve(results)
-        
+
         return resolved
 ```
 

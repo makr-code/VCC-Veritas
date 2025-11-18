@@ -24,6 +24,32 @@ Author: VERITAS System
 Date: 2025-09-28
 Version: 1.0 (Template)
 """
+#!/usr/bin/env python3
+"""
+VERITAS AGENT WORKER TEMPLATE
+=============================
+
+Standard Template-Implementierung für VERITAS Agent-Worker
+Verwendung als Basis-Vorlage für neue spezialisierte Agents
+
+VERWENDUNG:
+1. Kopiere diese Datei als neuen Agent: `veritas_api_agent_[domain].py`
+2. Ersetze alle [TEMPLATE] Platzhalter mit deiner Domain-spezifischen Logik
+3. Implementiere die abstrakten Methoden: process_query, validate_input, etc.
+4. Registriere den Agent im AgentRegistry
+
+ARCHITEKTUR:
+- Erbt von BaseAgent für Standard-Funktionalität
+- Implementiert standardisierte Query-Processing-Pipeline
+- Integriert mit VERITAS Agent-Registry
+- Unterstützt Async/Sync Processing
+- Built-in Error Handling und Logging
+- Progress Tracking und Status Updates
+
+Author: VERITAS System
+Date: 2025-09-28
+Version: 1.0 (Template)
+"""
 
 import os
 import sys
@@ -38,6 +64,10 @@ from enum import Enum
 from datetime import datetime, timedelta
 import traceback
 from abc import ABC, abstractmethod
+
+# Conservative runtime defaults for analysis environments
+DATABASE_AVAILABLE: bool = False
+MultiDatabaseAPI: Any = None
 
 # VERITAS Core Imports
 try:
@@ -223,6 +253,7 @@ class BaseTemplateAgent(ABC):
         if not AGENT_SYSTEM_AVAILABLE:
             self.logger.warning("⚠️ Agent Registry nicht verfügbar")
             return
+<<<<<<< Updated upstream
             
         try:
             registry = get_agent_registry()
@@ -238,6 +269,47 @@ class BaseTemplateAgent(ABC):
                 }
             )
             self.logger.info(f"✅ Agent registriert: {self.agent_id}")
+=======
+        try:
+            registry = get_agent_registry()
+
+            # Best-effort registration to handle differing registry APIs
+            if hasattr(registry, "_register_agent"):
+                try:
+                    registry._register_agent(
+                        agent_id=self.agent_id,
+                        domain=AGENT_DOMAIN,
+                        capabilities=AGENT_CAPABILITIES,
+                        class_reference=type(self),
+                        requires_db=False,
+                        requires_api=False,
+                        description=f"{AGENT_NAME}",
+                    )
+                    self.logger.info(f"✅ Agent registriert (via _register_agent): {self.agent_id}")
+                    return
+                except Exception:
+                    pass
+
+            if hasattr(registry, "register_agent"):
+                try:
+                    from typing import cast
+
+                    reg_register = cast(Any, getattr(registry, "register_agent", None))
+                    if reg_register:
+                        reg_register(
+                            agent_id=self.agent_id,
+                            agent_name=AGENT_NAME,
+                            capabilities=AGENT_CAPABILITIES,
+                            lifecycle_type=getattr(AgentLifecycleType, "PERSISTENT", None),
+                            metadata={"version": AGENT_VERSION, "domain": AGENT_DOMAIN, "config": self.config.__dict__},
+                        )
+                        self.logger.info(f"✅ Agent registriert (via register_agent): {self.agent_id}")
+                        return
+                except Exception:
+                    pass
+
+            self.logger.info("ℹ️ Agent-Registrierung übersprungen (Registry API inkompatibel)")
+>>>>>>> Stashed changes
         except Exception as e:
             self.logger.error(f"❌ Agent-Registrierung fehlgeschlagen: {e}")
     
@@ -403,7 +475,6 @@ class BaseTemplateAgent(ABC):
     
     def shutdown(self):
         """Graceful Agent Shutdown"""
-        self.status = AgentStatus.TERMINATING
         self.logger.info(f"🔄 Shutting down agent: {self.agent_id}")
         
         # [TEMPLATE] Füge cleanup-Logic hinzu

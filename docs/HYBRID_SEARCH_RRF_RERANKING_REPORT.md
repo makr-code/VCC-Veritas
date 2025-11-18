@@ -1,7 +1,7 @@
 # VERITAS Backend - Hybrid Search & Re-Ranking Analyse
 
-**Datum:** 20. Oktober 2025  
-**Prüfung:** Hybrid Search mit RRF & Semantic Re-Ranking  
+**Datum:** 20. Oktober 2025
+**Prüfung:** Hybrid Search mit RRF & Semantic Re-Ranking
 **Status:** ✅ **VOLLSTÄNDIG IMPLEMENTIERT**
 
 ---
@@ -10,10 +10,10 @@
 
 Das VERITAS Backend verfügt über **vollständig implementierte** Hybrid Search und Semantic Re-Ranking Funktionalität:
 
-✅ **Hybrid Search** (Dense + Sparse + RRF Fusion)  
-✅ **Reciprocal Rank Fusion (RRF)** Algorithm  
-✅ **LLM-based Semantic Re-Ranking**  
-✅ **Multiple Ranking Strategies** (RRF, Weighted, Borda)  
+✅ **Hybrid Search** (Dense + Sparse + RRF Fusion)
+✅ **Reciprocal Rank Fusion (RRF)** Algorithm
+✅ **LLM-based Semantic Re-Ranking**
+✅ **Multiple Ranking Strategies** (RRF, Weighted, Borda)
 ✅ **Query Expansion** (Synonym-based)
 
 ---
@@ -22,8 +22,8 @@ Das VERITAS Backend verfügt über **vollständig implementierte** Hybrid Search
 
 ### 1. RAG Service (backend/services/rag_service.py)
 
-**Datei:** `c:\VCC\veritas\backend\services\rag_service.py`  
-**Zeilen:** 996  
+**Datei:** `c:\VCC\veritas\backend\services\rag_service.py`
+**Zeilen:** 996
 **Status:** ✅ Production Ready
 
 **Implementierte Features:**
@@ -56,7 +56,7 @@ def hybrid_search(
 ) -> HybridSearchResult:
     """
     Perform hybrid search combining all methods
-    
+
     Flow:
     1. Vector Search (ChromaDB) → Top-50
     2. Graph Search (Neo4j) → Top-50
@@ -85,13 +85,13 @@ def _reciprocal_rank_fusion(
 ) -> List[SearchResult]:
     """Apply Reciprocal Rank Fusion (RRF) ranking"""
     k = 60  # RRF constant
-    
+
     # Calculate RRF scores
     for result in results:
         weight = self._get_weight_for_method(result.search_method, weights)
         rrf_score = weight * (1.0 / (k + result.rank))
         result.relevance_score = rrf_score
-    
+
     # Sort by RRF score
     return sorted(results, key=lambda r: r.relevance_score, reverse=True)
 ```
@@ -112,8 +112,8 @@ Where:
 
 ### 2. Reranker Service (backend/services/reranker_service.py)
 
-**Datei:** `c:\VCC\veritas\backend\services\reranker_service.py`  
-**Zeilen:** 395  
+**Datei:** `c:\VCC\veritas\backend\services\reranker_service.py`
+**Zeilen:** 395
 **Status:** ✅ Production Ready
 
 **Implementierte Features:**
@@ -123,11 +123,11 @@ Where:
 class RerankerService:
     """
     LLM-Based Document Reranker
-    
+
     Uses large language models to re-score search results based on
     contextual relevance to the user's query intent.
     """
-    
+
     def __init__(
         self,
         model_name: str = "llama3.1:8b",
@@ -157,13 +157,13 @@ def rerank(
 ) -> List[RerankingResult]:
     """
     Rerank documents using LLM-based scoring
-    
+
     Args:
         query: User's search query
         documents: List with 'content', 'relevance_score', 'document_id'
         top_k: Return only top K results
         batch_size: Process documents in batches
-        
+
     Returns:
         List of RerankingResult, sorted by reranked_score
     """
@@ -181,7 +181,7 @@ def _build_scoring_prompt(
     documents: List[Dict[str, Any]]
 ) -> str:
     """Build prompt for LLM scoring"""
-    prompt = f"""You are a search result relevance evaluator. 
+    prompt = f"""You are a search result relevance evaluator.
 Rate each document's relevance to the user's query on a scale of 0.0 to 1.0.
 
 Query: "{query}"
@@ -224,8 +224,8 @@ def get_statistics(self) -> Dict[str, Any]:
 
 ### 3. Hybrid Retrieval Agent (backend/agents/veritas_hybrid_retrieval.py)
 
-**Datei:** `c:\VCC\veritas\backend\agents\veritas_hybrid_retrieval.py`  
-**Zeilen:** 570  
+**Datei:** `c:\VCC\veritas\backend\agents\veritas_hybrid_retrieval.py`
+**Zeilen:** 570
 **Status:** ✅ Production Ready
 
 **Purpose:** Agent-level hybrid search combining Dense + Sparse + RRF
@@ -236,7 +236,7 @@ def get_statistics(self) -> Dict[str, Any]:
 class HybridRetriever:
     """
     Hybrid Retrieval Service: Dense + Sparse + RRF-Fusion.
-    
+
     Workflow:
     1. Dense Retrieval (UDS3/Embeddings) → Top-50
     2. Sparse Retrieval (BM25) → Top-50
@@ -253,14 +253,14 @@ class HybridRetrievalConfig:
     dense_top_k: int = 50
     sparse_top_k: int = 50
     final_top_k: int = 20
-    
+
     # Weights für RRF
     dense_weight: float = 0.6
     sparse_weight: float = 0.4
-    
+
     # RRF-Parameter
     rrf_k: int = 60
-    
+
     # Feature-Toggles
     enable_sparse: bool = True
     enable_fusion: bool = True
@@ -273,8 +273,8 @@ class HybridRetrievalConfig:
 
 ### 4. Reciprocal Rank Fusion Module (backend/agents/veritas_reciprocal_rank_fusion.py)
 
-**Datei:** `c:\VCC\veritas\backend\agents\veritas_reciprocal_rank_fusion.py`  
-**Zeilen:** 328  
+**Datei:** `c:\VCC\veritas\backend\agents\veritas_reciprocal_rank_fusion.py`
+**Zeilen:** 328
 **Status:** ✅ Production Ready
 
 **Purpose:** Standalone RRF implementation for multi-retriever fusion
@@ -318,7 +318,7 @@ class ReciprocalRankFusion:
     ) -> List[FusedDocument]:
         """
         Fusioniert Results von mehreren Retrievern via RRF.
-        
+
         Example:
             >>> retriever_results = {
             ...     "dense": [doc1, doc2, doc3],
@@ -329,11 +329,11 @@ class ReciprocalRankFusion:
         # Calculate RRF scores for each document
         for retriever_name, results in retriever_results.items():
             weight = self.config.weights.get(retriever_name, 1.0)
-            
+
             for rank, doc in enumerate(results):
                 rank_score = 1.0 / (self.config.k + rank + 1)
                 rrf_scores[doc_id] += weight * rank_score
-        
+
         # Sort by RRF score
         return sorted(documents, key=lambda d: d.rrf_score, reverse=True)
 ```
@@ -417,8 +417,8 @@ class ReciprocalRankFusion:
 
 ```python
 from backend.services.rag_service import (
-    RAGService, 
-    SearchWeights, 
+    RAGService,
+    SearchWeights,
     SearchFilters,
     RankingStrategy
 )
@@ -696,7 +696,7 @@ async def _process_rag(...):
         query=request.query,
         ranking_strategy=RankingStrategy.RECIPROCAL_RANK_FUSION
     )
-    
+
     # Optional: Re-Ranking
     if enable_reranking:
         documents = [convert_to_doc(r) for r in result.results]
@@ -714,7 +714,7 @@ async def _process_rag(...):
 ### RRF (Reciprocal Rank Fusion)
 
 **Paper:**
-- Cormack, G. V., Clarke, C. L., & Büttcher, S. (2009). 
+- Cormack, G. V., Clarke, C. L., & Büttcher, S. (2009).
   "Reciprocal Rank Fusion outperforms Condorcet and individual Rank Learning Methods"
   In Proceedings of SIGIR '09.
 
@@ -751,7 +751,7 @@ Das VERITAS Backend verfügt über eine **state-of-the-art** Hybrid Search und R
 5. ✅ **Testabdeckung:** Standalone tests für alle Komponenten
 6. ✅ **Dokumentation:** Vollständig dokumentiert mit Code-Beispielen
 
-**Empfehlung:** 
+**Empfehlung:**
 - Dokumentation um diese Features ergänzen ✅ (bereits erfolgt)
 - Performance-Monitoring für Hybrid Search hinzufügen
 - A/B-Tests: RRF vs. Weighted vs. Borda Count
@@ -759,6 +759,6 @@ Das VERITAS Backend verfügt über eine **state-of-the-art** Hybrid Search und R
 
 ---
 
-**Report erstellt von:** GitHub Copilot  
-**Datum:** 20. Oktober 2025  
+**Report erstellt von:** GitHub Copilot
+**Datum:** 20. Oktober 2025
 **Version:** 1.0

@@ -3,10 +3,9 @@
 
 """
 VERITAS Protected Module
-WARNING: This file contains embedded protection keys. 
+WARNING: This file contains embedded protection keys.
 Modification will be detected and may result in license violations.
 """
-
 
 
 """
@@ -14,7 +13,7 @@ VERITAS Core Engine - Kernfunktionen ohne GUI-Abhängigkeiten
 
 Dieses Module enthält alle schützenswerten Kernfunktionen von VERITAS:
 - Thread Management System
-- Queue-basierte Nachrichtenkommunikation  
+- Queue-basierte Nachrichtenkommunikation
 - Backend API Integration
 - Session Management
 - UDS3 Integration
@@ -27,25 +26,26 @@ ARCHITEKTUR:
 - Standardisierte Nachrichtentypen
 """
 
-import os
-import sys
 import json
 import logging
+import os
 import queue
+import sys
 import threading
-import requests
 import time
-from datetime import datetime
-from typing import Dict, List, Optional, Any, Union
-from enum import Enum
-from dataclasses import dataclass
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
+from datetime import datetime
+from enum import Enum
+from typing import Any, Dict, List, Optional, Union
+
+import requests
 
 # === LOGGING SETUP ===
 logger = logging.getLogger(__name__)
 
 # === KONSTANTEN ===
-API_BASE_URL = os.getenv('VERITAS_API_BASE_URL', 'http://localhost:8000')
+API_BASE_URL = os.getenv("VERITAS_API_BASE_URL", "http://localhost:8000")
 DEFAULT_TIMEOUT = 30
 MAX_RETRIES = 3
 
@@ -53,20 +53,30 @@ MAX_RETRIES = 3
 # Universal JSON Payload Library
 try:
     from shared.universal_json_payload import (
-        UniversalQueryRequest, UniversalQueryResponse,
-        RequestType, ResponseStatus, SystemComponent, QualityLevel,
-        ChatMessageRequest, FileUploadRequest,
-        validate_request_type, create_error_response
+        ChatMessageRequest,
+        FileUploadRequest,
+        QualityLevel,
+        RequestType,
+        ResponseStatus,
+        SystemComponent,
+        UniversalQueryRequest,
+        UniversalQueryResponse,
+        create_error_response,
+        validate_request_type,
     )
+
     PAYLOADS_AVAILABLE = True
     logger.info("✅ Universal JSON Payload Library erfolgreich geladen")
 except ImportError as e:
     logger.info(f"ℹ️ Universal JSON Payloads nicht verfügbar (optional): {e}")
     PAYLOADS_AVAILABLE = False
 
-# UDS3 Security Integration  
+# UDS3 Security Integration
 try:
-    from uds3.uds3_security import DataSecurityManager as SecurityManager, SecurityLevel, AdministrativeClassification
+    from uds3.uds3_security import AdministrativeClassification
+    from uds3.uds3_security import DataSecurityManager as SecurityManager
+    from uds3.uds3_security import SecurityLevel
+
     UDS3_AVAILABLE = True
     logger.info("✅ UDS3 Security Manager geladen")
 except ImportError:
@@ -76,8 +86,10 @@ except ImportError:
 
 # === MESSAGE SYSTEM ===
 
+
 class MessageType(Enum):
     """Definiert verschiedene Message-Typen für Queue-Kommunikation"""
+
     CHAT_MESSAGE = "chat_message"
     STATUS_UPDATE = "status_update"
     WINDOW_CLOSE = "window_close"
@@ -89,9 +101,11 @@ class MessageType(Enum):
     SESSION_CREATE = "session_create"
     SESSION_DESTROY = "session_destroy"
 
+
 @dataclass
 class QueueMessage:
     """Base class für Queue-Nachrichten"""
+
     msg_type: MessageType
     sender_id: str
     timestamp: float
@@ -99,80 +113,80 @@ class QueueMessage:
 
     def to_dict(self) -> Dict:
         """Konvertiert Message zu Dictionary für JSON-Serialisierung"""
-        return {
-            'msg_type': self.msg_type.value,
-            'sender_id': self.sender_id,
-            'timestamp': self.timestamp,
-            'data': self.data
-        }
-    
+        return {"msg_type": self.msg_type.value, "sender_id": self.sender_id, "timestamp": self.timestamp, "data": self.data}
+
     @classmethod
-    def from_dict(cls, data: Dict) -> 'QueueMessage':
+    def from_dict(cls, data: Dict) -> "QueueMessage":
         """Erstellt Message aus Dictionary"""
         return cls(
-            msg_type=MessageType(data['msg_type']),
-            sender_id=data['sender_id'],
-            timestamp=data['timestamp'],
-            data=data['data']
+            msg_type=MessageType(data["msg_type"]), sender_id=data["sender_id"], timestamp=data["timestamp"], data=data["data"]
         )
+
 
 @dataclass
 class ChatMessage(QueueMessage):
     """Spezielle Nachricht für Chat-Inhalte"""
+
     def __init__(self, sender_id: str, role: str, content: str, **kwargs):
         super().__init__(
             msg_type=MessageType.CHAT_MESSAGE,
             sender_id=sender_id,
             timestamp=datetime.now().timestamp(),
             data={
-                'role': role,
-                'content': content,
-                'chat_id': kwargs.get('chat_id'),
-                'session_id': kwargs.get('session_id'),
-                'attachments': kwargs.get('attachments', []),
-                'metadata': kwargs.get('metadata', {}),
-                **kwargs
-            }
+                "role": role,
+                "content": content,
+                "chat_id": kwargs.get("chat_id"),
+                "session_id": kwargs.get("session_id"),
+                "attachments": kwargs.get("attachments", []),
+                "metadata": kwargs.get("metadata", {}),
+                **kwargs,
+            },
         )
+
 
 @dataclass
 class StatusMessage(QueueMessage):
     """Status-Updates zwischen Threads"""
+
     def __init__(self, sender_id: str, status: str, details: Optional[Dict] = None):
         super().__init__(
             msg_type=MessageType.STATUS_UPDATE,
             sender_id=sender_id,
             timestamp=datetime.now().timestamp(),
-            data={'status': status, 'details': details or {}}
+            data={"status": status, "details": details or {}},
         )
+
 
 @dataclass
 class BackendResponse(QueueMessage):
     """Backend-Antworten mit erweiterten Metadaten"""
+
     def __init__(self, sender_id: str, content: str, **kwargs):
         super().__init__(
             msg_type=MessageType.BACKEND_RESPONSE,
             sender_id=sender_id,
             timestamp=datetime.now().timestamp(),
             data={
-                'content': content,
-                'sources': kwargs.get('sources', []),
-                'confidence_score': kwargs.get('confidence_score', 0.0),
-                'suggestions': kwargs.get('suggestions', []),
-                'session_id': kwargs.get('session_id'),
-                'processing_time': kwargs.get('processing_time', 0.0),
-                'quality_metrics': kwargs.get('quality_metrics', {}),
-                'error_info': kwargs.get('error_info'),
-                **kwargs
-            }
+                "content": content,
+                "sources": kwargs.get("sources", []),
+                "confidence_score": kwargs.get("confidence_score", 0.0),
+                "suggestions": kwargs.get("suggestions", []),
+                "session_id": kwargs.get("session_id"),
+                "processing_time": kwargs.get("processing_time", 0.0),
+                "quality_metrics": kwargs.get("quality_metrics", {}),
+                "error_info": kwargs.get("error_info"),
+                **kwargs,
+            },
         )
 
+
 # === THREAD MANAGEMENT SYSTEM ===
+
 
 class ThreadManager:
     """
     Verwaltet alle Chat-Threads und deren Kommunikation
-    
+
     Features:
     - Thread-sichere Queue-Verwaltung
     - Message Broadcasting
@@ -180,60 +194,55 @@ class ThreadManager:
     - Error Recovery
     - Performance Monitoring
     """
-    
+
     def __init__(self):
         self.threads: Dict[str, threading.Thread] = {}
         self.queues: Dict[str, queue.Queue] = {}
         self.main_queue = queue.Queue()
         self.shutdown_event = threading.Event()
         self._lock = threading.Lock()
-        self._stats = {
-            'messages_sent': 0,
-            'threads_created': 0,
-            'errors': 0,
-            'start_time': datetime.now()
-        }
-        
+        self._stats = {"messages_sent": 0, "threads_created": 0, "errors": 0, "start_time": datetime.now()}
+
         logger.info("ThreadManager initialisiert")
-    
+
     def create_thread_queue(self, thread_id: str) -> queue.Queue:
         """Erstellt eine neue Queue für einen Thread"""
         with self._lock:
             thread_queue = queue.Queue()
             self.queues[thread_id] = thread_queue
-            self._stats['threads_created'] += 1
+            self._stats["threads_created"] += 1
             logger.info(f"Queue für Thread {thread_id} erstellt")
             return thread_queue
-    
+
     def register_thread(self, thread_id: str, thread: threading.Thread):
         """Registriert einen neuen Thread"""
         with self._lock:
             self.threads[thread_id] = thread
             logger.info(f"Thread {thread_id} registriert")
-    
+
     def send_message(self, target_id: str, message: QueueMessage):
         """Sendet eine Nachricht an einen spezifischen Thread"""
         try:
             with self._lock:
                 if target_id in self.queues:
                     self.queues[target_id].put(message, timeout=5)
-                    self._stats['messages_sent'] += 1
+                    self._stats["messages_sent"] += 1
                     logger.debug(f"Message {message.msg_type} an {target_id} gesendet")
                 else:
                     logger.warning(f"Thread {target_id} nicht gefunden für Message {message.msg_type}")
-                    self._stats['errors'] += 1
+                    self._stats["errors"] += 1
         except queue.Full:
             logger.error(f"Queue für {target_id} ist voll - Message verworfen")
-            self._stats['errors'] += 1
+            self._stats["errors"] += 1
         except Exception as e:
             logger.error(f"Fehler beim Senden an {target_id}: {e}")
-            self._stats['errors'] += 1
-    
+            self._stats["errors"] += 1
+
     def broadcast_message(self, message: QueueMessage, exclude: Optional[List[str]] = None):
         """Sendet eine Nachricht an alle Threads"""
         exclude = exclude or []
         successful_sends = 0
-        
+
         with self._lock:
             for thread_id, thread_queue in self.queues.items():
                 if thread_id not in exclude:
@@ -242,11 +251,11 @@ class ThreadManager:
                         successful_sends += 1
                     except queue.Full:
                         logger.warning(f"Queue für {thread_id} voll - Broadcast verworfen")
-                        self._stats['errors'] += 1
-        
-        self._stats['messages_sent'] += successful_sends
+                        self._stats["errors"] += 1
+
+        self._stats["messages_sent"] += successful_sends
         logger.debug(f"Broadcast {message.msg_type} an {successful_sends} Threads")
-    
+
     def remove_thread(self, thread_id: str):
         """Entfernt einen Thread thread-sicher aus der Verwaltung"""
         try:
@@ -255,7 +264,7 @@ class ThreadManager:
                     thread = self.threads[thread_id]
                     del self.threads[thread_id]
                     logger.info(f"Thread {thread_id} entfernt")
-                
+
                 if thread_id in self.queues:
                     # Queue leeren bevor sie entfernt wird
                     try:
@@ -267,150 +276,136 @@ class ThreadManager:
                     logger.info(f"Queue für {thread_id} entfernt")
         except Exception as e:
             logger.error(f"Fehler beim Entfernen von Thread {thread_id}: {e}")
-            self._stats['errors'] += 1
-    
+            self._stats["errors"] += 1
+
     def shutdown_all(self):
         """Beendet alle Threads sauber"""
         self.shutdown_event.set()
-        shutdown_msg = QueueMessage(
-            MessageType.THREAD_SHUTDOWN, 
-            "ThreadManager", 
-            datetime.now().timestamp(), 
-            {}
-        )
+        shutdown_msg = QueueMessage(MessageType.THREAD_SHUTDOWN, "ThreadManager", datetime.now().timestamp(), {})
         self.broadcast_message(shutdown_msg)
-        
+
         with self._lock:
             for thread_id, thread in self.threads.items():
                 thread.join(timeout=2.0)
                 logger.info(f"Thread {thread_id} beendet")
-        
+
         logger.info("Alle Threads beendet")
-    
+
     def get_stats(self) -> Dict:
         """Gibt Performance-Statistiken zurück"""
-        uptime = datetime.now() - self._stats['start_time']
+        uptime = datetime.now() - self._stats["start_time"]
         return {
             **self._stats,
-            'active_threads': len(self.threads),
-            'active_queues': len(self.queues),
-            'uptime_seconds': uptime.total_seconds(),
-            'is_shutdown': self.shutdown_event.is_set()
+            "active_threads": len(self.threads),
+            "active_queues": len(self.queues),
+            "uptime_seconds": uptime.total_seconds(),
+            "is_shutdown": self.shutdown_event.is_set(),
         }
 
+
 # === SESSION MANAGEMENT ===
+
 
 class SessionManager:
     """
     Verwaltet API-Sessions und Backend-Verbindungen
-    
+
     Features:
     - Session-Lifecycle-Management
     - Connection Pooling
     - Retry Logic
     - Health Monitoring
     """
-    
+
     def __init__(self):
         self._sessions: Dict[str, Dict] = {}
         self._lock = threading.Lock()
-        self._health_stats = {
-            'successful_requests': 0,
-            'failed_requests': 0,
-            'total_sessions': 0,
-            'active_sessions': 0
-        }
-        
+        self._health_stats = {"successful_requests": 0, "failed_requests": 0, "total_sessions": 0, "active_sessions": 0}
+
     def create_session(self, user_id: str, **kwargs) -> Optional[str]:
         """Erstellt eine neue API-Session"""
         try:
             payload = {
                 "user_id": user_id,
-                "client_info": kwargs.get('client_info', 'veritas_core'),
-                "capabilities": kwargs.get('capabilities', [])
+                "client_info": kwargs.get("client_info", "veritas_core"),
+                "capabilities": kwargs.get("capabilities", []),
             }
-            
-            response = requests.post(
-                f"{API_BASE_URL}/start_session",
-                json=payload,
-                timeout=DEFAULT_TIMEOUT
-            )
-            
+
+            response = requests.post(f"{API_BASE_URL}/start_session", json=payload, timeout=DEFAULT_TIMEOUT)
+
             if response.status_code == 200:
                 data = response.json()
                 session_id = data.get("session_id")
-                
+
                 with self._lock:
                     self._sessions[session_id] = {
-                        'user_id': user_id,
-                        'created_at': datetime.now(),
-                        'last_activity': datetime.now(),
-                        'request_count': 0,
-                        'session_data': data
+                        "user_id": user_id,
+                        "created_at": datetime.now(),
+                        "last_activity": datetime.now(),
+                        "request_count": 0,
+                        "session_data": data,
                     }
-                    self._health_stats['total_sessions'] += 1
-                    self._health_stats['active_sessions'] += 1
-                
+                    self._health_stats["total_sessions"] += 1
+                    self._health_stats["active_sessions"] += 1
+
                 logger.info(f"✅ Session {session_id} für {user_id} erstellt")
                 return session_id
             else:
                 logger.error(f"❌ Session-Erstellung fehlgeschlagen: {response.status_code}")
-                self._health_stats['failed_requests'] += 1
+                self._health_stats["failed_requests"] += 1
                 return None
-                
+
         except Exception as e:
             logger.error(f"❌ Session-Erstellung Fehler: {e}")
-            self._health_stats['failed_requests'] += 1
+            self._health_stats["failed_requests"] += 1
             return None
-    
+
     def destroy_session(self, session_id: str) -> bool:
         """Beendet eine Session"""
         try:
             with self._lock:
                 if session_id in self._sessions:
                     del self._sessions[session_id]
-                    self._health_stats['active_sessions'] -= 1
-            
+                    self._health_stats["active_sessions"] -= 1
+
             # Optionale API-Benachrichtigung
             try:
-                requests.post(
-                    f"{API_BASE_URL}/end_session",
-                    json={"session_id": session_id},
-                    timeout=5
-                )
+                requests.post(f"{API_BASE_URL}/end_session", json={"session_id": session_id}, timeout=5)
             except:
                 pass  # Nicht kritisch wenn API nicht erreichbar
-            
+
             logger.info(f"Session {session_id} beendet")
             return True
-            
+
         except Exception as e:
             logger.error(f"Fehler beim Beenden von Session {session_id}: {e}")
             return False
-    
+
     def update_session_activity(self, session_id: str):
         """Aktualisiert die Last-Activity einer Session"""
         with self._lock:
             if session_id in self._sessions:
-                self._sessions[session_id]['last_activity'] = datetime.now()
-                self._sessions[session_id]['request_count'] += 1
-    
+                self._sessions[session_id]["last_activity"] = datetime.now()
+                self._sessions[session_id]["request_count"] += 1
+
     def is_session_valid(self, session_id: str) -> bool:
         """Prüft ob eine Session noch gültig ist"""
         with self._lock:
             return session_id in self._sessions
-    
+
     def get_session_info(self, session_id: str) -> Optional[Dict]:
         """Gibt Session-Informationen zurück"""
         with self._lock:
             return self._sessions.get(session_id)
 
+
 # === BACKEND INTEGRATION ENGINE ===
+
 
 class BackendProcessor:
     """
     Kernmodul für Backend-Integration und Request-Processing
-    
+
     Features:
     - UDS3 Integration
     - Universal JSON API
@@ -418,19 +413,19 @@ class BackendProcessor:
     - Response Validation
     - Performance Monitoring
     """
-    
+
     def __init__(self, session_manager: SessionManager):
         self.session_manager = session_manager
         self._lock = threading.Lock()
         self._stats = {
-            'total_requests': 0,
-            'successful_responses': 0,
-            'failed_responses': 0,
-            'uds3_requests': 0,
-            'api_requests': 0,
-            'avg_response_time': 0.0
+            "total_requests": 0,
+            "successful_responses": 0,
+            "failed_responses": 0,
+            "uds3_requests": 0,
+            "api_requests": 0,
+            "avg_response_time": 0.0,
         }
-        
+
         # UDS3 Strategy Setup
         self.uds3_strategy = None
         if UDS3_AVAILABLE:
@@ -439,272 +434,277 @@ class BackendProcessor:
                 logger.info("✅ UDS3 Backend Processor bereit")
             except Exception as e:
                 logger.warning(f"⚠️ UDS3 Setup Warnung: {e}")
-    
+
     def set_uds3_strategy(self, strategy):
         """Setzt die UDS3 Strategy (Dependency Injection)"""
         self.uds3_strategy = strategy
         logger.info("✅ UDS3 Strategy gesetzt")
-    
+
     def process_query(self, message: str, session_id: str, **kwargs) -> BackendResponse:
         """
         Verarbeitet eine Query über verfügbare Backends
-        
+
         Args:
             message: Die zu verarbeitende Nachricht
             session_id: Session-ID für Context
             **kwargs: Zusätzliche Parameter (mode, request_type, etc.)
-        
+
         Returns:
             BackendResponse mit Antwort und Metadaten
         """
         start_time = time.time()
-        sender_id = kwargs.get('sender_id', 'backend_processor')
-        
+        sender_id = kwargs.get("sender_id", "backend_processor")
+
         try:
-            self._stats['total_requests'] += 1
-            
+            self._stats["total_requests"] += 1
+
             # UDS3 Strategy versuchen falls verfügbar
             if self.uds3_strategy:
                 try:
                     response = self._process_uds3_query(message, session_id, **kwargs)
                     if response:
-                        self._update_stats(start_time, 'uds3', True)
+                        self._update_stats(start_time, "uds3", True)
                         return response
                 except Exception as e:
                     logger.error(f"❌ UDS3 Fehler: {e}")
-            
+
             # Universal JSON API als Fallback
             if PAYLOADS_AVAILABLE:
                 try:
                     response = self._process_api_query(message, session_id, **kwargs)
                     if response:
-                        self._update_stats(start_time, 'api', True)
+                        self._update_stats(start_time, "api", True)
                         return response
                 except Exception as e:
                     logger.error(f"❌ API Fehler: {e}")
-            
+
             # Kein Backend verfügbar
             error_response = BackendResponse(
                 sender_id=sender_id,
                 content="❌ Keine Backend-Services verfügbar",
-                error_info={'type': 'no_backend', 'timestamp': datetime.now().isoformat()},
-                session_id=session_id
+                error_info={"type": "no_backend", "timestamp": datetime.now().isoformat()},
+                session_id=session_id,
             )
-            self._update_stats(start_time, 'none', False)
+            self._update_stats(start_time, "none", False)
             return error_response
-            
+
         except Exception as e:
             logger.error(f"💥 Unerwarteter Backend-Fehler: {e}")
             error_response = BackendResponse(
                 sender_id=sender_id,
                 content=f"💥 Unerwarteter Fehler: {str(e)}",
-                error_info={'type': 'unexpected', 'error': str(e), 'timestamp': datetime.now().isoformat()},
-                session_id=session_id
+                error_info={"type": "unexpected", "error": str(e), "timestamp": datetime.now().isoformat()},
+                session_id=session_id,
             )
-            self._update_stats(start_time, 'error', False)
+            self._update_stats(start_time, "error", False)
             return error_response
-    
+
     def _process_uds3_query(self, message: str, session_id: str, **kwargs) -> Optional[BackendResponse]:
         """Verarbeitet Query über UDS3"""
         if not self.uds3_strategy:
             return None
-        
+
         try:
             response = self.uds3_strategy.process_query(
                 query=message,
-                context=kwargs.get('context', 'chat'),
-                security_level=kwargs.get('security_level', SecurityLevel.INTERNAL if UDS3_AVAILABLE else None)
+                context=kwargs.get("context", "chat"),
+                security_level=kwargs.get("security_level", SecurityLevel.INTERNAL if UDS3_AVAILABLE else None),
             )
-            
-            content = response.get('answer', 'Keine Antwort erhalten.')
-            
+
+            content = response.get("answer", "Keine Antwort erhalten.")
+
             backend_response = BackendResponse(
                 sender_id="UDS3",
                 content=content,
-                sources=response.get('sources', []),
-                confidence_score=response.get('confidence_score', 0.8),
-                suggestions=response.get('suggestions', []),
+                sources=response.get("sources", []),
+                confidence_score=response.get("confidence_score", 0.8),
+                suggestions=response.get("suggestions", []),
                 session_id=session_id,
-                processing_time=response.get('processing_time', 0.0),
-                quality_metrics=response.get('quality_metrics', {})
+                processing_time=response.get("processing_time", 0.0),
+                quality_metrics=response.get("quality_metrics", {}),
             )
-            
-            self._stats['uds3_requests'] += 1
+
+            self._stats["uds3_requests"] += 1
             logger.info(f"✅ UDS3 Response: {len(content)} Zeichen")
             return backend_response
-            
+
         except Exception as e:
             logger.error(f"UDS3 Processing Fehler: {e}")
             return None
-    
+
     def _process_api_query(self, message: str, session_id: str, **kwargs) -> Optional[BackendResponse]:
         """Verarbeitet Query über Universal JSON API"""
         try:
             # Session validieren
             if not self.session_manager.is_session_valid(session_id):
                 logger.warning(f"Session {session_id} ungültig - erstelle neue Session")
-                user_id = kwargs.get('user_id', f'user_{int(time.time())}')
+                user_id = kwargs.get("user_id", f"user_{int(time.time())}")
                 session_id = self.session_manager.create_session(user_id)
                 if not session_id:
                     return None
-            
+
             # Request Type bestimmen
-            request_type = kwargs.get('request_type', RequestType.RAG)
-            
+            request_type = kwargs.get("request_type", RequestType.RAG)
+
             # Universal Query Request erstellen
             query_request = UniversalQueryRequest(
                 query=message,
                 request_type=request_type,
                 system_component=SystemComponent.VERITAS,
                 session_id=session_id,
-                system_prompt=kwargs.get('system_prompt'),
-                max_tokens=kwargs.get('max_tokens', 2000),
-                temperature=kwargs.get('temperature', 0.7),
-                context_files=kwargs.get('context_files', []),
-                quality_level=kwargs.get('quality_level', QualityLevel.STANDARD)
+                system_prompt=kwargs.get("system_prompt"),
+                max_tokens=kwargs.get("max_tokens", 2000),
+                temperature=kwargs.get("temperature", 0.7),
+                context_files=kwargs.get("context_files", []),
+                quality_level=kwargs.get("quality_level", QualityLevel.STANDARD),
             )
-            
+
             # API Request
             response = requests.post(
-                f"{API_BASE_URL}/universal_query",
-                json=query_request.dict(),
-                timeout=kwargs.get('timeout', DEFAULT_TIMEOUT)
+                f"{API_BASE_URL}/universal_query", json=query_request.dict(), timeout=kwargs.get("timeout", DEFAULT_TIMEOUT)
             )
-            
+
             if response.status_code == 200:
                 data = response.json()
-                
+
                 backend_response = BackendResponse(
                     sender_id="UniversalAPI",
-                    content=data.get('answer', 'Keine Antwort erhalten.'),
-                    sources=data.get('sources', []),
-                    confidence_score=data.get('confidence_score', 0.0),
-                    suggestions=data.get('suggestions', []),
+                    content=data.get("answer", "Keine Antwort erhalten."),
+                    sources=data.get("sources", []),
+                    confidence_score=data.get("confidence_score", 0.0),
+                    suggestions=data.get("suggestions", []),
                     session_id=session_id,
-                    processing_time=data.get('processing_time', 0.0),
-                    quality_metrics=data.get('quality_metrics', {})
+                    processing_time=data.get("processing_time", 0.0),
+                    quality_metrics=data.get("quality_metrics", {}),
                 )
-                
-                self._stats['api_requests'] += 1
+
+                self._stats["api_requests"] += 1
                 self.session_manager.update_session_activity(session_id)
                 logger.info(f"✅ API Response: {len(backend_response.data['content'])} Zeichen")
                 return backend_response
             else:
                 logger.error(f"API Request fehlgeschlagen: {response.status_code}")
                 return None
-                
+
         except Exception as e:
             logger.error(f"API Processing Fehler: {e}")
             return None
-    
+
     def _update_stats(self, start_time: float, backend_type: str, success: bool):
         """Aktualisiert Performance-Statistiken"""
         processing_time = time.time() - start_time
-        
+
         with self._lock:
             if success:
-                self._stats['successful_responses'] += 1
+                self._stats["successful_responses"] += 1
             else:
-                self._stats['failed_responses'] += 1
-            
+                self._stats["failed_responses"] += 1
+
             # Rolling Average für Response Time
-            current_avg = self._stats['avg_response_time']
-            total_responses = self._stats['successful_responses'] + self._stats['failed_responses']
-            self._stats['avg_response_time'] = (current_avg * (total_responses - 1) + processing_time) / total_responses
-    
+            current_avg = self._stats["avg_response_time"]
+            total_responses = self._stats["successful_responses"] + self._stats["failed_responses"]
+            self._stats["avg_response_time"] = (current_avg * (total_responses - 1) + processing_time) / total_responses
+
     def get_stats(self) -> Dict:
         """Gibt Performance-Statistiken zurück"""
         with self._lock:
             return dict(self._stats)
 
+
 # === CORE ENGINE ORCHESTRATOR ===
+
 
 class VeritasCore:
     """
     Hauptklasse für VERITAS Core Engine
-    
+
     Orchestriert alle Kernkomponenten:
     - Thread Management
-    - Session Management  
+    - Session Management
     - Backend Processing
     - Message Routing
     """
-    
+
     def __init__(self):
         self.thread_manager = ThreadManager()
         self.session_manager = SessionManager()
         self.backend_processor = BackendProcessor(self.session_manager)
-        
+
         self._active = True
         self._lock = threading.Lock()
-        
+
         logger.info("✅ VERITAS Core Engine initialisiert")
-    
+
     def set_uds3_strategy(self, strategy):
         """Setzt UDS3 Strategy für Backend Processing"""
         self.backend_processor.set_uds3_strategy(strategy)
-    
+
     def create_session(self, user_id: str, **kwargs) -> Optional[str]:
         """Erstellt neue Session"""
         return self.session_manager.create_session(user_id, **kwargs)
-    
+
     def process_message(self, message: str, session_id: str, **kwargs) -> BackendResponse:
         """Verarbeitet Message über Backend"""
         return self.backend_processor.process_query(message, session_id, **kwargs)
-    
+
     def send_message(self, target_id: str, message: QueueMessage):
         """Sendet Message an Thread"""
         self.thread_manager.send_message(target_id, message)
-    
+
     def broadcast_message(self, message: QueueMessage, exclude: Optional[List[str]] = None):
         """Broadcast Message an alle Threads"""
         self.thread_manager.broadcast_message(message, exclude)
-    
+
     def shutdown(self):
         """Sauberes Herunterfahren aller Komponenten"""
         with self._lock:
             if not self._active:
                 return
-            
+
             self._active = False
-        
+
         logger.info("🔄 VERITAS Core Shutdown gestartet...")
-        
+
         # Thread Manager shutdown
         self.thread_manager.shutdown_all()
-        
+
         # Sessions cleanup
         for session_id in list(self.session_manager._sessions.keys()):
             self.session_manager.destroy_session(session_id)
-        
+
         logger.info("✅ VERITAS Core Shutdown abgeschlossen")
-    
+
     def get_health_status(self) -> Dict:
         """Gibt umfassenden Health Status zurück"""
         return {
-            'core_active': self._active,
-            'thread_manager': self.thread_manager.get_stats(),
-            'session_manager': {
-                'active_sessions': self.session_manager._health_stats['active_sessions'],
-                'total_sessions': self.session_manager._health_stats['total_sessions']
+            "core_active": self._active,
+            "thread_manager": self.thread_manager.get_stats(),
+            "session_manager": {
+                "active_sessions": self.session_manager._health_stats["active_sessions"],
+                "total_sessions": self.session_manager._health_stats["total_sessions"],
             },
-            'backend_processor': self.backend_processor.get_stats(),
-            'timestamp': datetime.now().isoformat()
+            "backend_processor": self.backend_processor.get_stats(),
+            "timestamp": datetime.now().isoformat(),
         }
 
+
 # === FACTORY & UTILITY FUNCTIONS ===
+
 
 def create_veritas_core() -> VeritasCore:
     """Factory Function für VERITAS Core"""
     return VeritasCore()
 
+
 def create_chat_message(sender_id: str, role: str, content: str, **kwargs) -> ChatMessage:
     """Factory Function für Chat Messages"""
     return ChatMessage(sender_id, role, content, **kwargs)
 
+
 def create_status_message(sender_id: str, status: str, details: Optional[Dict] = None) -> StatusMessage:
     """Factory Function für Status Messages"""
     return StatusMessage(sender_id, status, details)
+
 
 def validate_message_type(msg_type: str) -> bool:
     """Validiert Message Type"""
@@ -714,50 +714,51 @@ def validate_message_type(msg_type: str) -> bool:
     except ValueError:
         return False
 
+
 # === MODULE EXPORTS ===
 
 __all__ = [
-    'VeritasCore',
-    'ThreadManager', 
-    'SessionManager',
-    'BackendProcessor',
-    'MessageType',
-    'QueueMessage', 
-    'ChatMessage',
-    'StatusMessage',
-    'BackendResponse',
-    'create_veritas_core',
-    'create_chat_message',
-    'create_status_message',
-    'validate_message_type'
+    "VeritasCore",
+    "ThreadManager",
+    "SessionManager",
+    "BackendProcessor",
+    "MessageType",
+    "QueueMessage",
+    "ChatMessage",
+    "StatusMessage",
+    "BackendResponse",
+    "create_veritas_core",
+    "create_chat_message",
+    "create_status_message",
+    "validate_message_type",
 ]
 
 if __name__ == "__main__":
     # Test/Demo Modus
     print("🚀 VERITAS Core Engine - Standalone Test")
-    
+
     core = create_veritas_core()
     print("✅ Core Engine erstellt")
-    
+
     # Health Check
     health = core.get_health_status()
     print(f"📊 Health Status: {health}")
-    
+
     # Session Test
     session_id = core.create_session("test_user")
     if session_id:
         print(f"✅ Test Session erstellt: {session_id}")
-        
+
         # Message Test
         response = core.process_message("Test Message", session_id)
         print(f"📨 Response: {response.data['content'][:100]}...")
-    
+
     core.shutdown()
     print("🏁 Test abgeschlossen")
 
 """
 VERITAS Protected Module
-WARNING: This file contains embedded protection keys. 
+WARNING: This file contains embedded protection keys.
 Modification will be detected and may result in license violations.
 """
 

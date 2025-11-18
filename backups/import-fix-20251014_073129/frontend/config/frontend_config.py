@@ -68,17 +68,43 @@ MAX_FILES_PER_UPLOAD = int(os.getenv("VERITAS_MAX_FILES_PER_UPLOAD", "10"))
 
 SUPPORTED_FILE_TYPES = [
     # Dokumente
-    ".pdf", ".docx", ".doc", ".txt", ".rtf", ".odt",
+    ".pdf",
+    ".docx",
+    ".doc",
+    ".txt",
+    ".rtf",
+    ".odt",
     # Tabellen
-    ".xlsx", ".xls", ".csv", ".ods",
+    ".xlsx",
+    ".xls",
+    ".csv",
+    ".ods",
     # Präsentationen
-    ".pptx", ".ppt", ".odp",
+    ".pptx",
+    ".ppt",
+    ".odp",
     # Bilder
-    ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".svg",
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".gif",
+    ".bmp",
+    ".svg",
     # Code
-    ".py", ".js", ".html", ".css", ".json", ".xml", ".yaml", ".yml",
+    ".py",
+    ".js",
+    ".html",
+    ".css",
+    ".json",
+    ".xml",
+    ".yaml",
+    ".yml",
     # Andere
-    ".md", ".log", ".ini", ".cfg", ".conf",
+    ".md",
+    ".log",
+    ".ini",
+    ".cfg",
+    ".conf",
 ]
 
 # ============================================================================
@@ -86,12 +112,12 @@ SUPPORTED_FILE_TYPES = [
 # ============================================================================
 
 FEEDBACK_CATEGORIES = [
-    "relevanz",       # Antwort-Relevanz
-    "vollständigkeit", # Vollständigkeit der Antwort
-    "genauigkeit",    # Faktische Genauigkeit
-    "verständlichkeit", # Verständlichkeit
-    "quellen",        # Quellenqualität
-    "sonstiges",      # Andere Kategorien
+    "relevanz",  # Antwort-Relevanz
+    "vollständigkeit",  # Vollständigkeit der Antwort
+    "genauigkeit",  # Faktische Genauigkeit
+    "verständlichkeit",  # Verständlichkeit
+    "quellen",  # Quellenqualität
+    "sonstiges",  # Andere Kategorien
 ]
 
 # ============================================================================
@@ -120,17 +146,21 @@ MOCK_BACKEND = os.getenv("VERITAS_MOCK_BACKEND", "false").lower() == "true"
 # Helper Functions
 # ============================================================================
 
+
 def get_backend_url() -> str:
     """Gibt die aktuelle Backend-URL zurück"""
     return BACKEND_URL
+
 
 def get_api_endpoint(name: str) -> Optional[str]:
     """Gibt einen API-Endpoint zurück"""
     return API_ENDPOINTS.get(name)
 
+
 def is_file_type_supported(filename: str) -> bool:
     """Prüft ob Dateityp unterstützt wird"""
     return any(filename.lower().endswith(ext) for ext in SUPPORTED_FILE_TYPES)
+
 
 def get_theme_color(key: str, default: str = "#ffffff") -> str:
     """Gibt eine Theme-Farbe zurück"""
@@ -141,25 +171,26 @@ def get_theme_color(key: str, default: str = "#ffffff") -> str:
 # Configuration Validation
 # ============================================================================
 
+
 def validate_config():
     """Validiert die Konfiguration"""
     errors = []
-    
+
     # Backend-URL prüfen
     if not BACKEND_URL.startswith(("http://", "https://")):
         errors.append(f"Invalid BACKEND_URL: {BACKEND_URL}")
-    
+
     # Port prüfen
     if not (1 <= BACKEND_PORT <= 65535):
         errors.append(f"Invalid BACKEND_PORT: {BACKEND_PORT}")
-    
+
     # Timeout prüfen
     if REQUEST_TIMEOUT <= 0:
         errors.append(f"Invalid REQUEST_TIMEOUT: {REQUEST_TIMEOUT}")
-    
+
     if errors:
         raise ValueError(f"Configuration errors: {', '.join(errors)}")
-    
+
     return True
 
 
@@ -170,6 +201,7 @@ validate_config()
 # ============================================================================
 # Export Configuration Summary
 # ============================================================================
+
 
 def print_config_summary():
     """Druckt eine Konfigurations-Übersicht"""

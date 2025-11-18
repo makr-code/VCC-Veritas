@@ -1,7 +1,7 @@
 # PostgreSQL & CouchDB Integration Guide
 
-**Status:** ✅ Backends Active, ⏭️ Search API Pending  
-**Version:** 1.0.0  
+**Status:** ✅ Backends Active, ⏭️ Search API Pending
+**Version:** 1.0.0
 **Datum:** 11.10.2025
 
 ---
@@ -75,15 +75,15 @@ backend.execute_sql(query, params)  # ← Missing!
 
 ### Current Limitations
 
-**Problem:** Kein `execute_sql()` API  
-**Impact:** Keyword Search nicht möglich  
+**Problem:** Kein `execute_sql()` API
+**Impact:** Keyword Search nicht möglich
 **Workaround:** Neo4j `CONTAINS` für Text-Suche
 
 **Example (nicht möglich):**
 ```python
 # ❌ Would be nice, but NOT available
 results = backend.execute_sql("""
-    SELECT * FROM documents 
+    SELECT * FROM documents
     WHERE content @@ to_tsquery('german', 'Photovoltaik')
     LIMIT 10
 """)
@@ -108,11 +108,11 @@ async def keyword_search(self, query_text, top_k, filters):
     if not hasattr(backend, 'execute_sql'):
         logger.warning("PostgreSQL execute_sql() not available")
         return []
-    
+
     # Full-text search
     sql = """
         SELECT document_id, content, metadata,
-               ts_rank(to_tsvector('german', content), 
+               ts_rank(to_tsvector('german', content),
                        to_tsquery('german', %s)) AS score
         FROM documents
         WHERE to_tsvector('german', content) @@ to_tsquery('german', %s)
@@ -150,7 +150,7 @@ def direct_postgres_search(query_text, top_k=10):
         database='vcc_relational_prod'
     )
     cursor = conn.cursor()
-    
+
     # Direct SQL
     cursor.execute("""
         SELECT document_id, content, metadata
@@ -158,7 +158,7 @@ def direct_postgres_search(query_text, top_k=10):
         WHERE content @@ to_tsquery('german', %s)
         LIMIT %s
     """, (query_text, top_k))
-    
+
     results = cursor.fetchall()
     cursor.close()
     conn.close()
@@ -536,6 +536,6 @@ couchdb.create_document('lbo_bw_58', doc)
 
 ---
 
-**Last Updated:** 11.10.2025  
-**Version:** 1.0.0  
+**Last Updated:** 11.10.2025
+**Version:** 1.0.0
 **Status:** ✅ Neo4j Production-Ready, ⏭️ PostgreSQL/ChromaDB Pending

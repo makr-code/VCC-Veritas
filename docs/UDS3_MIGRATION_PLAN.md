@@ -42,7 +42,7 @@ test_frontend_backend_uds3.py                         ✅ 2 Imports
 ---
 
 ## 📋 Ursprünglicher Migrationsplan
-**Aktuell:** `C:\VCC\Veritas\uds3\` (eingebettet in VERITAS)  
+**Aktuell:** `C:\VCC\Veritas\uds3\` (eingebettet in VERITAS)
 **Ziel:** `C:\VCC\uds3\` (eigenständige Library)
 
 **Vorteile:**
@@ -62,7 +62,7 @@ test_frontend_backend_uds3.py                         ✅ 2 Imports
 backend/agents/veritas_intelligent_pipeline.py          ⚠️  KRITISCH
   └─ Line 66: from uds3.uds3_core import UnifiedDatabaseStrategy, get_optimized_unified_strategy
 
-backend/agents/veritas_api_agent_orchestrator.py        ⚠️  KRITISCH  
+backend/agents/veritas_api_agent_orchestrator.py        ⚠️  KRITISCH
   └─ Line 56: from uds3.uds3_core import OptimizedUnifiedDatabaseStrategy
 
 backend/agents/veritas_api_agent_core_components.py     ⚠️  KRITISCH
@@ -305,7 +305,7 @@ from uds3.uds3_core import OptimizedUnifiedDatabaseStrategy
    # Line 52: ÄNDERN
    # from uds3_security_quality import SecurityLevel, QualityMetric
    from uds3.uds3_security_quality import SecurityLevel, QualityMetric
-   
+
    # Line 56: ÄNDERN
    # from uds3_core import SecurityLevel
    from uds3.uds3_core import SecurityLevel
@@ -318,7 +318,7 @@ from uds3.uds3_core import OptimizedUnifiedDatabaseStrategy
    # from uds3_document_classifier import classify_document_by_content
    from uds3.uds3_admin_types import AdminDocumentType, AdminLevel, AdminDomain
    from uds3.uds3_document_classifier import classify_document_by_content
-   
+
    # Line 88: ÄNDERN
    # from uds3_process_mining import ProcessComplexityAnalyzer, ProcessWorkflowExtractor
    from uds3.uds3_process_mining import ProcessComplexityAnalyzer, ProcessWorkflowExtractor
@@ -345,7 +345,7 @@ from uds3.uds3_core import OptimizedUnifiedDatabaseStrategy
    # from uds3_security_quality import SecurityLevel
    from uds3.uds3_core import UnifiedDatabaseStrategy, get_optimized_unified_strategy
    from uds3.uds3_security_quality import SecurityLevel
-   
+
    # Line 37: ÄNDERN
    # from uds3 import create_secure_document_light
    from uds3 import create_secure_document_light  # ✅ Bereits korrekt
@@ -468,10 +468,10 @@ def migrate_imports(file_path: Path):
     """Migriere Imports in einer Datei"""
     content = file_path.read_text(encoding='utf-8')
     original_content = content
-    
+
     for pattern, replacement in PATTERNS:
         content = re.sub(pattern, replacement, content, flags=re.MULTILINE)
-    
+
     if content != original_content:
         file_path.write_text(content, encoding='utf-8')
         print(f"✅ {file_path}: Imports aktualisiert")
@@ -483,7 +483,7 @@ def migrate_imports(file_path: Path):
 if __name__ == "__main__":
     project_root = Path(__file__).parent.parent
     updated_count = 0
-    
+
     for file_rel in FILES_TO_UPDATE:
         file_path = project_root / file_rel
         if file_path.exists():
@@ -491,7 +491,7 @@ if __name__ == "__main__":
                 updated_count += 1
         else:
             print(f"⚠️  {file_path}: Datei nicht gefunden")
-    
+
     print(f"\n📊 {updated_count} von {len(FILES_TO_UPDATE)} Dateien aktualisiert")
 ```
 
@@ -539,15 +539,15 @@ if __name__ == "__main__":
 ## ⚠️ Risiken & Mitigationen
 
 ### Risiko 1: Circular Imports
-**Problem:** UDS3 importiert VERITAS-Module  
+**Problem:** UDS3 importiert VERITAS-Module
 **Mitigation:** UDS3 muss komplett eigenständig sein (keine VERITAS-Imports)
 
 ### Risiko 2: Missing Dependencies
-**Problem:** UDS3 benötigt Packages die nicht in setup.py sind  
+**Problem:** UDS3 benötigt Packages die nicht in setup.py sind
 **Mitigation:** `requirements.txt` aus aktuellem UDS3 extrahieren
 
 ### Risiko 3: Path Issues
-**Problem:** Relative Imports in UDS3 funktionieren nicht mehr  
+**Problem:** Relative Imports in UDS3 funktionieren nicht mehr
 **Mitigation:** Alle UDS3-internen Imports auf `from uds3.X` ändern
 
 ---

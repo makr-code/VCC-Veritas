@@ -84,13 +84,13 @@ from frontend.ui.veritas_ui_drag_drop import DragDropHandler
 class VeritasApp:
     def __init__(self):
         # ... existing code ...
-        
+
         # Setup Chat-Text Widget
         self.chat_text = tk.Text(...)
-        
+
         # ✨ NEW: Setup Drag & Drop
         self._setup_drag_drop()
-    
+
     def _setup_drag_drop(self):
         """Konfiguriert Drag & Drop für Chat-Fenster"""
         self.drag_drop_handler = DragDropHandler(
@@ -99,18 +99,18 @@ class VeritasApp:
             max_file_size=50 * 1024 * 1024,  # 50 MB
             max_files=10
         )
-        
+
         logger.info("✅ Drag & Drop aktiviert")
-    
+
     def _on_files_dropped(self, files: List[Dict]):
         """
         Callback: Files wurden gedroppt
-        
+
         Args:
             files: Liste von Dicts mit {name, size, path, mime_type}
         """
         logger.info(f"📂 {len(files)} Datei(en) gedroppt")
-        
+
         # Option 1: Direkt in Chat anzeigen
         for file in files:
             self.chat_text.insert(
@@ -118,14 +118,14 @@ class VeritasApp:
                 f"📎 {file['name']} ({file['size_mb']:.1f} MB)\n",
                 "attachment"
             )
-        
+
         # Option 2: Zu Attachments-Liste hinzufügen
         if not hasattr(self, 'attachments'):
             self.attachments = []
-        
+
         self.attachments.extend(files)
         self._update_attachment_display()
-        
+
         # Option 3: Automatisch hochladen (optional)
         # self._upload_files(files)
 ```
@@ -144,7 +144,7 @@ def _update_attachment_display(self):
             fg='#666'
         )
         self.attachment_label.pack(side=tk.TOP, fill=tk.X)
-    
+
     # Update Text
     if self.attachments:
         count = len(self.attachments)
@@ -519,7 +519,7 @@ class DragDropHandler:
         max_file_size: int = 50 * 1024 * 1024,
         max_files: int = 10
     )
-    
+
     def reset_uploaded_hashes() -> None
     def get_supported_formats_list() -> List[str]
     def get_supported_formats_string() -> str
@@ -540,6 +540,6 @@ class DragDropHandler:
 
 ---
 
-**Status:** ✅ **Ready for Integration**  
-**License:** MIT  
+**Status:** ✅ **Ready for Integration**
+**License:** MIT
 **Author:** VERITAS Team

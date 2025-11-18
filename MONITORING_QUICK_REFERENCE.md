@@ -1,7 +1,7 @@
 # Phase 1 Monitoring - Quick Command Reference
 
-**Monitoring Period:** 12.10.2025 - 26.10.2025  
-**Deployment:** Phase 1 Conservative (supervisor_enabled=false)  
+**Monitoring Period:** 12.10.2025 - 26.10.2025
+**Deployment:** Phase 1 Conservative (supervisor_enabled=false)
 **Daily Time Required:** 5 minutes
 
 ---
@@ -112,8 +112,8 @@ curl http://localhost:5000/health
 
 ```powershell
 # Find process using port 5000
-Get-NetTCPConnection -LocalPort 5000 -ErrorAction SilentlyContinue | 
-    Select-Object OwningProcess | 
+Get-NetTCPConnection -LocalPort 5000 -ErrorAction SilentlyContinue |
+    Select-Object OwningProcess |
     ForEach-Object {Get-Process -Id $_.OwningProcess}
 
 # Kill process if needed (use with caution!)
@@ -130,7 +130,7 @@ Get-Process python | Format-List ProcessName,CPU,WorkingSet,StartTime
 # If CPU > 90% consistently, investigate
 
 # Check logs for bottlenecks
-Get-Content data\veritas_auto_server.log -Tail 100 | 
+Get-Content data\veritas_auto_server.log -Tail 100 |
     Select-String "slow|timeout|bottleneck"
 ```
 
@@ -148,7 +148,7 @@ Action Items:
 
 ```powershell
 # Check logs for phase failures
-Get-Content data\veritas_auto_server.log -Tail 200 | 
+Get-Content data\veritas_auto_server.log -Tail 200 |
     Select-String "Phase.*failed|Phase.*error"
 
 # Common causes:
@@ -165,7 +165,7 @@ Get-Content data\veritas_auto_server.log -Tail 200 |
 
 ```powershell
 # Aggregate all test results from week
-$results = Get-ChildItem "monitoring_results_*.json" | 
+$results = Get-ChildItem "monitoring_results_*.json" |
     ForEach-Object {Get-Content $_.FullName | ConvertFrom-Json}
 
 # Average execution time (manual calculation)
@@ -269,8 +269,8 @@ function Restart-VeritasBackend {
 
 ## Emergency Contacts
 
-**System Owner:** ___  
-**Technical Contact:** ___  
+**System Owner:** ___
+**Technical Contact:** ___
 **Escalation:** ___
 
 ---
@@ -296,5 +296,5 @@ Phase 2 Ready:   After 2 weeks monitoring
 
 ---
 
-**Last Updated:** 12. Oktober 2025  
+**Last Updated:** 12. Oktober 2025
 **Next Review:** 26. Oktober 2025

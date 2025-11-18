@@ -1,7 +1,7 @@
 # ✅ VERITAS v3.20.0 - Deployment Checklist
 
-**Date:** 12. Oktober 2025, 17:45 Uhr  
-**Version:** v3.20.0 (Chat Persistence)  
+**Date:** 12. Oktober 2025, 17:45 Uhr
+**Version:** v3.20.0 (Chat Persistence)
 **Status:** 🟢 READY FOR DEPLOYMENT
 
 ---

@@ -2,19 +2,19 @@
 <#
 .SYNOPSIS
     VERITAS Backend v4.0.0 Management Script
-    
+
 .DESCRIPTION
     Verwaltet das VERITAS Unified Backend v4.0.0 (Start, Stop, Restart, Status, Test)
-    
+
 .PARAMETER Action
     Aktion: start, stop, restart, status, test, info
-    
+
 .PARAMETER Wait
     Wartezeit in Sekunden nach dem Start (Standard: 5)
-    
+
 .PARAMETER Debug
     Startet Backend mit Debug-Logging
-    
+
 .EXAMPLE
     .\manage_backend_v4.ps1 -Action start
     .\manage_backend_v4.ps1 -Action stop
@@ -29,10 +29,10 @@ param(
     [Parameter(Mandatory=$true)]
     [ValidateSet("start", "stop", "restart", "status", "test", "info")]
     [string]$Action,
-    
+
     [Parameter(Mandatory=$false)]
     [int]$Wait = 5,
-    
+
     [Parameter(Mandatory=$false)]
     [switch]$DebugMode
 )
@@ -100,7 +100,7 @@ function Get-BackendProcess {
     .SYNOPSIS
         Findet den Backend v4.0.0 Prozess
     #>
-    
+
     # Versuche PID aus File zu lesen
     if (Test-Path $PID_FILE) {
         $processPid = Get-Content $PID_FILE -ErrorAction SilentlyContinue
@@ -111,7 +111,7 @@ function Get-BackendProcess {
             }
         }
     }
-    
+
     # Fallback: Suche nach Python-Prozess mit uvicorn + backend.backend
     $processes = Get-Process -Name python -ErrorAction SilentlyContinue
     foreach ($proc in $processes) {
@@ -124,7 +124,7 @@ function Get-BackendProcess {
             # CIM-Zugriff fehlgeschlagen, weiter
         }
     }
-    
+
     return $null
 }
 
@@ -133,31 +133,31 @@ function Stop-Backend {
     .SYNOPSIS
         Stoppt das Backend v4.0.0
     #>
-    
+
     Write-Header "VERITAS Backend v4.0.0 Stoppen"
-    
+
     $process = Get-BackendProcess
-    
+
     if ($null -eq $process) {
         Write-Warning-Custom "Backend läuft nicht"
-        
+
         # Cleanup PID-File
         if (Test-Path $PID_FILE) {
             Remove-Item $PID_FILE -Force
             Write-Info "PID-Datei gelöscht"
         }
-        
+
         return $false
     }
-    
+
     Write-Info "Backend-Prozess gefunden (PID: $($process.Id))"
     Write-Step "Stoppe Backend v4.0.0..."
-    
+
     try {
         # Versuche graceful shutdown
         $process | Stop-Process -Force
         Start-Sleep -Seconds 2
-        
+
         # Prüfe ob beendet
         $stillRunning = Get-Process -Id $process.Id -ErrorAction SilentlyContinue
         if ($stillRunning) {
@@ -165,14 +165,14 @@ function Stop-Backend {
             $stillRunning | Stop-Process -Force
             Start-Sleep -Seconds 1
         }
-        
+
         Write-Success "Backend v4.0.0 gestoppt"
-        
+
         # Cleanup PID-File
         if (Test-Path $PID_FILE) {
             Remove-Item $PID_FILE -Force
         }
-        
+
         return $true
     }
     catch {
@@ -186,50 +186,50 @@ function Start-Backend {
     .SYNOPSIS
         Startet das Backend v4.0.0
     #>
-    
+
     Write-Header "VERITAS Backend v4.0.0 Starten"
-    
+
     # Prüfe ob bereits läuft
     $process = Get-BackendProcess
     if ($null -ne $process) {
         Write-Warning-Custom "Backend läuft bereits (PID: $($process.Id))"
         return $false
     }
-    
+
     Write-Info "Starte Backend v4.0.0 (Unified Architecture)..."
     Write-Info "Module: $BACKEND_MODULE"
     Write-Info "API Base: $API_BASE"
     Write-Info "Log: $LOG_FILE"
     Write-Host ""
-    
+
     try {
         # Erstelle Verzeichnisse falls nicht vorhanden
         $logsDir = Split-Path -Parent $LOG_FILE
         if (-not (Test-Path $logsDir)) {
             New-Item -ItemType Directory -Path $logsDir -Force | Out-Null
         }
-        
+
         $pidDir = Split-Path -Parent $PID_FILE
         if (-not (Test-Path $pidDir)) {
             New-Item -ItemType Directory -Path $pidDir -Force | Out-Null
         }
-        
+
         # Log-Rotation
         if (Test-Path $LOG_FILE) {
             $backupLog = "$LOG_FILE.old"
             Move-Item -Path $LOG_FILE -Destination $backupLog -Force -ErrorAction SilentlyContinue
         }
-        
+
         # Wechsle ins Projektverzeichnis
         Push-Location $PROJECT_ROOT
-        
+
         # Baue Uvicorn-Befehl
         $logLevel = if ($DebugMode) { "debug" } else { "info" }
         $uvicornCmd = "-m uvicorn $BACKEND_MODULE --host 0.0.0.0 --port 5000 --log-level $logLevel"
-        
+
         Write-Step "Starte Uvicorn..."
         Write-Host "  Command: python $uvicornCmd" -ForegroundColor Gray
-        
+
         # Starte Backend-Prozess
         $processInfo = New-Object System.Diagnostics.ProcessStartInfo
         $processInfo.FileName = "python"
@@ -239,62 +239,62 @@ function Start-Backend {
         $processInfo.RedirectStandardOutput = $true
         $processInfo.RedirectStandardError = $true
         $processInfo.WorkingDirectory = $PROJECT_ROOT
-        
+
         $process = New-Object System.Diagnostics.Process
         $process.StartInfo = $processInfo
-        
+
         # Event Handler für Output
         $outHandler = {
             if (-not [string]::IsNullOrEmpty($EventArgs.Data)) {
                 Add-Content -Path $using:LOG_FILE -Value $EventArgs.Data
             }
         }
-        
+
         $errHandler = {
             if (-not [string]::IsNullOrEmpty($EventArgs.Data)) {
                 $errLine = "[ERROR] $($EventArgs.Data)"
                 Add-Content -Path $using:LOG_FILE -Value $errLine
             }
         }
-        
+
         Register-ObjectEvent -InputObject $process -EventName OutputDataReceived -Action $outHandler | Out-Null
         Register-ObjectEvent -InputObject $process -EventName ErrorDataReceived -Action $errHandler | Out-Null
-        
+
         # Starte Prozess
         $started = $process.Start()
         if (-not $started) {
             throw "Prozess konnte nicht gestartet werden"
         }
-        
+
         $process.BeginOutputReadLine()
         $process.BeginErrorReadLine()
-        
+
         # Speichere PID
         $process.Id | Out-File -FilePath $PID_FILE -Encoding ascii -Force
-        
+
         Pop-Location
-        
+
         Write-Success "Backend v4.0.0 gestartet (PID: $($process.Id))"
         Write-Info "PID-Datei: $PID_FILE"
         Write-Info "Log-Datei: $LOG_FILE"
-        
+
         # Warte auf Start
         Write-Step "Warte $Wait Sekunden auf Initialisierung..."
         Start-Sleep -Seconds $Wait
-        
+
         # Health Check
         Write-Step "Führe Health Check durch..."
         $maxRetries = 10
         $healthy = $false
-        
+
         for ($i = 0; $i -lt $maxRetries; $i++) {
             try {
                 $response = Invoke-RestMethod -Uri $ENDPOINTS.health -TimeoutSec 2 -ErrorAction Stop
-                
+
                 if ($response.status -eq "healthy") {
                     $healthy = $true
                     Write-Success "Backend v4.0.0 ist healthy!"
-                    
+
                     # Zeige Components
                     if ($response.components) {
                         Write-Host "  Components:" -ForegroundColor Gray
@@ -304,7 +304,7 @@ function Start-Backend {
                             Write-Host "    $status $($comp.Name)" -ForegroundColor $color
                         }
                     }
-                    
+
                     break
                 }
             }
@@ -317,7 +317,7 @@ function Start-Backend {
                 }
             }
         }
-        
+
         return $healthy
     }
     catch {
@@ -332,17 +332,17 @@ function Get-BackendStatus {
     .SYNOPSIS
         Zeigt Backend v4.0.0 Status
     #>
-    
+
     Write-Header "VERITAS Backend v4.0.0 Status"
-    
+
     # Prozess-Status
     $process = Get-BackendProcess
-    
+
     if ($null -eq $process) {
         Write-Error-Custom "Backend läuft nicht"
         return $false
     }
-    
+
     Write-Success "Backend v4.0.0 läuft"
     Write-Host ""
     Write-Host "Prozess-Info:" -ForegroundColor Cyan
@@ -352,20 +352,20 @@ function Get-BackendStatus {
     Write-Host "  • Memory:    $([math]::Round($process.WorkingSet64 / 1MB, 2)) MB" -ForegroundColor White
     Write-Host "  • Threads:   $($process.Threads.Count)" -ForegroundColor White
     Write-Host "  • Start:     $($process.StartTime)" -ForegroundColor White
-    
+
     # API-Status
     Write-Host ""
     Write-Host "API-Status:" -ForegroundColor Cyan
-    
+
     try {
         $health = Invoke-RestMethod -Uri $ENDPOINTS.health -TimeoutSec 2
-        
+
         if ($health.status -eq "healthy") {
             Write-Success "Health: $($health.status)"
         } else {
             Write-Warning-Custom "Health: $($health.status)"
         }
-        
+
         if ($health.components) {
             Write-Host "  Components:" -ForegroundColor White
             foreach ($comp in $health.components.PSObject.Properties) {
@@ -373,7 +373,7 @@ function Get-BackendStatus {
                 Write-Host "    $status $($comp.Name): $($comp.Value)" -ForegroundColor Gray
             }
         }
-        
+
         if ($health.version) {
             Write-Host "  Version: $($health.version)" -ForegroundColor White
         }
@@ -381,7 +381,7 @@ function Get-BackendStatus {
     catch {
         Write-Error-Custom "Health Check fehlgeschlagen: $_"
     }
-    
+
     # Endpoints
     Write-Host ""
     Write-Host "Verfügbare Endpoints:" -ForegroundColor Cyan
@@ -391,7 +391,7 @@ function Get-BackendStatus {
     Write-Host "  • Modes:         $($ENDPOINTS.modes)" -ForegroundColor Gray
     Write-Host "  • Query:         $($ENDPOINTS.query)" -ForegroundColor Gray
     Write-Host "  • Docs:          $($ENDPOINTS.docs)" -ForegroundColor Gray
-    
+
     return $true
 }
 
@@ -400,19 +400,19 @@ function Test-Backend {
     .SYNOPSIS
         Testet Backend v4.0.0 mit Beispiel-Queries
     #>
-    
+
     Write-Header "VERITAS Backend v4.0.0 Test"
-    
+
     # Prüfe ob läuft
     $process = Get-BackendProcess
     if ($null -eq $process) {
         Write-Error-Custom "Backend läuft nicht. Starte zuerst mit: -Action start"
         return $false
     }
-    
+
     Write-Success "Backend läuft (PID: $($process.Id))"
     Write-Host ""
-    
+
     # Test 1: Health
     Write-Step "Test 1: Health Check"
     try {
@@ -422,7 +422,7 @@ function Test-Backend {
         Write-Error-Custom "Health Check fehlgeschlagen: $_"
         return $false
     }
-    
+
     # Test 2: System Info
     Write-Step "Test 2: System Info"
     try {
@@ -432,7 +432,7 @@ function Test-Backend {
     } catch {
         Write-Error-Custom "System Info fehlgeschlagen: $_"
     }
-    
+
     # Test 3: Capabilities
     Write-Step "Test 3: Capabilities"
     try {
@@ -444,7 +444,7 @@ function Test-Backend {
     } catch {
         Write-Error-Custom "Capabilities fehlgeschlagen: $_"
     }
-    
+
     # Test 4: Modes
     Write-Step "Test 4: Query Modes"
     try {
@@ -456,7 +456,7 @@ function Test-Backend {
     } catch {
         Write-Error-Custom "Modes fehlgeschlagen: $_"
     }
-    
+
     # Test 5: Simple Query
     Write-Step "Test 5: Simple Query (Mock)"
     try {
@@ -465,13 +465,13 @@ function Test-Backend {
             mode = "ask"
             model = "llama3.1"
         } | ConvertTo-Json
-        
+
         $headers = @{
             "Content-Type" = "application/json"
         }
-        
+
         $response = Invoke-RestMethod -Uri $ENDPOINTS.query -Method Post -Body $body -Headers $headers -TimeoutSec 10
-        
+
         if ($response.content) {
             Write-Success "Query erfolgreich"
             Write-Host "  Content: $($response.content.Substring(0, [Math]::Min(100, $response.content.Length)))..." -ForegroundColor Gray
@@ -482,10 +482,10 @@ function Test-Backend {
     } catch {
         Write-Warning-Custom "Query fehlgeschlagen (erwartet wenn UDS3 nicht verfügbar): $_"
     }
-    
+
     Write-Host ""
     Write-Success "Tests abgeschlossen!"
-    
+
     return $true
 }
 
@@ -494,17 +494,17 @@ function Get-BackendInfo {
     .SYNOPSIS
         Zeigt detaillierte Backend-Informationen
     #>
-    
+
     Write-Header "VERITAS Backend v4.0.0 Informationen"
-    
+
     try {
         $info = Invoke-RestMethod -Uri $ENDPOINTS.info -TimeoutSec 5
-        
+
         Write-Host "System:" -ForegroundColor Cyan
         Write-Host "  • Version:      $($info.version)" -ForegroundColor White
         Write-Host "  • Architecture: $($info.architecture)" -ForegroundColor White
         Write-Host "  • Description:  $($info.description)" -ForegroundColor White
-        
+
         if ($info.components) {
             Write-Host ""
             Write-Host "Components:" -ForegroundColor Cyan
@@ -512,7 +512,7 @@ function Get-BackendInfo {
                 Write-Host "  • $($comp.Name): $($comp.Value)" -ForegroundColor White
             }
         }
-        
+
         if ($info.features) {
             Write-Host ""
             Write-Host "Features:" -ForegroundColor Cyan
@@ -520,7 +520,7 @@ function Get-BackendInfo {
                 Write-Host "  • $feature" -ForegroundColor White
             }
         }
-        
+
         # Capabilities
         $caps = Invoke-RestMethod -Uri $ENDPOINTS.capabilities -TimeoutSec 5
         Write-Host ""
@@ -529,12 +529,12 @@ function Get-BackendInfo {
         Write-Host "  • Agent Types:   $($caps.agent_types.Count)" -ForegroundColor White
         Write-Host "  • Vector DBs:    $($caps.vector_databases -join ', ')" -ForegroundColor White
         Write-Host "  • Embeddings:    $($caps.embedding_models -join ', ')" -ForegroundColor White
-        
+
     } catch {
         Write-Error-Custom "Info konnte nicht abgerufen werden: $_"
         return $false
     }
-    
+
     return $true
 }
 
@@ -546,29 +546,29 @@ switch ($Action.ToLower()) {
     "start" {
         Start-Backend
     }
-    
+
     "stop" {
         Stop-Backend
     }
-    
+
     "restart" {
         Write-Header "VERITAS Backend v4.0.0 Restart"
-        
+
         $stopped = Stop-Backend
         if ($stopped -or -not (Get-BackendProcess)) {
             Start-Sleep -Seconds 2
             Start-Backend
         }
     }
-    
+
     "status" {
         Get-BackendStatus
     }
-    
+
     "test" {
         Test-Backend
     }
-    
+
     "info" {
         Get-BackendInfo
     }

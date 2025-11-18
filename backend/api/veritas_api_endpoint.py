@@ -759,7 +759,7 @@ async def rag_ask(request: RAGRequest):
             }
         else:
             # Covina Module Query - async wrapper with correct parameter mapping
-            query_params = {
+            query_params: Dict[str, Any] = {
                 "session_id": session_id,
                 "query": request.query,
                 "user_profile": request.user_profile or {"user_id": session_id, "experience_years": 5},  # Use provided or default user profile
@@ -1778,6 +1778,7 @@ async def universal_query_v2(request: dict):
                 # Verwende echtes Covina Module falls verfügbar
                 if COVINA_AVAILABLE:
                     # Covina-Parameter vorbereiten
+<<<<<<< Updated upstream
                     query_params = {
                         'session_id': session_id,
                         'query': question,
@@ -1785,6 +1786,15 @@ async def universal_query_v2(request: dict):
                         'model_name': model,
                         'temperature': getattr(request, 'temperature', None) or request.get('temperature', 0.7),
                         'attachments': None
+=======
+                    query_params: Dict[str, Any] = {
+                        "session_id": session_id,
+                        "query": question,
+                        "user_profile": {"user_id": session_id, "experience_years": 3},
+                        "model_name": model,
+                        "temperature": getattr(request, "temperature", None) or request.get("temperature", 0.7),
+                        "attachments": None,
+>>>>>>> Stashed changes
                     }
                     
                     logger.info(f"🔄 Starte Covina-Anfrage mit Parameters: {query_params}")
