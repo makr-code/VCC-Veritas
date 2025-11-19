@@ -1,11 +1,20 @@
 """
 VQB Frontend - Main Application
 
-Visual Query Builder for VCC-Veritas
+Visual Query Builder for VCC-Veritas with complete OOP-based UI structure.
+
+Layout:
+- MenuBar (top)
+- Toolbar (below menubar)
+- Left Sidebar with tabs (Filter, Search, Navigation)
+- Content Area with tabs (Timeline, Processes)
+- Right Sidebar with tabs (Details, Properties, AI Suggestions)
+- AI Chat Panel (bottom)
+- StatusBar (bottom)
 """
 
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk
 import logging
 import sys
 
@@ -14,6 +23,16 @@ from vqb_frontend.config.color_scheme import ColorScheme
 from vqb_frontend.models.process_model import ProcessModel
 from vqb_frontend.models.document_model import DocumentModel
 from vqb_frontend.services.async_worker import get_async_worker
+from vqb_frontend.controller import VQBController
+
+# UI Components
+from vqb_frontend.ui.vqb_menubar import VQBMenuBar
+from vqb_frontend.ui.vqb_toolbar import VQBToolbar
+from vqb_frontend.ui.vqb_statusbar import VQBStatusBar
+from vqb_frontend.ui.vqb_left_sidebar import VQBLeftSidebar
+from vqb_frontend.ui.vqb_right_sidebar import VQBRightSidebar
+from vqb_frontend.ui.vqb_content_area import VQBContentArea
+from vqb_frontend.ui.vqb_ai_chat import VQBAIChatPanel
 
 # Configure logging
 logging.basicConfig(
@@ -32,8 +51,12 @@ class VQBApplication(tk.Tk):
     """
     Main VQB Application Window
     
-    This is a minimal implementation demonstrating the architecture.
-    Full implementation will include Timeline, Graph, and Filter panels.
+    Complete OOP-based UI structure following VPB CI pattern:
+    - MenuBar, Toolbar, StatusBar
+    - Left Sidebar (tabs: Filter, Search, Navigation)
+    - Content Area (tabs: Timeline, Processes)  
+    - Right Sidebar (tabs: Details, Properties, AI Suggestions)
+    - AI Chat Panel (bottom)
     """
     
     def __init__(self):
@@ -43,7 +66,7 @@ class VQBApplication(tk.Tk):
         logger.info(f"Starting {config.APP_NAME} v{config.APP_VERSION}")
         
         # Window configuration
-        self.title(config.APP_NAME)
+        self.title(f"{config.APP_NAME} v{config.APP_VERSION}")
         self.geometry(f"{config.WINDOW_WIDTH}x{config.WINDOW_HEIGHT}")
         self.minsize(config.WINDOW_MIN_WIDTH, config.WINDOW_MIN_HEIGHT)
         
@@ -57,9 +80,14 @@ class VQBApplication(tk.Tk):
         # Initialize async worker
         self.async_worker = get_async_worker(num_threads=config.ASYNC_WORKER_THREADS)
         
-        # Create UI
-        self._create_menu()
+        # Initialize controller
+        self.controller = VQBController(self)
+        
+        # Create UI components (OOP-based)
         self._create_ui()
+        
+        # Setup keyboard shortcuts
+        self._setup_keyboard_shortcuts()
         
         # Start async result processing
         self._process_async_results()
@@ -80,79 +108,78 @@ class VQBApplication(tk.Tk):
                        foreground=ColorScheme.TEXT_PRIMARY)
         style.configure('TButton', background=ColorScheme.PRIMARY_BLUE,
                        foreground='white')
-    
-    def _create_menu(self):
-        """Create menu bar"""
-        menubar = tk.Menu(self)
-        self.config(menu=menubar)
-        
-        # File menu
-        file_menu = tk.Menu(menubar, tearoff=0)
-        menubar.add_cascade(label="File", menu=file_menu)
-        file_menu.add_command(label="Load Processes...", command=self._on_load_processes)
-        file_menu.add_command(label="Load Documents...", command=self._on_load_documents)
-        file_menu.add_separator()
-        file_menu.add_command(label="Exit", command=self._on_closing)
-        
-        # View menu
-        view_menu = tk.Menu(menubar, tearoff=0)
-        menubar.add_cascade(label="View", menu=view_menu)
-        view_menu.add_command(label="Timeline", command=lambda: self._show_view("timeline"))
-        view_menu.add_command(label="Graph", command=lambda: self._show_view("graph"))
-        view_menu.add_command(label="Documents", command=lambda: self._show_view("documents"))
-        
-        # Help menu
-        help_menu = tk.Menu(menubar, tearoff=0)
-        menubar.add_cascade(label="Help", menu=help_menu)
-        help_menu.add_command(label="About", command=self._show_about)
+        style.configure('TNotebook', background=ColorScheme.BACKGROUND)
     
     def _create_ui(self):
-        """Create main UI layout"""
-        # Configure grid
-        self.grid_rowconfigure(1, weight=1)
-        self.grid_columnconfigure(1, weight=1)
+        """Create main UI layout with all OOP components"""
+        # 1. Menu Bar (top)
+        self.menubar = VQBMenuBar(self, self.controller)
+        self.controller.menubar = self.menubar
         
-        # Status bar (top)
-        self.status_frame = ttk.Frame(self)
-        self.status_frame.grid(row=0, column=0, columnspan=2, sticky="ew", padx=5, pady=5)
+        # 2. Toolbar (below menubar)
+        toolbar_container = ttk.Frame(self)
+        toolbar_container.pack(side=tk.TOP, fill=tk.X)
+        self.toolbar = VQBToolbar(toolbar_container, self.controller)
+        self.controller.toolbar = self.toolbar
         
-        self.status_label = ttk.Label(self.status_frame, 
-                                     text="Welcome to VQB - Visual Query Builder")
-        self.status_label.pack(side=tk.LEFT, padx=5)
+        # 3. Main container for sidebars and content
+        main_container = ttk.Frame(self)
+        main_container.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
         
-        # Info labels
-        self.info_frame = ttk.Frame(self.status_frame)
-        self.info_frame.pack(side=tk.RIGHT, padx=5)
+        # 4. Left Sidebar (left side)
+        self.left_sidebar = VQBLeftSidebar(main_container, self.controller)
+        self.controller.left_sidebar = self.left_sidebar
         
-        self.process_count_label = ttk.Label(self.info_frame, text="Processes: 0")
-        self.process_count_label.pack(side=tk.LEFT, padx=5)
+        # 5. Content Area (center) with tabs: Timeline, Processes
+        self.content_area = VQBContentArea(main_container, self.controller)
+        self.controller.content_area = self.content_area
         
-        self.doc_count_label = ttk.Label(self.info_frame, text="Documents: 0")
-        self.doc_count_label.pack(side=tk.LEFT, padx=5)
+        # 6. Right Sidebar (right side)
+        self.right_sidebar = VQBRightSidebar(main_container, self.controller)
+        self.controller.right_sidebar = self.right_sidebar
         
-        # Main content area
-        self.content_frame = ttk.Frame(self, style='TFrame')
-        self.content_frame.grid(row=1, column=0, columnspan=2, sticky="nsew", padx=5, pady=5)
+        # 7. AI Chat Panel (bottom, above statusbar)
+        ai_chat_container = ttk.Frame(self)
+        ai_chat_container.pack(side=tk.BOTTOM, fill=tk.BOTH, before=main_container)
+        self.ai_chat = VQBAIChatPanel(ai_chat_container, self.controller)
+        self.controller.ai_chat = self.ai_chat
         
-        # Placeholder text
-        welcome_label = ttk.Label(
-            self.content_frame,
-            text=f"{config.APP_NAME}\n\nVersion {config.APP_VERSION}\n\n"
-                 f"This is a concept implementation.\n"
-                 f"Full features include:\n"
-                 f"• Timeline View (Gantt-style)\n"
-                 f"• Document Graph Visualization\n"
-                 f"• AI-assisted Filtering\n"
-                 f"• VPB Process Integration\n"
-                 f"• UDS3 Multi-Database Support",
-            justify=tk.CENTER,
-            font=('Arial', 12)
-        )
-        welcome_label.pack(expand=True)
+        # 8. Status Bar (very bottom)
+        statusbar_container = ttk.Frame(self)
+        statusbar_container.pack(side=tk.BOTTOM, fill=tk.X)
+        self.statusbar = VQBStatusBar(statusbar_container, self.controller)
+        self.controller.statusbar = self.statusbar
         
-        # Bottom status bar
-        self.bottom_status = ttk.Label(self, text="Ready", relief=tk.SUNKEN, anchor=tk.W)
-        self.bottom_status.grid(row=2, column=0, columnspan=2, sticky="ew")
+        # Set initial status
+        self.statusbar.set_status("Bereit - VQB initialisiert")
+        self.statusbar.set_connection_status(True)
+        self.statusbar.update_statistics(0, 0)
+        
+        logger.info("UI components created successfully")
+    
+    def _setup_keyboard_shortcuts(self):
+        """Setup keyboard shortcuts"""
+        # File operations
+        self.bind("<Control-n>", lambda e: self.controller.new_query())
+        self.bind("<Control-o>", lambda e: self.controller.open_query())
+        self.bind("<Control-s>", lambda e: self.controller.save_query())
+        self.bind("<Control-q>", lambda e: self.controller.quit_application())
+        
+        # Edit operations
+        self.bind("<Control-z>", lambda e: self.controller.undo())
+        self.bind("<Control-y>", lambda e: self.controller.redo())
+        
+        # View operations
+        self.bind("<Control-1>", lambda e: self.controller.switch_content_tab("timeline"))
+        self.bind("<Control-2>", lambda e: self.controller.switch_content_tab("processes"))
+        self.bind("<Control-plus>", lambda e: self.controller.zoom_in())
+        self.bind("<Control-minus>", lambda e: self.controller.zoom_out())
+        self.bind("<Control-0>", lambda e: self.controller.zoom_reset())
+        
+        # Help
+        self.bind("<F1>", lambda e: self.controller.show_documentation())
+        
+        logger.info("Keyboard shortcuts configured")
     
     def _process_async_results(self):
         """
@@ -167,42 +194,6 @@ class VQBApplication(tk.Tk):
         
         # Schedule next check
         self.after(100, self._process_async_results)
-    
-    def _update_status(self):
-        """Update status bar with current counts"""
-        process_count = self.process_model.get_count()
-        doc_count = self.document_model.get_count()
-        
-        self.process_count_label.config(text=f"Processes: {process_count}")
-        self.doc_count_label.config(text=f"Documents: {doc_count}")
-    
-    def _on_load_processes(self):
-        """Handle load processes action"""
-        messagebox.showinfo("Load Processes", 
-                           "Process loading will be implemented in Phase 2.\n"
-                           "Will connect to VPB backend API.")
-    
-    def _on_load_documents(self):
-        """Handle load documents action"""
-        messagebox.showinfo("Load Documents",
-                           "Document loading will be implemented in Phase 3.\n"
-                           "Will connect to UDS3 backend.")
-    
-    def _show_view(self, view_name: str):
-        """Handle view switching"""
-        messagebox.showinfo(f"{view_name.title()} View",
-                           f"{view_name.title()} view will be implemented in later phases.")
-    
-    def _show_about(self):
-        """Show about dialog"""
-        messagebox.showinfo(
-            "About VQB",
-            f"{config.APP_NAME}\n"
-            f"Version {config.APP_VERSION}\n\n"
-            f"Visual Query Builder for VCC-Veritas\n"
-            f"Connects VPB processes with documents\n\n"
-            f"© 2025 VCC-Veritas Development Team"
-        )
     
     def _on_closing(self):
         """Handle window close"""
