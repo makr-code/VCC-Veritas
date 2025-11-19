@@ -1,19 +1,36 @@
-# VQB - Anlagen-Lebenszyklus-View nach BImSchG
+# VQB - Prozess-Lebenszyklus-View (Generisches Konzept)
 
-## Konzept-Erweiterung für überwachungsbedürftige Anlagen
-**Version**: 1.2  
+## Anwendungszenario-Beispiel: BImSchG Anlagen
+**Version**: 1.3  
 **Datum**: 19. November 2025
+
+---
+
+## ⚠️ Wichtiger Hinweis
+
+**Dieses Dokument beschreibt ein GENERISCHES Konzept für die Visualisierung von Prozess-Lebenszyklen im VQB.**
+
+Das **BImSchG-Anlagen-Beispiel** ist nur **ein mögliches Anwendungsszenario** von vielen. Das gleiche Konzept ist anwendbar auf:
+
+- **Baurecht**: Baugenehmigungen, Nutzungsänderungen, Abbrüche
+- **Sozialrecht**: Antragsverfahren, Leistungsbewilligungen, Widersprüche
+- **Verwaltungsakte**: Beliebige Verwaltungsverfahren mit Lebenszyklus
+- **Personalverwaltung**: Einstellungen, Beförderungen, Austritte
+- **Vertragsmanagement**: Vertragsabschluss → Laufzeit → Verlängerung/Beendigung
+- **Asset Management**: Beschaffung → Nutzung → Wartung → Entsorgung
 
 ---
 
 ## 1. Executive Summary
 
-Der **Anlagen-Lebenszyklus-View** ist eine spezialisierte Ansicht im VQB, die den kompletten Lebenszyklus überwachungsbedürftiger Anlagen nach BImSchG visualisiert. Die Ansicht verbindet:
+Der **Prozess-Lebenszyklus-View** ist eine **generische** Visualisierungs-Komponente im VQB, die vollständige Lebenszyklen von Verwaltungsprozessen darstellt. Die Ansicht verbindet:
 
-- **VPB-Prozesse** (Genehmigung, Überwachung, Änderungen, Stilllegung)
-- **Rechtliche Grundlagen** (BImSchG, Verordnungen, Änderungen)
-- **Zeitliche Entwicklung** (Prozess-Timeline mit rechtlichen Änderungen)
-- **Pflichten & Ereignisse** (Anzeigen, Meldungen, Nachweise)
+- **VPB-Prozesse** (generische Prozessschritte über Zeit)
+- **Rechtliche Grundlagen** (relevante Rechtsnormen und deren Änderungen)
+- **Zeitliche Entwicklung** (Prozess-Timeline mit externen Einflüssen)
+- **Ereignisse & Pflichten** (prozessspezifische Events)
+
+**Beispiel-Anwendung: BImSchG Anlagen** (Genehmigung, Überwachung, Änderungen, Stilllegung)
 
 ### Visualisierung
 
@@ -54,9 +71,160 @@ Rechtliche Grundlagen (vertikal):
 
 ---
 
-## 2. Datenmodell-Erweiterungen
+## 2. Generisches Datenmodell
 
-### 2.1 Anlage (Facility)
+### 2.1 Generische Entität (GenericEntity)
+
+**Abstrakte Basis für beliebige Entitäten mit Lebenszyklus**:
+
+```python
+from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
+from datetime import datetime
+from typing import List, Optional, Dict, Any
+from enum import Enum
+
+class EntityStatus(Enum):
+    """Generische Status-Enumeration (anpassbar pro Domäne)"""
+    PLANNED = "planned"
+    IN_PROCESS = "in_process"
+    ACTIVE = "active"
+    SUSPENDED = "suspended"
+    COMPLETED = "completed"
+    ARCHIVED = "archived"
+
+@dataclass
+class GenericEntity(ABC):
+    """
+    Abstrakte Basis-Klasse für Entitäten mit Lebenszyklus
+    
+    Diese Klasse kann für beliebige Verwaltungsobjekte spezialisiert werden:
+    - Anlagen (BImSchG)
+    - Bauvorhaben (Baurecht)
+    - Sozialleistungen (Sozialrecht)
+    - Verträge (Vertragsmanagement)
+    - etc.
+    
+    Attributes:
+        urn: VCC-URN der Entität
+        bezeichnung: Entitätsbezeichnung
+        typ: Entitätstyp (domänenspezifisch)
+        verantwortlich: Verantwortliche Stelle/Person
+        standort_urn: Standort/Zuständigkeit (föderale Ebene)
+        status: Aktueller Status
+        start_datum: Startdatum des Lebenszyklus
+        end_datum: Enddatum (geplant oder tatsächlich)
+        prozesse: Zugeordnete VPB-Prozesse (URNs)
+        rechtliche_grundlagen: Anwendbare Rechtsnormen (URNs)
+        ereignisse: Wichtige Ereignisse im Lebenszyklus
+    """
+    urn: str
+    bezeichnung: str
+    typ: str  # Domänenspezifisch
+    verantwortlich: str
+    standort_urn: Optional[str] = None
+    status: EntityStatus = EntityStatus.PLANNED
+    start_datum: Optional[datetime] = None
+    end_datum: Optional[datetime] = None
+    prozesse: List[str] = field(default_factory=list)
+    rechtliche_grundlagen: List[str] = field(default_factory=list)
+    ereignisse: List['GenericEvent'] = field(default_factory=list)
+    metadata: Dict[str, Any] = field(default_factory=dict)
+    
+    @property
+    def lebensdauer_tage(self) -> Optional[int]:
+        """Berechne bisherige/geplante Lebensdauer in Tagen"""
+        if not self.start_datum:
+            return None
+        
+        end = self.end_datum or datetime.now()
+        delta = end - self.start_datum
+        return delta.days
+    
+    @abstractmethod
+    def get_phasen(self) -> List['Lebenszyklusphase']:
+        """
+        Definiere domänenspezifische Lebenszyklus-Phasen
+        
+        Muss von Subklassen implementiert werden.
+        """
+        pass
+```
+
+### 2.1.1 Beispiel-Spezialisierung: BImSchG-Anlage
+
+```python
+class AnlagenTyp(Enum):
+    """Anlagentypen nach 4. BImSchV Anhang 1"""
+    FEUERUNGSANLAGE = "feuerungsanlage"
+    ABFALLBEHANDLUNG = "abfallbehandlung"
+    STEINE_ERDEN = "steine_erden"
+    # ... weitere
+
+class AnlagenStatus(Enum):
+    """Status der Anlage"""
+    GEPLANT = "geplant"
+    GENEHMIGUNGSVERFAHREN = "genehmigungsverfahren"
+    IN_BETRIEB = "in_betrieb"
+    STILLGELEGT = "stillgelegt"
+    BERAEUMT = "beraeumt"
+
+@dataclass
+class BImSchGAnlage(GenericEntity):
+    """
+    Spezialisierung für BImSchG-Anlagen
+    
+    Erweitert GenericEntity um BImSchG-spezifische Attribute
+    """
+    anlagen_typ: AnlagenTyp = AnlagenTyp.FEUERUNGSANLAGE
+    betreiber: str = ""
+    genehmigungsdatum: Optional[datetime] = None
+    inbetriebnahme: Optional[datetime] = None
+    
+    def get_phasen(self) -> List['Lebenszyklusphase']:
+        """BImSchG-spezifische Phasen"""
+        return [
+            Lebenszyklusphase("Genehmigung", self.genehmigungsdatum, self.inbetriebnahme, "#FFE5B4"),
+            Lebenszyklusphase("Betrieb", self.inbetriebnahme, self.end_datum, "#B4E5FF"),
+            Lebenszyklusphase("Stilllegung", self.end_datum, None, "#FFB4B4") if self.end_datum else None
+        ]
+```
+
+### 2.1.2 Weitere Beispiel-Spezialisierungen
+
+```python
+@dataclass
+class Bauvorhaben(GenericEntity):
+    """Spezialisierung für Bauvorhaben"""
+    bauherr: str = ""
+    grundstueck: str = ""
+    baugenehmigung: Optional[datetime] = None
+    
+    def get_phasen(self):
+        return [
+            Lebenszyklusphase("Antragstellung", ...),
+            Lebenszyklusphase("Prüfung", ...),
+            Lebenszyklusphase("Genehmigung", ...),
+            Lebenszyklusphase("Bauphase", ...),
+            Lebenszyklusphase("Abnahme", ...)
+        ]
+
+@dataclass
+class Sozialleistung(GenericEntity):
+    """Spezialisierung für Sozialleistungen"""
+    antragsteller: str = ""
+    leistungsart: str = ""
+    
+    def get_phasen(self):
+        return [
+            Lebenszyklusphase("Antrag", ...),
+            Lebenszyklusphase("Prüfung", ...),
+            Lebenszyklusphase("Bewilligung", ...),
+            Lebenszyklusphase("Auszahlung", ...)
+        ]
+```
+
+### 2.2 Generisches Ereignis (GenericEvent)
 
 ```python
 from dataclasses import dataclass, field
