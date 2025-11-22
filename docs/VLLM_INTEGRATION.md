@@ -235,6 +235,93 @@ result = await client.synthesize_agent_results(
 
 ---
 
+## 🔧 LoRA Adapter Support (Clara Integration)
+
+### Übersicht
+
+vLLM unterstützt dynamisches Laden von LoRA (Low-Rank Adaptation) Adaptern, die von Clara erstellt werden können. Dies ermöglicht:
+
+- **Fachspezifische Anpassungen** ohne Neutraining des Basismodells
+- **Dynamisches Laden** von Adaptern zur Laufzeit
+- **Multi-Adapter Support** für verschiedene Domänen
+- **Effiziente Speichernutzung** durch Adapter-Sharing
+
+### LoRA Adapter laden
+
+```python
+from backend.agents.veritas_vllm_client import VeritasVLLMClient, VLLMRequest
+
+client = VeritasVLLMClient()
+await client.initialize()
+
+# LoRA-Adapter laden (von Clara erstellt)
+success = await client.load_lora_adapter(
+    adapter_name="clara-legal-v1",
+    adapter_path="/models/lora/clara-legal-v1"
+)
+
+if success:
+    # Request mit LoRA-Adapter
+    request = VLLMRequest(
+        model="meta-llama/Meta-Llama-3-8B-Instruct",
+        prompt="Erkläre das Baurecht",
+        lora_adapter="clara-legal-v1"
+    )
+    
+    response = await client.generate_response(request)
+    print(response.response)
+```
+
+### LoRA Adapter verwalten
+
+```python
+# Alle geladenen Adapter auflisten
+adapters = client.list_loaded_lora_adapters()
+print(f"Geladene Adapter: {adapters}")
+
+# Adapter-Info abrufen
+info = client.get_lora_adapter_info("clara-legal-v1")
+print(f"Adapter geladen am: {info['loaded_at']}")
+
+# Adapter entladen
+await client.unload_lora_adapter("clara-legal-v1")
+```
+
+### Konfiguration
+
+```bash
+# .env Datei
+VLLM_LORA_BASE_PATH=/models/lora
+VLLM_LORA_ENABLED=true
+```
+
+### Clara-Integration Workflow
+
+```
+1. Clara trainiert LoRA-Adapter basierend auf Feedback
+   ↓
+2. Adapter wird in VLLM_LORA_BASE_PATH gespeichert
+   ↓
+3. Programm fordert spezifischen Adapter an
+   ↓
+4. vLLM-Client lädt Adapter dynamisch
+   ↓
+5. Anfragen nutzen spezialisiertes Modell
+```
+
+### vLLM Server mit LoRA starten
+
+```bash
+# vLLM Server mit LoRA-Support
+python -m vllm.entrypoints.openai.api_server \
+  --model meta-llama/Meta-Llama-3-8B-Instruct \
+  --enable-lora \
+  --lora-modules clara-legal=/models/lora/clara-legal-v1 \
+  --max-lora-rank 64
+```
+
+---
+
 ## 🧪 Testing
 
 ### Unit Tests ausführen

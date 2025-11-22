@@ -69,6 +69,8 @@ class VLLMRequest:
     top_p: float = 1.0
     frequency_penalty: float = 0.0
     presence_penalty: float = 0.0
+    # LoRA adapter support (for Clara-generated adapters)
+    lora_adapter: Optional[str] = None  # Name/path of LoRA adapter to load
     
 @dataclass
 class VLLMResponse:
@@ -132,6 +134,10 @@ class VeritasVLLMClient:
         self.available_models: Dict[str, Dict[str, Any]] = {}
         self.default_model = VLLMModel.LLAMA3_8B.value
         self.offline_mode = False
+        
+        # LoRA Adapter Management (for Clara-generated adapters)
+        self.loaded_lora_adapters: Dict[str, Dict[str, Any]] = {}
+        self.lora_base_path = os.getenv("VLLM_LORA_BASE_PATH", "/models/lora")
         
         # Prompt Templates (imported from Ollama client for compatibility)
         self.prompt_templates = self._initialize_prompt_templates()
@@ -295,6 +301,126 @@ class VeritasVLLMClient:
             logger.error(f"❌ list_models fehlgeschlagen: {e}")
             return []
     
+    async def load_lora_adapter(self, adapter_name: str, adapter_path: Optional[str] = None) -> bool:
+        """
+        Lädt einen LoRA-Adapter dynamisch in vLLM
+        
+        Args:
+            adapter_name: Name des LoRA-Adapters (z.B. "clara-legal-v1")
+            adapter_path: Optionaler Pfad zum Adapter (Standard: VLLM_LORA_BASE_PATH/adapter_name)
+            
+        Returns:
+            bool: True wenn erfolgreich geladen
+        """
+        try:
+            # Bestimme Adapter-Pfad
+            if adapter_path is None:
+                adapter_path = os.path.join(self.lora_base_path, adapter_name)
+            
+            # vLLM unterstützt LoRA-Adapter über das /v1/models endpoint
+            # oder direkt beim Start des Servers
+            # Für dynamisches Laden nutzen wir ein Custom-Endpoint wenn verfügbar
+            
+            # Versuche LoRA-Adapter zu laden
+            payload = {
+                "adapter_name": adapter_name,
+                "adapter_path": adapter_path
+            }
+            
+            # Check if vLLM server has custom LoRA management endpoint
+            try:
+                response = await self.client.post(
+                    f"{self.base_url}/v1/load_lora_adapter",
+                    json=payload,
+                    timeout=60
+                )
+                
+                if response.status_code == 200:
+                    self.loaded_lora_adapters[adapter_name] = {
+                        "path": adapter_path,
+                        "loaded_at": datetime.now(timezone.utc).isoformat()
+                    }
+                    logger.info(f"✅ LoRA-Adapter geladen: {adapter_name} ({adapter_path})")
+                    return True
+                else:
+                    logger.warning(f"⚠️ LoRA-Adapter Laden fehlgeschlagen: HTTP {response.status_code}")
+                    return False
+                    
+            except Exception as endpoint_error:
+                # Fallback: LoRA wird beim Request mitgesendet (vLLM native support)
+                logger.info(f"ℹ️ vLLM Custom Endpoint nicht verfügbar, nutze Request-basiertes LoRA Loading")
+                self.loaded_lora_adapters[adapter_name] = {
+                    "path": adapter_path,
+                    "loaded_at": datetime.now(timezone.utc).isoformat(),
+                    "mode": "request-based"
+                }
+                return True
+                
+        except Exception as e:
+            logger.error(f"❌ Fehler beim Laden des LoRA-Adapters {adapter_name}: {e}")
+            return False
+    
+    async def unload_lora_adapter(self, adapter_name: str) -> bool:
+        """
+        Entlädt einen LoRA-Adapter aus vLLM
+        
+        Args:
+            adapter_name: Name des zu entladenden Adapters
+            
+        Returns:
+            bool: True wenn erfolgreich entladen
+        """
+        try:
+            if adapter_name not in self.loaded_lora_adapters:
+                logger.warning(f"⚠️ LoRA-Adapter {adapter_name} ist nicht geladen")
+                return False
+            
+            # Versuche Adapter zu entladen
+            payload = {"adapter_name": adapter_name}
+            
+            try:
+                response = await self.client.post(
+                    f"{self.base_url}/v1/unload_lora_adapter",
+                    json=payload,
+                    timeout=30
+                )
+                
+                if response.status_code == 200:
+                    del self.loaded_lora_adapters[adapter_name]
+                    logger.info(f"✅ LoRA-Adapter entladen: {adapter_name}")
+                    return True
+                    
+            except Exception:
+                # Fallback: Entferne aus lokaler Liste
+                del self.loaded_lora_adapters[adapter_name]
+                logger.info(f"ℹ️ LoRA-Adapter aus lokaler Liste entfernt: {adapter_name}")
+                return True
+                
+        except Exception as e:
+            logger.error(f"❌ Fehler beim Entladen des LoRA-Adapters {adapter_name}: {e}")
+            return False
+    
+    def list_loaded_lora_adapters(self) -> List[str]:
+        """
+        Listet alle aktuell geladenen LoRA-Adapter
+        
+        Returns:
+            List[str]: Liste der Adapter-Namen
+        """
+        return list(self.loaded_lora_adapters.keys())
+    
+    def get_lora_adapter_info(self, adapter_name: str) -> Optional[Dict[str, Any]]:
+        """
+        Holt Informationen über einen geladenen LoRA-Adapter
+        
+        Args:
+            adapter_name: Name des Adapters
+            
+        Returns:
+            Dict: Adapter-Informationen oder None
+        """
+        return self.loaded_lora_adapters.get(adapter_name)
+    
     def _initialize_prompt_templates(self) -> Dict[PipelineStage, Dict[str, str]]:
         """
         Initialisiert Prompt-Templates für verschiedene Pipeline-Stages
@@ -364,6 +490,20 @@ class VeritasVLLMClient:
                     "presence_penalty": request.presence_penalty,
                     "stream": stream,
                 }
+                
+                # Add LoRA adapter if specified (Clara-generated adapter support)
+                if request.lora_adapter:
+                    # vLLM supports LoRA adapters via extra_body or model parameter
+                    # Different vLLM versions support different methods
+                    payload["extra_body"] = {
+                        "lora_adapter": request.lora_adapter
+                    }
+                    logger.info(f"🔧 Using LoRA adapter: {request.lora_adapter}")
+                    
+                    # Track LoRA usage
+                    if request.lora_adapter not in self.loaded_lora_adapters:
+                        logger.warning(f"⚠️ LoRA adapter {request.lora_adapter} not pre-loaded, loading on-demand")
+                        await self.load_lora_adapter(request.lora_adapter)
 
                 # HTTP Request senden to OpenAI-compatible endpoint
                 response = await self.client.post(

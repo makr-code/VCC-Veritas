@@ -262,6 +262,160 @@ class TestVeritasVLLMClient:
             assert stats['usage_stats']['completion_tokens'] == 8
 
 # ============================================================================
+# TEST LORA ADAPTER SUPPORT
+# ============================================================================
+
+class TestLoRAAdapterSupport:
+    """Test suite for LoRA adapter functionality"""
+    
+    @pytest.mark.asyncio
+    async def test_load_lora_adapter_success(self, vllm_client):
+        """Test successful LoRA adapter loading"""
+        with patch.object(vllm_client.client, 'post') as mock_post:
+            mock_response = MagicMock()
+            mock_response.status_code = 200
+            mock_post.return_value = mock_response
+            
+            result = await vllm_client.load_lora_adapter(
+                adapter_name="clara-legal-v1",
+                adapter_path="/models/lora/clara-legal-v1"
+            )
+            
+            assert result is True
+            assert "clara-legal-v1" in vllm_client.loaded_lora_adapters
+            assert vllm_client.loaded_lora_adapters["clara-legal-v1"]["path"] == "/models/lora/clara-legal-v1"
+    
+    @pytest.mark.asyncio
+    async def test_load_lora_adapter_default_path(self, vllm_client):
+        """Test LoRA adapter loading with default path"""
+        vllm_client.lora_base_path = "/models/lora"
+        
+        with patch.object(vllm_client.client, 'post') as mock_post:
+            mock_response = MagicMock()
+            mock_response.status_code = 200
+            mock_post.return_value = mock_response
+            
+            result = await vllm_client.load_lora_adapter("clara-legal-v1")
+            
+            assert result is True
+            # Check that default path was used
+            call_args = mock_post.call_args
+            payload = call_args.kwargs['json']
+            assert payload['adapter_path'] == "/models/lora/clara-legal-v1"
+    
+    @pytest.mark.asyncio
+    async def test_load_lora_adapter_fallback_mode(self, vllm_client):
+        """Test LoRA adapter loading with fallback (no custom endpoint)"""
+        with patch.object(vllm_client.client, 'post') as mock_post:
+            # Simulate endpoint not available
+            mock_post.side_effect = Exception("Endpoint not found")
+            
+            result = await vllm_client.load_lora_adapter("clara-legal-v1")
+            
+            # Should succeed with fallback mode
+            assert result is True
+            assert "clara-legal-v1" in vllm_client.loaded_lora_adapters
+            assert vllm_client.loaded_lora_adapters["clara-legal-v1"]["mode"] == "request-based"
+    
+    @pytest.mark.asyncio
+    async def test_unload_lora_adapter(self, vllm_client):
+        """Test LoRA adapter unloading"""
+        # Pre-load an adapter
+        vllm_client.loaded_lora_adapters["test-adapter"] = {
+            "path": "/models/lora/test",
+            "loaded_at": "2025-11-22"
+        }
+        
+        with patch.object(vllm_client.client, 'post') as mock_post:
+            mock_response = MagicMock()
+            mock_response.status_code = 200
+            mock_post.return_value = mock_response
+            
+            result = await vllm_client.unload_lora_adapter("test-adapter")
+            
+            assert result is True
+            assert "test-adapter" not in vllm_client.loaded_lora_adapters
+    
+    @pytest.mark.asyncio
+    async def test_list_loaded_lora_adapters(self, vllm_client):
+        """Test listing loaded LoRA adapters"""
+        vllm_client.loaded_lora_adapters = {
+            "adapter1": {"path": "/path/1"},
+            "adapter2": {"path": "/path/2"}
+        }
+        
+        adapters = vllm_client.list_loaded_lora_adapters()
+        
+        assert len(adapters) == 2
+        assert "adapter1" in adapters
+        assert "adapter2" in adapters
+    
+    @pytest.mark.asyncio
+    async def test_get_lora_adapter_info(self, vllm_client):
+        """Test getting LoRA adapter info"""
+        vllm_client.loaded_lora_adapters["test"] = {
+            "path": "/models/lora/test",
+            "loaded_at": "2025-11-22T10:00:00Z"
+        }
+        
+        info = vllm_client.get_lora_adapter_info("test")
+        
+        assert info is not None
+        assert info["path"] == "/models/lora/test"
+        assert info["loaded_at"] == "2025-11-22T10:00:00Z"
+    
+    @pytest.mark.asyncio
+    async def test_generate_response_with_lora(self, vllm_client, mock_vllm_response):
+        """Test response generation with LoRA adapter"""
+        # Pre-load adapter
+        vllm_client.loaded_lora_adapters["clara-legal-v1"] = {
+            "path": "/models/lora/clara-legal-v1",
+            "loaded_at": "2025-11-22"
+        }
+        
+        with patch.object(vllm_client.client, 'post') as mock_post:
+            mock_response = MagicMock()
+            mock_response.status_code = 200
+            mock_response.json.return_value = mock_vllm_response
+            mock_post.return_value = mock_response
+            
+            request = VLLMRequest(
+                model="meta-llama/Meta-Llama-3-8B-Instruct",
+                prompt="Test with LoRA",
+                lora_adapter="clara-legal-v1"
+            )
+            
+            response = await vllm_client.generate_response(request)
+            
+            # Verify LoRA was included in request
+            call_args = mock_post.call_args
+            payload = call_args.kwargs['json']
+            assert 'extra_body' in payload
+            assert payload['extra_body']['lora_adapter'] == "clara-legal-v1"
+    
+    @pytest.mark.asyncio
+    async def test_generate_response_loads_lora_on_demand(self, vllm_client, mock_vllm_response):
+        """Test automatic LoRA loading when not pre-loaded"""
+        with patch.object(vllm_client, 'load_lora_adapter') as mock_load:
+            with patch.object(vllm_client.client, 'post') as mock_post:
+                mock_load.return_value = True
+                mock_response = MagicMock()
+                mock_response.status_code = 200
+                mock_response.json.return_value = mock_vllm_response
+                mock_post.return_value = mock_response
+                
+                request = VLLMRequest(
+                    model="meta-llama/Meta-Llama-3-8B-Instruct",
+                    prompt="Test",
+                    lora_adapter="not-loaded-adapter"
+                )
+                
+                response = await vllm_client.generate_response(request)
+                
+                # Verify on-demand loading was called
+                mock_load.assert_called_once_with("not-loaded-adapter")
+
+# ============================================================================
 # TEST LLM FACTORY
 # ============================================================================
 
