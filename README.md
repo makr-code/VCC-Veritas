@@ -32,6 +32,13 @@ curl http://localhost:5000/api/feedback/health
 
 ## 🌟 Hauptfunktionen
 
+### 🤖 Flexible LLM-Integration (NEU!)
+- **Multi-Provider-Support**: Ollama oder vLLM
+- **Automatischer Fallback**: Nahtloser Wechsel bei Ausfall
+- **Provider-agnostisch**: Gleiche API für alle Provider
+- **Performance-optimiert**: vLLM für Produktion (+200% Durchsatz)
+- **Einfacher Wechsel**: Via Umgebungsvariable `LLM_PROVIDER`
+
 ### 💬 Intelligenter Chat (Chat Design v2.0)
 - **Sprechblasen-Design**: User (rechts) vs Assistant (links)
 - **Strukturierte Antworten**: 6 Sections (Antwort, Details, Quellen, Rechtliche Hinweise, Nächste Schritte, Verwandte Themen)
@@ -92,7 +99,7 @@ curl http://localhost:5000/api/feedback/health
 ┌─────────────────────────────────┐
 │   FastAPI Backend (Server)      │
 │  - REST API Endpoints           │
-│  - Ollama LLM Integration       │
+│  - Ollama/vLLM LLM Integration  │
 │  - UDS3 Multi-DB                │
 │  - Streaming Services           │
 │  - Intelligent Agent Pipeline   │
@@ -127,7 +134,9 @@ curl http://localhost:5000/api/feedback/health
 
 ### Voraussetzungen
 - Python 3.13+
-- Ollama (für LLM-Support)
+- LLM Provider (wähle einen):
+  - **Ollama** (empfohlen für Entwicklung) - [Installation](https://ollama.ai)
+  - **vLLM** (empfohlen für Produktion) - [Quick Start](docs/VLLM_QUICK_START.md)
 - Optional: Neo4j (für Graph-Datenbank)
 
 ### Installation
@@ -143,16 +152,32 @@ curl http://localhost:5000/api/feedback/health
    pip install -r requirements.txt
    ```
 
-3. **Ollama starten** (separates Terminal):
+3. **LLM Provider starten** (separates Terminal):
+   
+   **Option A: Ollama** (Standard)
    ```bash
    ollama serve
-   ```
-
-4. **Ollama-Modelle herunterladen**:
-   ```bash
-   ollama pull llama3
-   ollama pull codellama
+   ollama pull llama3.2
    ollama pull nomic-embed-text
+   ```
+   
+   **Option B: vLLM** (High-Performance)
+   ```bash
+   pip install vllm
+   python -m vllm.entrypoints.openai.api_server \
+     --model meta-llama/Meta-Llama-3-8B-Instruct
+   ```
+   
+   Siehe [vLLM Quick Start](docs/VLLM_QUICK_START.md) für Details.
+
+4. **Konfiguration** (optional):
+   ```bash
+   # Für Ollama (Standard)
+   export LLM_PROVIDER=ollama
+   
+   # Für vLLM
+   export LLM_PROVIDER=vllm
+   export VLLM_API_URL=http://localhost:8000
    ```
 
 ### Anwendung starten

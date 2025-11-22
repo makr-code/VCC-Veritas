@@ -36,3 +36,9 @@ httpx>=0.28.1,<0.29
 # Hinweis: Das exakte SDK kann je nach Version abweichen. Wir nutzen hier
 # eine generische Abhängigkeit; bei Bedarf kann später ein genauer Pin gesetzt werden.
 mcp>=0.1.0
+
+# vLLM Integration (Optional - nur für vLLM-Provider)
+# Install with: pip install vllm
+# Note: vLLM requires CUDA/GPU for optimal performance
+# Can be installed separately on the vLLM server
+# vllm>=0.2.0
