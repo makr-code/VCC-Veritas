@@ -245,9 +245,9 @@ class VeritasVLLMClient:
                     logger.info(f"📋 {len(models)} vLLM-Modelle geladen: {list(models.keys())}")
                     return models
 
-            raise httpx.HTTPStatusError(
-                f"HTTP {response.status_code}", request=response.request, response=response
-            )
+            # HTTP error - raise standard exception
+            logger.warning(f"vLLM /v1/models returned status {response.status_code}")
+            raise Exception(f"HTTP {response.status_code} from vLLM server")
 
         except Exception as e:
             logger.error(f"❌ Fehler beim Laden der Modell-Liste: {e}")
@@ -299,11 +299,19 @@ class VeritasVLLMClient:
         """
         Initialisiert Prompt-Templates für verschiedene Pipeline-Stages
         Identical to Ollama client for compatibility
+        
+        Note: Templates are imported from the Ollama client to maintain consistency.
+        In a future refactoring, these could be moved to a shared constants module.
         """
-        # Import from Ollama client to maintain consistency
-        from backend.agents.veritas_ollama_client import VeritasOllamaClient
-        temp_client = VeritasOllamaClient()
-        return temp_client.prompt_templates
+        # Import templates from Ollama client to maintain consistency
+        # This is acceptable since we want identical behavior across providers
+        try:
+            from backend.agents.veritas_ollama_client import VeritasOllamaClient
+            temp_client = VeritasOllamaClient()
+            return temp_client.prompt_templates
+        except Exception:
+            # Fallback to empty templates if import fails
+            return {stage: {"system": "", "user_template": ""} for stage in PipelineStage}
 
     def _default_model_catalog(self) -> Dict[str, Dict[str, Any]]:
         """Fallback-Modellkatalog, falls vLLM nicht erreichbar ist."""
@@ -382,9 +390,9 @@ class VeritasVLLMClient:
                         return self._process_streaming_response(response, model_key)
                     return self._process_single_response(response.json(), model_key)
 
-                raise httpx.HTTPStatusError(
-                    f"HTTP {response.status_code}", request=response.request, response=response
-                )
+                # HTTP error - raise standard exception
+                logger.warning(f"vLLM request returned status {response.status_code}")
+                raise Exception(f"HTTP {response.status_code} from vLLM server")
 
             except Exception as e:
                 last_error = str(e)
