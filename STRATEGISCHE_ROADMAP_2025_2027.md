@@ -100,15 +100,12 @@
 
 ### 3.1 Technology Radar
 
-```
-ADOPT (Sofort)      TRIAL (Pilot)        ASSESS (Beobachten)   HOLD (Vermeiden)
-─────────────────────────────────────────────────────────────────────────────
-FastAPI             vLLM                 WebGPU                Legacy PHP/Java
-Neo4j               NATS                 Rust                  Monolith
-ChromaDB            OpenTelemetry        Quantum ML            On-Prem Only
-Docker              Kubernetes           Edge Computing        SQL Server
-pytest              Traefik              Deno                  XML-RPC
-```
+| Kategorie | ADOPT (Sofort) | TRIAL (Pilot) | ASSESS (Beobachten) | HOLD (Vermeiden) |
+|-----------|----------------|---------------|---------------------|------------------|
+| **Backend** | FastAPI | vLLM | Rust | Legacy PHP/Java |
+| **Datenbank** | Neo4j, ChromaDB | - | - | SQL Server |
+| **Infra** | Docker, pytest | NATS, OpenTelemetry, Traefik, Kubernetes | WebGPU, Edge Computing, Deno | Monolith, On-Prem Only |
+| **AI/ML** | - | - | Quantum ML | XML-RPC |
 
 ### 3.2 Technologie-Trends (State-of-the-Art)
 
@@ -820,9 +817,9 @@ Tech Writer: 0.5 Person kontinuierlich
 | **2027 Q1-Q2** | 6 Monate | 280 PT | 224.000€ |
 | **Gesamt** | 30 Monate | 1,280 PT | **1,024,000€** |
 
-*Zusätzlich: Infrastruktur (~60k€), Tools (~25k€), Externe Consultants (~50k€)*
+*Zusätzlich: Infrastruktur (~60k€), Tools (~25k€), Externe Consultants (~50k€) = 135k€*
 
-**Gesamt-Investment 2025-2027:** ~1,16 Millionen Euro
+**Gesamt-Investment 2025-2027:** ~1,159 Millionen Euro
 
 ---
 
@@ -962,7 +959,7 @@ Tech Writer: 0.5 Person kontinuierlich
 
 ## 10. Schlusswort
 
-Diese Roadmap ist ein **living document** und wird quartalsweise reviewed und angepasst. Sie basiert auf:
+Diese Roadmap ist ein **living document** und wird quartalsweise überprüft und angepasst. Sie basiert auf:
 
 - **State-of-the-Art Technologien** (2025-2027)
 - **Best Practices** aus der Industrie
