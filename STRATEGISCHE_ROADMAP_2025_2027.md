@@ -48,7 +48,7 @@
 - **Test Coverage:** 73% partial (Ziel: 90%+)
 - **Architektur:** Monolith (Ziel: Microservices)
 - **VCC-Integration:** Fragmentiert (Ziel: Vollständig)
-- **Skalierung:** Limitiert (Ziel: Cloud-Native)
+- **Skalierung:** Limitiert (Ziel: On-Premise Skalierbar)
 
 ### 1.2 Marktpositionierung & Wettbewerb
 
@@ -64,6 +64,39 @@
 3. **Domain-Specific** - Verwaltungsrecht im Fokus
 4. **Multidimensional** - Komplexe Datenanalysen (VQB)
 5. **Modular** - VCC-Ökosystem Integration
+6. **🔒 On-Premise First** - Keine Vendor-Abhängigkeit, volle Datenkontrolle
+
+### 1.3 Architektur-Grundsätze
+
+**Kerngrundsatz: On-Premise & Vendor-Unabhängig**
+
+VCC-Veritas folgt dem strikten Prinzip der **vollständigen On-Premise Deployierbarkeit** ohne Abhängigkeit von externen Vendor-Services:
+
+✅ **On-Premise Deployment:**
+- Alle Komponenten können lokal gehostet werden
+- Keine Cloud-Services als Abhängigkeit
+- Keine externen API-Calls erforderlich
+
+✅ **Keine Vendor-Authentifizierung:**
+- Keine API-Keys von kommerziellen Anbietern
+- Keine externen Login-Services
+- Vollständige Kontrolle über Authentication/Authorization
+
+✅ **Open Source Priorität:**
+- Bevorzugung von Open Source Technologien
+- Self-hosted Alternativen zu proprietären Services
+- Community-getriebene Weiterentwicklung
+
+✅ **Daten-Souveränität:**
+- Alle Daten verbleiben im eigenen Rechenzentrum
+- Keine Datenübertragung an Dritte
+- DSGVO-konforme Datenverarbeitung
+
+**Beispiele:**
+- ✅ LLMs: Ollama, vLLM (lokal) statt OpenAI/Anthropic
+- ✅ Vector DB: ChromaDB, Qdrant (self-hosted) statt Pinecone
+- ✅ Auth: Eigenes LDAP/KeyCloak statt Auth0
+- ✅ Deployment: Docker/Kubernetes On-Premise statt AWS/Azure
 
 ---
 
@@ -71,7 +104,7 @@
 
 ### 2.1 Vision 2027
 
-> **VCC-Veritas wird die führende Open-Source AI-Plattform für intelligente Verwaltungsinformation im deutschsprachigen Raum.**
+> **VCC-Veritas wird die führende Open-Source On-Premise AI-Plattform für intelligente Verwaltungsinformation im deutschsprachigen Raum - ohne Vendor-Abhängigkeiten.**
 
 ### 2.2 Strategische Ziele
 
@@ -80,7 +113,7 @@
 - ⭐ 80%+ Documentation Coverage
 - ⭐ <500ms P50 Response Time
 - ⭐ 99.9% Availability
-- ⭐ Zero-Trust Security
+- ⭐ Zero-Trust Security (On-Premise)
 
 **User Excellence:**
 - ⭐ 1000+ aktive Nutzer
@@ -94,6 +127,12 @@
 - ⭐ Developer Portal mit 500+ Registrierungen
 - ⭐ Open-Source Community (50+ Contributors)
 
+**On-Premise Excellence:**
+- ⭐ 100% On-Premise Deployierbarkeit
+- ⭐ Null Vendor-Abhängigkeiten
+- ⭐ Volle Daten-Souveränität
+- ⭐ Self-Hosted AI (Ollama, vLLM)
+
 ---
 
 ## 3. Technologische Roadmap
@@ -104,7 +143,7 @@
 |-----------|----------------|---------------|---------------------|------------------|
 | **Backend** | FastAPI | vLLM | Rust | Legacy PHP/Java |
 | **Datenbank** | Neo4j, ChromaDB | - | - | SQL Server |
-| **Infra** | Docker, pytest | NATS, OpenTelemetry, Traefik, Kubernetes | WebGPU, Edge Computing, Deno | Monolith, On-Prem Only |
+| **Infra** | Docker, pytest | NATS, OpenTelemetry, Traefik, Kubernetes | WebGPU, Edge Computing, Deno | Monolith, Cloud-Only, Vendor Lock-in |
 | **AI/ML** | - | - | Quantum ML | XML-RPC |
 
 ### 3.2 Technologie-Trends (State-of-the-Art)
@@ -121,28 +160,34 @@
 # Multi-Provider AI Orchestration
 class AIOrchestrator:
     """
-    State-of-the-Art AI Integration
+    On-Premise AI Integration
+    
+    Prinzip: Vollständig On-Premise, keine externen Vendor-APIs
     
     Features:
-    - Multi-Provider (Ollama, vLLM, OpenAI, Anthropic, Google)
-    - Intelligent Routing (Cost, Speed, Quality)
+    - Multi-Provider (Ollama, vLLM) - beide On-Premise
+    - Intelligent Routing (Geschwindigkeit, Qualität, Ressourcen)
     - Context Window Management (bis 200K Tokens)
     - Streaming Responses
     - Function Calling / Tool Use
-    - Multi-Modal (Text, Image, Audio)
+    - Multi-Modal (Text, Image, Audio) via lokale Modelle
     """
     
     def __init__(self):
         self.providers = {
-            'ollama': OllamaProvider(models=['llama3.2', 'phi3']),
-            'vllm': VLLMProvider(endpoint='http://localhost:8000'),
-            'openai': OpenAIProvider(api_key=os.getenv('OPENAI_KEY')),
-            'anthropic': AnthropicProvider(api_key=os.getenv('ANTHROPIC_KEY'))
+            'ollama': OllamaProvider(
+                models=['llama3.2', 'phi3', 'mistral', 'mixtral'],
+                endpoint='http://localhost:11434'
+            ),
+            'vllm': VLLMProvider(
+                models=['meta-llama/Meta-Llama-3-8B-Instruct'],
+                endpoint='http://localhost:8000'
+            )
         }
         self.router = IntelligentRouter(
-            cost_weight=0.3,
-            speed_weight=0.4,
-            quality_weight=0.3
+            speed_weight=0.5,
+            quality_weight=0.3,
+            resource_weight=0.2
         )
     
     async def query(self, 
@@ -150,13 +195,15 @@ class AIOrchestrator:
                    context: List[Message],
                    constraints: QueryConstraints) -> AIResponse:
         """
-        Route query to optimal provider
+        Route query to optimal On-Premise provider
         
         Decision Matrix:
-        - Simple Queries → Ollama (fast, free)
-        - Complex Reasoning → Claude (high quality)
-        - Long Context → Gemini (2M tokens)
-        - Code Generation → GPT-4 (specialized)
+        - Einfache Queries → Ollama llama3.2 (schnell, effizient)
+        - Komplexes Reasoning → vLLM Mixtral (hohe Qualität)
+        - Langer Context → Ollama/vLLM mit erweiterten Context Windows
+        - Code Generation → Spezialmodelle (lokal gehostet)
+        
+        Alle Modelle laufen On-Premise ohne externe API-Calls
         """
         provider = await self.router.select(
             prompt=prompt,
@@ -170,12 +217,12 @@ class AIOrchestrator:
         )
 ```
 
-**Technologien:**
-- **LLM Serving:** vLLM, TGI (Text Generation Inference)
-- **Vector DBs:** ChromaDB, Weaviate, Pinecone, Qdrant
-- **Embeddings:** nomic-embed-text, UAE-Large, E5
-- **Fine-Tuning:** LoRA, QLoRA für Domain-Adaptation
-- **Agents:** LangGraph, AutoGPT, Semantic Kernel
+**Technologien (On-Premise Focus):**
+- **LLM Serving:** vLLM, TGI (Text Generation Inference) - beide On-Premise
+- **Vector DBs:** ChromaDB, Qdrant, Weaviate (self-hosted) - alles On-Premise
+- **Embeddings:** nomic-embed-text, UAE-Large, E5 - lokal gehostet
+- **Fine-Tuning:** LoRA, QLoRA für Domain-Adaptation - On-Premise Training
+- **Agents:** LangGraph, AutoGPT, Semantic Kernel - lokal ausgeführt
 
 #### 3.2.2 Backend Architecture
 
@@ -915,7 +962,7 @@ Tech Writer: 0.5 Person kontinuierlich
 | 3 | **Stakeholder Alignment** | Mittel | Hoch | Regelmäßige Demos, Klare Kommunikation |
 | 4 | **Sicherheitsvorfälle** | Niedrig | Kritisch | Zero-Trust, Penetration Testing |
 | 5 | **Performance Degradation** | Mittel | Hoch | Extensive Load Testing, Monitoring |
-| 6 | **Vendor Lock-in** | Niedrig | Mittel | Open Standards, Multi-Cloud |
+| 6 | **Vendor Lock-in** | Niedrig | Mittel | Open Source, On-Premise, Open Standards |
 | 7 | **Skill Gaps** | Mittel | Mittel | Training, Pair Programming, Docs |
 | 8 | **Scope Creep** | Hoch | Mittel | Strikte Phase Gates, Product Owner |
 
