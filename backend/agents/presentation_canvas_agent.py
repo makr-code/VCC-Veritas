@@ -28,6 +28,7 @@ VDL (Visual Description Language) Format:
 import json
 import logging
 import base64
+import time
 from typing import Dict, Any, List, Optional, Tuple
 from io import BytesIO
 from pathlib import Path
@@ -209,6 +210,35 @@ class PresentationCanvasAgent:
         
         logger.info("PresentationCanvasAgent initialisiert")
     
+    @staticmethod
+    def _get_font(size: int = 16) -> ImageFont.FreeTypeFont:
+        """
+        Cross-platform font loading mit Fallback
+        
+        Versucht verschiedene Font-Pfade für Linux, Windows, macOS
+        """
+        font_paths = [
+            # Linux
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+            "/usr/share/fonts/TTF/DejaVuSans.ttf",
+            # macOS
+            "/Library/Fonts/Arial.ttf",
+            "/System/Library/Fonts/Helvetica.ttc",
+            # Windows
+            "C:\\Windows\\Fonts\\arial.ttf",
+            "C:\\Windows\\Fonts\\calibri.ttf",
+        ]
+        
+        for font_path in font_paths:
+            try:
+                return ImageFont.truetype(font_path, size)
+            except (OSError, IOError):
+                continue
+        
+        # Fallback: Default-Font
+        logger.warning("Kein TrueType-Font gefunden, nutze Default-Font")
+        return ImageFont.load_default()
+    
     async def generate_presentation(
         self,
         user_prompt: str,
@@ -378,7 +408,7 @@ Antworte NUR mit dem VDL-JSON, keine Erklärungen."""
                 self._render_element(img, draw, element)
             
             # Speichern
-            timestamp = int(__import__('time').time() * 1000)
+            timestamp = int(time.time() * 1000)
             png_path = self.output_dir / f"slide_{i+1}_{timestamp}.png"
             img.save(png_path, 'PNG', dpi=(150, 150))
             
@@ -444,11 +474,8 @@ Antworte NUR mit dem VDL-JSON, keine Erklärungen."""
         font_size = props.get('font_size', 16)
         color = props.get('color', '#000000')
         
-        try:
-            # Versuche TrueType-Font zu laden
-            font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", font_size)
-        except:
-            font = ImageFont.load_default()
+        # Load font using cross-platform helper
+        font = self._get_font(font_size)
         
         # Text-Position (vereinfacht, ohne Alignment)
         x = pos.get('x', 0)
@@ -505,10 +532,7 @@ Antworte NUR mit dem VDL-JSON, keine Erklärungen."""
         
         # Text
         chart_spec = element.get('chart_spec', 'Chart')
-        try:
-            font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14)
-        except:
-            font = ImageFont.load_default()
+        font = self._get_font(14)
         
         draw.text((x + 10, y + 10), f"[Chart: {chart_spec}]", fill='#666666', font=font)
         draw.text((x + 10, y + 30), "→ Chart Agent Integration", fill='#999999', font=font)
@@ -529,10 +553,7 @@ Antworte NUR mit dem VDL-JSON, keine Erklärungen."""
         
         # Text
         ai_prompt = element.get('ai_prompt', 'AI Image')
-        try:
-            font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14)
-        except:
-            font = ImageFont.load_default()
+        font = self._get_font(14)
         
         draw.text((x + 10, y + 10), f"[AI Image: {ai_prompt[:40]}]", fill='#ff9800', font=font)
         draw.text((x + 10, y + 30), "→ AI Image Generator", fill='#ffa726', font=font)
@@ -568,7 +589,7 @@ Antworte NUR mit dem VDL-JSON, keine Erklärungen."""
                 slide.shapes.add_picture(png_path, left, top, width=Inches(10))
             
             # Speichern
-            timestamp = int(__import__('time').time() * 1000)
+            timestamp = int(time.time() * 1000)
             title_slug = metadata.get('title', 'presentation').replace(' ', '_').lower()[:30]
             pptx_path = self.output_dir / f"{title_slug}_{timestamp}.pptx"
             prs.save(str(pptx_path))
