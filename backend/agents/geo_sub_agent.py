@@ -228,7 +228,7 @@ class GeoSubAgent:
                     }
                 })
             except Exception as e:
-                logger.warning(f"Fehler bei Koordinaten-Transformation: {e}")
+                logger.warning(f"Error in coordinate transformation: {e}")
         
         return geo_features
     
@@ -280,7 +280,7 @@ class GeoSubAgent:
                     }
                 })
             except Exception as e:
-                logger.warning(f"Fehler bei Koordinaten-Transformation: {e}")
+                logger.warning(f"Error in coordinate transformation: {e}")
         
         return geo_features
     
@@ -518,7 +518,7 @@ class GeoSubAgent:
         try:
             font_title = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 20)
             font_label = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 10)
-        except:
+        except (OSError, IOError):
             font_title = ImageFont.load_default()
             font_label = ImageFont.load_default()
         
