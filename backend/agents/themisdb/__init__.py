@@ -103,7 +103,7 @@ from .rag_agent import (
     create_uds3_agent,
 )
 
-# Execution Plan Analysis (NEW)
+# Execution Plan Analysis
 from .execution_plan_analysis import (
     # Enums
     ResourceType,
@@ -125,7 +125,26 @@ from .execution_plan_analysis import (
     format_execution_plan,
 )
 
-__version__ = "2.1.0"
+# Agent Framework Integration (NEW)
+from .agent_framework_integration import (
+    # Config Loader
+    ResourceCostConfigLoader,
+    
+    # Mappers
+    AgentCapabilityMapper,
+    
+    # Integrations
+    ResearchPlanIntegration,
+    IntelligentPipelineIntegration,
+    UnifiedOrchestratorV7Integration,
+    
+    # Factory Functions
+    create_intelligent_pipeline_integration,
+    create_unified_orchestrator_integration,
+    sync_costs_from_yaml,
+)
+
+__version__ = "2.2.0"
 __author__ = "VERITAS Backend Team"
 
 __all__ = [
@@ -173,7 +192,7 @@ __all__ = [
     "create_themisdb_agent",
     "create_uds3_agent",
     
-    # Execution Plan Analysis (NEW)
+    # Execution Plan Analysis
     "ResourceType",
     "QueryApproach",
     "ExecutionMode",
@@ -185,4 +204,14 @@ __all__ = [
     "ExecutionPlanBuilder",
     "ExecutionPlanOptimizer",
     "format_execution_plan",
+    
+    # Agent Framework Integration
+    "ResourceCostConfigLoader",
+    "AgentCapabilityMapper",
+    "ResearchPlanIntegration",
+    "IntelligentPipelineIntegration",
+    "UnifiedOrchestratorV7Integration",
+    "create_intelligent_pipeline_integration",
+    "create_unified_orchestrator_integration",
+    "sync_costs_from_yaml",
 ]
