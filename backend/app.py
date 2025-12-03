@@ -671,6 +671,17 @@ except ImportError as e:
     logger.warning(f"⚠️  Chart API router not available: {e}")
 
 # ============================================================================
+# Mount Presentation API Router (Presentation Canvas Agent)
+# ============================================================================
+
+try:
+    from backend.api.presentation_endpoints import router as presentation_router
+    app.include_router(presentation_router)
+    logger.info("✅ Presentation API Router mounted at /api/presentations")
+except ImportError as e:
+    logger.warning(f"⚠️  Presentation API router not available: {e}")
+
+# ============================================================================
 # Root Endpoints
 # ============================================================================
 
