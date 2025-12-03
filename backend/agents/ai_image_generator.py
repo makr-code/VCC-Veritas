@@ -154,10 +154,12 @@ class AIImageGenerator:
                         if 'image' in result:
                             image_data = base64.b64decode(result['image'])
                             
-                            # Speichern
+                            # Speichern mit UUID für Eindeutigkeit
                             import time
+                            import uuid
                             timestamp = int(time.time() * 1000)
-                            image_path = self.output_dir / f"swarmui_{timestamp}.png"
+                            unique_id = str(uuid.uuid4())[:8]
+                            image_path = self.output_dir / f"swarmui_{timestamp}_{unique_id}.png"
                             
                             with open(image_path, 'wb') as f:
                                 f.write(image_data)
@@ -219,10 +221,12 @@ class AIImageGenerator:
                             image_base64 = result['images'][0]
                             image_data = base64.b64decode(image_base64)
                             
-                            # Speichern
+                            # Speichern mit UUID
                             import time
+                            import uuid
                             timestamp = int(time.time() * 1000)
-                            image_path = self.output_dir / f"sd_{timestamp}.png"
+                            unique_id = str(uuid.uuid4())[:8]
+                            image_path = self.output_dir / f"sd_{timestamp}_{unique_id}.png"
                             
                             with open(image_path, 'wb') as f:
                                 f.write(image_data)
@@ -296,10 +300,12 @@ class AIImageGenerator:
                             image_base64 = result['data'][0]['b64_json']
                             image_data = base64.b64decode(image_base64)
                             
-                            # Speichern
+                            # Speichern mit UUID
                             import time
+                            import uuid
                             timestamp = int(time.time() * 1000)
-                            image_path = self.output_dir / f"dalle_{timestamp}.png"
+                            unique_id = str(uuid.uuid4())[:8]
+                            image_path = self.output_dir / f"dalle_{timestamp}_{unique_id}.png"
                             
                             with open(image_path, 'wb') as f:
                                 f.write(image_data)
@@ -345,9 +351,27 @@ class AIImageGenerator:
         draw.rectangle([10, 10, width-10, height-10], outline='#cccccc', width=2)
         
         # Text
-        try:
-            font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 16)
-        except (OSError, IOError):
+        # Font with cross-platform paths
+        font_paths = [
+            # Linux
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+            # macOS
+            "/Library/Fonts/Arial.ttf",
+            "/System/Library/Fonts/Helvetica.ttc",
+            # Windows
+            "C:\\Windows\\Fonts\\arial.ttf",
+            "C:\\Windows\\Fonts\\Arial.ttf"
+        ]
+        
+        font = None
+        for font_path in font_paths:
+            try:
+                font = ImageFont.truetype(font_path, 16)
+                break
+            except (OSError, IOError):
+                continue
+        
+        if font is None:
             font = ImageFont.load_default()
         
         # Prompt-Text (gekürzt)
@@ -371,10 +395,12 @@ class AIImageGenerator:
             draw.text((x, y), line, fill='#666666', font=font)
             y += 25
         
-        # Speichern
+        # Speichern mit UUID
         import time
+        import uuid
         timestamp = int(time.time() * 1000)
-        image_path = self.output_dir / f"placeholder_{timestamp}.png"
+        unique_id = str(uuid.uuid4())[:8]
+        image_path = self.output_dir / f"placeholder_{timestamp}_{unique_id}.png"
         img.save(image_path, 'PNG')
         
         # Base64
@@ -675,7 +701,7 @@ class AIImageGenerator:
         
         # EXIF-Daten (falls vorhanden)
         try:
-            exif = img._getexif()
+            exif = img.getexif()
             if exif:
                 analysis_parts.append("EXIF data available")
         except:
