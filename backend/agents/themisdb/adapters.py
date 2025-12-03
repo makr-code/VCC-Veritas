@@ -824,7 +824,3 @@ class AdapterSelector:
             )
         else:
             raise ValueError(f"Unknown database type: {db_type}")
-
-
-# Make AdapterSelector's method a classmethod
-AdapterSelector._get_config_for_type = classmethod(AdapterSelector._get_config_for_type.__func__)

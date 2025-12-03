@@ -103,7 +103,29 @@ from .rag_agent import (
     create_uds3_agent,
 )
 
-__version__ = "2.0.0"
+# Execution Plan Analysis (NEW)
+from .execution_plan_analysis import (
+    # Enums
+    ResourceType,
+    QueryApproach,
+    ExecutionMode,
+    
+    # Data Classes
+    ResourceCost,
+    ExecutionStep,
+    ExecutionPlan,
+    
+    # Core Classes
+    ResourceCostDatabase,
+    QueryAnalyzer,
+    ExecutionPlanBuilder,
+    ExecutionPlanOptimizer,
+    
+    # Utilities
+    format_execution_plan,
+)
+
+__version__ = "2.1.0"
 __author__ = "VERITAS Backend Team"
 
 __all__ = [
@@ -150,4 +172,17 @@ __all__ = [
     "create_rag_agent",
     "create_themisdb_agent",
     "create_uds3_agent",
+    
+    # Execution Plan Analysis (NEW)
+    "ResourceType",
+    "QueryApproach",
+    "ExecutionMode",
+    "ResourceCost",
+    "ExecutionStep",
+    "ExecutionPlan",
+    "ResourceCostDatabase",
+    "QueryAnalyzer",
+    "ExecutionPlanBuilder",
+    "ExecutionPlanOptimizer",
+    "format_execution_plan",
 ]
