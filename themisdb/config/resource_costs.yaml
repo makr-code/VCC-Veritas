@@ -1,0 +1,304 @@
+# ThemisDB Resource Cost Configuration
+# =====================================
+# 
+# Basiert auf VERITAS Agent Framework (docs/AGENT_FRAMEWORK_QUICKSTART.md)
+# Integriert mit Research Plan Schema und Execution Flow
+#
+# Alle Kosten in relativen Einheiten (1.0 = Baseline)
+# Version: 1.0
+# Date: 2025-12-03
+
+# Resource Costs (kompatibel mit Agent Framework)
+resources:
+  # Large Language Models
+  llm_large:
+    computational_cost: 10.0
+    time_cost: 5.0
+    monetary_cost: 10.0
+    quality_score: 0.95
+    enabled: true
+    agent_type: "LLMAgent"
+    capabilities:
+      - "text_generation"
+      - "reasoning"
+      - "synthesis"
+    
+  llm_medium:
+    computational_cost: 5.0
+    time_cost: 3.0
+    monetary_cost: 5.0
+    quality_score: 0.85
+    enabled: true
+    agent_type: "LLMAgent"
+    capabilities:
+      - "text_generation"
+      - "summarization"
+    
+  # Small Language Models
+  slm_small:
+    computational_cost: 2.0
+    time_cost: 1.0
+    monetary_cost: 1.0
+    quality_score: 0.70
+    enabled: true
+    agent_type: "SLMAgent"
+    capabilities:
+      - "classification"
+      - "quick_answers"
+    
+  # Traditional NLP
+  nlp_traditional:
+    computational_cost: 0.5
+    time_cost: 0.2
+    monetary_cost: 0.1
+    quality_score: 0.50
+    enabled: true
+    agent_type: "NLPAgent"
+    capabilities:
+      - "tokenization"
+      - "ner"
+      - "sentiment"
+    
+  # Vector Search
+  vector_search:
+    computational_cost: 1.0
+    time_cost: 0.1
+    monetary_cost: 0.5
+    quality_score: 0.75
+    enabled: true
+    agent_type: "VectorSearchAgent"
+    uds3_database: "chromadb"
+    phase5_hybrid_search: true
+    capabilities:
+      - "semantic_search"
+      - "similarity"
+    
+  # Graph Traversal
+  graph_traversal:
+    computational_cost: 2.0
+    time_cost: 0.5
+    monetary_cost: 1.0
+    quality_score: 0.80
+    enabled: true
+    agent_type: "GraphAgent"
+    uds3_database: "neo4j"
+    capabilities:
+      - "relationship_discovery"
+      - "path_finding"
+    
+  # Fulltext Search
+  fulltext_search:
+    computational_cost: 0.3
+    time_cost: 0.1
+    monetary_cost: 0.2
+    quality_score: 0.60
+    enabled: true
+    agent_type: "FulltextAgent"
+    uds3_database: "postgres"
+    capabilities:
+      - "keyword_search"
+      - "exact_match"
+
+# Query Approach to Agent Mapping
+# Integriert mit Research Plan Schema
+query_approaches:
+  simple_ask:
+    resources:
+      - vector_search
+      - slm_small
+    agent_types:
+      - "VectorSearchAgent"
+      - "SLMAgent"
+    max_cost: 2.0
+    target_quality: 0.70
+    research_plan_config:
+      total_steps: 2
+      security_level: "internal"
+      
+  research_basic:
+    resources:
+      - vector_search
+      - fulltext_search
+      - slm_small
+    agent_types:
+      - "VectorSearchAgent"
+      - "FulltextAgent"
+      - "SLMAgent"
+    max_cost: 3.0
+    target_quality: 0.75
+    research_plan_config:
+      total_steps: 3
+      security_level: "internal"
+      uds3_databases:
+        - "chromadb"
+        - "postgres"
+      
+  research_deep:
+    resources:
+      - vector_search
+      - graph_traversal
+      - llm_medium
+    agent_types:
+      - "VectorSearchAgent"
+      - "GraphAgent"
+      - "LLMAgent"
+    max_cost: 6.0
+    target_quality: 0.85
+    research_plan_config:
+      total_steps: 3
+      security_level: "internal"
+      uds3_databases:
+        - "chromadb"
+        - "neo4j"
+      phase5_hybrid_search: true
+      
+  scientific:
+    resources:
+      - vector_search
+      - graph_traversal
+      - fulltext_search
+      - llm_large
+    agent_types:
+      - "VectorSearchAgent"
+      - "GraphAgent"
+      - "FulltextAgent"
+      - "LLMAgent"
+    max_cost: 12.0
+    target_quality: 0.90
+    research_plan_config:
+      total_steps: 4
+      security_level: "confidential"
+      uds3_databases:
+        - "chromadb"
+        - "neo4j"
+        - "postgres"
+      phase5_hybrid_search: true
+      
+  expert_analysis:
+    resources:
+      - vector_search
+      - graph_traversal
+      - llm_large
+      - nlp_traditional
+    agent_types:
+      - "VectorSearchAgent"
+      - "GraphAgent"
+      - "LLMAgent"
+      - "NLPAgent"
+    max_cost: 15.0
+    target_quality: 0.95
+    research_plan_config:
+      total_steps: 4
+      security_level: "secret"
+      uds3_databases:
+        - "chromadb"
+        - "neo4j"
+        - "postgres"
+      phase5_hybrid_search: true
+
+# Quality Policy (integriert mit Agent Framework Quality Gates)
+quality_policy:
+  min_confidence_score: 0.7
+  min_quality_score: 0.6
+  require_sources: true
+  max_retries: 3
+  retry_strategy: "exponential_backoff"
+
+# Parallelization (compatible with OrchestrationController)
+parallelization:
+  enabled: true
+  max_parallel_steps: 4
+  parallelizable_resources:
+    - vector_search
+    - fulltext_search
+    - graph_traversal
+  sequential_resources:
+    - llm_large
+    - llm_medium
+    - slm_small
+    - nlp_traditional
+
+# Performance Targets (aligned with Agent Monitoring)
+performance_targets:
+  simple_ask:
+    max_latency_ms: 500
+    min_quality: 0.65
+    max_cost: 2.0
+    avg_execution_time_ms: 350
+    
+  research_basic:
+    max_latency_ms: 1000
+    min_quality: 0.75
+    max_cost: 4.0
+    avg_execution_time_ms: 750
+    
+  research_deep:
+    max_latency_ms: 2000
+    min_quality: 0.82
+    max_cost: 8.0
+    avg_execution_time_ms: 1500
+    
+  scientific:
+    max_latency_ms: 5000
+    min_quality: 0.88
+    max_cost: 15.0
+    avg_execution_time_ms: 3500
+
+# Database Integration (PostgreSQL + JSON Fallback)
+database:
+  primary: "postgresql"
+  fallback: "json"
+  tables:
+    research_plans: "research_plans"
+    research_plan_steps: "research_plan_steps"
+    step_results: "step_results"
+    agent_execution_log: "agent_execution_log"
+    agent_registry_metadata: "agent_registry_metadata"
+
+# Monitoring (compatible with agent_monitoring.py)
+monitoring:
+  enabled: true
+  log_level: "INFO"
+  metrics:
+    - query_count
+    - avg_latency
+    - cost_total
+    - quality_score
+    - cache_hit_rate
+    - success_rate
+    - error_rate
+  storage:
+    table: "agent_execution_log"
+    retention_days: 90
+
+# Cost Calculation Weights
+cost_weights:
+  computational: 0.3
+  time: 0.4
+  monetary: 0.3
+
+# Budget Templates
+budget_templates:
+  fast:
+    name: "Fast Response"
+    time: 1.0
+    computational: 3.0
+    monetary: 2.0
+    
+  cheap:
+    name: "Cost Optimized"
+    time: 5.0
+    computational: 2.0
+    monetary: 1.0
+    
+  quality:
+    name: "High Quality"
+    time: 10.0
+    computational: 15.0
+    monetary: 15.0
+    
+  balanced:
+    name: "Balanced"
+    time: 5.0
+    computational: 5.0
+    monetary: 5.0
