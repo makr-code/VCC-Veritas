@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-Test Script für Vector Chart Agent
+Test Script for Vector Chart Agent
 
 Tests:
 1. Backend Agent (standalone)
 2. Backend API Endpoints
-3. Frontend UI (manuell)
+3. Frontend UI (manual)
 """
 
 import asyncio

@@ -238,16 +238,19 @@ Antworte NUR mit dem JSON-Objekt, keine zusätzlichen Erklärungen."""
         1. SQL Query (wenn intent['data_source'] == 'database')
         2. RAG Search (wenn intent['data_source'] == 'rag')
         3. Example Data (wenn intent['data_source'] == 'example')
+        
+        Note: Database and RAG extraction are planned for future releases.
+        GitHub Issue: #TBD - RAG/Database integration for Vector Chart Agent
         """
         data_source = intent.get('data_source', 'example')
         
         if data_source == 'database':
-            # TODO: SQL-Query ausführen (UDS3-Integration)
+            # Future: SQL-Query execution via UDS3-Integration
             logger.info("Database-Extraktion noch nicht implementiert, nutze Beispieldaten")
             data = self._get_example_data(intent['chart_type'])
         
         elif data_source == 'rag':
-            # TODO: RAG-Suche
+            # Future: RAG-Search implementation
             logger.info("RAG-Extraktion noch nicht implementiert, nutze Beispieldaten")
             data = self._get_example_data(intent['chart_type'])
         

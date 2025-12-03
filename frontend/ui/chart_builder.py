@@ -368,7 +368,7 @@ Powered by:
             self.current_chart = chart_data
             
             # Placeholder entfernen
-            if self.placeholder_label.winfo_exists():
+            if hasattr(self, 'placeholder_label') and self.placeholder_label.winfo_exists():
                 self.placeholder_label.destroy()
             
             # Alte Widgets entfernen
