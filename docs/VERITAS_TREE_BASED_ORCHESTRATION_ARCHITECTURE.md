@@ -269,7 +269,7 @@ backend/
 
 ```
 ExecutionTree for: "Bauantrag Windkraftanlage in Naturschutzgebiet"
-Budget: €0.50, 30s, Quality Target: 8.5/10
+Budget: 50 CU, 30s, Quality Target: 8.5/10  (50 CU ≈ 50.0 CU at 0.01 rate)
 
 ROOT (session_abc123)
 │
@@ -279,7 +279,7 @@ ROOT (session_abc123)
 │  ├─ SUB_1.3: Search "Baurecht Windenergie" → 18 docs
 │  └─ SUB_1.4: Search "UVP WKA" → 10 docs
 │  Status: COMPLETED, Quality: 8.5/10
-│  Cost: Predicted €0.05, Actual €0.048, Variance: -4%
+│  Cost: Predicted 5.0 CU, Actual 4.8 CU, Variance: -4%
 │  Time: Predicted 3s, Actual 2.8s, Variance: -7%
 │  ROI: 8.5/0.048 = 177 ✅ EXCELLENT
 │  Decision: CONTINUE
@@ -288,56 +288,56 @@ ROOT (session_abc123)
 │  └─ Traverse legal relationships (BImSchG ↔ BNatSchG)
 │     Result: 45 connections
 │     Status: COMPLETED, Quality: 9/10
-│     Cost: Predicted €0.08, Actual €0.12, Variance: +50% ⚠️
+│     Cost: Predicted 8.0 CU, Actual 12.0 CU, Variance: +50% ⚠️
 │     Time: Predicted 4s, Actual 5.5s, Variance: +38%
 │     ROI: 9.0/0.12 = 75 ✅ ACCEPTABLE
 │     Decision: CONTINUE (high quality justifies cost overrun)
 │
 ├─ STEP_3 (Agent Baurecht) [PARALLEL with STEP_1, STEP_2]
 │  ├─ Initial consultation → Preliminary findings
-│  │  Cost: Predicted €0.10, Actual €0.11, Variance: +10%
+│  │  Cost: Predicted 10.0 CU, Actual 11.0 CU, Variance: +10%
 │  │  Time: Predicted 5s, Actual 5.2s, Variance: +4%
 │  │  Quality: 7.5/10, ROI: 68
 │  │
 │  └─ AGENT_REQUESTED: Additional step
 │      ├─ Per-Step Verification (t=5.2s):
-│      │  Overall Metrics: Cost €0.218, Time 8.5s, Avg Quality 8.3
+│      │  Overall Metrics: Cost 21.8 CU, Time 8.5s, Avg Quality 8.3
 │      │  Forecast: Will finish on budget ✅, on time ✅
 │      │  Agent requests: "Need case law for precedent"
-│      │  ROI Forecast: +1.5 quality for €0.06 = ROI 25 ✅
+│      │  ROI Forecast: +1.5 quality for 6.0 CU = ROI 25 ✅
 │      │  Decision: APPROVE additional step
 │      │
 │      └─ STEP_3.1 (Fulltext search case law) → 8 precedents
 │         Status: COMPLETED, Quality: 9.5/10
-│         Cost: Predicted €0.06, Actual €0.058, Variance: -3%
+│         Cost: Predicted 6.0 CU, Actual 5.8 CU, Variance: -3%
 │         Time: Predicted 3s, Actual 2.9s
 │         ROI: (9.5-7.5)/0.058 = 34.5 ✅ GOOD
 │         Decision: CONTINUE
 │
 ├─ STEP_4 (USER_REFINEMENT: "Was ist mit Artenschutz?") [t=11.6s]
 │  ├─ Per-Step Overall Verification:
-│  │  Current Metrics: Cost €0.276, Time 11.6s, Avg Quality 8.5
-│  │  Budget Remaining: €0.224, Time 18.4s
-│  │  User Refinement Cost Estimate: €0.10, Time 6s
-│  │  Projected Total: €0.376, Time 17.6s ✅ Within budget
+│  │  Current Metrics: Cost 27.6 CU, Time 11.6s, Avg Quality 8.5
+│  │  Budget Remaining: 22.4 CU, Time 18.4s
+│  │  User Refinement Cost Estimate: 10.0 CU, Time 6s
+│  │  Projected Total: 37.6 CU, Time 17.6s ✅ Within budget
 │  │  Decision: ACCEPT refinement
 │  │
 │  └─ STEP_4.1 (Agent Naturschutz)
 │      ├─ Search "Artenschutz Windkraft" → 14 docs
 │      └─ Agent analysis → Expert findings
 │         Status: COMPLETED, Quality: 9/10
-│         Cost: Predicted €0.10, Actual €0.095, Variance: -5%
+│         Cost: Predicted 10.0 CU, Actual 9.5 CU, Variance: -5%
 │         Time: Predicted 6s, Actual 5.8s
 │         ROI: 9.0/0.095 = 94.7 ✅ EXCELLENT
 │         Decision: BRANCH SUCCESSFUL
 │
 ├─ [PRUNED] STEP_5 (Agent Umweltverträglichkeit)
-│  ├─ Initial estimate: €0.15, Time 8s, Expected Quality: 7/10
+│  ├─ Initial estimate: 15.0 CU, Time 8s, Expected Quality: 7/10
 │  │  Per-Step Verification (t=17.4s):
-│  │  Current Metrics: Cost €0.371, Time 17.4s, Avg Quality 8.75
-│  │  Budget Remaining: €0.129, Time 12.6s
-│  │  This step would cost €0.15 → Would exceed budget
-│  │  ROI: 7.0/0.15 = 46.7 (vs current average 8.75/0.371 = 23.6)
+│  │  Current Metrics: Cost 37.1 CU, Time 17.4s, Avg Quality 8.75
+│  │  Budget Remaining: 12.9 CU, Time 12.6s
+│  │  This step would cost 15.0 CU → Would exceed budget
+│  │  ROI: 7.0/15.0 = 0.47 (vs current average 8.75/37.1 = 0.24)
 │  │  Decision: PRUNE (insufficient budget, quality already exceeds target)
 │  └─ Status: PRUNED, Reason: "budget_exceeded_quality_target_met"
 │
@@ -346,19 +346,19 @@ ROOT (session_abc123)
    ├─ Reranking: 67 docs → Top 15
    └─ LLM synthesis → Final answer
       Status: COMPLETED, Quality: 9.2/10
-      Cost: Predicted €0.08, Actual €0.075
+      Cost: Predicted 8.0 CU, Actual 7.5 CU
       Time: Predicted 4s, Actual 3.8s
       
 FINAL OVERALL METRICS:
 ═══════════════════════════════════════════════════════════
 Time:    Total 21.2s / Budget 30s = 71% utilization ✅
-Cost:    Total €0.446 / Budget €0.50 = 89% utilization ✅
+Cost:    Total 44.6 CU / Budget 50.0 CU = 89% utilization ✅
 Quality: Final 9.2/10 vs Target 8.5/10 = 108% achievement ✅
-ROI:     9.2 / (0.446 + 21.2/60) = 18.2 EXCELLENT
+ROI:     9.2 / (44.6 + 21.2/60) = 0.20 EXCELLENT
 
 Branches: 4 completed, 1 pruned
 Steps:    8 completed, 1 pruned
-Forecast Accuracy: 92% (predicted €0.48, actual €0.446)
+Forecast Accuracy: 92% (predicted 48.0 CU, actual 44.6 CU)
 ═══════════════════════════════════════════════════════════
 ```
 
@@ -506,7 +506,7 @@ class ExecutionTree:
     
     # Budget Constraints
     time_budget: float                  # Maximum allowed time (seconds)
-    cost_budget: float                  # Maximum allowed cost (€)
+    cost_budget: float                  # Maximum allowed cost (CU)
     quality_target: float               # Minimum acceptable quality (0-10)
     
     # Timestamps
@@ -519,7 +519,7 @@ class ExecutionTree:
 ## 6. Cost-Benefit Analysis
 
 Every plan includes:
-- **Total Cost** (€): Sum of all resource costs
+- **Total Cost** (CU): Sum of all resource costs in Cost Units
 - **Total Time** (seconds): Critical path duration
 - **Expected Quality** (0-10): Predicted answer quality
 - **Success Probability** (0-1): Likelihood of satisfactory result
@@ -628,7 +628,7 @@ class OverallExecutionMetrics:
     time_utilization: float                      # total_elapsed_time / time_budget
     
     # Cost Metrics
-    total_cost_accrued: float                    # €, sum across all branches
+    total_cost_accrued: float                    # CU (Cost Units), sum across all branches
     predicted_remaining_cost: float              # Estimated cost to completion
     cost_budget_remaining: float                 # cost_budget - total_cost_accrued
     cost_utilization: float                      # total_cost_accrued / cost_budget
@@ -779,8 +779,8 @@ Stream overall metrics to client in real-time:
     "data": {
         "time_elapsed": "12.5s",
         "time_budget_remaining": "17.5s",
-        "cost_accrued": "€0.23",
-        "cost_budget_remaining": "€0.22",
+        "cost_accrued": "23.0 CU",
+        "cost_budget_remaining": "27.0 CU",
         "average_quality": 8.2,
         "completion": "65%",
         "forecast": {
@@ -808,6 +808,64 @@ This provides **full transparency** to users about execution progress and resour
 2. When has **enough time** elapsed to justify stopping?
 3. How do we quantify if the content is **sufficient for a quality answer**?
 
+### 6.3.0 Dimensionless Cost Units (Best Practice)
+
+**Problem**: Absolute costs in euros (€) create problems:
+- Currency dependency and exchange rate fluctuations
+- Inflation makes historic comparisons difficult
+- Hard to compare across different deployment environments
+- No standardized reference point
+
+**Solution**: **Cost Units (CU)** - Dimensionless normalized metric following industry best practices:
+
+```python
+# Baseline Definition (1.0 CU = reference operation)
+BASELINE_OPERATION = {
+    "type": "simple_vector_search",
+    "computational": 1.0,    # 1 CPU core-second
+    "time": 1.0,             # 1 second wall-clock time
+    "memory": 1.0,           # 1 GB RAM
+    "monetary": 1.0          # Baseline cost (can be mapped to actual currency)
+}
+
+# All costs normalized to this baseline
+# Examples:
+# - Vector search: 1.0 CU (baseline)
+# - Small LLM inference: 5.0 CU (5x more expensive)
+# - Large LLM inference: 10.0 CU (10x more expensive)
+# - Graph traversal: 2.0 CU (2x more expensive)
+```
+
+**Benefits**:
+- ✅ **Platform-independent**: Works across cloud providers, on-prem, edge
+- ✅ **Time-invariant**: Meaningful comparisons across months/years
+- ✅ **Transparent**: Easy to understand "this costs 5x baseline operation"
+- ✅ **Composable**: Total cost = sum of normalized units
+- ✅ **Budget-friendly**: Set budgets in CU (e.g., 50 CU per query)
+
+**Conversion to Real Costs**:
+```python
+# Define monetary mapping per deployment
+CU_TO_EUR_MAPPING = 0.01  # 1 CU = 1.0 CU in production
+CU_TO_USD_MAPPING = 0.011 # 1 CU = $0.011 in US deployment
+
+# Query cost: 47.5 CU
+real_cost_eur = 47.5 * 0.01  # 47.5 CU
+real_cost_usd = 47.5 * 0.011 # $0.5225
+```
+
+**Integration with existing YAML**:
+The `resource_costs.yaml` already uses relative units! We formalize this as CU:
+```yaml
+resources:
+  vector_search:
+    cost_units: 1.0        # Baseline operation
+  llm_large:
+    cost_units: 10.0       # 10x more expensive
+  slm_small:
+    cost_units: 2.0        # 2x more expensive
+```
+
 ### 6.3.1 Multi-Dimensional Cap System
 
 The system implements **5 types of caps** that can trigger termination:
@@ -821,9 +879,14 @@ class ExecutionCaps:
     max_total_time: float = 30.0           # Hard limit: total execution time (seconds)
     soft_time_threshold: float = 0.80       # Soft limit: 80% of time budget
     
-    # Cost Caps
-    max_total_cost: float = 0.50           # Hard limit: total cost (€)
+    # Cost Caps (in dimensionless Cost Units)
+    max_total_cost_units: float = 50.0     # Hard limit: total cost (CU)
     soft_cost_threshold: float = 0.85       # Soft limit: 85% of cost budget
+    baseline_cost_unit: float = 1.0         # Reference operation cost
+    
+    # Optional: Monetary conversion (environment-specific)
+    cu_to_currency_rate: float = 0.01      # 1 CU = 1.0 CU (configurable)
+    currency: str = "EUR"                   # Currency for display only
     
     # Resource Quantity Caps
     max_documents_retrieved: int = 100      # Hard limit: total documents
@@ -871,7 +934,7 @@ class ResourceCapEvaluator:
         if current_state.total_time >= caps.max_total_time:
             return (True, "max_time_exceeded")
         
-        if current_state.total_cost >= caps.max_total_cost:
+        if current_state.total_cost_units >= caps.max_total_cost_units:
             return (True, "max_cost_exceeded")
         
         # 2. OPTIMAL RANGE - Can stop if quality is good
@@ -1266,8 +1329,8 @@ Stream cap status to users:
             "status": "ok"
         },
         "cost_cap": {
-            "used": "€0.23",
-            "limit": "€0.50",
+            "used": "23.0 CU",
+            "limit": "50.0 CU",
             "utilization": 0.46,
             "status": "ok"
         },
@@ -1302,28 +1365,28 @@ Stream cap status to users:
 
 ```
 Query: "Bauantrag Windkraft in Naturschutzgebiet"
-Caps: 30s, €0.50, Quality Target 8.5/10
+Caps: 30s, 50.0 CU, Quality Target 8.5/10
 
-Step 1 (t=3s, €0.05): Vector Search → 18 docs, CSS=0.45
+Step 1 (t=3s, 5.0 CU): Vector Search → 18 docs, CSS=0.45
   Decision: CONTINUE (low CSS, well within caps)
 
-Step 2 (t=6s, €0.13): Graph Search → +12 docs, CSS=0.62
+Step 2 (t=6s, 13.0 CU): Graph Search → +12 docs, CSS=0.62
   Decision: CONTINUE (moderate CSS, sufficient budget)
 
-Step 3 (t=11s, €0.24): Legal Agent → +8 docs, CSS=0.76
+Step 3 (t=11s, 24.0 CU): Legal Agent → +8 docs, CSS=0.76
   Decision: CONTINUE (approaching sufficiency, budget ok)
 
-Step 4 (t=16s, €0.35): Construction Agent → +6 docs, CSS=0.82
+Step 4 (t=16s, 35.0 CU): Construction Agent → +6 docs, CSS=0.82
   Decision: CONTINUE (good CSS, still have budget)
 
 User Refinement (t=16s): "Was ist mit Artenschutz?"
   New Branch: Environmental Agent
-  Cost Estimate: €0.12, Time: 6s
-  Projected Total: €0.47, 22s
+  Cost Estimate: 12.0 CU, Time: 6s
+  Projected Total: 47.0 CU, 22s
   CSS if added: 0.89 (estimated)
   Decision: ACCEPT (high projected CSS, within budget)
 
-Step 5 (t=22s, €0.47): Environmental Agent → +9 docs, CSS=0.88
+Step 5 (t=22s, 47.0 CU): Environmental Agent → +9 docs, CSS=0.88
   ✅ TERMINATE: "high_content_sufficiency (0.88) + soft_time_reached"
   
   Breakdown:
@@ -1334,7 +1397,7 @@ Step 5 (t=22s, €0.47): Environmental Agent → +9 docs, CSS=0.88
   - Confidence: 0.85 (high system confidence)
   - Completeness: 0.90 (LLM confirms all aspects addressed)
   
-  Final: 53 documents, 22s, €0.47, Quality 9.1/10
+  Final: 53 documents, 22s, 47.0 CU, Quality 9.1/10
 ```
 
 ---
@@ -1393,23 +1456,23 @@ Step 5 (t=22s, €0.47): Environmental Agent → +9 docs, CSS=0.88
 ### Simple Query
 ```
 Query: "Was ist §45 BNatSchG?"
-Plan: Speed-Optimized (€0.01, 2s, 7/10)
+Plan: Speed-Optimized (1.0 CU, 2s, 7/10)
 Tree: Vector Search → LLM Synthesis
 Result: Legal text explanation
-Time: 1.8s, Cost: €0.01
+Time: 1.8s, Cost: 1.0 CU
 ```
 
 ### Complex Query with Refinement
 ```
 Query: "Bauantrag für Windkraftanlage"
-Plan: Balanced (€0.45, 8s, 9/10)
+Plan: Balanced (45.0 CU, 8s, 9/10)
 Tree: Vector + Graph + Agents (parallel)
 
 t=2s: User adds "Was ist mit Artenschutz?"
 → Tree expanded with Naturschutz agent
 
 Result: Comprehensive answer covering all aspects
-Time: 8.2s, Cost: €0.47, Quality: 9.2/10
+Time: 8.2s, Cost: 47.0 CU, Quality: 9.2/10
 ```
 
 ---
@@ -1438,7 +1501,7 @@ This **Tree-Based Orchestration Architecture** positions VERITAS as a world-clas
 
 **2. Integrated Overall Tracking**: A real-time dashboard of overall execution metrics (time, cost, quality, ROI) is maintained and updated after every step. This provides forecast accuracy, budget utilization monitoring, quality trajectory analysis, and global decision making.
 
-**3. Resource Caps**: Multi-dimensional cap system with hard limits (must stop), soft limits (consider stopping), and optimal ranges (sweet spot). Includes time caps (30s max), cost caps (€0.50 max), document caps (100 max, 15-30 optimal), and quality targets (8.5/10).
+**3. Resource Caps**: Multi-dimensional cap system with hard limits (must stop), soft limits (consider stopping), and optimal ranges (sweet spot). Includes time caps (30s max), cost caps (50.0 CU max), document caps (100 max, 15-30 optimal), and quality targets (8.5/10).
 
 **4. Content Sufficiency Quantification**: The **Content Sufficiency Score (CSS)** uses 6 dimensions to quantify whether gathered content is sufficient for a quality answer:
 - **Evidence Coverage** (30%): How many query aspects have supporting evidence?
@@ -1456,12 +1519,12 @@ CSS ≥ 0.75 = sufficient, CSS ≥ 0.85 = high sufficiency, CSS ≥ 0.95 = excep
 - Quality plateau detected (no improvement over last 3 steps)
 - Optimal document range achieved with quality target met
 
-**Example**: In a €0.50, 30s budget scenario, the system:
+**Example**: In a 50.0 CU, 30s budget scenario, the system:
 1. Tracks actual vs predicted cost at each step (±20% variance threshold)
 2. Calculates per-step ROI (quality improvement / cost)
 3. Evaluates CSS after each step (6-factor score)
 4. Terminates at 22s with CSS=0.88 (high sufficiency, soft time reached)
-5. Delivers 9.1/10 quality with 53 documents, €0.47 spent
+5. Delivers 9.1/10 quality with 53 documents, 47.0 CU spent
 6. Avoided unnecessary STEP_6 that would have exceeded budget without meaningful quality gain
 
 **Next Steps**:
