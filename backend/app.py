@@ -693,6 +693,17 @@ except ImportError as e:
     logger.warning(f"⚠️  Geo API router not available: {e}")
 
 # ============================================================================
+# Mount Image Generation API Router (AI Image Generator)
+# ============================================================================
+
+try:
+    from backend.api.image_endpoints import router as image_router
+    app.include_router(image_router)
+    logger.info("✅ Image Generation API Router mounted at /api/images")
+except ImportError as e:
+    logger.warning(f"⚠️  Image Generation API router not available: {e}")
+
+# ============================================================================
 # Root Endpoints
 # ============================================================================
 

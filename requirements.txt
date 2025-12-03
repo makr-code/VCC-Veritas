@@ -55,3 +55,6 @@ Pillow>=10.1.0  # Bildverarbeitung (bereits in vielen Projekten vorhanden)
 
 # Geo Sub-Agent (OSM Karten & GeoInformationen)
 pyproj>=3.6.0  # Koordinaten-Transformation (ETRS89 UTM → WGS84)
+
+# AI Image Generator (SwarmUI, Stable Diffusion, DALL-E Integration)
+aiohttp>=3.9.0  # Async HTTP Client für API-Calls
