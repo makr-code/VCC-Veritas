@@ -682,6 +682,17 @@ except ImportError as e:
     logger.warning(f"⚠️  Presentation API router not available: {e}")
 
 # ============================================================================
+# Mount Geo API Router (Geo Sub-Agent)
+# ============================================================================
+
+try:
+    from backend.api.geo_endpoints import router as geo_router
+    app.include_router(geo_router)
+    logger.info("✅ Geo API Router mounted at /api/geo")
+except ImportError as e:
+    logger.warning(f"⚠️  Geo API router not available: {e}")
+
+# ============================================================================
 # Root Endpoints
 # ============================================================================
 
