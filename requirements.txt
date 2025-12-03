@@ -42,3 +42,13 @@ mcp>=0.1.0
 # Note: vLLM requires CUDA/GPU for optimal performance
 # Can be installed separately on the vLLM server
 # vllm>=0.2.0
+
+# Vector Chart Generation (AI-gestützte Chart-Erstellung)
+matplotlib>=3.8.0
+seaborn>=0.13.0
+plotly>=5.18.0
+kaleido>=0.2.1  # Plotly-Export zu Bildern
+python-pptx>=0.6.23  # PowerPoint-Export
+svgwrite>=1.4.3  # SVG-Generierung
+# cairosvg>=2.7.1  # SVG→PNG Konvertierung (optional, benötigt cairo)
+Pillow>=10.1.0  # Bildverarbeitung (bereits in vielen Projekten vorhanden)

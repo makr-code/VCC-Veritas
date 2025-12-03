@@ -660,6 +660,17 @@ except ImportError as e:
     logger.warning(f"⚠️  Authentication router not available: {e}")
 
 # ============================================================================
+# Mount Chart API Router (Vector Chart Agent)
+# ============================================================================
+
+try:
+    from backend.api.chart_endpoints import router as chart_router
+    app.include_router(chart_router)
+    logger.info("✅ Chart API Router mounted at /api/charts")
+except ImportError as e:
+    logger.warning(f"⚠️  Chart API router not available: {e}")
+
+# ============================================================================
 # Root Endpoints
 # ============================================================================
 
