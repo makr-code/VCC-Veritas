@@ -660,6 +660,50 @@ except ImportError as e:
     logger.warning(f"⚠️  Authentication router not available: {e}")
 
 # ============================================================================
+# Mount Chart API Router (Vector Chart Agent)
+# ============================================================================
+
+try:
+    from backend.api.chart_endpoints import router as chart_router
+    app.include_router(chart_router)
+    logger.info("✅ Chart API Router mounted at /api/charts")
+except ImportError as e:
+    logger.warning(f"⚠️  Chart API router not available: {e}")
+
+# ============================================================================
+# Mount Presentation API Router (Presentation Canvas Agent)
+# ============================================================================
+
+try:
+    from backend.api.presentation_endpoints import router as presentation_router
+    app.include_router(presentation_router)
+    logger.info("✅ Presentation API Router mounted at /api/presentations")
+except ImportError as e:
+    logger.warning(f"⚠️  Presentation API router not available: {e}")
+
+# ============================================================================
+# Mount Geo API Router (Geo Sub-Agent)
+# ============================================================================
+
+try:
+    from backend.api.geo_endpoints import router as geo_router
+    app.include_router(geo_router)
+    logger.info("✅ Geo API Router mounted at /api/geo")
+except ImportError as e:
+    logger.warning(f"⚠️  Geo API router not available: {e}")
+
+# ============================================================================
+# Mount Image Generation API Router (AI Image Generator)
+# ============================================================================
+
+try:
+    from backend.api.image_endpoints import router as image_router
+    app.include_router(image_router)
+    logger.info("✅ Image Generation API Router mounted at /api/images")
+except ImportError as e:
+    logger.warning(f"⚠️  Image Generation API router not available: {e}")
+
+# ============================================================================
 # Root Endpoints
 # ============================================================================
 
