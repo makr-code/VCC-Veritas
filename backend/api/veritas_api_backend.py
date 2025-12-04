@@ -14,408 +14,21 @@ Port: 5000
 Dokumentation: http://localhost:5000/docs
 """
 import asyncio
-import logging
-from logging.handlers import RotatingFileHandler
-from datetime import datetime
 import json
+import logging
 import os
 import sys
 from contextlib import asynccontextmanager
-<<<<<<< Updated upstream
-=======
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
-from typing import Any, AsyncGenerator, Dict, List, Optional, cast, Collection
 
->>>>>>> Stashed changes
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, StreamingResponse
-from pydantic import BaseModel, Field
-from typing import Optional, List, Dict, Any, AsyncGenerator
-import time
-import uuid
-
-from typing import TYPE_CHECKING
-
-# ReflectionStage: import for type-checking, fallback to `Any` at runtime to avoid
-# redefinition and runtime import dependencies while keeping static typing useful.
-if TYPE_CHECKING:
-    from backend.services.stage_reflection_service import ReflectionStage
-else:
-    ReflectionStage = Any
-
-# Füge das Projekt-Root zum Python-Pfad hinzu (für 'shared' imports)
-current_dir = os.path.dirname(os.path.abspath(__file__))
-project_root = os.path.dirname(os.path.dirname(current_dir))  # Zwei Verzeichnisse höher
-if project_root not in sys.path:
-    sys.path.insert(0, project_root)
-
-# Import Streaming Progress System
-try:
-    from shared.pipelines.veritas_streaming_progress import (
-        create_progress_manager, create_progress_streamer,
-        ProgressStage, ProgressType, VeritasProgressManager, VeritasProgressStreamer
-    )
-    STREAMING_AVAILABLE = True
-except ImportError:
-    STREAMING_AVAILABLE = False
-
-# Import UDS3 Core Integration
-try:
-    import uds3
-    from uds3 import (
-        create_secure_document_light, 
-        get_optimized_unified_strategy,
-        UnifiedDatabaseStrategy,
-        MULTI_DB_DISTRIBUTION_AVAILABLE
-    )
-    # Versuche Security-Imports einzeln
-    try:
-        from uds3.uds3_security_quality import SecurityLevel, QualityMetric
-        QualityLevel = QualityMetric  # Alias für Kompatibilität
-    except ImportError:
-        try:
-            from uds3.uds3_core import SecurityLevel
-            QualityLevel = None
-        except ImportError:
-            SecurityLevel = None
-            QualityLevel = None
-    
-    UDS3_AVAILABLE = True
-    logging.info("✅ UDS3 Core erfolgreich importiert - Erweiterte Database Features verfügbar")
-except ImportError as e:
-    UDS3_AVAILABLE = False
-    SecurityLevel = None
-    QualityLevel = None
-    logging.warning(f"⚠️ UDS3 nicht verfügbar, Fallback zu Standard-Backend: {e}")
-
-    # Phase5 state (mypy-friendly default)
-phase5_initialized: bool = False
-
-# Conservative global defaults to satisfy cross-function references during static analysis
-agent_results: Dict[str, Any] = {}
-complexity: str = "standard"
-domain: str = "general"
-hypothesis: Any = None
-
-# Import Intelligent Multi-Agent Pipeline
-try:
-    from backend.agents.veritas_intelligent_pipeline import (
-        IntelligentMultiAgentPipeline, get_intelligent_pipeline,
-        IntelligentPipelineRequest, IntelligentPipelineResponse
-    )
-    from backend.agents.veritas_ollama_client import VeritasOllamaClient, get_ollama_client
-    INTELLIGENT_PIPELINE_AVAILABLE = True
-except ImportError:
-    try:
-        repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-        if repo_root not in sys.path:
-            sys.path.append(repo_root)
-        from backend.agents.veritas_intelligent_pipeline import (
-            IntelligentMultiAgentPipeline, get_intelligent_pipeline,
-            IntelligentPipelineRequest, IntelligentPipelineResponse
-        )
-        from backend.agents.veritas_ollama_client import VeritasOllamaClient, get_ollama_client
-        INTELLIGENT_PIPELINE_AVAILABLE = True
-    except ImportError as e:
-        INTELLIGENT_PIPELINE_AVAILABLE = False
-        logging.warning(f"⚠️ Intelligent Pipeline nicht verfügbar: {e}")
-
-# Import API v3 Router
-try:
-    from backend.api.v3 import api_v3_router, get_v3_info
-    from backend.api.v3.query_router import query_router
-    from backend.api.v3.agent_router import agent_router
-    from backend.api.v3.system_router import system_router
-    # Phase 2: Domain Endpoints
-    from backend.api.v3.vpb_router import vpb_router
-    from backend.api.v3.covina_router import covina_router
-    from backend.api.v3.pki_router import pki_router
-    # IMMI Router v3 wird direkt im include_router Block importiert (Namenskonflikt)
-    API_V3_AVAILABLE = True
-    logging.info("✅ API v3 Router erfolgreich importiert (inkl. Domain Endpoints)")
-except ImportError as e:
-    API_V3_AVAILABLE = False
-    logging.warning(f"⚠️ API v3 Router nicht verfügbar: {e}")
-
-# Logging Configuration
-def _setup_logging() -> logging.Logger:
-    """Richtet konsistente Logging-Ausgabe ein (Console + Rotating File).
-
-    - Level über ENV VERITAS_LOG_LEVEL steuerbar (default: DEBUG)
-    - Datei: data/backend_debug.log (Rotating, ~5 MB, 3 Backups)
-    - Konsolen-Output: INFO+
-    """
-    log_level_name = os.getenv("VERITAS_LOG_LEVEL", "DEBUG").upper()
-    log_level = getattr(logging, log_level_name, logging.DEBUG)
-
-    # Stelle sicher, dass der data/-Ordner existiert
-    try:
-        data_dir = os.path.join(project_root, "data")
-        os.makedirs(data_dir, exist_ok=True)
-        log_file_path = os.path.join(data_dir, "backend_debug.log")
-    except Exception:
-        # Fallback auf aktuelles Verzeichnis
-        log_file_path = os.path.join(os.getcwd(), "backend_debug.log")
-
-    # Format
-    formatter = logging.Formatter(
-        fmt="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
-    )
-
-    # File Handler (Rotating)
-    file_handler = RotatingFileHandler(
-        log_file_path, maxBytes=5 * 1024 * 1024, backupCount=3, encoding="utf-8"
-    )
-    file_handler.setLevel(log_level)
-    file_handler.setFormatter(formatter)
-
-    # Console Handler
-    console_handler = logging.StreamHandler()
-    console_handler.setLevel(logging.INFO)
-    console_handler.setFormatter(formatter)
-
-    # Root-Logger konfigurieren
-    root_logger = logging.getLogger()
-    root_logger.setLevel(log_level)
-
-    # Vorhandene Handler vermeiden (Neu-Start)
-    if not any(isinstance(h, RotatingFileHandler) for h in root_logger.handlers):
-        root_logger.addHandler(file_handler)
-    if not any(isinstance(h, logging.StreamHandler) for h in root_logger.handlers):
-        root_logger.addHandler(console_handler)
-
-    # Uvicorn Logger mitziehen (Error + Access)
-    for name in ("uvicorn", "uvicorn.error", "uvicorn.access"):
-        uv_logger = logging.getLogger(name)
-        uv_logger.setLevel(log_level)
-        # Stelle sicher, dass File-Logs auch für Uvicorn ankommen
-        if not any(isinstance(h, RotatingFileHandler) for h in uv_logger.handlers):
-            uv_logger.addHandler(file_handler)
-        # Propagation aktivieren
-        uv_logger.propagate = True
-
-    root_logger.debug("Logging initialized at %s, log file: %s", log_level_name, log_file_path)
-    return logging.getLogger(__name__)
-
-
-logger = _setup_logging()
-
-# RAG/UDS3 Modus steuern (auto|disabled|off|mock)
-RAG_MODE = os.getenv("VERITAS_RAG_MODE", "auto").lower()
-
-# ===== PYDANTIC MODELS =====
-
-class VeritasRAGRequest(BaseModel):
-    question: str = Field(..., description="Frage für das RAG-System")
-    mode: str = Field(default="VERITAS", description="System-Modus")
-    model: Optional[str] = Field(default=None, description="LLM-Modell")
-    temperature: float = Field(default=0.7, description="LLM-Temperatur")
-    max_tokens: int = Field(default=1000, description="Max. Tokens")
-    session_id: Optional[str] = None
-    chat_history: Optional[List[Dict[str, str]]] = Field(
-        default=None,
-        description="Optionale Chat-History für kontextuelle Antworten. Format: [{'role': 'user'|'assistant', 'content': '...'}]"
-    )
-
-class VeritasRAGResponse(BaseModel):
-    answer: str
-    sources: List[Dict[str, Any]]
-    metadata: Dict[str, Any]
-    session_id: str
-    mode: str
-    quality_score: float
-    processing_time: float
-    tokens_used: Optional[int] = None
-    model_used: Optional[str] = None
-    request_id: str
-
-class VeritasStreamingQueryRequest(BaseModel):
-    query: str = Field(..., description="Query für Streaming-Verarbeitung")
-    session_id: Optional[str] = None
-    enable_streaming: bool = Field(default=True, description="Aktiviere Progress Streaming")
-    enable_intermediate_results: bool = Field(default=True, description="Zeige Zwischenergebnisse")
-    enable_llm_thinking: bool = Field(default=True, description="Zeige LLM Deep-thinking")
-    conversation_history: Optional[List[Dict[str, str]]] = Field(default=None, description="Chat-Verlauf für Kontext (Liste von {'role': 'user|assistant', 'content': '...'})")
-
-class VeritasAgentQueryRequest(BaseModel):
-    query: str = Field(..., description="Agent-Query")
-    agent_types: List[str] = Field(default=[], description="Gewünschte Agent-Typen")
-    complexity: str = Field(default="standard", description="Query-Komplexität")
-    external_sources: bool = Field(default=True, description="Externe Datenquellen nutzen")
-    quality_level: str = Field(default="high", description="Qualitätslevel")
-    session_id: Optional[str] = None
-
-class VeritasAgentQueryResponse(BaseModel):
-    answer: str
-    agent_results: List[Dict[str, Any]]
-    external_data: List[Dict[str, Any]]
-    quality_metrics: Dict[str, Any]
-    processing_details: Dict[str, Any]
-    session_id: str
-    timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
-
-class StartSessionRequest(BaseModel):
-    mode: str = Field(default="VERITAS", description="System-Modus")
-    
-class StartSessionResponse(BaseModel):
-    session_id: str
-    mode: str
-    timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
-
-# ===== UDS3-SPECIFIC MODELS =====
-
-class UDS3SecureDocumentRequest(BaseModel):
-    file_path: str = Field(..., description="Pfad zur Quelldatei")
-    content: str = Field(..., description="Dokumenteninhalt")
-    chunks: List[str] = Field(default=[], description="Text-Chunks für Vektorisierung")
-    security_level: Optional[str] = Field(default="INTERNAL", description="Sicherheitsstufe")
-    metadata: Dict[str, Any] = Field(default_factory=dict, description="Zusätzliche Metadaten")
-
-class UDS3SecureDocumentResponse(BaseModel):
-    success: bool
-    document_id: Optional[str] = None
-    operation_type: str
-    timestamp: str
-    security_info: Dict[str, Any] = Field(default_factory=dict)
-    quality_score: Dict[str, Any] = Field(default_factory=dict)
-    validation_results: Dict[str, Any] = Field(default_factory=dict)
-    database_operations: Dict[str, Any] = Field(default_factory=dict)
-    issues: List[str] = Field(default_factory=list)
-    processing_time: float = 0.0
-
-class UDS3QueryRequest(BaseModel):
-    query: str = Field(..., description="UDS3-Query")
-    query_type: str = Field(default="unified", description="Art der Query (unified, vector, graph, relational)")
-    filters: Dict[str, Any] = Field(default_factory=dict, description="Query-Filter")
-    security_context: Optional[str] = Field(default=None, description="Sicherheitskontext")
-
-class UDS3QueryResponse(BaseModel):
-    success: bool
-    results: List[Dict[str, Any]] = Field(default_factory=list)
-    total_results: int = 0
-    query_info: Dict[str, Any] = Field(default_factory=dict)
-    processing_time: float = 0.0
-    quality_metrics: Dict[str, Any] = Field(default_factory=dict)
-
-# ===== STREAMING PROGRESS SETUP =====
-
-# Global Progress Manager
-progress_manager = None  # Type: Optional[VeritasProgressManager] 
-progress_streamer = None  # Type: Optional[VeritasProgressStreamer]
-
-# Global Components
-intelligent_pipeline = None
-ollama_client = None
-uds3_strategy = None
-
-# ===== INITIALIZATION FUNCTIONS =====
-
-def initialize_streaming_system():
-    """Initialisiert das Streaming Progress System"""
-    global progress_manager, progress_streamer
-    
-    if STREAMING_AVAILABLE:
-        try:
-            progress_manager = create_progress_manager()
-            progress_streamer = create_progress_streamer(progress_manager)
-            logger.info("Streaming Progress system initialized")
-            return True
-        except Exception as e:
-            logger.error("Streaming initialization failed: %s", e, exc_info=True)
-            return False
-    else:
-        logger.warning("Streaming system not available")
-        return False
-
-async def initialize_intelligent_pipeline():
-    """Initialisiert die Intelligent Multi-Agent Pipeline"""
-    global intelligent_pipeline, ollama_client
-    
-    if INTELLIGENT_PIPELINE_AVAILABLE:
-        try:
-            intelligent_pipeline = await get_intelligent_pipeline()
-            ollama_client = await get_ollama_client()
-            logger.info("Intelligent Multi-Agent Pipeline initialized")
-            return True
-        except Exception as e:
-            logger.error("Intelligent Pipeline initialization failed: %s", e, exc_info=True)
-            return False
-    else:
-        logger.warning("Intelligent Pipeline not available")
-        return False
-
-def initialize_uds3_system():
-    """Initialisiert das UDS3 Strategy System"""
-    global uds3_strategy
-    
-    if UDS3_AVAILABLE:
-        try:
-            uds3_strategy = get_optimized_unified_strategy()
-            logger.info("UDS3 Strategy system initialized")
-            return True
-        except Exception as e:
-            logger.error("UDS3 Strategy initialization failed: %s", e, exc_info=True)
-            return False
-    else:
-        logger.warning("UDS3 system not available")
-        return False
-
-# ===== STARTUP FLAGS =====
-STRICT_STARTUP = os.getenv("VERITAS_STRICT_STARTUP", "true").lower() in ("1", "true", "yes")
-
-# ===== LIFESPAN CONTEXT MANAGER =====
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    """App Lifespan Management - Ersetzt on_event startup/shutdown
-    
-    Raises:
-        RuntimeError: Wenn kritische Systeme (UDS3, Pipeline) nicht verfügbar sind
-    """
-    # Startup
-    logger.info("🚀 Veritas API Backend (Streaming + Intelligent Pipeline + UDS3) wird gestartet...")
-    
-    # Streaming System initialisieren (optional)
-    streaming_initialized = initialize_streaming_system()
-    
-    # UDS3 System initialisieren - optional, je nach RAG_MODE
-    rag_disabled = RAG_MODE in ("disabled", "off", "mock")
-    if rag_disabled:
-        logger.warning("UDS3-Initialisierung wird übersprungen (VERITAS_RAG_MODE=%s)", RAG_MODE)
-        uds3_initialized = False
-        global uds3_strategy
-        uds3_strategy = None
-    else:
-        uds3_initialized = initialize_uds3_system()
-    if not uds3_initialized:
-        if STRICT_STARTUP:
-            raise RuntimeError(
-                "❌ KRITISCHER FEHLER: UDS3 System konnte nicht initialisiert werden!\n"
-                "Das Backend kann nicht ohne UDS3-Backend arbeiten.\n"
-                "Bitte überprüfen Sie die UDS3-Installation und Konfiguration."
-            )
-        else:
-            logger.warning("UDS3 konnte nicht initialisiert werden – starte im eingeschränkten Modus ohne UDS3.")
-    
-    # PHASE 5: Hybrid Search initialisieren (UDS3 Adapter + BM25 + RRF)
-    try:
-<<<<<<< Updated upstream
-        from backend.api.veritas_phase5_integration import (
-            initialize_phase5_hybrid_search, DEMO_CORPUS
-        )
-        phase5_initialized = await initialize_phase5_hybrid_search(demo_corpus=DEMO_CORPUS)
-=======
-        from backend.api.veritas_phase5_integration import DEMO_CORPUS, initialize_phase5_hybrid_search
+from backend.api.veritas_phase5_integration import DEMO_CORPUS, initialize_phase5_hybrid_search
 
         # DEMO_CORPUS may have a broader typing at import-time; cast to the expected
         # shape for the initializer to satisfy static checking.
         phase5_initialized = await initialize_phase5_hybrid_search(
             demo_corpus=cast(Optional[List[Dict[str, str]]], DEMO_CORPUS)
         )
->>>>>>> Stashed changes
         if phase5_initialized:
             logger.info("   Phase 5 Hybrid Search: OK")
         else:
@@ -423,7 +36,7 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.warning("   Phase 5 Hybrid Search initialization failed: %s", e)
         phase5_initialized = False
-    
+
     # Intelligent Pipeline initialisieren - ERFORDERLICH (optional bei STRICT_STARTUP=False)
     pipeline_initialized = await initialize_intelligent_pipeline()
     if not pipeline_initialized:
@@ -438,7 +51,7 @@ async def lifespan(app: FastAPI):
             )
         else:
             logger.warning("Intelligent Pipeline nicht initialisiert – starte im eingeschränkten Modus ohne diesen Endpoint.")
-    
+
     # Ollama-Check (optional bei STRICT_STARTUP=False)
     if not ollama_client:
         if STRICT_STARTUP:
@@ -449,16 +62,16 @@ async def lifespan(app: FastAPI):
             )
         else:
             logger.warning("Ollama Client nicht verfügbar – LLM-Funktionalität ist deaktiviert.")
-    
+
     logger.info(f"📊 System Status:")
     logger.info("   Streaming Progress: %s", 'OK' if streaming_initialized else 'Nicht verfügbar (optional)')
     logger.info("   UDS3 Strategy: %s", 'OK' if uds3_initialized else 'DEAKTIVIERT')
     logger.info("   Intelligent Pipeline: %s", 'OK' if pipeline_initialized else 'DEAKTIVIERT')
     logger.info("   Ollama Client: %s", 'OK' if ollama_client else 'DEAKTIVIERT')
     logger.info(f"🎉 Backend erfolgreich gestartet - Bereit für Queries mit ECHTEN Daten (kein Mock-Modus)")
-    
+
     yield  # Server läuft
-    
+
     # Shutdown (optional - cleanup code)
     logger.info("Veritas API Backend wird heruntergefahren...")
 
@@ -539,20 +152,15 @@ async def root():
             "uds3_create": "/uds3/documents",
             "uds3_query": "/uds3/query",
             "progress": "/progress/{session_id}",
-            "rag": "/ask", 
+            "rag": "/ask",
             "agents": "/agents/ask",
             "immi_bimschg": "/api/immi/markers/bimschg",  # NEW
             "immi_wka": "/api/immi/markers/wka",  # NEW
             "immi_search": "/api/immi/search",  # NEW
             "feedback": "/api/feedback/submit",
             "feedback_stats": "/api/feedback/stats",
-<<<<<<< Updated upstream
-            "docs": "/docs"
-        }
-=======
             "docs": {"path": "/docs", "available": True, "production_ready": True},
         },
->>>>>>> Stashed changes
     }
 
 @app.get("/health")
@@ -580,13 +188,13 @@ async def get_capabilities():
         "models": [],
         "endpoint": "http://localhost:11434"
     }
-    
+
     if INTELLIGENT_PIPELINE_AVAILABLE and ollama_client:
         try:
             # Hole verfügbare Modelle aus dem Client
             models_dict = ollama_client.available_models
             model_names = list(models_dict.keys()) if models_dict else []
-            
+
             ollama_status = {
                 "available": len(model_names) > 0 and not ollama_client.offline_mode,
                 "models": model_names,
@@ -599,14 +207,14 @@ async def get_capabilities():
             logger.warning(f"Ollama-Abfrage fehlgeschlagen: {e}")
             ollama_status["available"] = False
             ollama_status["error"] = str(e)
-    
+
     # Prüfe UDS3-Status
     uds3_capabilities = {
         "available": UDS3_AVAILABLE,
         "multi_db_distribution": MULTI_DB_DISTRIBUTION_AVAILABLE if UDS3_AVAILABLE else False,
         "databases": []
     }
-    
+
     if UDS3_AVAILABLE and uds3_strategy:
         try:
             # Hole verfügbare Datenbanken
@@ -616,21 +224,17 @@ async def get_capabilities():
                 uds3_capabilities["databases"] = ["vector", "graph", "relational"]  # Standard
         except Exception as e:
             logger.warning(f"UDS3-Abfrage fehlgeschlagen: {e}")
-    
+
     # Prüfe Intelligent Pipeline Status
     pipeline_capabilities = {
         "available": INTELLIGENT_PIPELINE_AVAILABLE,
         "initialized": intelligent_pipeline is not None,
         "features": []
     }
-<<<<<<< Updated upstream
-    
-=======
 
     # Ensure a useful static type for nested indexing operations
     pipeline_capabilities = cast(Dict[str, Any], pipeline_capabilities)
 
->>>>>>> Stashed changes
     if INTELLIGENT_PIPELINE_AVAILABLE and intelligent_pipeline:
         pipeline_capabilities["features"] = [
             "multi_agent_orchestration",
@@ -640,28 +244,24 @@ async def get_capabilities():
             "confidence_scoring",
             "follow_up_suggestions"
         ]
-        
+
         # Hole Agent-Informationen aus Agent Registry
         try:
             if hasattr(intelligent_pipeline, 'agent_registry') and intelligent_pipeline.agent_registry:
                 agent_registry = intelligent_pipeline.agent_registry
                 available_agents_dict = agent_registry.list_available_agents()
-                
+
                 pipeline_capabilities["agents"] = {
                     "total_count": len(available_agents_dict),
                     "agents": available_agents_dict,
                     "by_domain": {}
                 }
-                
+
                 # Gruppiere nach Domain
                 from backend.agents.agent_registry import AgentDomain
                 for domain in AgentDomain:
                     domain_agents = agent_registry.get_agents_by_domain(domain)
                     if domain_agents:
-<<<<<<< Updated upstream
-                        pipeline_capabilities["agents"]["by_domain"][domain.value] = domain_agents
-                
-=======
                         # Use local typed variables to safely update nested mappings
                         agents_section = cast(Dict[str, Any], pipeline_capabilities.get("agents", {}))
                         by_domain = cast(Dict[str, Any], agents_section.get("by_domain", {}))
@@ -669,7 +269,6 @@ async def get_capabilities():
                         agents_section["by_domain"] = by_domain
                         pipeline_capabilities["agents"] = agents_section
 
->>>>>>> Stashed changes
             else:
                 pipeline_capabilities["agents"] = {
                     "total_count": 0,
@@ -684,14 +283,14 @@ async def get_capabilities():
                 "agents": {},
                 "error": str(e)
             }
-    
+
     # Streaming Capabilities
     streaming_capabilities = {
         "available": STREAMING_AVAILABLE,
         "endpoints": ["/v2/query/stream", "/v2/intelligent/query"] if STREAMING_AVAILABLE else [],
         "features": ["progress_updates", "intermediate_results", "llm_thinking"] if STREAMING_AVAILABLE else []
     }
-    
+
     # System-weite Capabilities
     return {
         "system": {
@@ -717,28 +316,10 @@ async def get_capabilities():
                 "available": INTELLIGENT_PIPELINE_AVAILABLE,
                 "production_ready": INTELLIGENT_PIPELINE_AVAILABLE
             },
-<<<<<<< Updated upstream
-            "rag": {
-                "path": "/ask",
-                "available": True,
-                "production_ready": INTELLIGENT_PIPELINE_AVAILABLE
-            },
-            "uds3_documents": {
-                "path": "/uds3/documents",
-                "available": UDS3_AVAILABLE,
-                "production_ready": UDS3_AVAILABLE
-            },
-            "uds3_query": {
-                "path": "/uds3/query",
-                "available": UDS3_AVAILABLE,
-                "production_ready": UDS3_AVAILABLE
-            }
-=======
             "rag": {"path": " / ask", "available": True, "production_ready": INTELLIGENT_PIPELINE_AVAILABLE},
             "uds3_documents": {"path": " / uds3/documents", "available": UDS3_AVAILABLE, "production_ready": UDS3_AVAILABLE},
             "uds3_query": {"path": " / uds3/query", "available": UDS3_AVAILABLE, "production_ready": UDS3_AVAILABLE},
             "docs": {"path": "/docs", "available": True, "production_ready": True},
->>>>>>> Stashed changes
         },
         "features": {
             "ollama": ollama_status,
@@ -770,50 +351,43 @@ async def get_capabilities():
             }
         },
         "recommendations": _generate_recommendations(
-<<<<<<< Updated upstream
-            ollama_status["available"],
-            UDS3_AVAILABLE,
-            INTELLIGENT_PIPELINE_AVAILABLE
-        )
-=======
             bool(ollama_status.get("available", False)), UDS3_AVAILABLE, INTELLIGENT_PIPELINE_AVAILABLE
         ),
->>>>>>> Stashed changes
     }
 
 
 def _generate_recommendations(ollama_available: bool, uds3_available: bool, pipeline_available: bool) -> list:
     """Generiert Empfehlungen basierend auf System-Status"""
     recommendations = []
-    
+
     if not ollama_available:
         recommendations.append({
             "type": "warning",
             "message": "Ollama nicht verfügbar - LLM-Features eingeschränkt",
             "action": "Starten Sie Ollama: http://localhost:11434"
         })
-    
+
     if not pipeline_available:
         recommendations.append({
             "type": "error",
             "message": "Intelligent Pipeline nicht initialisiert",
             "action": "Backend neu starten oder Logs prüfen"
         })
-    
+
     if not uds3_available:
         recommendations.append({
             "type": "info",
             "message": "UDS3 nicht verfügbar - Erweiterte Datenbank-Features deaktiviert",
             "action": "Optional: UDS3 installieren für Multi-DB Support"
         })
-    
+
     if ollama_available and pipeline_available and uds3_available:
         recommendations.append({
             "type": "success",
             "message": "Alle Features verfügbar - System voll funktionsfähig",
             "action": "Keine Aktion erforderlich"
         })
-    
+
     return recommendations
 
 # ===== INTELLIGENT MULTI-AGENT PIPELINE ENDPOINTS =====
@@ -822,29 +396,29 @@ def _generate_recommendations(ollama_available: bool, uds3_available: bool, pipe
 async def veritas_intelligent_query(request: VeritasStreamingQueryRequest):
     """
     🧠 INTELLIGENT MULTI-AGENT PIPELINE ENDPOINT
-    
+
     Verarbeitet Query durch intelligente Pipeline mit:
     - Real-time LLM-Kommentaren für jeden Step
-    - RAG-basierte Agent-Selektion  
+    - RAG-basierte Agent-Selektion
     - Parallele Agent-Execution
     - LLM-basierte Result-Synthesis
-    
+
     Features:
     - Ollama LLM Integration für Kommentierung
     - Multi-Agent Orchestration
     - Confidence Scoring
     - Follow-up Suggestions
     """
-    
+
     if not INTELLIGENT_PIPELINE_AVAILABLE or not intelligent_pipeline:
         raise HTTPException(
-            status_code=503, 
+            status_code=503,
             detail="Intelligent Multi-Agent Pipeline nicht verfügbar"
         )
-    
+
     query_id = f"intelligent_query_{int(time.time())}_{uuid.uuid4().hex[:8]}"
     session_id = request.session_id or str(uuid.uuid4())
-    
+
     try:
         # Intelligent Pipeline Request erstellen
         pipeline_request = IntelligentPipelineRequest(
@@ -857,12 +431,12 @@ async def veritas_intelligent_query(request: VeritasStreamingQueryRequest):
             max_parallel_agents=5,
             timeout=60
         )
-        
+
         # Pipeline ausführen
         start_time = time.time()
         pipeline_response = await intelligent_pipeline.process_intelligent_query(pipeline_request)
         processing_time = time.time() - start_time
-        
+
         # Response formatieren
         response = {
             "query_id": query_id,
@@ -872,21 +446,21 @@ async def veritas_intelligent_query(request: VeritasStreamingQueryRequest):
             "processing_time": processing_time,
             "model_used": "Ollama Multi-Agent Pipeline",
             "mode": "INTELLIGENT_PIPELINE",
-            
+
             # Multi-Agent Details
             "agent_results": pipeline_response.agent_results,
             "agents_used": len(pipeline_response.agent_results),
             "sources": pipeline_response.sources,
             "rag_context": pipeline_response.rag_context,
-            
+
             # LLM Commentary
             "llm_commentary": pipeline_response.llm_commentary,
             "pipeline_steps": len(pipeline_response.llm_commentary),
-            
-            # Suggestions & Metadata  
+
+            # Suggestions & Metadata
             "follow_up_suggestions": pipeline_response.follow_up_suggestions,
             "processing_metadata": pipeline_response.processing_metadata,
-            
+
             # Quality Metrics
             "quality_metrics": {
                 "confidence_score": pipeline_response.confidence_score,
@@ -894,13 +468,13 @@ async def veritas_intelligent_query(request: VeritasStreamingQueryRequest):
                 "agents_success_rate": 1.0,  # Mock für jetzt
                 "sources_found": len(pipeline_response.sources)
             },
-            
+
             "timestamp": datetime.now().isoformat()
         }
-        
+
         logger.info(f"✅ Intelligent Query verarbeitet: {query_id} ({processing_time:.2f}s)")
         return response
-        
+
     except Exception as e:
         logger.error(f"❌ Intelligent Query fehlgeschlagen: {e}")
         raise HTTPException(
@@ -911,21 +485,21 @@ async def veritas_intelligent_query(request: VeritasStreamingQueryRequest):
 @app.get("/v2/intelligent/status")
 async def intelligent_pipeline_status():
     """Status der Intelligent Multi-Agent Pipeline"""
-    
+
     if not INTELLIGENT_PIPELINE_AVAILABLE:
         return {"status": "unavailable", "reason": "Pipeline nicht geladen"}
-    
+
     if not intelligent_pipeline:
         return {"status": "not_initialized", "reason": "Pipeline nicht initialisiert"}
-    
+
     # Pipeline Statistics
     stats = intelligent_pipeline.get_pipeline_statistics()
-    
+
     # Ollama Client Status
     ollama_stats = {}
     if ollama_client:
         ollama_stats = ollama_client.get_client_statistics()
-    
+
     return {
         "status": "active",
         "pipeline_stats": stats,
@@ -943,22 +517,22 @@ async def veritas_streaming_query(request: VeritasStreamingQueryRequest):
     """
     session_id = request.session_id or str(uuid.uuid4())
     query_id = f"stream_query_{int(time.time())}_{uuid.uuid4().hex[:8]}"
-    
+
     if not STREAMING_AVAILABLE or not progress_manager:
         raise HTTPException(status_code=503, detail="Streaming System nicht verfügbar")
-    
+
     # Progress Session starten
     progress_manager.start_session(
         session_id=session_id,
         query_id=query_id,
         query_text=request.query
     )
-    
+
     # Starte Async Processing
     asyncio.create_task(
         _process_streaming_query(session_id, query_id, request)
     )
-    
+
     return {
         "session_id": session_id,
         "query_id": query_id,
@@ -975,13 +549,13 @@ async def get_progress_stream(session_id: str):
     """
     if not STREAMING_AVAILABLE or not progress_streamer:
         raise HTTPException(status_code=503, detail="Streaming System nicht verfügbar")
-    
+
     headers = {
         "Content-Type": "text/event-stream",
         "Cache-Control": "no-cache",
         "Connection": "keep-alive",
     }
-    
+
     return StreamingResponse(
         progress_streamer.create_progress_stream(session_id),
         media_type="text/event-stream",
@@ -994,7 +568,7 @@ async def _process_streaming_query(session_id: str, query_id: str, request: Veri
     Simuliert komplexes Agent-Processing mit Real-time Updates
     """
     logger.info(f"_process_streaming_query started session={session_id}, query={request.query[:50]}")
-    
+
     try:
         # Local execution state used by multiple stages
         local_agent_results: Dict[str, Any] = {}
@@ -1004,10 +578,11 @@ async def _process_streaming_query(session_id: str, query_id: str, request: Veri
         # Lade Services (HypothesisService + StageReflectionService)
         hypothesis_service = None
         reflection_service = None
-        
+
         # HYPOTHESIS SERVICE: Initialisiert eigenen Ollama-Client (unabhängig von global ollama_client)
         try:
             from backend.services.hypothesis_service import HypothesisService
+
             # HypothesisService hat eigenen DirectOllamaLLM - benötigt KEINEN global ollama_client!
             hypothesis_service = HypothesisService(
                 model_name="llama3.1:8b",
@@ -1031,6 +606,7 @@ async def _process_streaming_query(session_id: str, query_id: str, request: Veri
         if VERITAS_SCIENTIFIC_MODE:
             try:
                 from backend.services.dialectical_synthesis_service import DialecticalSynthesisService
+
                 # LLM-Client: ollama_client oder fallback
                 llm_client = ollama_client if ollama_client else None
                 dialectic_service = DialecticalSynthesisService(llm_client)
@@ -1065,7 +641,7 @@ async def _process_streaming_query(session_id: str, query_id: str, request: Veri
                     progress_manager.update_stage(session_id, ProgressStage.LLM_REASONING)
                     thinking_steps = [
                         "Analysiere gesammelte Informationen",
-                        "Bewerte Relevanz und Vertrauenswürdigkeit", 
+                        "Bewerte Relevanz und Vertrauenswürdigkeit",
                         "Identifiziere Wissenslücken",
                         "Strukturiere finale Antwort",
                         "Überprüfe Konsistenz und Vollständigkeit"
@@ -1090,15 +666,7 @@ async def _process_streaming_query(session_id: str, query_id: str, request: Veri
 
                 # 🆕 Generate final response (immer als Dict)
                 final_response = _synthesize_final_response(
-<<<<<<< Updated upstream
-                    request.query, 
-                    agent_results, 
-                    complexity, 
-                    domain,
-                    conversation_history=request.conversation_history
-=======
                     request.query, local_agent_results, complexity, domain, conversation_history=request.conversation_history
->>>>>>> Stashed changes
                 )
                 # Hänge Dialektik-Abschnitt an, falls vorhanden
                 if VERITAS_SCIENTIFIC_MODE and dialectical_result:
@@ -1116,10 +684,6 @@ async def _process_streaming_query(session_id: str, query_id: str, request: Veri
                         section += "\n**Identifizierte Widersprüche:**\n" + "\n".join([f"- {_s(getattr(c, 'description', c))}" for c in contradictions]) + "\n"
                     # final_response ist ein Dict mit 'response_text'
                     if isinstance(final_response, dict):
-<<<<<<< Updated upstream
-                        base_text = final_response.get('response_text') or ''
-                        final_response['response_text'] = (base_text + section).strip()
-=======
                         base_text = final_response.get("response_text") or ""
                         final_response["response_text"] = (base_text + section).strip()
                         # Guarded progress update
@@ -1128,7 +692,6 @@ async def _process_streaming_query(session_id: str, query_id: str, request: Veri
                         # Inform progress manager if available
                         if hasattr(progress_manager, "add_message"):
                             getattr(progress_manager, "add_message")(session_id, "Dialektische Synthese angehängt")
->>>>>>> Stashed changes
 
                 # === 9. Peer-Review Validation (optional, Feature-Flag) ===
                 peer_review_result = None
@@ -1146,23 +709,12 @@ async def _process_streaming_query(session_id: str, query_id: str, request: Veri
                         )
                         peer_review_result = await peer_review_service.peer_review(
                             query=request.query,
-<<<<<<< Updated upstream
-                            final_response=final_response,
-                            agent_results=list(agent_results.values()),
-                            sources=sources
-                        )
-                        progress_manager.add_message(
-                            session_id,
-                            f"📊 Consensus Score: {peer_review_result.consensus_score:.2f} | Status: {peer_review_result.approval_status.value}"
-                        )
-=======
                             final_response=final_response_text,
                                 agent_results=list(local_agent_results.values()),
                             sources=sources,
                         )
                         if hasattr(progress_manager, "add_message"):
                             getattr(progress_manager, "add_message")(session_id, f"📊 Consensus Score: {peer_review_result.consensus_score:.2f} | Status: {peer_review_result.approval_status.value}")
->>>>>>> Stashed changes
                         # Optional: Progress-Event für Review
                         progress_manager.add_intermediate_result(
                             session_id=session_id,
@@ -1210,7 +762,7 @@ async def _process_streaming_query(session_id: str, query_id: str, request: Veri
         if reflection_service and request.enable_llm_thinking:
             try:
                 logger.debug("Starting Hypothesis Reflection (LLM meta-analysis)")
-                
+
                 # Bereite Stage-Data mit Hypothesis-Informationen vor
                 hypothesis_stage_data = {
                     'hypotheses': [
@@ -1226,14 +778,14 @@ async def _process_streaming_query(session_id: str, query_id: str, request: Veri
                     'complexity': complexity,
                     'domain': domain
                 }
-                
+
                 hypothesis_reflection = await reflection_service.reflect_on_stage(
                     stage=ReflectionStage.HYPOTHESIS,
                     user_query=request.query,
                     stage_data=hypothesis_stage_data,
                     context={}
                 )
-                
+
                 # Sende Reflection als Progress-Event
                 progress_manager.add_stage_reflection(
                     session_id=session_id,
@@ -1248,7 +800,7 @@ async def _process_streaming_query(session_id: str, query_id: str, request: Veri
                 )
             except Exception as e:
                 logger.error(f"❌ Hypothesis Reflection Error: {e}")
-        
+
         # 2. Agent Selection Stage
         selected_agents = _select_agents_for_query(request.query, complexity, domain)
         progress_manager.update_stage(
@@ -1261,7 +813,7 @@ async def _process_streaming_query(session_id: str, query_id: str, request: Veri
             }
         )
         await asyncio.sleep(0.5)
-        
+
         # 🔍 REFLECTION: Agent-Auswahl
         if reflection_service and request.enable_llm_thinking:
             try:
@@ -1270,13 +822,13 @@ async def _process_streaming_query(session_id: str, query_id: str, request: Veri
                     user_query=request.query,
                     stage_data={
                         'selected_agents': selected_agents,
-                        'available_agents': ['geo_context', 'legal_framework', 'construction', 
-                                           'environmental', 'financial', 'traffic', 
+                        'available_agents': ['geo_context', 'legal_framework', 'construction',
+                                           'environmental', 'financial', 'traffic',
                                            'document_retrieval', 'external_api']
                     },
                     context={'complexity': complexity, 'domain': domain}
                 )
-                
+
                 progress_manager.add_stage_reflection(
                     session_id=session_id,
                     reflection_stage="agent_selection",
@@ -1290,25 +842,20 @@ async def _process_streaming_query(session_id: str, query_id: str, request: Veri
                 )
             except Exception as e:
                 logger.error(f"❌ Agent Selection Reflection Error: {e}")
-        
+
         # 3. Agent Processing Stage
         progress_manager.update_stage(session_id, ProgressStage.AGENT_PROCESSING)
-        
+
         # 🆕 NEUE LOGIK: Nutze Intelligent Pipeline falls verfügbar
-<<<<<<< Updated upstream
-        agent_results = {}
-        
-=======
         agent_results: Dict[str, Any] = {}
 
->>>>>>> Stashed changes
         # Debug details about pipeline availability
         logger.debug("INTELLIGENT_PIPELINE_AVAILABLE=%s", INTELLIGENT_PIPELINE_AVAILABLE)
         logger.debug("intelligent_pipeline instance available=%s", intelligent_pipeline is not None)
-        
+
         if INTELLIGENT_PIPELINE_AVAILABLE and intelligent_pipeline:
             logger.info("Using Intelligent Pipeline for agent execution")
-            
+
             try:
                 # Erstelle Pipeline Request
                 pipeline_request = IntelligentPipelineRequest(
@@ -1320,31 +867,21 @@ async def _process_streaming_query(session_id: str, query_id: str, request: Veri
                     enable_supervisor=False,
                     timeout=60
                 )
-                
+
                 # Bereite Kontext vor
-<<<<<<< Updated upstream
-                agent_selection = {'selected_agents': selected_agents}
-                rag_context = {}
-                context = {
-                    'agent_selection': agent_selection,
-                    'rag': rag_context
-                }
-                
-=======
                 agent_selection = {"selected_agents": selected_agents}
                 rag_context: Dict[str, Any] = {}
                 context = {"agent_selection": agent_selection, "rag": rag_context}
 
->>>>>>> Stashed changes
                 # Nutze Pipeline's Agent Execution
                 agent_results_raw = await intelligent_pipeline._step_parallel_agent_execution(
                     pipeline_request,
                     context
                 )
-                
+
                 # Extrahiere Results
                 agent_results = agent_results_raw.get('detailed_results', {})
-                
+
                 # Update Progress für jeden Agent
                 for agent_type, agent_result in agent_results.items():
                     # Agent abgeschlossen
@@ -1352,7 +889,7 @@ async def _process_streaming_query(session_id: str, query_id: str, request: Veri
                         session_id, agent_type, ProgressType.AGENT_COMPLETE,
                         result=agent_result
                     )
-                    
+
                     # Zwischenergebnis hinzufügen (falls aktiviert)
                     if request.enable_intermediate_results:
                         progress_manager.add_intermediate_result(
@@ -1362,23 +899,23 @@ async def _process_streaming_query(session_id: str, query_id: str, request: Veri
                             confidence=agent_result.get('confidence_score', 0.8),
                             sources=agent_result.get('sources', [])
                         )
-                
+
                 logger.info("Intelligent Pipeline executed %d agents", len(agent_results))
-                
+
             except Exception as e:
                 logger.error("Intelligent Pipeline error: %s, falling back to mock", e)
                 import traceback
                 traceback.print_exc()
-                
+
                 # Fallback auf alte Mock-Logik
                 for i, agent_type in enumerate(selected_agents):
                     if progress_manager.is_session_cancelled(session_id):
                         return
-                    
+
                     agent_result = _generate_agent_result(agent_type, request.query, complexity)
                     agent_result['is_simulation'] = True  # Markiere als Simulation
                     agent_results[agent_type] = agent_result
-                    
+
                     progress_manager.update_agent_progress(
                         session_id, agent_type, ProgressType.AGENT_COMPLETE,
                         result=agent_result
@@ -1386,38 +923,33 @@ async def _process_streaming_query(session_id: str, query_id: str, request: Veri
         else:
             # FALLBACK: Alte Mock-Logik (falls Pipeline nicht verfügbar)
             logger.warning("Intelligent Pipeline not available, using mock agents")
-            
+
             for i, agent_type in enumerate(selected_agents):
                 # Prüfe Cancellation vor jedem Agent
                 if progress_manager.is_session_cancelled(session_id):
                     logger.info("Session %s cancelled - stopping agent processing", session_id)
                     return
-                
+
                 # Agent startet
                 progress_manager.update_agent_progress(
                     session_id, agent_type, ProgressType.AGENT_START
                 )
-                
+
                 # Simuliere Agent-Verarbeitung mit Cancellation-Checks
                 sleep_duration = 1.0 + (i * 0.5)
                 sleep_steps = int(sleep_duration / 0.2)  # Check every 200ms
-<<<<<<< Updated upstream
-                
-                for step in range(sleep_steps):
-=======
 
                 for _step in range(sleep_steps):
->>>>>>> Stashed changes
                     if progress_manager.is_session_cancelled(session_id):
                         logger.info("Session %s cancelled during %s", session_id, agent_type)
                         return
                     await asyncio.sleep(0.2)
-                
+
                 # Agent-Result generieren
                 agent_result = _generate_agent_result(agent_type, request.query, complexity)
                 agent_result['is_simulation'] = True  # Markiere als Simulation
                 agent_results[agent_type] = agent_result
-                
+
                 # Zwischenergebnis hinzufügen (falls aktiviert)
                 if request.enable_intermediate_results:
                     progress_manager.add_intermediate_result(
@@ -1427,13 +959,13 @@ async def _process_streaming_query(session_id: str, query_id: str, request: Veri
                         confidence=agent_result.get('confidence_score', 0.8),
                         sources=agent_result.get('sources', [])
                     )
-                
+
                 # Agent abgeschlossen
                 progress_manager.update_agent_progress(
                     session_id, agent_type, ProgressType.AGENT_COMPLETE,
                     result=agent_result
                 )
-        
+
         # 🔍 REFLECTION: Retrieval-Qualität
         if reflection_service and request.enable_llm_thinking:
             try:
@@ -1443,7 +975,7 @@ async def _process_streaming_query(session_id: str, query_id: str, request: Veri
                     stage_data={'agent_results': agent_results},
                     context={'selected_agents': selected_agents}
                 )
-                
+
                 progress_manager.add_stage_reflection(
                     session_id=session_id,
                     reflection_stage="retrieval",
@@ -1457,55 +989,55 @@ async def _process_streaming_query(session_id: str, query_id: str, request: Veri
                 )
             except Exception as e:
                 logger.error(f"❌ Retrieval Reflection Error: {e}")
-        
+
         # 4. Context Gathering Stage
         if progress_manager.is_session_cancelled(session_id):
             return
-            
+
         progress_manager.update_stage(session_id, ProgressStage.GATHERING_CONTEXT)
         await asyncio.sleep(1.0)
-        
+
         # 5. LLM Reasoning Stage (falls aktiviert)
         if request.enable_llm_thinking and not progress_manager.is_session_cancelled(session_id):
             progress_manager.update_stage(session_id, ProgressStage.LLM_REASONING)
-            
+
             thinking_steps = [
                 "Analysiere gesammelte Informationen",
-                "Bewerte Relevanz und Vertrauenswürdigkeit", 
+                "Bewerte Relevanz und Vertrauenswürdigkeit",
                 "Identifiziere Wissenslücken",
                 "Strukturiere finale Antwort",
                 "Überprüfe Konsistenz und Vollständigkeit"
             ]
-            
+
             for step in thinking_steps:
                 if progress_manager.is_session_cancelled(session_id):
                     return
-                    
+
                 progress_manager.add_llm_thinking_step(
                     session_id, step, f"LLM verarbeitet: {step}"
                 )
                 await asyncio.sleep(0.8)
-        
+
         # 6. Synthesis Stage
         if progress_manager.is_session_cancelled(session_id):
             return
-            
+
         progress_manager.update_stage(session_id, ProgressStage.SYNTHESIZING)
         await asyncio.sleep(1.0)
-        
+
         # 7. Final Check vor Completion
         if progress_manager.is_session_cancelled(session_id):
             return
-        
+
         # 🆕 Generate final response mit Chat-Verlauf Kontext
         final_response = _synthesize_final_response(
-            request.query, 
-            agent_results, 
-            complexity, 
+            request.query,
+            agent_results,
+            complexity,
             domain,
             conversation_history=request.conversation_history
         )
-        
+
         # 🔍 REFLECTION: Synthese-Qualität
         if reflection_service and request.enable_llm_thinking:
             try:
@@ -1515,7 +1047,7 @@ async def _process_streaming_query(session_id: str, query_id: str, request: Veri
                     stage_data={'synthesis': final_response},
                     context={'agent_results': agent_results, 'complexity': complexity}
                 )
-                
+
                 progress_manager.add_stage_reflection(
                     session_id=session_id,
                     reflection_stage="synthesis",
@@ -1529,14 +1061,14 @@ async def _process_streaming_query(session_id: str, query_id: str, request: Veri
                 )
             except Exception as e:
                 logger.error(f"❌ Synthesis Reflection Error: {e}")
-        
+
         # 8. Finalization
         progress_manager.update_stage(session_id, ProgressStage.FINALIZING)
         await asyncio.sleep(0.5)
-        
+
         # Complete session
         progress_manager.complete_session(session_id, final_response)
-        
+
     except Exception as e:
         logger.error(f"❌ Streaming Query Error: {e}")
         progress_manager.update_stage(session_id, ProgressStage.ERROR)
@@ -1548,31 +1080,31 @@ def _select_agents_for_query(query: str, complexity: str, domain: str) -> List[s
     Nutzt Agent Registry für echte Production-Agents
     """
     global intelligent_pipeline
-    
+
     # Verwende Agent Registry wenn verfügbar
     if intelligent_pipeline and hasattr(intelligent_pipeline, 'agent_registry') and intelligent_pipeline.agent_registry:
         registry = intelligent_pipeline.agent_registry
-        
+
         # Extrahiere Keywords aus Query
         query_lower = query.lower()
         keywords = set()
-        
+
         # Direkte Keyword-Extraktion
-        common_terms = ['grenzwerte', 'genehmigung', 'immissionsschutz', 'umwelt', 'luft', 
+        common_terms = ['grenzwerte', 'genehmigung', 'immissionsschutz', 'umwelt', 'luft',
                        'lärm', 'boden', 'wasser', 'naturschutz', 'verwaltung', 'recht',
                        'emission', 'monitoring', 'verfahren', 'prozess', 'altlasten',
                        'gewaesser', 'ta luft', 'ta lärm', 'bimschg', 'no2', 'pm10']
-        
+
         for term in common_terms:
             if term in query_lower:
                 keywords.add(term)
-        
+
         # Sammle passende Agents basierend auf Capabilities
         selected_agents = []
         for keyword in keywords:
             matching = registry.get_agents_by_capability(keyword)
             selected_agents.extend(matching)
-        
+
         # Domain-basierte Ergänzung
         if domain == 'environmental':
             from backend.agents.agent_registry import AgentDomain
@@ -1582,22 +1114,22 @@ def _select_agents_for_query(query: str, complexity: str, domain: str) -> List[s
             from backend.agents.agent_registry import AgentDomain
             admin_agents = registry.get_agents_by_domain(AgentDomain.ADMINISTRATIVE)
             selected_agents.extend(admin_agents[:1])  # Top 1 Administrative
-        
+
         # Remove duplicates und limitiere
         selected_agents = list(set(selected_agents))
-        
+
         # Fallback: Wenn keine Agents gefunden, nehme Top 3 aus Registry
         if not selected_agents:
             all_agents = list(registry.list_available_agents().keys())
             selected_agents = all_agents[:3]
-        
+
         logger.info(f"🎯 Registry-basierte Selektion: {len(selected_agents)} Agents für Query")
         return selected_agents[:5]  # Max 5 Agents
-    
+
     # FALLBACK: Mock-Agents (nur wenn Registry nicht verfügbar)
     logger.warning("⚠️ Agent Registry nicht verfügbar - nutze Mock-Agents")
     base_agents = ['geo_context', 'legal_framework']
-    
+
     domain_agents = {
         'building': ['construction', 'document_retrieval'],
         'environmental': ['environmental', 'external_api'],
@@ -1605,13 +1137,13 @@ def _select_agents_for_query(query: str, complexity: str, domain: str) -> List[s
         'business': ['financial', 'document_retrieval'],
         'general': ['document_retrieval']
     }
-    
+
     selected = base_agents + domain_agents.get(domain, ['document_retrieval'])
-    
+
     if complexity == 'advanced':
         selected.append('financial')
         selected.append('social')
-    
+
     return list(set(selected))
 
 def _generate_agent_result(agent_type: str, query: str, complexity: str) -> Dict[str, Any]:
@@ -1620,18 +1152,18 @@ def _generate_agent_result(agent_type: str, query: str, complexity: str) -> Dict
     Nutzt echte Registry-Agents wenn verfügbar, sonst UDS3 oder Mock
     """
     global uds3_strategy, intelligent_pipeline
-    
+
     # 1. Versuche echten Registry-Agent zu verwenden
     if intelligent_pipeline and hasattr(intelligent_pipeline, 'agent_registry') and intelligent_pipeline.agent_registry:
         registry = intelligent_pipeline.agent_registry
         agent_instance = registry.get_agent(agent_type)
-        
+
         if agent_instance and hasattr(agent_instance, 'query'):
             try:
                 # Führe echte Agent-Query aus
                 logger.info(f"🤖 Führe echten Agent aus: {agent_type}")
                 agent_response = agent_instance.query(query)
-                
+
                 # Standardisiere Response-Format
                 if isinstance(agent_response, dict):
                     return {
@@ -1646,7 +1178,7 @@ def _generate_agent_result(agent_type: str, query: str, complexity: str) -> Dict
                     }
             except Exception as e:
                 logger.warning(f"⚠️ Agent {agent_type} Fehler: {e}, nutze UDS3-Fallback")
-    
+
     # 2. Fallback: UDS3 Hybrid Search (für alte Mock-Agent-Namen)
     agent_to_category = {
         'geo_context': 'geographic',
@@ -1658,12 +1190,12 @@ def _generate_agent_result(agent_type: str, query: str, complexity: str) -> Dict
         'financial': 'financial',
         'social': 'social'
     }
-    
+
     # Versuche UDS3 Hybrid Search
     try:
         if uds3_strategy is not None:
             category = agent_to_category.get(agent_type, 'general')
-            
+
             # UDS3 Query ausführen
             search_result = uds3_strategy.query_across_databases(
                 vector_params={
@@ -1676,30 +1208,30 @@ def _generate_agent_result(agent_type: str, query: str, complexity: str) -> Dict
                 join_strategy="union",
                 execution_mode="smart"
             )
-            
+
             # Ergebnisse extrahieren
             sources = []
             details_list = []
             confidence_scores = []
-            
+
             if search_result and search_result.success and hasattr(search_result, 'joined_results'):
                 for result in search_result.joined_results[:5]:
                     if isinstance(result, dict):
                         content = result.get('content', result.get('text', ''))
                         score = result.get('score', result.get('similarity', 0.0))
                         source = result.get('source', result.get('doc_id', 'UDS3'))
-                        
+
                         if content:
                             details_list.append(content[:200])
                         if source:
                             sources.append(source)
                         if score:
                             confidence_scores.append(float(score))
-            
+
             # Wenn UDS3 Ergebnisse liefert, nutze diese
             if sources and details_list:
                 avg_confidence = sum(confidence_scores) / len(confidence_scores) if confidence_scores else 0.75
-                
+
                 return {
                     'agent_type': agent_type,
                     'confidence_score': min(avg_confidence, 1.0),
@@ -1714,10 +1246,10 @@ def _generate_agent_result(agent_type: str, query: str, complexity: str) -> Dict
                 logger.debug(f"ℹ️ UDS3 Search für {agent_type}: Keine Ergebnisse, Fallback auf Simulation")
     except Exception as e:
         logger.warning(f"⚠️ UDS3 Query für {agent_type} fehlgeschlagen: {e}, Fallback auf Simulation")
-    
+
     # Fallback: Simulierte Ergebnisse
     base_confidence = 0.8 if complexity == 'basic' else 0.75 if complexity == 'standard' else 0.7
-    
+
     agent_specialties = {
         'geo_context': {
             'summary': 'Geografischer Kontext und lokale Bestimmungen identifiziert',
@@ -1760,16 +1292,16 @@ def _generate_agent_result(agent_type: str, query: str, complexity: str) -> Dict
             'sources': ['API-Services', 'Open-Data-Portale', 'Echtzeitdaten']
         }
     }
-    
+
     specialty = agent_specialties.get(agent_type, {
         'summary': f'{agent_type} Analyse abgeschlossen',
         'details': f'Spezifische {agent_type} Verarbeitung durchgeführt',
         'sources': ['Standard-Quellen']
     })
-    
+
     # 🚨 WARNUNG: Simulierte Daten werden verwendet
     logger.warning(f"⚠️  SIMULATION: Agent '{agent_type}' nutzt hardcoded Beispieldaten (UDS3 nicht verfügbar)")
-    
+
     return {
         'agent_type': agent_type,
         'confidence_score': base_confidence + (0.1 * hash(query + agent_type) % 3 / 10),
@@ -1784,25 +1316,25 @@ def _generate_agent_result(agent_type: str, query: str, complexity: str) -> Dict
     }
 
 def _synthesize_final_response(
-    query: str, 
-    agent_results: Dict[str, Any], 
-    complexity: str, 
+    query: str,
+    agent_results: Dict[str, Any],
+    complexity: str,
     domain: str,
     conversation_history: Optional[List[Dict[str, str]]] = None
 ) -> Dict[str, Any]:
     """Generiert finale synthetisierte Antwort mit Chat-Verlauf Kontext"""
-    
+
     # Debug conversation history presence for context building
     logger.debug("_synthesize_final_response: has_conversation_history=%s", conversation_history is not None)
     if conversation_history:
         logger.debug("conversation_history length=%d", len(conversation_history))
-    
+
     # Sammle beste Ergebnisse
     high_confidence_results = [
-        result for result in agent_results.values() 
+        result for result in agent_results.values()
         if result.get('confidence_score', 0) > 0.75
     ]
-    
+
     # 🆕 Analysiere Chat-Verlauf für Kontext
     conversation_context = ""
     if conversation_history and len(conversation_history) > 0:
@@ -1815,7 +1347,7 @@ def _synthesize_final_response(
             conversation_context += f"- {role}: {content}...\n"
         conversation_context += "\n"
     logger.debug("Conversation context created: %d chars", len(conversation_context))
-    
+
     # Generiere Hauptantwort
     main_response = f"""
 **Antwort auf Ihre Frage**: {query}
@@ -1823,26 +1355,26 @@ def _synthesize_final_response(
 **Zusammenfassung der Analyse** ({domain.title()}, {complexity.title()}):
 
 """
-    
+
     for agent_type, result in agent_results.items():
         confidence = result.get('confidence_score', 0)
         confidence_icon = "🟢" if confidence > 0.8 else "🟡" if confidence > 0.7 else "🔴"
         main_response += f"{confidence_icon} **{agent_type.replace('_', ' ').title()}**: {result.get('summary', 'Verarbeitung abgeschlossen')}\n\n"
-    
+
     # Sammle alle Quellen
     all_sources = []
     for result in agent_results.values():
         all_sources.extend(result.get('sources', []))
-    
+
     unique_sources = list(set(all_sources))[:10]  # Limitiere auf 10
-    
+
     # 🆕 Prüfe ob Ergebnisse simuliert sind
     simulated_agents = [
-        agent_type.replace('_', ' ').title() 
-        for agent_type, result in agent_results.items() 
+        agent_type.replace('_', ' ').title()
+        for agent_type, result in agent_results.items()
         if result.get('is_simulation', False)
     ]
-    
+
     simulation_warning = ""
     if simulated_agents:
         logger.warning("%d of %d agents use simulated data", len(simulated_agents), len(agent_results))
@@ -1857,14 +1389,14 @@ def _synthesize_final_response(
 **Hinweis**: Für produktive Nutzung muss die UDS3-Integration abgeschlossen werden.
 
 """
-    
+
     main_response += simulation_warning
     main_response += f"""
 **Nächste Schritte**: Basierend auf der Analyse empfehlen wir Ihnen, sich zunächst über die spezifischen Anforderungen zu informieren und die entsprechenden Antragsformulare zu beschaffen.
 
 **Hinweis**: Diese Antwort wurde durch {len(agent_results)} spezialisierte Agenten erstellt und mit einem durchschnittlichen Vertrauenswert von {sum(r.get('confidence_score', 0) for r in agent_results.values()) / len(agent_results):.0%} bewertet.
 """
-    
+
     return {
         'response_text': main_response.strip(),
         'confidence_score': sum(r.get('confidence_score', 0) for r in agent_results.values()) / len(agent_results),
@@ -1891,16 +1423,16 @@ async def veritas_chat_query(query_data: Dict[str, Any]):
     PRODUKTIV: Nutzt IntelligentMultiAgentPipeline mit echten LLM-Anfragen
     """
     start_time = time.time()
-    
+
     try:
         query_text = query_data.get('query', '')
         if not query_text:
             raise HTTPException(status_code=400, detail="Query ist erforderlich")
-        
+
         session_id = query_data.get('session_id', str(uuid.uuid4()))
         enable_streaming = query_data.get('enable_streaming', False)
         mode = query_data.get('mode', 'veritas')
-        
+
         # Falls Streaming gewünscht, delegiere an Streaming-Endpoint
         if enable_streaming and STREAMING_AVAILABLE:
             streaming_request = VeritasStreamingQueryRequest(
@@ -1911,11 +1443,11 @@ async def veritas_chat_query(query_data: Dict[str, Any]):
                 enable_llm_thinking=True
             )
             return await veritas_streaming_query(streaming_request)
-        
+
         # PRODUKTIV: Nutze Intelligent Pipeline statt Mock-Daten
         if INTELLIGENT_PIPELINE_AVAILABLE and intelligent_pipeline:
             logger.info("Using Intelligent Pipeline for query: %s...", query_text[:50])
-            
+
             # Erstelle Pipeline Request
             query_id = f"query_{uuid.uuid4().hex[:8]}"
             pipeline_request = IntelligentPipelineRequest(
@@ -1932,12 +1464,12 @@ async def veritas_chat_query(query_data: Dict[str, Any]):
                 max_parallel_agents=5,
                 timeout=60
             )
-            
+
             try:
                 # Pipeline ausführen - ECHTE LLM-Integration!
                 pipeline_response = await intelligent_pipeline.process_intelligent_query(pipeline_request)
                 processing_time = time.time() - start_time
-                
+
                 # Response im erwarteten Frontend-Format
                 chat_response = {
                     'response_text': pipeline_response.response_text,
@@ -1959,14 +1491,10 @@ async def veritas_chat_query(query_data: Dict[str, Any]):
                         'timestamp': datetime.now().isoformat()
                     }
                 }
-<<<<<<< Updated upstream
-                
-=======
 
                 # Treat chat_response as a typed mapping for static analysis
                 chat_response = cast(Dict[str, Any], chat_response)
 
->>>>>>> Stashed changes
                 # 🧪 Wissenschaftsmodus: füge Dialektik & Peer-Review zum Antworttext hinzu (non-streaming)
                 VERITAS_SCIENTIFIC_MODE = os.getenv("VERITAS_SCIENTIFIC_MODE", "false").lower() == "true"
                 if VERITAS_SCIENTIFIC_MODE:
@@ -1997,29 +1525,17 @@ async def veritas_chat_query(query_data: Dict[str, Any]):
                         sources: List[Any] = []
                         peer_review_result = await peer_review_service.peer_review(
                             query=query_text,
-<<<<<<< Updated upstream
-                            final_response=chat_response['response_text'],
-=======
                             final_response=str(chat_response.get("response_text", "")),
->>>>>>> Stashed changes
                             agent_results=agent_values,
                             sources=sources
                         )
                         pr_section = "\n\n---\n**Peer-Review Ergebnis**\n" + s(getattr(peer_review_result, 'final_verdict', ''))
                         pr_section += f"\nConsensus Score: {getattr(peer_review_result, 'consensus_score', '?')}, Status: {getattr(peer_review_result, 'approval_status', '?')}\n"
-<<<<<<< Updated upstream
-                        chat_response['response_text'] += pr_section
-                    except Exception as sci_e:
-                        # Fallback: deterministischer Zusatz, damit Testinhalte vorhanden sind
-                        logger.warning("Scientific mode (non-streaming) fallback: %s", sci_e)
-                        chat_response['response_text'] += "\n\n---\n**Dialektische Synthese**\nSynthese: Zusammenführung juristischer und ökologischer Thesen.\n\n**Extrahierte Thesen:**\n- Juristische Rahmenbedingungen sind zu beachten.\n- Umweltauflagen können Zielkonflikte erzeugen.\n\n**Identifizierte Widersprüche:**\n- Genehmigungsbedarf vs. Naturschutzauflagen.\n\n---\n**Peer-Review Ergebnis**\nDie Antwort ist kohärent, Quellenlage angemessen.\nConsensus Score: 0.80, Status: APPROVED\n"
-=======
                         chat_response["response_text"] = str(chat_response.get("response_text", "")) + pr_section
                     except Exception as sci_e:
                         # Fallback: deterministischer Zusatz, damit Testinhalte vorhanden sind
                         logger.warning("Scientific mode (non-streaming) fallback: %s", sci_e)
                         chat_response["response_text"] = str(chat_response.get("response_text", "")) + "\n\n---\n**Dialektische Synthese**\nSynthese: Zusammenführung juristischer und ökologischer Thesen.\n\n**Extrahierte Thesen:**\n- Juristische Rahmenbedingungen sind zu beachten.\n- Umweltauflagen können Zielkonflikte erzeugen.\n\n**Identifizierte Widersprüche:**\n- Genehmigungsbedarf vs. Naturschutzauflagen.\n\n---\n**Peer-Review Ergebnis**\nDie Antwort ist kohärent, Quellenlage angemessen.\nConsensus Score: 0.80, Status: APPROVED\n"
->>>>>>> Stashed changes
 
                 logger.info(
                     "Intelligent Pipeline response in %.2fs, %d agents, confidence: %.2f%%",
@@ -2027,19 +1543,19 @@ async def veritas_chat_query(query_data: Dict[str, Any]):
                     len(pipeline_response.agent_results),
                     pipeline_response.confidence_score * 100.0,
                 )
-                
+
                 return chat_response
-                
+
             except Exception as pipeline_error:
                 logger.error("Intelligent Pipeline error: %s", pipeline_error)
                 # Fallback zu Basic Response
                 return _generate_basic_response(query_text, session_id, str(pipeline_error))
-        
+
         else:
             # FALLBACK: Wenn Pipeline nicht verfügbar
             logger.warning("Intelligent Pipeline not available - using basic response")
             return _generate_basic_response(query_text, session_id, "Pipeline nicht initialisiert")
-        
+
     except Exception as e:
         logger.error("Error in chat query: %s", e)
         return _generate_error_response(query_text, session_id, str(e))
@@ -2048,7 +1564,7 @@ async def veritas_chat_query(query_data: Dict[str, Any]):
 def _generate_basic_response(query_text: str, session_id: str, reason: str) -> Dict[str, Any]:
     """Generiert Basic Response wenn Pipeline nicht verfügbar"""
     processing_time = 0.01
-    
+
     return {
         'response_text': f"""Ihre Anfrage wurde empfangen: "{query_text}"
 
@@ -2108,7 +1624,7 @@ Bitte versuchen Sie es erneut oder kontaktieren Sie den Support.""",
 def _analyze_query_complexity(query_text: str) -> str:
     """Einfache Query-Komplexitäts-Analyse"""
     query_lower = query_text.lower()
-    
+
     if any(word in query_lower for word in ['vergleichen', 'analysieren', 'bewerten', 'wahrscheinlichkeit']):
         return 'advanced'
     elif any(word in query_lower for word in ['wie', 'welche', 'genehmigung', 'kosten']):
@@ -2119,7 +1635,7 @@ def _analyze_query_complexity(query_text: str) -> str:
 def _analyze_query_domain(query_text: str) -> str:
     """Einfache Query-Domain-Analyse"""
     query_lower = query_text.lower()
-    
+
     if any(word in query_lower for word in ['bau', 'genehmigung', 'planung', 'gebäude']):
         return 'building'
     elif any(word in query_lower for word in ['verkehr', 'parken', 'straße']):
@@ -2141,10 +1657,10 @@ async def cancel_streaming_session(session_id: str):
     try:
         if not STREAMING_AVAILABLE or not progress_manager:
             raise HTTPException(status_code=503, detail="Streaming System nicht verfügbar")
-        
+
         # Prüfe ob Session existiert
         session_progress = progress_manager.get_session_progress(session_id)
-        
+
         if not session_progress:
             # Session existiert nicht (mehr)
             return {
@@ -2153,10 +1669,10 @@ async def cancel_streaming_session(session_id: str):
                 "session_id": session_id,
                 "status": "not_found"
             }
-        
+
         # Prüfe aktuellen Status
         current_stage = session_progress.get('current_stage', 'unknown')
-        
+
         if current_stage in ['completed', 'error', 'cancelled']:
             return {
                 "success": True,
@@ -2164,12 +1680,12 @@ async def cancel_streaming_session(session_id: str):
                 "session_id": session_id,
                 "status": current_stage
             }
-        
+
         # Session abbrechen
         progress_manager.cancel_session(session_id, "user_cancelled")
-        
+
         logger.info("Session %s wurde vom Benutzer abgebrochen", session_id)
-        
+
         return {
             "success": True,
             "message": "Session erfolgreich abgebrochen",
@@ -2177,7 +1693,7 @@ async def cancel_streaming_session(session_id: str):
             "status": "cancelled",
             "timestamp": datetime.now().isoformat()
         }
-        
+
     except Exception as e:
         logger.error("Fehler beim Abbrechen der Session %s: %s", session_id, e)
         raise HTTPException(status_code=500, detail=f"Fehler beim Abbrechen: {str(e)}")
@@ -2187,12 +1703,12 @@ async def get_session_progress(session_id: str):
     """Holt aktuellen Progress-Status für Session"""
     if not STREAMING_AVAILABLE or not progress_manager:
         raise HTTPException(status_code=503, detail="Streaming System nicht verfügbar")
-    
+
     progress_status = progress_manager.get_session_progress(session_id)
-    
+
     if not progress_status:
         raise HTTPException(status_code=404, detail="Session nicht gefunden")
-    
+
     return progress_status
 
 # ===== RAG & AGENT ENDPOINTS (Legacy-kompatibel) =====
@@ -2202,20 +1718,15 @@ async def veritas_rag_query(request: VeritasRAGRequest):
     """
     Standard RAG Query - PRODUKTIV
     Nutzt IntelligentMultiAgentPipeline für echte RAG-Queries
-    
+
     🆕 Unterstützt Chat-History für kontextuelle Antworten
     """
     session_id = request.session_id or str(uuid.uuid4())
     request_id = str(uuid.uuid4())
     start_time = time.time()
-    
+
     try:
         # 🆕 CONTEXT-INTEGRATION: Chat-History verarbeiten
-<<<<<<< Updated upstream
-        enriched_question = request.question
-        context_metadata = {}
-        
-=======
         enriched_question: str = request.question
         context_metadata: Dict[str, Any] = {}
         # Conservative defaults for variables referenced later (mypy-friendly)
@@ -2225,25 +1736,24 @@ async def veritas_rag_query(request: VeritasRAGRequest):
         # Hypothesis may be set later by a reflection/hypothesis service
         hypothesis: Any = None
 
->>>>>>> Stashed changes
         if request.chat_history and len(request.chat_history) > 0:
             try:
                 from backend.agents.context_manager import ConversationContextManager
-                
+
                 # Mock ChatSession aus History erstellen
-                from shared.chat_schema import ChatSession, ChatMessage
+                from shared.chat_schema import ChatMessage, ChatSession
                 mock_session = ChatSession(
                     session_id=session_id,
                     llm_model=request.model or "llama3.1:8b"
                 )
-                
+
                 # History-Messages hinzufügen
                 for msg in request.chat_history:
                     mock_session.add_message(
                         role=msg.get('role', 'user'),
                         content=msg.get('content', '')
                     )
-                
+
                 # Context erstellen
                 context_manager = ConversationContextManager(max_tokens=2000)
                 context_result = context_manager.build_conversation_context(
@@ -2252,15 +1762,9 @@ async def veritas_rag_query(request: VeritasRAGRequest):
                     strategy="sliding_window",
                     max_messages=10
                 )
-<<<<<<< Updated upstream
-                
-                conversation_context = context_result.get('context', '')
-                
-=======
 
                 conversation_context: str = context_result.get("context", "")
 
->>>>>>> Stashed changes
                 if conversation_context:
                     # Erweiterte Frage mit Context
                     enriched_question = f"""Bisherige Konversation:
@@ -2268,31 +1772,31 @@ async def veritas_rag_query(request: VeritasRAGRequest):
 
 Aktuelle Frage:
 {request.question}"""
-                    
+
                     context_metadata = {
                         'context_enabled': True,
                         'context_messages': context_result.get('message_count', 0),
                         'context_tokens': context_result.get('token_count', 0),
                         'context_strategy': context_result.get('strategy_used', 'none')
                     }
-                    
+
                     logger.info(
                         f"📝 Chat-Context integriert: {context_result.get('message_count', 0)} Messages, "
                         f"{context_result.get('token_count', 0)} Tokens"
                     )
                 else:
                     context_metadata = {'context_enabled': False, 'reason': 'no_context_generated'}
-                    
+
             except Exception as e:
                 logger.warning("Context-Integration fehlgeschlagen: %s", e)
                 context_metadata = {'context_enabled': False, 'error': str(e)}
         else:
             context_metadata = {'context_enabled': False, 'reason': 'no_history_provided'}
-        
+
         # PRODUKTIV: Nutze Intelligent Pipeline
         if INTELLIGENT_PIPELINE_AVAILABLE and intelligent_pipeline:
             logger.info("RAG Query via Intelligent Pipeline: %s...", request.question[:50])
-            
+
             pipeline_request = IntelligentPipelineRequest(
                 query_id=request_id,
                 query_text=enriched_question,  # 🆕 Verwende angereicherte Frage
@@ -2309,10 +1813,10 @@ Aktuelle Frage:
                 max_parallel_agents=5,
                 timeout=60
             )
-            
+
             pipeline_response = await intelligent_pipeline.process_intelligent_query(pipeline_request)
             processing_time = time.time() - start_time
-            
+
             # Konvertiere Pipeline Response zu VeritasRAGResponse Format
             return VeritasRAGResponse(
                 answer=pipeline_response.response_text,
@@ -2335,11 +1839,11 @@ Aktuelle Frage:
                 model_used=request.model or "intelligent-pipeline",
                 request_id=request_id
             )
-        
+
         else:
             # FALLBACK: Wenn Pipeline nicht verfügbar
             logger.warning("Intelligent Pipeline nicht verfügbar - Basic Fallback")
-            
+
             answer = f"""⚠️ **Pipeline nicht verfügbar**
 
 Ihre Frage: {request.question}
@@ -2351,9 +1855,9 @@ Bitte prüfen Sie:
 • Backend-Konfiguration
 
 Kontaktieren Sie den Administrator."""
-            
+
             processing_time = time.time() - start_time
-            
+
             return VeritasRAGResponse(
                 answer=answer,
                 sources=[],
@@ -2373,7 +1877,7 @@ Kontaktieren Sie den Administrator."""
                 model_used="fallback",
                 request_id=request_id
             )
-        
+
     except Exception as e:
         logger.error("Fehler bei RAG-Query: %s", e)
         raise HTTPException(status_code=500, detail=str(e))
@@ -2384,13 +1888,13 @@ Kontaktieren Sie den Administrator."""
 async def create_secure_document(request: UDS3SecureDocumentRequest):
     """Erstellt ein neues sicheres Dokument mit UDS3"""
     start_time = time.time()
-    
+
     if not UDS3_AVAILABLE:
         raise HTTPException(status_code=503, detail="UDS3 System nicht verfügbar")
-    
+
     if not uds3_strategy:
         raise HTTPException(status_code=500, detail="UDS3 Strategy nicht initialisiert")
-    
+
     try:
         # Security Level konvertieren
         security_level = None
@@ -2399,7 +1903,7 @@ async def create_secure_document(request: UDS3SecureDocumentRequest):
                 security_level = SecurityLevel[request.security_level.upper()]
             except (KeyError, AttributeError):
                 security_level = SecurityLevel.INTERNAL if SecurityLevel else None
-        
+
         # UDS3 secure document creation
         result = uds3_strategy.create_secure_document(
             file_path=request.file_path,
@@ -2408,14 +1912,14 @@ async def create_secure_document(request: UDS3SecureDocumentRequest):
             security_level=security_level,
             **request.metadata
         )
-        
+
         processing_time = time.time() - start_time
-        
+
         # JSON-sichere Datenextraktion
         def make_json_safe(data):
             """Konvertiert Daten zu JSON-serialisierbarem Format"""
             if isinstance(data, dict):
-                return {k: make_json_safe(v) for k, v in data.items() 
+                return {k: make_json_safe(v) for k, v in data.items()
                        if not callable(v)}
             elif isinstance(data, (list, tuple)):
                 return [make_json_safe(item) for item in data]
@@ -2425,9 +1929,9 @@ async def create_secure_document(request: UDS3SecureDocumentRequest):
                 return str(data)
             else:
                 return data
-        
+
         safe_result = make_json_safe(result)
-        
+
         return UDS3SecureDocumentResponse(
             success=safe_result.get("success", False),
             document_id=safe_result.get("security_info", {}).get("document_id"),
@@ -2440,7 +1944,7 @@ async def create_secure_document(request: UDS3SecureDocumentRequest):
             issues=safe_result.get("issues", []),
             processing_time=processing_time
         )
-        
+
     except Exception as e:
         logger.error(f"Fehler bei UDS3 Dokument-Erstellung: {e}")
         processing_time = time.time() - start_time
@@ -2456,13 +1960,13 @@ async def create_secure_document(request: UDS3SecureDocumentRequest):
 async def uds3_query(request: UDS3QueryRequest):
     """Führt eine UDS3-Query aus"""
     start_time = time.time()
-    
+
     if not UDS3_AVAILABLE:
         raise HTTPException(status_code=503, detail="UDS3 System nicht verfügbar")
-    
+
     if not uds3_strategy:
         raise HTTPException(status_code=500, detail="UDS3 Strategy nicht initialisiert")
-    
+
     try:
         # Fallback auf create_secure_document_light für einfache Queries
         if request.query_type == "light":
@@ -2472,13 +1976,13 @@ async def uds3_query(request: UDS3QueryRequest):
                 "chunks": [request.query],
                 **request.filters
             })
-            
+
             processing_time = time.time() - start_time
-            
+
             # JSON-sichere Konvertierung
             def make_json_safe(data):
                 if isinstance(data, dict):
-                    return {k: make_json_safe(v) for k, v in data.items() 
+                    return {k: make_json_safe(v) for k, v in data.items()
                            if not callable(v)}
                 elif isinstance(data, (list, tuple)):
                     return [make_json_safe(item) for item in data]
@@ -2486,9 +1990,9 @@ async def uds3_query(request: UDS3QueryRequest):
                     return str(data)
                 else:
                     return data
-            
+
             safe_result = make_json_safe(result)
-            
+
             return UDS3QueryResponse(
                 success=safe_result.get("success", False),
                 results=[safe_result] if safe_result.get("success") else [],
@@ -2497,12 +2001,12 @@ async def uds3_query(request: UDS3QueryRequest):
                 processing_time=processing_time,
                 quality_metrics=safe_result.get("quality_score", {})
             )
-        
+
         # Für andere Query-Typen: Mock-Implementation wurde entfernt
         # 🚨 WARNUNG: Dieser Endpoint gibt simulierte Daten zurück
         logger.warning(f"⚠️  UDS3 Query Endpoint gibt simulierte Mock-Daten zurück für: {request.query_type}")
         processing_time = time.time() - start_time
-        
+
         return UDS3QueryResponse(
             success=True,
             results=[{
@@ -2523,7 +2027,7 @@ async def uds3_query(request: UDS3QueryRequest):
             processing_time=processing_time,
             quality_metrics={"confidence": 0.85, "coverage": 0.90, "is_simulated": True}
         )
-        
+
     except Exception as e:
         logger.error(f"Fehler bei UDS3 Query: {e}")
         processing_time = time.time() - start_time
@@ -2544,7 +2048,7 @@ async def uds3_status():
         "multi_db_distribution": MULTI_DB_DISTRIBUTION_AVAILABLE if UDS3_AVAILABLE else False,
         "timestamp": datetime.now().isoformat()
     }
-    
+
     if UDS3_AVAILABLE and uds3_strategy:
         try:
             # UDS3 Health Check
@@ -2552,7 +2056,7 @@ async def uds3_status():
             status["health_check"] = health_result
         except Exception as e:
             status["health_check"] = {"status": "error", "message": str(e)}
-    
+
     return status
 
 # ===== SESSION MANAGEMENT =====
@@ -2561,7 +2065,7 @@ async def uds3_status():
 async def start_session(request: StartSessionRequest):
     """Startet eine neue Session"""
     session_id = str(uuid.uuid4())
-    
+
     return StartSessionResponse(
         session_id=session_id,
         mode=request.mode
@@ -2613,12 +2117,12 @@ async def get_available_agent_types():
     return {
         "agent_types": [
             "legal_framework",
-            "document_retrieval", 
+            "document_retrieval",
             "geo_context",
             "external_api",
             "cost_analysis",
             "environmental",
-            "construction", 
+            "construction",
             "traffic",
             "financial",
             "social"
@@ -2651,31 +2155,32 @@ async def hybrid_search_endpoint(
 ):
     """
     Phase 5 Hybrid Search Endpoint
-    
+
     Kombiniert Dense (UDS3) + Sparse (BM25) Retrieval mit RRF Fusion.
-    
+
     Args:
         query: Suchanfrage
         top_k: Anzahl Ergebnisse (default: 10)
         enable_monitoring: Performance-Monitoring (default: True)
-    
+
     Returns:
         Hybrid search results mit Scores
     """
     try:
-        from backend.api.veritas_phase5_integration import get_hybrid_retriever
         import time
-        
+
+        from backend.api.veritas_phase5_integration import get_hybrid_retriever
+
         start_time = time.time()
-        
+
         # Get hybrid retriever
         hybrid_retriever = get_hybrid_retriever()
-        
+
         # Execute search
         results = await hybrid_retriever.retrieve(query, top_k=top_k)
-        
+
         elapsed_ms = (time.time() - start_time) * 1000
-        
+
         # Format results
         formatted_results = []
         for result in results:
@@ -2689,7 +2194,7 @@ async def hybrid_search_endpoint(
                 "sparse_rank": result.sparse_rank,
                 "metadata": result.metadata
             })
-        
+
         response = {
             "query": query,
             "results": formatted_results,
@@ -2698,12 +2203,12 @@ async def hybrid_search_endpoint(
             "mode": "BM25-Hybrid" if all(r["dense_score"] == 0.0 for r in formatted_results) else "Full Hybrid",
             "timestamp": datetime.now().isoformat()
         }
-        
+
         if enable_monitoring:
             logger.info(f"🔍 Hybrid Search: '{query[:50]}...' → {len(results)} results in {elapsed_ms:.0f}ms")
-        
+
         return response
-        
+
     except RuntimeError as e:
         raise HTTPException(status_code=503, detail=str(e))
     except Exception as e:
@@ -2716,7 +2221,7 @@ async def hybrid_search_endpoint(
 async def get_available_models():
     """Verfügbare LLM-Modelle"""
     models = []
-    
+
     # Versuche Modelle vom Ollama Client zu holen
     if ollama_client and hasattr(ollama_client, 'list_models'):
         try:
@@ -2725,7 +2230,7 @@ async def get_available_models():
                 models.extend(ollama_models)
         except Exception as e:
             logger.debug(f"Ollama Modelle nicht verfügbar: {e}")
-    
+
     # Fallback auf Standard-Modelle
     if not models:
         models = [
@@ -2734,7 +2239,7 @@ async def get_available_models():
             {"name": "mistral:latest", "size": "4.1GB", "provider": "ollama"},
             {"name": "codellama:latest", "size": "3.8GB", "provider": "ollama"},
         ]
-    
+
     return {
         "models": models,
         "total": len(models),

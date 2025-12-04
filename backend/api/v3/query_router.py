@@ -9,22 +9,14 @@ Endpoints für Query Operations:
 Integration mit bestehendem Backend.
 """
 
-<<<<<<< Updated upstream
-=======
 import asyncio
 import json
 import logging
 from datetime import datetime
 from typing import Any, AsyncIterator, Dict, List
 
->>>>>>> Stashed changes
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import StreamingResponse
-from typing import AsyncIterator, Dict, Any
-import logging
-import json
-import asyncio
-from datetime import datetime
 
 from .models import (
     QueryRequest, QueryResponse, QueryMetadata, SourceMetadata,

@@ -7,10 +7,10 @@ Simuliert Extraktion von Text, Metadaten und Struktur.
 Status: STUB - Bereit für Integration mit python-docx, openpyxl, python-pptx
 """
 
-import logging
-from typing import Dict, List, Any, Optional
-from datetime import datetime
 import hashlib
+import logging
+from datetime import datetime
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -21,29 +21,29 @@ logger = logging.getLogger(__name__)
 def parse_word_document(content: bytes, filename: str = "document.docx") -> Dict[str, Any]:
     """
     Parst ein Word-Dokument (.docx) und extrahiert Text + Metadaten
-    
+
     **STUB Implementation:**
     - Simuliert Textextraktion
     - Generiert Dummy-Metadaten
     - Gibt strukturierte Daten zurück
-    
+
     **TODO: Integration mit python-docx**
     ```python
     from docx import Document
     import io
-    
+
     doc = Document(io.BytesIO(content))
-    
+
     # Text extraction
     paragraphs = [p.text for p in doc.paragraphs]
     text = '\n'.join(paragraphs)
-    
+
     # Tables
     tables = []
     for table in doc.tables:
         table_data = [[cell.text for cell in row.cells] for row in table.rows]
         tables.append(table_data)
-    
+
     # Metadata
     metadata = {
         'title': doc.core_properties.title,
@@ -52,18 +52,18 @@ def parse_word_document(content: bytes, filename: str = "document.docx") -> Dict
         'modified': doc.core_properties.modified
     }
     ```
-    
+
     **Parameters:**
     - content: Binär-Inhalt des .docx-Files
     - filename: Dateiname (für Logging)
-    
+
     **Returns:** Dict mit text, metadata, structure
     """
     logger.info(f"[STUB] Parsing Word document: {filename} ({len(content)} bytes)")
-    
+
     # STUB: Simuliere Textextraktion
     doc_hash = hashlib.md5(content).hexdigest()[:8]
-    
+
     stub_text = f"""[STUB] Word-Dokument: {filename}
 
 Absatz 1: Dies ist ein simulierter Text aus einem Word-Dokument.
@@ -75,7 +75,7 @@ durch echten Code ersetzen.
 
 Dokumenten-Hash: {doc_hash}
 """
-    
+
     return {
         'text': stub_text,
         'metadata': {
@@ -112,18 +112,18 @@ Dokumenten-Hash: {doc_hash}
 def parse_excel_document(content: bytes, filename: str = "spreadsheet.xlsx") -> Dict[str, Any]:
     """
     Parst ein Excel-Dokument (.xlsx) und extrahiert Daten + Metadaten
-    
+
     **STUB Implementation:**
     - Simuliert Sheet-Extraktion
     - Generiert Dummy-Tabellendaten
-    
+
     **TODO: Integration mit openpyxl**
     ```python
     from openpyxl import load_workbook
     import io
-    
+
     wb = load_workbook(io.BytesIO(content), data_only=True)
-    
+
     # Extract all sheets
     sheets = {}
     for sheet_name in wb.sheetnames:
@@ -132,7 +132,7 @@ def parse_excel_document(content: bytes, filename: str = "spreadsheet.xlsx") -> 
         for row in sheet.iter_rows(values_only=True):
             data.append(list(row))
         sheets[sheet_name] = data
-    
+
     # Metadata
     metadata = {
         'title': wb.properties.title,
@@ -140,33 +140,24 @@ def parse_excel_document(content: bytes, filename: str = "spreadsheet.xlsx") -> 
         'sheet_count': len(wb.sheetnames)
     }
     ```
-    
+
     **Parameters:**
     - content: Binär-Inhalt des .xlsx-Files
     - filename: Dateiname
-    
+
     **Returns:** Dict mit sheets, metadata, structure
     """
     logger.info(f"[STUB] Parsing Excel document: {filename} ({len(content)} bytes)")
-    
+
     doc_hash = hashlib.md5(content).hexdigest()[:8]
-    
+
     # STUB: Simuliere Sheet-Daten
-<<<<<<< Updated upstream
-    stub_sheets = {
-        'Sheet1': [
-            ['Name', 'Value', 'Status'],
-            ['STUB Row 1', 100, 'Active'],
-            ['STUB Row 2', 200, 'Inactive'],
-            ['STUB Row 3', 300, 'Active']
-=======
     stub_sheets: Dict[str, List[List[Any]]] = {
         "Sheet1": [
             ["Name", "Value", "Status"],
             ["STUB Row 1", 100, "Active"],
             ["STUB Row 2", 200, "Inactive"],
             ["STUB Row 3", 300, "Active"],
->>>>>>> Stashed changes
         ],
         'Metadata': [
             ['Key', 'Value'],
@@ -174,16 +165,16 @@ def parse_excel_document(content: bytes, filename: str = "spreadsheet.xlsx") -> 
             ['Parser', 'STUB']
         ]
     }
-    
+
     # Text representation (für RAG)
     text_lines: List[str] = []
     for sheet_name, data in stub_sheets.items():
         text_lines.append(f'## {sheet_name}')
         for row in data:
             text_lines.append(' | '.join(str(cell) for cell in row))
-    
+
     stub_text = '\n'.join(text_lines)
-    
+
     return {
         'text': stub_text,
         'metadata': {
@@ -220,18 +211,18 @@ def parse_excel_document(content: bytes, filename: str = "spreadsheet.xlsx") -> 
 def parse_powerpoint_document(content: bytes, filename: str = "presentation.pptx") -> Dict[str, Any]:
     """
     Parst eine PowerPoint-Präsentation (.pptx) und extrahiert Folien + Metadaten
-    
+
     **STUB Implementation:**
     - Simuliert Folien-Extraktion
     - Generiert Dummy-Folientexte
-    
+
     **TODO: Integration mit python-pptx**
     ```python
     from pptx import Presentation
     import io
-    
+
     prs = Presentation(io.BytesIO(content))
-    
+
     # Extract slides
     slides = []
     for i, slide in enumerate(prs.slides):
@@ -240,16 +231,16 @@ def parse_powerpoint_document(content: bytes, filename: str = "presentation.pptx
             'title': '',
             'content': []
         }
-        
+
         for shape in slide.shapes:
             if hasattr(shape, "text"):
                 if shape.is_placeholder and shape.placeholder_format.type == 1:
                     slide_data['title'] = shape.text
                 else:
                     slide_data['content'].append(shape.text)
-        
+
         slides.append(slide_data)
-    
+
     # Metadata
     metadata = {
         'title': prs.core_properties.title,
@@ -257,17 +248,17 @@ def parse_powerpoint_document(content: bytes, filename: str = "presentation.pptx
         'slide_count': len(prs.slides)
     }
     ```
-    
+
     **Parameters:**
     - content: Binär-Inhalt des .pptx-Files
     - filename: Dateiname
-    
+
     **Returns:** Dict mit slides, metadata, structure
     """
     logger.info(f"[STUB] Parsing PowerPoint document: {filename} ({len(content)} bytes)")
-    
+
     doc_hash = hashlib.md5(content).hexdigest()[:8]
-    
+
     # STUB: Simuliere Folien
     stub_slides: List[Dict[str, Any]] = [
         {
@@ -296,20 +287,16 @@ def parse_powerpoint_document(content: bytes, filename: str = "presentation.pptx
             ]
         }
     ]
-    
-<<<<<<< Updated upstream
-=======
 
->>>>>>> Stashed changes
     # Text representation (für RAG)
     text_lines: List[str] = []
     for slide in stub_slides:
         text_lines.append(f'## Folie {slide["slide_number"]}: {slide["title"]}')
         text_lines.extend(slide['content'])
         text_lines.append('')
-    
+
     stub_text = '\n'.join(text_lines)
-    
+
     return {
         'text': stub_text,
         'metadata': {
@@ -345,14 +332,14 @@ def parse_powerpoint_document(content: bytes, filename: str = "presentation.pptx
 def parse_office_document(content: bytes, file_type: str, filename: str) -> Dict[str, Any]:
     """
     Generic Dispatcher für Office-Dokument-Parsing
-    
+
     **Parameters:**
     - content: Binär-Inhalt
     - file_type: 'word', 'excel', 'powerpoint'
     - filename: Dateiname
-    
+
     **Returns:** Parsed document dict
-    
+
     **Raises:** ValueError bei unbekanntem file_type
     """
     parsers = {
@@ -360,10 +347,10 @@ def parse_office_document(content: bytes, file_type: str, filename: str) -> Dict
         'excel': parse_excel_document,
         'powerpoint': parse_powerpoint_document
     }
-    
+
     if file_type not in parsers:
         raise ValueError(f"Unknown file type: {file_type}. Supported: {list(parsers.keys())}")
-    
+
     return parsers[file_type](content, filename)
 
 

@@ -3,15 +3,15 @@ Universal JSON Payload Library
 ===============================
 Standardisierte Payload-Strukturen für VERITAS-Kommunikation
 
-Dieses Modul definiert einheitliche Request/Response-Formate für 
+Dieses Modul definiert einheitliche Request/Response-Formate für
 die Kommunikation zwischen Frontend, Backend und verschiedenen Services.
 """
 
 import uuid
+from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from enum import Enum
-from dataclasses import dataclass, field, asdict
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
 # ===== ENUMS =====
 
@@ -58,12 +58,7 @@ class QualityLevel(Enum):
 @dataclass
 class UniversalQueryRequest:
     """Standardisierte Query-Anfrage"""
-<<<<<<< Updated upstream
-    request_id: str
-    request_type: RequestType
-=======
 
->>>>>>> Stashed changes
     query: str
     # Backwards-compatible defaults so callers may omit request_id/request_type
     request_id: str = field(default_factory=lambda: f"req_{uuid.uuid4().hex[:16]}")
@@ -80,18 +75,11 @@ class UniversalQueryRequest:
     system_prompt: Optional[str] = None
     context_files: List[str] = field(default_factory=list)
     timestamp: str = field(default_factory=lambda: datetime.now().isoformat())
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Konvertiert zu Dictionary"""
         data = asdict(self)
         # Enums zu Strings konvertieren
-<<<<<<< Updated upstream
-        data['request_type'] = self.request_type.value
-        data['quality_level'] = self.quality_level.value
-        data['source_component'] = self.source_component.value
-        return data
-
-=======
         data["request_type"] = self.request_type.value
         data["quality_level"] = self.quality_level.value
         data["source_component"] = self.source_component.value
@@ -105,7 +93,6 @@ class UniversalQueryRequest:
         return self.to_dict()
 
 
->>>>>>> Stashed changes
 @dataclass
 class UniversalQueryResponse:
     """Standardisierte Query-Antwort"""
@@ -123,7 +110,7 @@ class UniversalQueryResponse:
     errors: List[str] = field(default_factory=list)
     source_component: SystemComponent = SystemComponent.BACKEND
     timestamp: str = field(default_factory=lambda: datetime.now().isoformat())
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Konvertiert zu Dictionary"""
         data = asdict(self)
@@ -185,80 +172,6 @@ def create_query_response(
         **kwargs
     )
 
-<<<<<<< Updated upstream
-=======
-
-# ===== Additional Payloads for Compatibility =====
-
-
-@dataclass
-class ChatMessageRequest:
-    """Simplified chat message request for compatibility"""
-
-    message_id: str
-    sender: str
-    role: str
-    content: str
-    attachments: List[Dict[str, Any]] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
-
-
-@dataclass
-class FileUploadRequest:
-    """Simplified file upload request for compatibility"""
-
-    file_id: str
-    filename: str
-    uploader: str
-    metadata: Dict[str, Any] = field(default_factory=dict)
-
-
-def create_error_response(request_id: str, error_message: str, code: str = "error") -> Dict[str, Any]:
-    """Create a minimal error response dict for compatibility with older callers."""
-    return {
-        "request_id": request_id,
-        "response_id": create_response_id(),
-        "status": ResponseStatus.ERROR.value,
-        "answer": "",
-        "errors": [error_message],
-        "error_code": code,
-        "timestamp": datetime.now().isoformat(),
-    }
-
-
->>>>>>> Stashed changes
-# ===== COMPATIBILITY =====
-
-# Legacy-Aliase für Kompatibilität
-def generate_request_id() -> str:
-    """Legacy-Alias für create_request_id"""
-    return create_request_id()
-
-def generate_session_id() -> str:
-    """Legacy-Alias für create_session_id"""
-    return create_session_id()
-
-__all__ = [
-    # Enums
-    'RequestType',
-    'ResponseStatus', 
-    'SystemComponent',
-    'QualityLevel',
-    
-    # Dataclasses
-    'UniversalQueryRequest',
-    'UniversalQueryResponse',
-    
-    # Functions
-<<<<<<< Updated upstream
-    'create_request_id',
-    'create_session_id',
-    'create_response_id',
-    'validate_request_type',
-    'create_query_request',
-    'create_query_response',
-    
-=======
     "create_request_id",
     "create_session_id",
     "create_response_id",
@@ -279,7 +192,6 @@ __all__ = [
     "SecurityLevel",
     "create_metadata",
     "create_success_response",
->>>>>>> Stashed changes
     # Legacy
     'generate_request_id',
     'generate_session_id',

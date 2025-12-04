@@ -18,12 +18,8 @@ Version: 3.0.0
 
 import time
 import uuid
-from typing import List, Dict, Any, Optional
 from datetime import datetime, timedelta
-<<<<<<< Updated upstream
-=======
 from typing import Any, Dict, List, Optional, cast
->>>>>>> Stashed changes
 
 from fastapi import APIRouter, Request, HTTPException, Query
 

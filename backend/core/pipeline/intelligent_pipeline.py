@@ -18,44 +18,40 @@ Date: 2025-09-28
 Version: 1.0
 """
 
-import os
-import sys
 import asyncio
-import logging
+import copy
 import json
+import logging
+import os
+import queue
+import sys
+import threading
 import time
 import uuid
-import queue
-import threading
-import copy
 from collections import Counter, deque
-from typing import Dict, List, Any, Optional, AsyncGenerator, Tuple
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-<<<<<<< Updated upstream
-from concurrent.futures import ThreadPoolExecutor
-from contextlib import asynccontextmanager
-=======
-from typing import Any, AsyncGenerator, Dict, List, Optional, Tuple, Set, cast
->>>>>>> Stashed changes
+from typing import Any, AsyncGenerator, Dict, List, Optional, Set, Tuple, cast
 
 # Sicherstellen, dass das Projekt-Root im Python-Pfad liegt
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if REPO_ROOT not in sys.path:
     sys.path.append(REPO_ROOT)
 
-# VERITAS Shared Enums
-from backend.agents.veritas_shared_enums import QueryComplexity, QueryDomain, QueryStatus, PipelineStage
 from backend.agents.rag_context_service import RAGContextService, RAGQueryOptions
+
+# VERITAS Shared Enums
+from backend.agents.veritas_shared_enums import PipelineStage, QueryComplexity, QueryDomain, QueryStatus
 
 # VERITAS Imports
 try:
     from backend.agents.veritas_ollama_client import VeritasOllamaClient, get_ollama_client
+
     # Import andere Agent-Module wenn verfügbar, aber nicht erforderlich
     try:
+        from backend.agents.veritas_api_agent_core_components import AgentCoordinator, create_agent_coordinator
         from backend.agents.veritas_api_agent_orchestrator import AgentOrchestrator, create_agent_orchestrator
         from backend.agents.veritas_api_agent_pipeline_manager import AgentPipelineManager, get_agent_pipeline_db
-        from backend.agents.veritas_api_agent_core_components import AgentCoordinator, create_agent_coordinator
         VERITAS_AGENT_MODULES_AVAILABLE = True
     except ImportError:
         VERITAS_AGENT_MODULES_AVAILABLE = False
@@ -67,11 +63,7 @@ except ImportError as e:
 
 # 🆕 Agent Registry Import
 try:
-    from backend.agents.agent_registry import (
-        AgentRegistry,
-        AgentDomain,
-        get_agent_registry
-    )
+    from backend.agents.agent_registry import AgentDomain, AgentRegistry, get_agent_registry
     AGENT_REGISTRY_AVAILABLE = True
     logging.info("✅ Agent Registry verfügbar")
 except ImportError as e:
@@ -81,11 +73,11 @@ except ImportError as e:
 # Supervisor Agent (optional)
 try:
     from backend.agents.veritas_supervisor_agent import (
-        SupervisorAgent, 
-        get_supervisor_agent,
-        SubQuery,
         AgentResult,
-        SynthesizedResult
+        SubQuery,
+        SupervisorAgent,
+        SynthesizedResult,
+        get_supervisor_agent,
     )
     SUPERVISOR_AGENT_AVAILABLE = True
     logging.info("✅ Supervisor-Agent verfügbar")
@@ -100,15 +92,16 @@ except ImportError as e:
 # System will NOT start if import fails - this is intentional!
 
 from uds3.core import UDS3PolyglotManager  # ✨ UDS3 v2.0.0 (Legacy stable)
+
 logging.info("✅ RAG Integration (UDS3 v2.0.0) verfügbar")
 
 # Streaming Progress
 try:
     from shared.pipelines.veritas_streaming_progress import (
-        VeritasProgressManager,
-        create_progress_manager,
         ProgressStage,
         ProgressType,
+        VeritasProgressManager,
+        create_progress_manager,
     )
     STREAMING_AVAILABLE = True
 except ImportError:
@@ -121,173 +114,20 @@ logger = logging.getLogger(__name__)
 # INTELLIGENT PIPELINE DATASTRUKTUREN
 # ============================================================================
 
-<<<<<<< Updated upstream
-=======
-# Provide a permissive fallback for optional database API type used in some configs
-MultiDatabaseAPI: Any = None
-
-
->>>>>>> Stashed changes
-@dataclass
-class IntelligentPipelineRequest:
-    """Request für intelligente Multi-Agent-Pipeline"""
-    query_id: str
-    query_text: str
-    user_context: Dict[str, Any] = field(default_factory=dict)
-    session_id: Optional[str] = None
-    enable_llm_commentary: bool = True
-    enable_real_time_updates: bool = True
-    enable_supervisor: bool = False  # 🆕 Supervisor-Agent-Modus
-    complexity_hint: Optional[str] = None
-    requested_agents: List[str] = field(default_factory=list)
-    max_parallel_agents: int = 5
-    timeout: int = 60
-    metadata: Dict[str, Any] = field(default_factory=dict)
-    # Dynamic runtime fields populated during pipeline execution
-    token_budget: Optional[int] = None
-    budget_breakdown: Optional[Dict[str, Any]] = None
-    intent_prediction: Optional[Dict[str, Any]] = None
-
-@dataclass
-class IntelligentPipelineResponse:
-    """Response von intelligenter Multi-Agent-Pipeline"""
-    query_id: str
-    session_id: str
-    response_text: str
-    confidence_score: float
-    agent_results: Dict[str, Any] = field(default_factory=dict)
-    agent_priority_map: Dict[str, float] = field(default_factory=dict)
-    agent_selection_reasoning: List[Dict[str, Any]] = field(default_factory=list)
-    agent_selection_insights: List[str] = field(default_factory=list)
-    aggregation_summary: Dict[str, Any] = field(default_factory=dict)
-    agent_consensus: Dict[str, Any] = field(default_factory=dict)
-    rag_context: Dict[str, Any] = field(default_factory=dict)
-    sources: List[Dict[str, Any]] = field(default_factory=list)
-    follow_up_suggestions: List[str] = field(default_factory=list)
-    processing_metadata: Dict[str, Any] = field(default_factory=dict)
-    llm_commentary: List[str] = field(default_factory=list)
-    json_metadata: Optional[Dict[str, Any]] = None  # 🆕 Extracted JSON (next_steps, related_topics)
-    total_processing_time: float = 0.0
-    created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
-
-@dataclass
-class PipelineStep:
-    """Einzelner Pipeline-Step mit LLM-Kommentar"""
-    step_id: str
-    step_name: str
-    status: str = "pending"  # pending, running, completed, failed
-    start_time: Optional[float] = None
-    end_time: Optional[float] = None
-    llm_comment: Optional[str] = None
-    result: Optional[Dict[str, Any]] = None
-    error: Optional[str] = None
-    progress_percentage: float = 0.0
-
-
-@dataclass
-class AgentExecutionTask:
-    """Repräsentiert eine Agenten-Aufgabe für Thread-Pool-Ausführung"""
-
-    agent_type: str
-    stage: str  # parallel oder sequential
-    priority_score: float
-    planned_order: int
-    metadata: Dict[str, Any] = field(default_factory=dict)
-    disabled: bool = False
-
-# ============================================================================
-# INTELLIGENT MULTI-AGENT PIPELINE
-# ============================================================================
-
-class IntelligentMultiAgentPipeline:
-    """
-    Intelligent Multi-Agent Pipeline mit Real-time LLM-Kommentaren
-    
-    KERNFUNKTIONEN:
-    - LLM-kommentierte Pipeline-Steps
-    - Parallele Agent-Execution mit Thread-Pool
-    - RAG-basierte Agent-Selektion
-    - Real-time Progress Updates
-    - Intelligente Result-Aggregation
-    """
-
-    STEP_PROGRESS_MAPPING = {
-        "query_analysis": ProgressStage.ANALYZING_QUERY,
-        "rag_search": ProgressStage.GATHERING_CONTEXT,
-        "agent_selection": ProgressStage.SELECTING_AGENTS,
-        "agent_execution": ProgressStage.AGENT_PROCESSING,
-        "result_aggregation": ProgressStage.SYNTHESIZING,
-    }
-    
-    def __init__(self, max_workers: int = 5):
-        """
-        Initialisiert die Intelligent Multi-Agent Pipeline
-        
-        Args:
-            max_workers: Maximale Anzahl paralleler Agent-Threads
-        """
-        self.max_workers = max_workers
-        
-        # Core Components
-        self.ollama_client: Optional[VeritasOllamaClient] = None
-        self.agent_orchestrator: Optional[AgentOrchestrator] = None
-        self.pipeline_manager: Optional[AgentPipelineManager] = None
-        self.agent_coordinator: Optional[AgentCoordinator] = None
-        self.progress_manager: Optional[VeritasProgressManager] = None
-        self.supervisor_agent: Optional[SupervisorAgent] = None  # 🆕 Supervisor-Agent
-        self.agent_registry: Optional[AgentRegistry] = None  # 🆕 Agent Registry
-        
-        # RAG Integration
-        self.database_api: Optional[MultiDatabaseAPI] = None
-        self.uds3_strategy: Optional[UDS3PolyglotManager] = None  # ✨ NEU: UDS3 v2.0.0
-        self.rag_service: Optional[RAGContextService] = None
-        
-        # Token Budget & Intent Classification
-<<<<<<< Updated upstream
-        self.token_calculator = None  # Wird in initialize() geladen
-        self.intent_classifier = None  # Wird in initialize() geladen
-        self.context_window_manager = None  # Wird in initialize() geladen
-        
-=======
         self.token_calculator: Optional[Any] = None  # Wird in initialize() geladen
         self.intent_classifier: Optional[Any] = None  # Wird in initialize() geladen
         self.context_window_manager: Optional[Any] = None  # Wird in initialize() geladen
 
->>>>>>> Stashed changes
         # Threading
         self.executor = ThreadPoolExecutor(max_workers=max_workers)
         self.agent_task_queue: "queue.Queue[AgentExecutionTask]" = queue.Queue()
         self._agent_results_lock = threading.RLock()
-        
+
         # Active Pipelines
         self.active_pipelines: Dict[str, IntelligentPipelineRequest] = {}
         self.pipeline_steps: Dict[str, List[PipelineStep]] = {}
-        
+
         # Statistics
-<<<<<<< Updated upstream
-        self.stats = {
-            'pipelines_processed': 0,
-            'successful_pipelines': 0,
-            'failed_pipelines': 0,
-            'total_processing_time': 0.0,
-            'average_processing_time': 0.0,
-            'llm_comments_generated': 0,
-            'agents_executed': 0,
-            'agent_timeouts': 0,
-            'rag_queries_executed': 0,
-            'agent_priority_updates': 0,
-            'orchestrator_usage': 0,
-            'supervisor_usage': 0,  # 🆕 Supervisor-Statistik
-            'agent_registry_usage': 0,  # 🆕 Agent Registry-Statistik
-            'stage_duration_stats': {},
-            'agent_metrics': {},
-            'query_metrics': {
-                'complexity_counts': {},
-                'domain_counts': {},
-                'avg_processing_time_by_complexity': {}
-            },
-            'last_error': None
-=======
         self.stats: Dict[str, Any] = {
             "pipelines_processed": 0,
             "successful_pipelines": 0,
@@ -306,20 +146,19 @@ class IntelligentMultiAgentPipeline:
             "agent_metrics": {},
             "query_metrics": {"complexity_counts": {}, "domain_counts": {}, "avg_processing_time_by_complexity": {}},
             "last_error": None,
->>>>>>> Stashed changes
         }
 
         self.recent_pipeline_metrics: deque = deque(maxlen=20)
         self.recent_agent_events: deque = deque(maxlen=50)
         self.recent_query_metrics: deque = deque(maxlen=50)
         self.recent_errors: deque = deque(maxlen=50)
-        
+
         logger.info("🧠 Intelligent Multi-Agent Pipeline initialisiert")
-    
+
     async def initialize(self) -> bool:
         """
         Initialisiert alle Pipeline-Komponenten
-        
+
         Returns:
             bool: True wenn erfolgreich initialisiert
         """
@@ -329,7 +168,7 @@ class IntelligentMultiAgentPipeline:
             if not self.ollama_client:
                 logger.error("❌ Ollama Client Initialisierung fehlgeschlagen")
                 return False
-            
+
             # VERITAS Agents initialisieren
             if VERITAS_AGENT_MODULES_AVAILABLE:
                 self.pipeline_manager = get_agent_pipeline_db()
@@ -342,19 +181,19 @@ class IntelligentMultiAgentPipeline:
                 logger.info("✅ VERITAS Agent-Module erfolgreich initialisiert")
             else:
                 logger.info("ℹ️ VERITAS Agent-Module nicht verfügbar - läuft im Mock-Modus")
-            
+
             # ============================================================================
             # RAG Integration - REQUIRED (NO FALLBACK MODE)
             # ============================================================================
             # UDS3 v2.0.0 is REQUIRED. System will fail fast if initialization fails.
-            
+
             backend_config = {
                 "vector": {"enabled": True, "backend": "chromadb"},
                 "graph": {"enabled": False},
                 "relational": {"enabled": False},
                 "file_storage": {"enabled": False}
             }
-            
+
             try:
                 self.uds3_strategy = UDS3PolyglotManager(
                     backend_config=backend_config,
@@ -364,7 +203,7 @@ class IntelligentMultiAgentPipeline:
             except Exception as e:
                 logger.error(f"❌ CRITICAL: UDS3 Polyglot Manager Init FAILED: {e}")
                 raise RuntimeError(f"Intelligent Pipeline requires UDS3 - Init failed: {e}")
-            
+
             # RAG Context Service initialisieren (REQUIRED)
             try:
                 self.rag_service = RAGContextService(
@@ -375,7 +214,7 @@ class IntelligentMultiAgentPipeline:
             except Exception as e:
                 logger.error(f"❌ CRITICAL: RAG Context Service Init FAILED: {e}")
                 raise RuntimeError(f"Intelligent Pipeline requires RAG Service - Init failed: {e}")
-            
+
             # Token Budget Calculator initialisieren
             try:
                 from backend.services.token_budget_calculator import TokenBudgetCalculator
@@ -383,7 +222,7 @@ class IntelligentMultiAgentPipeline:
                 logger.info("✅ Token Budget Calculator initialisiert")
             except Exception as e:
                 logger.warning(f"⚠️ Token Budget Calculator konnte nicht geladen werden: {e}")
-            
+
             # Intent Classifier initialisieren
             try:
                 from backend.services.intent_classifier import HybridIntentClassifier
@@ -391,7 +230,7 @@ class IntelligentMultiAgentPipeline:
                 logger.info("✅ Intent Classifier initialisiert")
             except Exception as e:
                 logger.warning(f"⚠️ Intent Classifier konnte nicht geladen werden: {e}")
-            
+
             # Context Window Manager initialisieren
             try:
                 from backend.services.context_window_manager import ContextWindowManager
@@ -399,11 +238,11 @@ class IntelligentMultiAgentPipeline:
                 logger.info("✅ Context Window Manager initialisiert")
             except Exception as e:
                 logger.warning(f"⚠️ Context Window Manager konnte nicht geladen werden: {e}")
-            
+
             # Progress Manager initialisieren
             if STREAMING_AVAILABLE:
                 self.progress_manager = create_progress_manager()
-            
+
             # 🆕 Supervisor-Agent initialisieren
             if SUPERVISOR_AGENT_AVAILABLE and self.ollama_client:
                 try:
@@ -412,7 +251,7 @@ class IntelligentMultiAgentPipeline:
                 except Exception as e:
                     logger.warning(f"⚠️ Supervisor-Agent Initialisierung fehlgeschlagen: {e}")
                     self.supervisor_agent = None
-            
+
             # 🆕 Agent Registry initialisieren
             if AGENT_REGISTRY_AVAILABLE:
                 try:
@@ -422,14 +261,14 @@ class IntelligentMultiAgentPipeline:
                 except Exception as e:
                     logger.warning(f"⚠️ Agent Registry Initialisierung fehlgeschlagen: {e}")
                     self.agent_registry = None
-            
+
             logger.info("✅ Intelligent Pipeline erfolgreich initialisiert")
             return True
-            
+
         except Exception as e:
             logger.error(f"❌ Pipeline Initialisierung fehlgeschlagen: {e}")
             return False
-    
+
     async def _initialize_request_scoped_resources(
         self,
         enable_rag: bool = True,
@@ -437,14 +276,14 @@ class IntelligentMultiAgentPipeline:
     ) -> bool:
         """
         Initialisiert Request-spezifische Ressourcen.
-        
+
         Diese Methode wird von PipelineFactory nach Dependency Injection aufgerufen.
         Sie initialisiert nur die Ressourcen, die pro Request benötigt werden.
-        
+
         Args:
             enable_rag: RAG-Integration aktivieren
             enable_supervisor: Supervisor-Agent aktivieren
-        
+
         Returns:
             bool: True wenn erfolgreich
         """
@@ -453,7 +292,7 @@ class IntelligentMultiAgentPipeline:
             if not self.executor:
                 self.executor = ThreadPoolExecutor(max_workers=self.max_workers)
                 logger.info(f"✅ ThreadPool erstellt ({self.max_workers} workers)")
-            
+
             # RAG Context Service (falls RAG enabled)
             if enable_rag and self.uds3_strategy:
                 try:
@@ -465,7 +304,7 @@ class IntelligentMultiAgentPipeline:
                     logger.info("✅ RAG Context Service initialisiert")
                 except Exception as e:
                     logger.warning(f"⚠️ RAG Context Service Initialisierung fehlgeschlagen: {e}")
-            
+
             # Supervisor Agent (falls enabled)
             if enable_supervisor and SUPERVISOR_AGENT_AVAILABLE and self.ollama_client:
                 try:
@@ -473,21 +312,21 @@ class IntelligentMultiAgentPipeline:
                     logger.info("✅ Supervisor-Agent initialisiert")
                 except Exception as e:
                     logger.warning(f"⚠️ Supervisor-Agent Initialisierung fehlgeschlagen: {e}")
-            
+
             logger.info("✅ Request-scoped Ressourcen initialisiert")
             return True
-            
+
         except Exception as e:
             logger.error(f"❌ Request-scoped Initialisierung fehlgeschlagen: {e}")
             return False
-    
+
     async def cleanup(self):
         """
         Räumt Pipeline-Ressourcen nach Request auf.
-        
+
         Diese Methode sollte am Ende jedes Requests aufgerufen werden,
         um Ressourcen freizugeben und Memory-Leaks zu vermeiden.
-        
+
         Cleanup umfasst:
         - ThreadPool shutdown
         - State clearing
@@ -499,43 +338,43 @@ class IntelligentMultiAgentPipeline:
                 self.executor.shutdown(wait=False)
                 self.executor = None
                 logger.info("✅ ThreadPool beendet")
-            
+
             # State clearen
             self.active_pipelines.clear()
             self.pipeline_steps.clear()
-            
+
             # Temporary caches clearen (falls vorhanden)
             if hasattr(self, '_temp_cache'):
                 self._temp_cache.clear()
-            
+
             logger.info("✅ Pipeline-Ressourcen bereinigt")
-            
+
         except Exception as e:
             logger.error(f"❌ Cleanup-Fehler: {e}")
-    
+
     async def process_intelligent_query(self, request: IntelligentPipelineRequest) -> IntelligentPipelineResponse:
         """
         Verarbeitet Query durch intelligente Multi-Agent-Pipeline
-        
+
         Args:
             request: Pipeline-Request
-            
+
         Returns:
             IntelligentPipelineResponse: Umfassende Pipeline-Response
         """
         start_time = time.time()
         request.session_id = request.session_id or str(uuid.uuid4())
-        
+
         # Pipeline in aktive Liste aufnehmen
         self.active_pipelines[request.query_id] = request
         self.pipeline_steps[request.query_id] = []
         self._start_progress_session(request)
-        
+
         try:
             # STEP 0: Intent Classification & Token Budget Calculation
             intent_prediction = None
             token_budget = 1000  # Default fallback
-            
+
             if self.intent_classifier:
                 try:
                     intent_prediction = await self.intent_classifier.classify_async(
@@ -547,14 +386,14 @@ class IntelligentMultiAgentPipeline:
                                f"(confidence: {intent_prediction.confidence:.2%}, method: {intent_prediction.method})")
                 except Exception as e:
                     logger.warning(f"⚠️ Intent classification failed: {e}")
-                    from backend.services.intent_classifier import UserIntent, IntentPrediction
+                    from backend.services.intent_classifier import IntentPrediction, UserIntent
                     intent_prediction = IntentPrediction(
                         intent=UserIntent.EXPLANATION,
                         confidence=0.5,
                         method="fallback",
                         reasoning="Classification error"
                     )
-            
+
             # Token Budget berechnen (wird nach RAG-Step aktualisiert)
             if self.token_calculator and intent_prediction:
                 try:
@@ -570,7 +409,7 @@ class IntelligentMultiAgentPipeline:
                     )
                     logger.info(f"💰 Token budget calculated: {token_budget} tokens "
                                f"(complexity: {budget_breakdown['complexity_score']:.1f}/10)")
-                    
+
                     # Budget in Request speichern für spätere Verwendung
                     request.token_budget = token_budget
                     request.budget_breakdown = budget_breakdown
@@ -578,19 +417,19 @@ class IntelligentMultiAgentPipeline:
                 except Exception as e:
                     logger.warning(f"⚠️ Token budget calculation failed: {e}")
                     request.token_budget = 1000
-            
+
             # STEP 1: Query Analysis
             analysis_result = await self._execute_pipeline_step(
                 request, "query_analysis", "Query Analysis",
                 self._step_query_analysis
             )
-            
+
             # STEP 2: RAG Search
             rag_result = await self._execute_pipeline_step(
-                request, "rag_search", "RAG Database Search", 
+                request, "rag_search", "RAG Database Search",
                 self._step_rag_search, {"analysis": analysis_result}
             )
-            
+
             # Token-Budget nach RAG aktualisieren (mehr Chunks → mehr Tokens)
             if self.token_calculator and intent_prediction and rag_result:
                 try:
@@ -602,7 +441,7 @@ class IntelligentMultiAgentPipeline:
                         source_types.append("graph")
                     if rag_result.get("relational"):
                         source_types.append("relational")
-                    
+
                     updated_budget, updated_breakdown = self.token_calculator.calculate_budget(
                         query=request.query_text,
                         chunk_count=chunk_count,
@@ -612,20 +451,20 @@ class IntelligentMultiAgentPipeline:
                         confidence=None,
                         user_preference=getattr(request, 'user_preference', 1.0)
                     )
-                    
+
                     logger.info(f"💰 Token budget updated after RAG: {updated_budget} tokens "
                                f"(chunks: {chunk_count}, sources: {len(source_types)})")
                     request.token_budget = updated_budget
                     request.budget_breakdown = updated_breakdown
                 except Exception as e:
                     logger.warning(f"⚠️ Token budget update after RAG failed: {e}")
-            
+
             # STEP 3: Agent Selection
             agent_selection_result = await self._execute_pipeline_step(
                 request, "agent_selection", "Agent Selection",
                 self._step_agent_selection, {"analysis": analysis_result, "rag": rag_result}
             )
-            
+
             # Token-Budget final nach Agent-Selection aktualisieren
             if self.token_calculator and intent_prediction and agent_selection_result:
                 try:
@@ -640,7 +479,7 @@ class IntelligentMultiAgentPipeline:
                             source_types.append("graph")
                         if rag_result.get("relational"):
                             source_types.append("relational")
-                    
+
                     final_budget, final_breakdown = self.token_calculator.calculate_budget(
                         query=request.query_text,
                         chunk_count=chunk_count,
@@ -650,20 +489,20 @@ class IntelligentMultiAgentPipeline:
                         confidence=None,
                         user_preference=getattr(request, 'user_preference', 1.0)
                     )
-                    
+
                     logger.info(f"💰 Final token budget: {final_budget} tokens "
                                f"(chunks: {chunk_count}, sources: {len(source_types)}, agents: {agent_count})")
                     request.token_budget = final_budget
                     request.budget_breakdown = final_breakdown
                 except Exception as e:
                     logger.warning(f"⚠️ Final token budget calculation failed: {e}")
-            
+
             # STEP 4: Parallel Agent Execution
             agent_results = await self._execute_pipeline_step(
                 request, "agent_execution", "Agent Execution",
                 self._step_parallel_agent_execution, {"agent_selection": agent_selection_result, "rag": rag_result}
             )
-            
+
             # STEP 5: Result Aggregation
             final_result = await self._execute_pipeline_step(
                 request, "result_aggregation", "Result Aggregation",
@@ -678,7 +517,7 @@ class IntelligentMultiAgentPipeline:
                 for step in self.pipeline_steps.get(request.query_id, [])
                 if step.start_time and step.end_time
             }
-            
+
             # Pipeline erfolgreich abgeschlossen
             processing_time = time.time() - start_time
             self.stats['pipelines_processed'] += 1
@@ -688,7 +527,7 @@ class IntelligentMultiAgentPipeline:
                 self.stats['average_processing_time'] = (
                     self.stats['total_processing_time'] / self.stats['pipelines_processed']
                 )
-            
+
             # Response zusammenstellen
             response = IntelligentPipelineResponse(
                 query_id=request.query_id,
@@ -745,15 +584,15 @@ class IntelligentMultiAgentPipeline:
                 'confidence': response.confidence_score
             })
             self._complete_progress_session(request, response)
-            
+
             return response
-            
+
         except Exception as e:
             logger.error(f"❌ Pipeline-Verarbeitung fehlgeschlagen: {e}")
             self._record_pipeline_error(request, e)
             self.stats['failed_pipelines'] += 1
             self._fail_progress_session(request, str(e))
-            
+
             # Fehler-Response
             return IntelligentPipelineResponse(
                 query_id=request.query_id,
@@ -762,16 +601,16 @@ class IntelligentMultiAgentPipeline:
                 confidence_score=0.0,
                 total_processing_time=time.time() - start_time
             )
-        
+
         finally:
             # ✅ CLEANUP: Request-scoped Ressourcen freigeben
             if request.query_id in self.active_pipelines:
                 del self.active_pipelines[request.query_id]
-            
+
             # Optional: Vollständiger Cleanup (wenn Factory-Pattern genutzt wird)
             # Wird auskommentiert, bis Factory-Pattern aktiviert ist
             # await self.cleanup()
-    
+
     async def _execute_pipeline_step(self,
                                    request: IntelligentPipelineRequest,
                                    step_id: str,
@@ -780,30 +619,30 @@ class IntelligentMultiAgentPipeline:
                                    context: Dict[str, Any] = None) -> Dict[str, Any]:
         """
         Führt Pipeline-Step mit LLM-Kommentar aus
-        
+
         Args:
             request: Pipeline Request
             step_id: Eindeutige Step-ID
             step_name: Human-readable Step-Name
             step_function: Auszuführende Funktion
             context: Kontext für den Step
-            
+
         Returns:
             Dict: Step-Ergebnis
         """
-        
+
         step = PipelineStep(
             step_id=step_id,
             step_name=step_name,
             status="running",
             start_time=time.time()
         )
-        
+
         self.pipeline_steps[request.query_id].append(step)
         progress_stage = self.STEP_PROGRESS_MAPPING.get(step_id)
         if progress_stage:
             self._update_progress_stage(request, progress_stage, context or {})
-        
+
         try:
             # LLM-Kommentar für Step-Start generieren
             if request.enable_llm_commentary and self.ollama_client:
@@ -816,10 +655,10 @@ class IntelligentMultiAgentPipeline:
                     }
                 )
                 self.stats['llm_comments_generated'] += 1
-            
+
             # Step ausführen
             result = await step_function(request, context or {})
-            
+
             # Step erfolgreich abgeschlossen
             step.status = "completed"
             step.end_time = time.time()
@@ -827,15 +666,9 @@ class IntelligentMultiAgentPipeline:
             step.progress_percentage = 100.0
             duration = step.end_time - step.start_time
             self._record_stage_duration(step_id, duration)
-<<<<<<< Updated upstream
-            
-            return result
-            
-=======
 
             return cast(Dict[str, Any], result)
 
->>>>>>> Stashed changes
         except Exception as e:
             # Step fehlgeschlagen
             step.status = "failed"
@@ -847,7 +680,7 @@ class IntelligentMultiAgentPipeline:
                     'failed_stage': step_id,
                     'error': str(e)
                 })
-            
+
             self._record_pipeline_error(
                 request,
                 e,
@@ -856,10 +689,10 @@ class IntelligentMultiAgentPipeline:
             )
             logger.error(f"❌ Pipeline Step '{step_name}' fehlgeschlagen: {e}")
             raise
-    
+
     async def _step_query_analysis(self, request: IntelligentPipelineRequest, context: Dict[str, Any]) -> Dict[str, Any]:
         """STEP 1: Analysiert Query mit Ollama LLM"""
-        
+
         if not self.ollama_client:
             # Fallback ohne LLM
             return {
@@ -868,58 +701,58 @@ class IntelligentMultiAgentPipeline:
                 "required_agents": ["document_retrieval", "legal_framework"],
                 "estimated_time": 15
             }
-        
+
         return await self.ollama_client.analyze_query(request.query_text, request.user_context)
-    
+
     async def _step_rag_search(self, request: IntelligentPipelineRequest, context: Dict[str, Any]) -> Dict[str, Any]:
         """STEP 2: Führt RAG-Suche durch"""
-        
+
         # RAG Service is REQUIRED (initialized in __init__)
         # No fallback mode - system would have failed fast during startup
         if not self.rag_service:
             raise RuntimeError("RAG Service not initialized - System in invalid state")
-        
+
         analysis = context.get("analysis", {}) or {}
         complexity = analysis.get("complexity", "standard")
         # Fortgeschrittene Anfragen bekommen mehr Dokumente zur Verfügung
         limit_documents = 8 if complexity == "advanced" else 5
         options = RAGQueryOptions(limit_documents=limit_documents)
-        
+
         rag_context = await self.rag_service.build_context(
             query_text=request.query_text,
             user_context=request.user_context,
             options=options
         )
-        
+
         self.stats['rag_queries_executed'] += 1
-        
+
         return rag_context
-    
+
     async def _step_agent_selection(self, request: IntelligentPipelineRequest, context: Dict[str, Any]) -> Dict[str, Any]:
         """STEP 3: Wählt optimale Agenten basierend auf Analyse und RAG-Kontext"""
-        
+
         analysis = context.get("analysis", {})
         rag = context.get("rag", {})
-        
+
         # 🆕 SUPERVISOR-MODUS: Nutze Supervisor-Agent für intelligente Decomposition & Selection
         if request.enable_supervisor and self.supervisor_agent and SUPERVISOR_AGENT_AVAILABLE:
             return await self._supervisor_agent_selection(request, context)
-        
+
         # 🆕 WORKER REGISTRY-MODUS: Capability-based Worker Selection
         if self.agent_registry and AGENT_REGISTRY_AVAILABLE:
             return await self._agent_registry_selection(request, context)
-        
+
         # STANDARD-MODUS: Bestehende Logik (Backward-Compatibility)
         complexity = analysis.get("complexity", "standard")
         domain = analysis.get("domain", "general")
         base_required = set(analysis.get("required_agents", ["document_retrieval"]))
         base_required.update(request.requested_agents)
-        
+
         priority_map: Dict[str, float] = {}
         agent_reasons: Dict[str, List[str]] = {}
         selection_insights: List[str] = []
         orchestrator_result: Optional[Dict[str, Any]] = None
-        
+
         if self.agent_orchestrator:
             query_payload = {
                 "query": request.query_text,
@@ -943,18 +776,18 @@ class IntelligentMultiAgentPipeline:
             except Exception as exc:
                 logger.warning("⚠️ AgentOrchestrator Preprocessing fehlgeschlagen: %s", exc)
                 selection_insights.append("AgentOrchestrator nicht verfügbar")
-        
+
         def register_agent(agent: str, score: float, reason: str) -> None:
             if not agent:
                 return
             base_required.add(agent)
             priority_map[agent] = priority_map.get(agent, 0.0) + score
             agent_reasons.setdefault(agent, []).append(reason)
-        
+
         # Basispunkte für bereits analysierte Agenten
         for agent in base_required:
             register_agent(agent, 0.5, "Analysevorschlag")
-        
+
         # Domain-basierte Anpassung
         domain_agent_mapping = {
             "environmental": "environmental",
@@ -966,21 +799,21 @@ class IntelligentMultiAgentPipeline:
         }
         if domain in domain_agent_mapping:
             register_agent(domain_agent_mapping[domain], 0.6, f"Domäne '{domain}' erkannt")
-        
+
         # Komplexitäts-basierte Erweiterung
         if complexity == "advanced":
             register_agent("external_api", 0.7, "Komplexität 'advanced'")
             register_agent("quality_assessor", 0.6, "Komplexität 'advanced'")
         elif complexity == "basic":
             priority_map = {agent: score * 0.9 for agent, score in priority_map.items()}
-        
+
         # RAG-Kontext analysieren
         documents = rag.get("documents", []) or []
         tag_counter: Counter[str] = Counter()
         for doc in documents:
             tags = doc.get("domain_tags") or []
             tag_counter.update(tag.lower() for tag in tags if isinstance(tag, str))
-        
+
         tag_agent_mapping = {
             "environmental": "environmental",
             "air_quality": "environmental",
@@ -994,31 +827,31 @@ class IntelligentMultiAgentPipeline:
             "legal": "legal_framework",
             "authority": "authority_mapping",
         }
-        
+
         for tag, count in tag_counter.items():
             agent = tag_agent_mapping.get(tag)
             if agent:
                 boost = min(0.4 + count * 0.1, 1.0)
                 register_agent(agent, boost, f"RAG-Tag '{tag}' ({count} Treffer)")
-        
+
         if documents:
             selection_insights.append(f"{len(documents)} RAG-Dokumente verfügbar")
-        
+
         vector_stats = rag.get("vector", {}).get("statistics", {})
         if vector_stats.get("count", 0) > 0:
             register_agent("document_retrieval", 0.3, "Vector-Suche erfolgreich")
         else:
             selection_insights.append("Keine Vector-Matches → Fokus auf qualitative Agenten")
             register_agent("quality_assessor", 0.2, "Fehlende Vector-Matches")
-        
+
         graph_entities = rag.get("graph", {}).get("related_entities", []) or []
         if graph_entities:
             register_agent("authority_mapping", 0.4, "Graph-Beziehungen vorhanden")
             selection_insights.append(f"Graph-Entities: {', '.join(graph_entities[:3])}")
-        
+
         # Sicherstellen, dass document_retrieval stets verfügbar bleibt
         register_agent("document_retrieval", 0.2, "Standard-Fallback")
-        
+
         # Endgültige Agentenliste nach Priorität sortieren
         ordered_agents = sorted(priority_map.items(), key=lambda item: item[1], reverse=True)
         selected_agents = [agent for agent, score in ordered_agents if score > 0]
@@ -1026,12 +859,12 @@ class IntelligentMultiAgentPipeline:
             selected_agents = ["document_retrieval"]
             priority_map = {"document_retrieval": 1.0}
             agent_reasons = {"document_retrieval": ["Fallback"]}
-        
+
         execution_plan = {
             "parallel_agents": [agent for agent in selected_agents[:3]],
             "sequential_agents": [agent for agent in selected_agents[3:]],
         }
-        
+
         selection_reasoning = [
             {
                 "agent": agent,
@@ -1040,7 +873,7 @@ class IntelligentMultiAgentPipeline:
             }
             for agent in selected_agents
         ]
-        
+
         if priority_map:
             self.stats['agent_priority_updates'] += 1
         if orchestrator_result:
@@ -1054,21 +887,21 @@ class IntelligentMultiAgentPipeline:
             "insights": selection_insights,
             "orchestrator_context": orchestrator_result
         }
-    
+
     async def _supervisor_agent_selection(self, request: IntelligentPipelineRequest, context: Dict[str, Any]) -> Dict[str, Any]:
         """
         🆕 SUPERVISOR-BASIERTE AGENT-SELEKTION
-        
+
         Nutzt Supervisor-Agent für:
         1. Query Decomposition (komplexe Queries → Subqueries)
         2. Intelligente Agent-Selektion pro Subquery
         3. Dependency-basierte Execution-Planung
         """
         logger.info("🎯 Supervisor-Modus aktiviert - starte intelligente Agent-Selektion")
-        
+
         analysis = context.get("analysis", {})
         rag = context.get("rag", {})
-        
+
         try:
             # Phase 1: Query Decomposition
             complexity_hint = analysis.get("complexity", "standard")
@@ -1077,17 +910,17 @@ class IntelligentMultiAgentPipeline:
                 user_context=request.user_context,
                 complexity_hint=complexity_hint
             )
-            
+
             logger.info(f"📋 {len(subqueries)} Subqueries erstellt")
-            
+
             # Phase 2: Agent-Plan erstellen
             agent_plan = await self.supervisor_agent.create_agent_plan(subqueries, rag)
-            
+
             # Phase 3: Agent-Plan in Pipeline-Format umwandeln
             selected_agents = []
             priority_map = {}
             selection_reasoning = []
-            
+
             # Parallel Agents
             for sq_id, assignment in agent_plan.parallel_agents:
                 agent_type = assignment.agent_type
@@ -1100,7 +933,7 @@ class IntelligentMultiAgentPipeline:
                         "reasons": [assignment.reason],
                         "subquery_id": sq_id
                     })
-            
+
             # Sequential Agents
             for sq_id, assignment in agent_plan.sequential_agents:
                 agent_type = assignment.agent_type
@@ -1113,22 +946,22 @@ class IntelligentMultiAgentPipeline:
                         "reasons": [assignment.reason],
                         "subquery_id": sq_id
                     })
-            
+
             # Fallback
             if not selected_agents:
                 selected_agents = ["document_retrieval"]
                 priority_map = {"document_retrieval": 1.0}
-            
+
             execution_plan = {
                 "parallel_agents": [a.agent_type for _, a in agent_plan.parallel_agents],
                 "sequential_agents": [a.agent_type for _, a in agent_plan.sequential_agents],
             }
-            
+
             # Statistiken
             self.stats['supervisor_usage'] += 1
-            
+
             logger.info(f"✅ Supervisor-Selektion: {len(selected_agents)} Agents, {len(agent_plan.parallel_agents)} parallel")
-            
+
             return {
                 "selected_agents": selected_agents,
                 "execution_plan": execution_plan,
@@ -1141,7 +974,7 @@ class IntelligentMultiAgentPipeline:
                     "mode": "supervisor"
                 }
             }
-            
+
         except Exception as e:
             logger.error(f"❌ Supervisor-Agent-Selektion fehlgeschlagen: {e}")
             # Fallback auf Standard-Selektion
@@ -1149,43 +982,38 @@ class IntelligentMultiAgentPipeline:
             request_copy = copy.copy(request)
             request_copy.enable_supervisor = False
             return await self._step_agent_selection(request_copy, context)
-    
+
     async def _agent_registry_selection(self, request: IntelligentPipelineRequest, context: Dict[str, Any]) -> Dict[str, Any]:
         """
         🆕 WORKER REGISTRY-BASIERTE AGENT-SELEKTION
-        
+
         Nutzt Agent Registry für:
         1. Capability-based Worker Selection
         2. Domain-basierte Worker-Filterung
         3. Text-Search für Query-Matching
-        
+
         Returns:
             Agent selection dict mit agent_registry_context
         """
         logger.info("🔧 Agent Registry-Modus aktiviert - starte capability-based selection")
-        
+
         analysis = context.get("analysis", {})
         rag = context.get("rag", {})
-        
+
         try:
             selected_agents = []
             priority_map = {}
             selection_reasoning = []
             registry_insights = []
-            
+
             # Phase 1: Text-Search basierend auf Query
             query_text = request.query_text.lower()
-<<<<<<< Updated upstream
-            text_search_workers = self.agent_registry.search_workers(query_text)
-            
-=======
             text_search_workers = self.agent_registry.search_agents(query_text) if self.agent_registry else []
 
->>>>>>> Stashed changes
             if text_search_workers:
                 logger.info(f"📝 Text-Search: {len(text_search_workers)} workers gefunden")
                 registry_insights.append(f"Text-Search matched {len(text_search_workers)} workers")
-                
+
                 for worker_id in text_search_workers:
                     if worker_id not in selected_agents:
                         selected_agents.append(worker_id)
@@ -1196,7 +1024,7 @@ class IntelligentMultiAgentPipeline:
                             "reasons": ["Query text match"],
                             "method": "text_search"
                         })
-            
+
             # Phase 2: Domain-basierte Selection
             domain = analysis.get("domain", "general")
             domain_mapping = {
@@ -1208,12 +1036,12 @@ class IntelligentMultiAgentPipeline:
                 "atmospheric": AgentDomain.ATMOSPHERIC,
                 "database": AgentDomain.DATABASE
             }
-            
+
             if domain in domain_mapping:
                 domain_workers = self.agent_registry.get_agents_by_domain(domain_mapping[domain]) if self.agent_registry else []
                 logger.info(f"🏢 Domain '{domain}': {len(domain_workers)} workers")
                 registry_insights.append(f"Domain {domain} matched {len(domain_workers)} workers")
-                
+
                 for worker_id in domain_workers:
                     if worker_id not in selected_agents:
                         selected_agents.append(worker_id)
@@ -1227,7 +1055,7 @@ class IntelligentMultiAgentPipeline:
                     else:
                         # Boost priority für bereits selektierte Workers
                         priority_map[worker_id] = min(priority_map[worker_id] + 0.2, 1.0)
-            
+
             # Phase 3: RAG-Context basierte Capability-Matching
             documents = rag.get("documents", []) or []
             if documents:
@@ -1236,12 +1064,12 @@ class IntelligentMultiAgentPipeline:
                 for doc in documents[:5]:  # Top 5 Dokumente
                     tags = doc.get("domain_tags", []) or []
                     keywords.update(tag.lower() for tag in tags if isinstance(tag, str))
-                    
+
                     # Auch aus Dokumenten-Titel
                     title = doc.get("title", "")
                     if title:
                         keywords.update(title.lower().split())
-                
+
                 # Capability-Matching für Keywords
                 for keyword in keywords:
                     capability_workers = self.agent_registry.get_agents_by_capability(keyword)
@@ -1257,10 +1085,10 @@ class IntelligentMultiAgentPipeline:
                             })
                         else:
                             priority_map[worker_id] = min(priority_map[worker_id] + 0.15, 1.0)
-                
+
                 if keywords:
                     registry_insights.append(f"RAG keywords: {', '.join(list(keywords)[:5])}")
-            
+
             # Phase 4: Fallback - Mindestens ein Worker muss vorhanden sein
             if not selected_agents:
                 logger.warning("⚠️ Keine Workers gefunden - verwende alle verfügbaren Workers")
@@ -1274,7 +1102,7 @@ class IntelligentMultiAgentPipeline:
                     "method": "fallback"
                 } for w in selected_agents]
                 registry_insights.append("Fallback: All available workers")
-            
+
             # Phase 5: Execution Plan erstellen
             # Sortiere Workers nach Priorität
             sorted_workers = sorted(
@@ -1282,21 +1110,21 @@ class IntelligentMultiAgentPipeline:
                 key=lambda w: priority_map.get(w, 0.0),
                 reverse=True
             )
-            
+
             execution_plan = {
                 "parallel_agents": sorted_workers[:3],  # Top 3 parallel
                 "sequential_agents": sorted_workers[3:]  # Rest sequenziell
             }
-            
+
             # Statistiken
             self.stats['agent_registry_usage'] = self.stats.get('agent_registry_usage', 0) + 1
-            
+
             logger.info(
                 f"✅ Agent Registry Selection: {len(selected_agents)} workers "
                 f"({len(execution_plan['parallel_agents'])} parallel, "
                 f"{len(execution_plan['sequential_agents'])} sequential)"
             )
-            
+
             return {
                 "selected_agents": selected_agents,
                 "execution_plan": execution_plan,
@@ -1309,7 +1137,7 @@ class IntelligentMultiAgentPipeline:
                     "selection_methods": list(set(r["method"] for r in selection_reasoning))
                 }
             }
-            
+
         except Exception as e:
             logger.error(f"❌ Agent Registry Agent-Selektion fehlgeschlagen: {e}")
             # Fallback auf Standard-Selektion
@@ -1320,7 +1148,7 @@ class IntelligentMultiAgentPipeline:
             result = await self._step_agent_selection(request, context)
             self.agent_registry = original_registry
             return result
-    
+
     async def _step_parallel_agent_execution(self, request: IntelligentPipelineRequest, context: Dict[str, Any]) -> Dict[str, Any]:
         """STEP 4: Führt Agents parallel (Thread-Pool) & sequenziell (Queue) aus"""
 
@@ -1418,7 +1246,7 @@ class IntelligentMultiAgentPipeline:
             },
             "priority_map": priority_map
         }
-    
+
     def _prepare_agent_task_queue(self, tasks: List[AgentExecutionTask]) -> None:
         """Initialisiert die Queue für Agenten-Aufgaben"""
 
@@ -2012,22 +1840,22 @@ class IntelligentMultiAgentPipeline:
 
     async def _step_result_aggregation(self, request: IntelligentPipelineRequest, context: Dict[str, Any]) -> Dict[str, Any]:
         """STEP 5: Aggregiert Agent-Ergebnisse mit Ollama LLM"""
-        
+
         agent_results = context.get("agent_results", {}).get("detailed_results", {})
         rag_context = context.get("rag", {})
         analysis = context.get("analysis", {})
-        
+
         # 🆕 SUPERVISOR-MODUS: Nutze Supervisor für Result-Synthesis
         if request.enable_supervisor and self.supervisor_agent and SUPERVISOR_AGENT_AVAILABLE:
             return await self._supervisor_result_aggregation(request, context)
-        
+
         # STANDARD-MODUS: Bestehende Logik (Backward-Compatibility)
         normalized_agent_results = self._normalize_agent_results(agent_results)
         aggregation_summary, consensus_summary = self._build_aggregation_summary(
             normalized_agent_results,
             rag_context
         )
-        
+
         if not self.ollama_client:
             # Fallback ohne LLM - einfache Aggregation
             blended_confidence = self._blend_confidence_scores(0.7, (consensus_summary.get('confidence') or {}).get('average'))
@@ -2046,11 +1874,11 @@ class IntelligentMultiAgentPipeline:
                 "aggregation_summary": aggregation_summary,
                 "agent_consensus": consensus_summary
             }
-        
+
         # LLM-basierte Synthesis (mit dynamischem Token-Budget + Context-Window-Check)
         max_tokens = getattr(request, 'token_budget', 1500)
         model_name = getattr(request, 'model_name', 'llama3.1:8b')
-        
+
         # Context-Window-Check durchführen
         if self.context_window_manager:
             try:
@@ -2058,7 +1886,7 @@ class IntelligentMultiAgentPipeline:
                 system_prompt = ""  # TODO: Extrahieren aus synthesize_agent_results
                 user_prompt = f"Query: {request.query_text}\nResults: {str(agent_results)[:500]}"
                 rag_context_str = str(rag_context)[:1000]
-                
+
                 adjusted_tokens, context = self.context_window_manager.adjust_token_budget(
                     model_name=model_name,
                     requested_tokens=max_tokens,
@@ -2066,33 +1894,25 @@ class IntelligentMultiAgentPipeline:
                     user_prompt=user_prompt,
                     rag_context=rag_context_str
                 )
-                
+
                 if adjusted_tokens < max_tokens:
                     logger.warning(
                         f"⚠️ Token-Budget reduziert: {max_tokens} → {adjusted_tokens} "
                         f"(Context-Window-Limit für {model_name})"
                     )
                     max_tokens = adjusted_tokens
-<<<<<<< Updated upstream
-                
-                if context.needs_model_upgrade and context.recommended_model:
-                    logger.info(
-                        f"💡 Model-Upgrade empfohlen: {model_name} → {context.recommended_model} "
-                        f"für {max_tokens} tokens"
-=======
 
                 # `context` kann ein dict sein; sichere Key-Lookups verwenden
                 if isinstance(context, dict) and context.get("needs_model_upgrade") and context.get("recommended_model"):
                     recommended = context.get("recommended_model")
                     logger.info(
                         f"💡 Model-Upgrade empfohlen: {model_name} → {recommended} für {max_tokens} tokens"
->>>>>>> Stashed changes
                     )
                     # TODO: Implementiere automatisches Model-Switching
-                    
+
             except Exception as e:
                 logger.warning(f"⚠️ Context-Window-Check fehlgeschlagen: {e}")
-        
+
         synthesis_result = await self.ollama_client.synthesize_agent_results(
             query=request.query_text,
             agent_results=agent_results,
@@ -2101,7 +1921,7 @@ class IntelligentMultiAgentPipeline:
             consensus_summary=consensus_summary,
             max_tokens=max_tokens  # 🆕 Dynamisches + Context-Window-geprüftes Budget
         )
-        
+
         model_confidence = synthesis_result.get("confidence_score")
         consensus_average = (consensus_summary.get('confidence') or {}).get('average')
         blended_confidence = self._blend_confidence_scores(model_confidence, consensus_average)
@@ -2127,24 +1947,24 @@ class IntelligentMultiAgentPipeline:
             "aggregation_summary": aggregation_summary,
             "agent_consensus": consensus_summary
         }
-    
+
     async def _supervisor_result_aggregation(self, request: IntelligentPipelineRequest, context: Dict[str, Any]) -> Dict[str, Any]:
         """
         🆕 SUPERVISOR-BASIERTE RESULT-AGGREGATION
-        
+
         Nutzt Supervisor-Agent für:
         1. Konflikt-Detektion zwischen Agent-Ergebnissen
         2. Deduplizierung redundanter Informationen
         3. LLM-basierte Narrative-Generierung
         """
         logger.info("🔗 Supervisor-Modus aktiviert - starte Result-Synthesis")
-        
+
         agent_results_dict = context.get("agent_results", {}).get("detailed_results", {})
         rag_context = context.get("rag", {})
         agent_selection = context.get("agent_selection", {})
         supervisor_context = agent_selection.get("supervisor_context", {})
         subqueries = supervisor_context.get("subqueries", [])
-        
+
         try:
             # Agent-Ergebnisse in Supervisor-Format umwandeln
             agent_results_list = []
@@ -2153,14 +1973,14 @@ class IntelligentMultiAgentPipeline:
                 if not isinstance(result, dict):
                     logger.warning(f"⚠️ Agent {agent_type} lieferte kein Dict: {type(result)}")
                     result = {"summary": str(result), "status": "completed", "confidence_score": 0.5}
-                
+
                 # Finde passende Subquery (falls vorhanden)
                 subquery_id = "unknown"
                 for reasoning in agent_selection.get("selection_reasoning", []):
                     if reasoning.get("agent") == agent_type:
                         subquery_id = reasoning.get("subquery_id", "unknown")
                         break
-                
+
                 agent_result = AgentResult(
                     subquery_id=subquery_id,
                     agent_type=agent_type,
@@ -2174,22 +1994,22 @@ class IntelligentMultiAgentPipeline:
                     sources=result.get("sources", [])
                 )
                 agent_results_list.append(agent_result)
-            
+
             if not agent_results_list:
                 logger.warning("⚠️ Keine Agent-Ergebnisse für Supervisor-Synthesis")
                 # Fallback auf Standard-Aggregation
                 request_copy = copy.copy(request)
                 request_copy.enable_supervisor = False
                 return await self._step_result_aggregation(request_copy, context)
-            
+
             # Supervisor-Synthesis
             synthesized = await self.supervisor_agent.synthesize_results(
                 agent_results=agent_results_list,
                 original_query=request.query_text
             )
-            
+
             logger.info(f"✅ Supervisor-Synthesis abgeschlossen (Conf: {synthesized.confidence_score:.2f})")
-            
+
             return {
                 "response_text": synthesized.response_text,
                 "confidence_score": synthesized.confidence_score,
@@ -2211,7 +2031,7 @@ class IntelligentMultiAgentPipeline:
                 },
                 "supervisor_metadata": synthesized.metadata
             }
-            
+
         except Exception as e:
             logger.error(f"❌ Supervisor-Result-Aggregation fehlgeschlagen: {e}")
             # Fallback auf Standard-Aggregation
@@ -2219,10 +2039,10 @@ class IntelligentMultiAgentPipeline:
             request_copy = copy.copy(request)
             request_copy.enable_supervisor = False
             return await self._step_result_aggregation(request_copy, context)
-    
+
     def _generate_mock_agent_result(self, agent_type: str, query: str) -> Dict[str, Any]:
         """Generiert Mock-Ergebnis für Agent (für Testing/Fallback)"""
-        
+
         agent_specialties = {
             'document_retrieval': {
                 'summary': 'Relevante Dokumente gefunden',
@@ -2230,7 +2050,7 @@ class IntelligentMultiAgentPipeline:
                 'sources': ['Verwaltungsportal', 'Formulardatenbank']
             },
             'legal_framework': {
-                'summary': 'Rechtliche Bestimmungen analysiert', 
+                'summary': 'Rechtliche Bestimmungen analysiert',
                 'confidence': 0.90,
                 'sources': ['BauGB', 'VwVfG']
             },
@@ -2245,13 +2065,13 @@ class IntelligentMultiAgentPipeline:
                 'sources': ['API-Services', 'Open-Data-Portale']
             }
         }
-        
+
         specialty = agent_specialties.get(agent_type, {
             'summary': f'{agent_type} Analyse durchgeführt',
             'confidence': 0.75,
             'sources': ['Standard-Quellen']
         })
-        
+
         return {
             'agent_type': agent_type,
             'status': 'completed',
@@ -2261,18 +2081,18 @@ class IntelligentMultiAgentPipeline:
             'processing_time': 2.5,
             'details': f'Detaillierte {agent_type} Analyse für: {query[:50]}...'
         }
-    
+
     def _execute_real_agent(self, agent_type: str, query: str, rag_context: Dict[str, Any]) -> Dict[str, Any]:
         """
         🆕 Führt echten VERITAS Agent aus mit UDS3 Hybrid Search
-        
+
         Falls Agent nicht verfügbar oder UDS3 fehlt, Fallback auf Mock-Daten
-        
+
         Args:
             agent_type: Typ des Agents (z.B. 'environmental', 'legal_framework')
             query: User Query
             rag_context: RAG Context mit zusätzlichen Informationen
-            
+
         Returns:
             Agent-Ergebnis Dict mit summary, sources, confidence_score
         """
@@ -2288,11 +2108,11 @@ class IntelligentMultiAgentPipeline:
                 'financial': 'financial',
                 'social': 'social'
             }
-            
+
             # UDS3 Hybrid Search ausführen
             if self.uds3_strategy:
                 category = agent_to_category.get(agent_type, 'general')
-                
+
                 # UDS3 Query mit Filter für Agent-Kategorie
                 search_result = self.uds3_strategy.query_across_databases(
                     vector_params={
@@ -2305,12 +2125,12 @@ class IntelligentMultiAgentPipeline:
                     join_strategy="union",
                     execution_mode="smart"
                 )
-                
+
                 # Ergebnisse extrahieren
                 sources = []
                 summaries = []
                 confidence_scores = []
-                
+
                 if search_result and search_result.success and hasattr(search_result, 'joined_results'):
                     for result in search_result.joined_results[:5]:  # Top 5
                         if isinstance(result, dict):
@@ -2318,18 +2138,18 @@ class IntelligentMultiAgentPipeline:
                             content = result.get('content', result.get('text', ''))
                             score = result.get('score', result.get('similarity', 0.0))
                             source = result.get('source', result.get('doc_id', 'UDS3'))
-                            
+
                             if content:
                                 summaries.append(content[:200])  # Erste 200 Zeichen
                             if source:
                                 sources.append(source)
                             if score:
                                 confidence_scores.append(float(score))
-                
+
                 # Wenn UDS3 Ergebnisse liefert, nutze diese
                 if sources and summaries:
                     avg_confidence = sum(confidence_scores) / len(confidence_scores) if confidence_scores else 0.75
-                    
+
                     return {
                         'agent_type': agent_type,
                         'status': 'completed',
@@ -2344,14 +2164,14 @@ class IntelligentMultiAgentPipeline:
                     logger.debug(f"ℹ️ UDS3 Search für {agent_type}: Keine Ergebnisse, Fallback auf Mock")
             else:
                 logger.debug(f"ℹ️ UDS3 nicht verfügbar für {agent_type}, Fallback auf Mock")
-                
+
         except Exception as e:
             logger.warning(f"⚠️ Fehler bei Agent-Execution {agent_type}: {e}, Fallback auf Mock")
-        
+
         # Fallback: Mock-Daten
         return self._generate_mock_agent_result(agent_type, query)
-    
-    
+
+
     def _normalize_agent_results(self, agent_results: Dict[str, Any]) -> List[Dict[str, Any]]:
         """Normalisiert Agent-Ergebnisse für Aggregation und LLM"""
 
@@ -2569,28 +2389,28 @@ class IntelligentMultiAgentPipeline:
     def _extract_sources_from_results(self, agent_results: Dict[str, Any], rag_context: Dict[str, Any]) -> List[Dict[str, Any]]:
         """
         Extrahiert Quellen aus Agent-Ergebnissen (✨ IEEE-ENHANCED)
-        
+
         Erstellt vollständige IEEE-Citation-Metadaten aus RAG-Context.
         """
-        
+
         sources = []
         citation_id = 1
-        
+
         # ✨ PRIORITÄT 1: Quellen aus RAG-Kontext mit vollständigen Metadaten
         documents = rag_context.get('documents', [])
-        
+
         # ⚠️ MOCK-MODE FALLBACK: Wenn UDS3 im Demo-Modus keine Dokumente liefert
         if not documents or len(documents) == 0:
             logger.info("⚠️ Keine RAG-Dokumente verfügbar - Generiere IEEE-Mock-Quellen für Demo")
             documents = self._generate_mock_ieee_sources()
-        
+
         for doc in documents:
             # Vollständige IEEE-Metadaten aus RAG-Context
             source_meta = {
                 'id': citation_id,  # Numeric ID für IEEE-Citations
                 'title': doc.get('title', 'Unbekanntes Dokument'),
                 'type': 'document',
-                
+
                 # ✨ IEEE-Metadaten aus RAG-Context
                 'authors': doc.get('authors', None),
                 'year': doc.get('year', None),
@@ -2599,35 +2419,35 @@ class IntelligentMultiAgentPipeline:
                 'url': doc.get('url', None),
                 'file': doc.get('file', None),
                 'page': doc.get('page', None),
-                
+
                 # ✨ Scores aus RAG-Context
                 'similarity_score': doc.get('similarity_score', doc.get('score', 0.0)),
                 'rerank_score': doc.get('rerank_score', 0.0),
                 'quality_score': doc.get('quality_score', 0.0),
                 'confidence': doc.get('confidence', doc.get('relevance', 0.7)),
                 'score': doc.get('score', doc.get('relevance', 0.7)),
-                
+
                 # ✨ Classification
                 'impact': doc.get('impact', 'Medium'),
                 'relevance': doc.get('relevance', 'Medium'),
-                
+
                 # ✨ Legal Metadata (falls vorhanden)
                 'rechtsgebiet': doc.get('rechtsgebiet', None),
                 'behörde': doc.get('behoerde', doc.get('behörde', None)),
                 'aktenzeichen': doc.get('aktenzeichen', None),
                 'gericht': doc.get('gericht', None),
-                
+
                 # ✨ IEEE Citation (falls bereits formatiert)
                 'ieee_citation': doc.get('ieee_citation', None),
                 'original_source': doc.get('original_source', None)
             }
-            
+
             # Entferne None-Werte für sauberere Response
             source_meta = {k: v for k, v in source_meta.items() if v is not None}
-            
+
             sources.append(source_meta)
             citation_id += 1
-        
+
         # PRIORITÄT 2: Quellen aus Agent-Ergebnissen (fallback)
         for agent_type, result in agent_results.items():
             agent_sources = result.get('sources', [])
@@ -2643,19 +2463,19 @@ class IntelligentMultiAgentPipeline:
                     'confidence': result.get('confidence_score', 0.8)
                 })
                 citation_id += 1
-        
+
         return sources[:10]  # Limitiere auf 10 Quellen
-    
+
     def _generate_mock_ieee_sources(self) -> List[Dict[str, Any]]:
         """
         Generiert Mock-IEEE-Quellen für Demo-Zwecke (UDS3 Demo Mode)
-        
+
         Returns:
             Liste von Mock-Dokumenten mit vollständigen IEEE-Metadaten
         """
         import random
         from datetime import datetime, timedelta
-        
+
         mock_sources = [
             {
                 'title': 'Bundes-Immissionsschutzgesetz (BImSchG) - Kommentar',
@@ -2757,15 +2577,15 @@ class IntelligentMultiAgentPipeline:
                 'original_source': 'UBA-Publikationen'
             }
         ]
-        
+
         # Wähle 3-5 zufällige Quellen aus
         num_sources = random.randint(3, 5)
         selected = random.sample(mock_sources, num_sources)
-        
+
         logger.info(f"📚 Generiert {len(selected)} Mock-IEEE-Quellen für Demo-Zwecke")
-        
+
         return selected
-    
+
     def _generate_follow_up_suggestions(self,
                                         query: str,
                                         agent_results: Dict[str, Any],
@@ -2819,14 +2639,14 @@ class IntelligentMultiAgentPipeline:
             add_suggestion(f"Möchten Sie tiefer in '{key_point}' einsteigen?")
 
         return suggestions[:5]
-    
+
     def get_pipeline_statistics(self) -> Dict[str, Any]:
         """Liefert Pipeline-Statistiken"""
-        
+
         success_rate = (
             self.stats['successful_pipelines'] / max(self.stats['pipelines_processed'], 1)
         ) * 100
-        
+
         return {
             'pipeline_stats': self.stats.copy(),
             'success_rate_percent': round(success_rate, 2),
@@ -2882,22 +2702,22 @@ _global_intelligent_pipeline: Optional[IntelligentMultiAgentPipeline] = None
 async def get_intelligent_pipeline() -> IntelligentMultiAgentPipeline:
     """
     Liefert globale Intelligent Pipeline Instanz
-    
+
     Returns:
         IntelligentMultiAgentPipeline: Globale Pipeline-Instanz
     """
     global _global_intelligent_pipeline
-    
+
     if _global_intelligent_pipeline is None:
         _global_intelligent_pipeline = IntelligentMultiAgentPipeline()
         await _global_intelligent_pipeline.initialize()
-    
+
     return _global_intelligent_pipeline
 
 def create_intelligent_pipeline(**kwargs) -> IntelligentMultiAgentPipeline:
     """
     Factory für neue Intelligent Pipeline Instanz
-    
+
     Returns:
         IntelligentMultiAgentPipeline: Neue Pipeline-Instanz
     """
@@ -2909,12 +2729,12 @@ def create_intelligent_pipeline(**kwargs) -> IntelligentMultiAgentPipeline:
 
 async def main():
     """Test der Intelligent Multi-Agent Pipeline"""
-    
+
     pipeline = await get_intelligent_pipeline()
-    
+
     print("🧠 Intelligent Multi-Agent Pipeline Test")
     print("=" * 50)
-    
+
     # Test Request
     request = IntelligentPipelineRequest(
         query_id=str(uuid.uuid4()),
@@ -2922,27 +2742,27 @@ async def main():
         user_context={"location": "München", "user_type": "citizen"},
         enable_llm_commentary=True
     )
-    
+
     print(f"Query: {request.query_text}")
     print(f"Query ID: {request.query_id}")
-    
+
     # Pipeline ausführen
     response = await pipeline.process_intelligent_query(request)
-    
+
     print(f"\n📋 Pipeline Response:")
     print(f"Confidence Score: {response.confidence_score:.2f}")
     print(f"Processing Time: {response.total_processing_time:.2f}s")
     print(f"Agents Used: {len(response.agent_results)}")
     print(f"Sources Found: {len(response.sources)}")
     print(f"LLM Comments: {len(response.llm_commentary)}")
-    
+
     print(f"\n💬 LLM Commentary:")
     for i, comment in enumerate(response.llm_commentary, 1):
         print(f"{i}. {comment}")
-    
+
     print(f"\n📊 Response Preview:")
     print(response.response_text[:200] + "..." if len(response.response_text) > 200 else response.response_text)
-    
+
     # Statistics
     stats = pipeline.get_pipeline_statistics()
     print(f"\n📈 Pipeline Statistics:")

@@ -15,29 +15,25 @@ Date: 2025-11-01
 import logging
 import uuid
 from datetime import datetime
-<<<<<<< Updated upstream
-from fastapi import APIRouter, HTTPException, Depends
-=======
+from typing import Any, Dict, List
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
->>>>>>> Stashed changes
 from fastapi.responses import JSONResponse
 
+from backend.agents.veritas_ollama_client import VeritasOllamaClient
+from backend.models.enums import QueryMode
 from backend.models.office_api_schema import (
     OfficeAPIRequest,
     OfficeAPIResponse,
-    OfficeResponseContent,
-    OfficeResponseMetadata,
-    OfficeResponseError,
     OfficeCitation,
-    map_unified_to_office_response
+    OfficeResponseContent,
+    OfficeResponseError,
+    OfficeResponseMetadata,
+    map_unified_to_office_response,
 )
 from backend.models.request import UnifiedQueryRequest
-from backend.models.enums import QueryMode
 from backend.services.query_service import QueryService
-from backend.agents.veritas_ollama_client import VeritasOllamaClient
-from typing import Dict, Any, List
 
 logger = logging.getLogger(__name__)
 
@@ -48,14 +44,13 @@ router = APIRouter(prefix="/office", tags=["Office Add-in"])
 # Dependency: Get QueryService
 # ============================================================================
 
+
 async def get_query_service() -> QueryService:
     """Get QueryService from app state"""
     from backend.app import app
-    if not hasattr(app.state, 'query_service'):
-        raise HTTPException(
-            status_code=503,
-            detail="QueryService not initialized"
-        )
+
+    if not hasattr(app.state, "query_service"):
+        raise HTTPException(status_code=503, detail="QueryService not initialized")
     return app.state.query_service
 
 
@@ -63,41 +58,41 @@ async def get_query_service() -> QueryService:
 # POST /api/office/query
 # ============================================================================
 
+
 @router.post(
     "/query",
     response_model=OfficeAPIResponse,
     summary="Office Add-in Query",
     description="""
     📝 Versionierter Endpoint für Office Add-ins (Word/Excel/PowerPoint/Outlook)
-    
+
     Request:
         - version: API Version (1.0)
         - session_id: Session UUID (auto-generated)
         - metadata: Mode (ask/agent/edit/plan), Scope (selection/document), Host (word/excel/...)
         - content: Query, Context (Markdown), History
-    
+
     Response:
         - version: API Version (1.0)
         - status: success|error|partial
         - metadata: Confidence, Processing Time, Model, Tokens, Sources Count
         - content: Answer (Markdown mit [1], [2] Citations), Citations, Suggestions
         - error: Optional Error Info
-    
+
     Features:
         - Versionierung (Breaking Changes sicher)
         - Metadaten-Trennung (Business Logic ≠ Payload)
         - Embedded Markdown (sauber im content.answer)
         - IEEE-Standard Citations (OfficeCitation-Format)
         - Error-Handling (Retry-Logic)
-    """
+    """,
 )
 async def office_query(
-    request: OfficeAPIRequest,
-    query_service: QueryService = Depends(get_query_service)
+    request: OfficeAPIRequest, query_service: QueryService = Depends(get_query_service)
 ) -> OfficeAPIResponse:
     """
     Office Add-in Query Endpoint
-    
+
     Flow:
         1. Validate Request (Version, Content)
         2. Map OfficeAPIRequest → UnifiedQueryRequest
@@ -105,29 +100,19 @@ async def office_query(
         4. Map UnifiedResponse → OfficeAPIResponse
         5. Return Response
     """
-    
+
     request_id = str(uuid.uuid4())
-    
+
     try:
         logger.info(f"[Office API] Request {request_id}: {request.metadata.mode} query from {request.metadata.host}")
         logger.debug(f"[Office API] Query: {request.content.query[:100]}...")
-        
+
         # ========== Step 1: Generate Session ID ==========
         session_id = request.session_id or str(uuid.uuid4())
-        
+
         # ========== Step 2: Map OfficeAPIRequest → UnifiedQueryRequest ==========
-        
+
         # Determine QueryMode
-<<<<<<< Updated upstream
-        mode_map = {
-            "ask": QueryMode.ASK,
-            "agent": QueryMode.AGENT,
-            "edit": QueryMode.EDIT,
-            "plan": QueryMode.PLAN
-        }
-        query_mode = mode_map.get(request.metadata.mode.lower(), QueryMode.ASK)
-        
-=======
         normalized_mode = (request.metadata.mode or "ask").lower()
         mode_aliases = {
             "ask": QueryMode.ASK,
@@ -143,12 +128,11 @@ async def office_query(
                 request.metadata.mode,
             )
 
->>>>>>> Stashed changes
         # Build query text: combine user query + context
         full_query = request.content.query
         if request.content.context:
             full_query += f"\n\n**Kontext ({request.metadata.scope}):**\n{request.content.context}"
-        
+
         # Build UnifiedQueryRequest
         unified_request = UnifiedQueryRequest(
             query=full_query,
@@ -159,51 +143,46 @@ async def office_query(
                 "office_host": request.metadata.host,
                 "office_scope": request.metadata.scope,
                 "office_mode": request.metadata.mode,
-                "user_context": request.metadata.user_context
-            }
+                "user_context": request.metadata.user_context,
+            },
         )
-        
+
         logger.debug(f"[Office API] Mapped to UnifiedQueryRequest: mode={query_mode}, session={session_id}")
-        
+
         # ========== Step 3: Execute Query ==========
-        
+
         start_time = datetime.now()
-        
+
         try:
             unified_response = await query_service.process_query(unified_request)
         except Exception as query_err:
             logger.error(f"[Office API] Query execution failed: {query_err}")
-            raise HTTPException(
-                status_code=500,
-                detail=f"Query execution failed: {str(query_err)}"
-            )
-        
+            raise HTTPException(status_code=500, detail=f"Query execution failed: {str(query_err)}")
+
         end_time = datetime.now()
         duration_ms = int((end_time - start_time).total_seconds() * 1000)
-        
+
         logger.info(f"[Office API] Query completed in {duration_ms}ms")
-        
+
         # ========== Step 4: Map UnifiedResponse → OfficeAPIResponse ==========
-        
+
         office_response = map_unified_to_office_response(
-            unified_response=unified_response,
-            request_id=request_id,
-            status="success"
+            unified_response=unified_response, request_id=request_id, status="success"
         )
-        
+
         # Override processing_time_ms with measured value
         office_response.metadata.processing_time_ms = duration_ms
-        
+
         logger.info(f"[Office API] Response ready: {len(office_response.content.citations)} citations")
-        
+
         return office_response
-        
+
     except HTTPException:
         raise
-    
+
     except Exception as e:
         logger.error(f"[Office API] Unexpected error: {e}", exc_info=True)
-        
+
         # Build Error Response
         error_response = OfficeAPIResponse(
             version="1.0",
@@ -212,43 +191,10 @@ async def office_query(
             status="error",
             metadata=OfficeResponseMetadata(),
             content=None,
-            error=OfficeResponseError(
-                code="INTERNAL_ERROR",
-                message=str(e),
-                retry_after_ms=None
-            )
+            error=OfficeResponseError(code="INTERNAL_ERROR", message=str(e), retry_after_ms=None),
         )
-        
-        return JSONResponse(
-            status_code=500,
-            content=error_response.dict()
-        )
-<<<<<<< Updated upstream
-=======
 
-        return JSONResponse(status_code=500, content=jsonable_encoder(error_response))
->>>>>>> Stashed changes
-
-
-# ============================================================================
-# Health Check
-# ============================================================================
-
-@router.get(
-    "/health",
-    summary="Office API Health Check",
-    description="Health check für Office Add-in Integration"
-)
-async def office_health():
-    """Office API Health Check"""
-<<<<<<< Updated upstream
-    return {
-        "status": "healthy",
-        "service": "veritas-office-api",
-        "version": "1.0",
-        "timestamp": datetime.now().isoformat()
-    }
-=======
+        return JSONResponse(status_code=500, content=error_response.dict())
     return {"status": "healthy", "service": "veritas - office-api", "version": "1.0", "timestamp": datetime.now().isoformat()}
 
 
@@ -257,7 +203,7 @@ async def office_health():
     summary="Office Capabilities & API Documentation",
     description="""
     Vollständige API-Dokumentation für Office Add-ins (analog zu FastAPI /docs).
-    
+
     Enthält:
     - Verfügbare Endpunkte mit Beschreibungen
     - Request/Response-Schemas und Beispiele
@@ -269,7 +215,7 @@ async def office_health():
 async def office_capabilities() -> Dict[str, Any]:
     """
     Return comprehensive capabilities for Office Add-in.
-    
+
     Bietet analog zu FastAPI /docs eine maschinenlesbare API-Beschreibung:
     - Alle verfügbaren Endpunkte
     - Request/Response-Schemas mit Beispielen
@@ -318,7 +264,10 @@ async def office_capabilities() -> Dict[str, Any]:
                             "context": {"type": "string", "description": "Markdown-formatierter Kontext (Selection/Document)"},
                             "history": {
                                 "type": "array",
-                                "items": {"type": "object", "properties": {"role": {"type": "string"}, "content": {"type": "string"}}},
+                                "items": {
+                                    "type": "object",
+                                    "properties": {"role": {"type": "string"}, "content": {"type": "string"}},
+                                },
                                 "description": "Conversation History",
                             },
                         },
@@ -389,7 +338,13 @@ async def office_capabilities() -> Dict[str, Any]:
                 "request_id": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
                 "timestamp": "2025-11-17T10:30:00Z",
                 "status": "success",
-                "metadata": {"confidence_score": 0.92, "processing_time_ms": 1234, "model": "llama3.1:8b", "tokens_used": 567, "sources_count": 3},
+                "metadata": {
+                    "confidence_score": 0.92,
+                    "processing_time_ms": 1234,
+                    "model": "llama3.1:8b",
+                    "tokens_used": 567,
+                    "sources_count": 3,
+                },
                 "content": {
                     "answer": "Das **Bundes-Immissionsschutzgesetz (BImSchG)** [1] regelt den Schutz vor schädlichen Umwelteinwirkungen...",
                     "format": "markdown",
@@ -447,7 +402,9 @@ async def office_capabilities() -> Dict[str, Any]:
             "description": "Upload mehrerer Office-Dokumente gleichzeitig",
             "request_schema": {
                 "type": "multipart/form-data",
-                "properties": {"files": {"type": "array", "items": {"type": "file"}, "description": "Liste von Office-Dokumenten"}},
+                "properties": {
+                    "files": {"type": "array", "items": {"type": "file"}, "description": "Liste von Office-Dokumenten"}
+                },
             },
             "response_schema": {
                 "type": "object",
@@ -528,9 +485,19 @@ async def office_capabilities() -> Dict[str, Any]:
             "description": "Health check für Office Add-in Integration",
             "response_schema": {
                 "type": "object",
-                "properties": {"status": {"type": "string"}, "service": {"type": "string"}, "version": {"type": "string"}, "timestamp": {"type": "string"}},
+                "properties": {
+                    "status": {"type": "string"},
+                    "service": {"type": "string"},
+                    "version": {"type": "string"},
+                    "timestamp": {"type": "string"},
+                },
             },
-            "example_response": {"status": "healthy", "service": "veritas-office-api", "version": "1.0", "timestamp": "2025-11-17T10:30:00Z"},
+            "example_response": {
+                "status": "healthy",
+                "service": "veritas-office-api",
+                "version": "1.0",
+                "timestamp": "2025-11-17T10:30:00Z",
+            },
         },
         "capabilities": {
             "path": "/api/office/capabilities",
@@ -553,7 +520,12 @@ async def office_capabilities() -> Dict[str, Any]:
     try:
         await ollama_client.initialize()
         models = await ollama_client.list_models()
-        ollama_info = {"available": not ollama_client.offline_mode, "default_model": ollama_client.default_model, "models": models, "error": None}
+        ollama_info = {
+            "available": not ollama_client.offline_mode,
+            "default_model": ollama_client.default_model,
+            "models": models,
+            "error": None,
+        }
     except Exception as e:
         ollama_info["error"] = str(e)
     finally:
@@ -567,7 +539,10 @@ async def office_capabilities() -> Dict[str, Any]:
     features = {
         "query_modes": {
             "ask": {"description": "Standard Q&A Mode - direkte Beantwortung", "example": "Was bedeutet BImSchG?"},
-            "agent": {"description": "Agent Mode - komplexe Multi-Step-Reasoning", "example": "Analysiere die rechtlichen Implikationen"},
+            "agent": {
+                "description": "Agent Mode - komplexe Multi-Step-Reasoning",
+                "example": "Analysiere die rechtlichen Implikationen",
+            },
             "edit": {"description": "Edit Mode - Textbearbeitung mit Kontext", "example": "Verbessere diesen Absatz"},
             "plan": {"description": "Plan Mode - Strukturierung und Planung", "example": "Erstelle einen Projektplan"},
         },
@@ -587,8 +562,18 @@ async def office_capabilities() -> Dict[str, Any]:
         "error_codes": {
             "RATE_LIMIT": {"description": "Rate limit exceeded", "http_status": 429, "retry": True, "retry_after_ms": 5000},
             "INVALID_REQUEST": {"description": "Invalid request format", "http_status": 400, "retry": False},
-            "INTERNAL_ERROR": {"description": "Internal server error", "http_status": 500, "retry": True, "retry_after_ms": 2000},
-            "SERVICE_UNAVAILABLE": {"description": "Service temporarily unavailable", "http_status": 503, "retry": True, "retry_after_ms": 10000},
+            "INTERNAL_ERROR": {
+                "description": "Internal server error",
+                "http_status": 500,
+                "retry": True,
+                "retry_after_ms": 2000,
+            },
+            "SERVICE_UNAVAILABLE": {
+                "description": "Service temporarily unavailable",
+                "http_status": 503,
+                "retry": True,
+                "retry_after_ms": 10000,
+            },
             "UNAUTHORIZED": {"description": "Authentication required", "http_status": 401, "retry": False},
         },
         "retry_strategy": {
@@ -664,7 +649,12 @@ async def get_available_models() -> Dict[str, Any]:
                 (m for m in model_names if "llama3.1" in m.lower()), model_names[0] if model_names else "llama3.1:8b"
             )
 
-            return {"models": model_names, "default": default_model, "count": len(model_names), "timestamp": datetime.utcnow().isoformat()}
+            return {
+                "models": model_names,
+                "default": default_model,
+                "count": len(model_names),
+                "timestamp": datetime.utcnow().isoformat(),
+            }
 
         finally:
             if created_local:
@@ -684,4 +674,3 @@ async def get_available_models() -> Dict[str, Any]:
             "error": str(e),
             "timestamp": datetime.utcnow().isoformat(),
         }
->>>>>>> Stashed changes

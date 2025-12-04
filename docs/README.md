@@ -1,15 +1,16 @@
 # VERITAS Dokumentation
 
 **Letzte Aktualisierung:** 4. Dezember 2025
-**Version:** 1.0.1
-**Status:** ✅ Neu strukturiert & Reorganisiert
+**Version:** 3.20.0
+**System-Status:** ✅ PRODUKTIONSBEREIT
 
-**Neu in Phase 14:** 📊 Benchmark Suite, 📁 Dokumentation reorganisiert, 📖 README.md für alle Verzeichnisse
+**Aktuell:** 20 Agents aktiv, 22 Capabilities, Vollständige Orchestrator-Integration
 
 ---
 
 ## 🚀 Schneller Start
 
+- **System-Status?** → [Aktueller Stand](CURRENT_STATUS.md) - Vollständiger Überblick
 - **Neu hier?** → [Quickstart Guide](getting-started/QUICK_START.md) (30 Minuten)
 - **Installation?** → [Installation Guide](getting-started/INSTALLATION.md)
 - **Erste Abfrage?** → [Erste Abfrage durchführen](getting-started/FIRST_QUERY.md)

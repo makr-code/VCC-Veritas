@@ -175,6 +175,35 @@ class AgentOrchestrator:
             "parallel": True,
             "depends_on": [],  # Kann unabhängig laufen
         },
+        # Visualization & Generation Tasks (NEW - 2025-12-04)
+        "chart_generation": {
+            "stage": "response_generation",
+            "capability": "chart_generation",
+            "priority": 0.7,
+            "parallel": True,
+            "depends_on": ["data_analysis", "database"],
+        },
+        "presentation_creation": {
+            "stage": "response_enhancement",
+            "capability": "presentation_creation",
+            "priority": 0.75,
+            "parallel": False,
+            "depends_on": ["content_synthesis", "chart_generation"],
+        },
+        "image_generation": {
+            "stage": "response_enhancement",
+            "capability": "image_generation",
+            "priority": 0.65,
+            "parallel": True,
+            "depends_on": [],  # Kann unabhängig laufen
+        },
+        "map_generation": {
+            "stage": "response_generation",
+            "capability": "map_generation",
+            "priority": 0.7,
+            "parallel": True,
+            "depends_on": ["data_analysis"],  # Benötigt Geo-Daten
+        },
     }
 
     def __init__(self, schema_dir: str = None, agent_coordinator=None, pipeline_manager=None):
