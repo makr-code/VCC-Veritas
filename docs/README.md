@@ -1,54 +1,158 @@
-# VERITAS Documentation Index
+# VERITAS Dokumentation
 
-**Last Updated:** 14. Oktober 2025
-**Version:** 3.25.0
-**Status:** ✅ Production Ready
-
----
-
-## 📚 **Current Documentation (Active)**
-
-### 🎯 **Getting Started**
-
-| Document | Description | Status |
-|----------|-------------|--------|
-| [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) | Project organization and file structure | ✅ Current |
-| [STATUS_REPORT.md](STATUS_REPORT.md) | Overall project status and metrics | ✅ Current |
-| [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) | Production deployment instructions | ✅ Current |
-| [TESTING.md](TESTING.md) | Testing guidelines and procedures | ✅ Current |
+**Letzte Aktualisierung:** 4. Dezember 2025
+**Version:** 1.0
+**Status:** ✅ Neu strukturiert
 
 ---
 
-### 🚀 **Phase 4 & 5: RAG & Hypothesis Generation (Latest)**
+## 🚀 Schneller Start
 
-**Priority: HIGH - Current Implementation**
+- **Neu hier?** → [Quickstart Guide](getting-started/QUICK_START.md) (30 Minuten)
+- **Installation?** → [Installation Guide](getting-started/INSTALLATION.md)
+- **Erste Abfrage?** → [Erste Abfrage durchführen](getting-started/FIRST_QUERY.md)
+- **Problem?** → [Troubleshooting](getting-started/TROUBLESHOOTING.md)
 
-| Document | Description | Lines | Status |
-|----------|-------------|-------|--------|
-| [PHASE5_HYPOTHESIS_GENERATION.md](PHASE5_HYPOTHESIS_GENERATION.md) | **Complete Phase 5 Documentation** | 1,050+ | ✅ **NEW** |
-| [PHASE4_RAG_INTEGRATION.md](PHASE4_RAG_INTEGRATION.md) | RAG Integration + Enhanced RAG Features | 2,000+ | ✅ Enhanced |
-| [PHASE5_START_HERE.md](PHASE5_START_HERE.md) | Quick start guide for Phase 5 | 200+ | ✅ Current |
+---
 
-**Phase 5 Features:**
-- ✅ **Hypothesis Generation** - LLM-based query analysis (8 question types, 4 confidence levels)
-- ✅ **Batch Search** - Parallel query processing (10x-13x speedup)
-- ✅ **Query Expansion** - 30+ German synonym categories (+40-60% recall)
-- ✅ **LLM Re-ranking** - Contextual relevance scoring (+15-25% precision)
+## 📂 Dokumentation nach Kategorie
 
-**Phase 4 Features:**
-- ✅ **Multi-Source Search** - ChromaDB (vector), Neo4j (graph), PostgreSQL (relational)
-- ✅ **Hybrid Ranking** - 3 strategies (RRF, Weighted, Borda)
-- ✅ **Source Citations** - Page numbers, sections, timestamps
-- ✅ **Context Building** - Token-limited LLM context
+### 📘 Erste Schritte
+Alle Guides für Anfänger - Setup, Installation, erste Schritte.
 
-**Quick Start:**
-```bash
-# See comprehensive documentation
-docs/PHASE5_HYPOTHESIS_GENERATION.md
+- [Quickstart](getting-started/QUICK_START.md) - 30-Minuten Setup
+- [Installation](getting-started/INSTALLATION.md) - Detaillierte Installation
+- [Erste Abfrage](getting-started/FIRST_QUERY.md) - Test-Query durchführen
+- [Troubleshooting](getting-started/TROUBLESHOOTING.md) - Häufige Probleme
 
-# Quick start guide
-docs/PHASE5_START_HERE.md
-```
+### 🏗️ Architektur
+Detaillierte Dokumentation des Systems - Backend, RAG, Agents.
+
+- [Systemübersicht](architecture/OVERVIEW.md) - Was ist VERITAS?
+- [Backend-Architektur](architecture/BACKEND_ARCHITECTURE.md) - Backend-Aufbau
+- [Frontend-Architektur](architecture/FRONTEND_ARCHITECTURE.md) - Frontend-Aufbau
+- [Datenfluss](architecture/DATA_FLOW.md) - Wie Daten fließen
+- [RAG-Pipeline](architecture/RAG_PIPELINE.md) - RAG-System
+- [Agent-Framework](architecture/AGENTS.md) - Agent-Orchestration
+
+### 🔌 API & Integration
+API-Referenz und Integration mit externen Systemen.
+
+**API-Referenz:**
+- [API-Übersicht](api/API_REFERENCE.md) - API-Einführung
+- [Endpoints](api/ENDPOINTS.md) - Alle Endpoints
+- [Authentifizierung](api/AUTHENTICATION.md) - Auth konzept
+- [v3 API Docs](api/v3/OVERVIEW.md) - v3 API Details
+
+**System-Integration:**
+- [UDS3 Integration](integration/UDS3_INTEGRATION.md) - UDS3 Setup
+- [ThemisDB Integration](integration/THEMIS_INTEGRATION.md) - ThemisDB Setup
+- [Ollama/LLM](integration/OLLAMA_INTEGRATION.md) - LLM Integration
+- [Office Add-In](integration/OFFICE_ADDON.md) - Word Add-In
+- [MCP-Server](integration/MCP_SERVER.md) - MCP Server
+
+### 🚀 Deployment & Betrieb
+Production-Setup und Betrieb.
+
+- [Deployment-Guide](deployment/DEPLOYMENT_GUIDE.md) - Schritt-für-Schritt
+- [Docker Setup](deployment/DOCKER.md) - Docker/Compose
+- [Kubernetes](deployment/KUBERNETES.md) - K8S Deployment
+- [Konfiguration](deployment/CONFIGURATION.md) - Umgebungsvariablen
+- [Monitoring](deployment/MONITORING.md) - Observability
+- [Troubleshooting](deployment/TROUBLESHOOTING.md) - Problembehebung
+
+### 🧪 Entwicklung
+Für Contributor und Entwickler.
+
+- [Dev-Environment](development/DEVELOPMENT.md) - Local Development
+- [Testing Guide](development/TESTING_GUIDE.md) - Test-Strategie
+- [Contributing](development/CONTRIBUTING.md) - Contribution Guide
+- [Code-Style](development/CODE_STYLE.md) - Coding Standards
+- [Debugging](development/DEBUGGING.md) - Debug-Tipps
+
+### 📊 Komponenten
+Dokumentation einzelner System-Komponenten.
+
+- [Database Agent](components/DATABASE_AGENT.md) - DB-Queries
+- [RAG-Service](components/RAG_SERVICE.md) - RAG System
+- [Re-Ranking System](components/RERANKING.md) - Document Ranking
+- [Hypothesis Agent](components/HYPOTHESIS_AGENT.md) - Query Analysis
+- [Chat Persistence](components/CHAT_PERSISTENCE.md) - Chat-Verlauf
+
+### 📋 Referenz
+Glossar, Changelog, FAQ und mehr.
+
+- [Glossar](reference/GLOSSAR.md) - Fachbegriffe
+- [Changelog](reference/CHANGELOG.md) - Versionshistorie
+- [Roadmap](reference/ROADMAP.md) - Zukunftsplanung
+- [FAQ](reference/FAQ.md) - Häufige Fragen
+
+---
+
+## 🎯 Nach Rolle
+
+### 👨‍💼 **Projektmanager / Stakeholder**
+1. [Systemübersicht](architecture/OVERVIEW.md) - Was ist VERITAS?
+2. [Roadmap](reference/ROADMAP.md) - Was kommt als nächstes?
+3. [Deployment Guide](deployment/DEPLOYMENT_GUIDE.md) - Wie wird deployed?
+
+### 👨‍💻 **Entwickler (Backend)**
+1. [Quickstart](getting-started/QUICK_START.md) - Setup
+2. [Dev-Environment](development/DEVELOPMENT.md) - Local Development
+3. [Backend-Architektur](architecture/BACKEND_ARCHITECTURE.md) - Wie es funktioniert
+4. [API-Referenz](api/API_REFERENCE.md) - Endpoints & Schemas
+5. [Testing Guide](development/TESTING_GUIDE.md) - Tests schreiben
+
+### 👨‍💻 **Entwickler (Frontend)**
+1. [Quickstart](getting-started/QUICK_START.md) - Setup
+2. [Frontend-Architektur](architecture/FRONTEND_ARCHITECTURE.md) - Struktur
+3. [API-Referenz](api/API_REFERENCE.md) - Welche Endpoints?
+4. [Office Add-In](integration/OFFICE_ADDON.md) - Word Add-In Setup
+5. [Testing Guide](development/TESTING_GUIDE.md) - Tests
+
+### 🚀 **DevOps / SRE**
+1. [Deployment Guide](deployment/DEPLOYMENT_GUIDE.md) - Deployment
+2. [Docker](deployment/DOCKER.md) - Container Setup
+3. [Kubernetes](deployment/KUBERNETES.md) - K8S Setup
+4. [Monitoring](deployment/MONITORING.md) - Observability
+5. [Konfiguration](deployment/CONFIGURATION.md) - Env Variables
+
+### 🔧 **Integration / System Admin**
+1. [UDS3 Integration](integration/UDS3_INTEGRATION.md) - UDS3 Setup
+2. [ThemisDB Integration](integration/THEMIS_INTEGRATION.md) - ThemisDB Setup
+3. [Konfiguration](deployment/CONFIGURATION.md) - Alle Config-Options
+4. [Troubleshooting](getting-started/TROUBLESHOOTING.md) - Häufige Probleme
+
+---
+
+## 📚 Navigationshilfe
+
+- **Sidebar (links):** Schnelle Navigation nach Kategorie
+- **Suche:** Drücke `Ctrl+K` um schnell Inhalte zu finden
+- **Breadcrumbs:** Am oberen Rand - zurück zur vorherigen Seite
+
+## 🗂️ Archivierte Docs
+
+Alte Dokumentation (Phase-Reports, alte Guides, veraltete APIs) findest du im [Archiv](.archive/README.md).
+
+---
+
+## 🤝 Beiträge
+
+Dokumentation fehlerhaft oder unvollständig?
+→ Siehe [Contributing Guide](development/CONTRIBUTING.md)
+
+## 📞 Support
+
+- **Fragen?** → GitHub Issues mit Label `docs`
+- **Bugs?** → GitHub Issues mit Label `bug`
+- **Feature-Requests?** → GitHub Discussions
+
+---
+
+**Status:** ✅ Aktiv & Gepflegt
+**Zuletzt aktualisiert:** 4. Dezember 2025
+
 
 ---
 

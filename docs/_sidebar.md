@@ -1,53 +1,81 @@
-* [[Home]]
+* **🏠 [Home](README.md)**
 
-* Schnellstart
-  * [[QUICK_START_V7_REAL]]
-  * [[PROJECT_STRUCTURE]]
-  * [[DEPLOYMENT_QUICKSTART]]
+---
 
-* Architektur
-  * [[VERITAS_System_Overview]]
-  * [[BACKEND_ARCHITECTURE_ANALYSIS]]
-  * [[PROCESS_TREE_ARCHITECTURE]]
-  * [[SERVER_SIDE_PROCESSING_ARCHITECTURE]]
+## 📘 Erste Schritte
 
-* UDS3 & Suche
-  * [[UDS3_QUICK_START]]
-  * [[UDS3_INTEGRATION_GUIDE]]
-  * [[HYBRID_SEARCH_RRF_RERANKING_REPORT]]
-  * [[UDS3_POLYGLOT_QUERY_API]]
+* [🚀 Quickstart](getting-started/QUICK_START.md)
+* [📦 Installation](getting-started/INSTALLATION.md)
+* [🔍 Erste Abfrage](getting-started/FIRST_QUERY.md)
+* [🆘 Troubleshooting](getting-started/TROUBLESHOOTING.md)
 
-* Agents
-  * [[AGENT_FRAMEWORK_QUICKSTART]]
-  * [[AGENT_SYSTEM_ANALYSIS_REPORT]]
-  * [[PRODUCTION_AGENTS_FINAL_REPORT]]
+---
 
-* API & Integration
-  * [[API_REFERENCE]]
-  * [[VERITAS_API_BACKEND_DOCUMENTATION]]
-  * [[WEBSOCKET_PROTOCOL]]
+## 🏗️ Architektur
 
-* Deployment & Betrieb
-  * [[DEPLOYMENT_GUIDE]]
-  * [[PRODUCTION_DEPLOYMENT_PLAN]]
-  * [[SECRETS_MANAGEMENT_GUIDE]]
+* [📊 Übersicht](architecture/OVERVIEW.md)
+* [🛠️ Backend-Aufbau](architecture/BACKEND_ARCHITECTURE.md)
+* [🎨 Frontend-Aufbau](architecture/FRONTEND_ARCHITECTURE.md)
+* [📈 Datenfluss](architecture/DATA_FLOW.md)
+* [🔍 RAG-Pipeline](architecture/RAG_PIPELINE.md)
+* [🤖 Agent-Framework](architecture/AGENTS.md)
 
-* Entwicklung
-  * [[TESTING]]
-  * [[FRONTEND_INTEGRATION]]
-  * [[VERITAS_STREAMING_WITH_AGENTS]]
+---
 
-* Qualität & Evaluierung
-  * [[BASELINE_EVALUATION_INTEGRATION_COMPLETE]]
-  * [[RERANKING_EVALUATION_IMPLEMENTATION]]
-  * [[GOLDEN_DATASET_SYSTEM]]
+## 🔌 API & Integration
 
-* Sicherheit
-  * [[AUTHENTICATION]]
-  * [[MTLS_QUICK_START]]
+* **API-Referenz**
+  * [📖 API-Übersicht](api/API_REFERENCE.md)
+  * [🔗 Endpoints](api/ENDPOINTS.md)
+  * [🔐 Authentifizierung](api/AUTHENTICATION.md)
 
-* Troubleshooting & Leitfäden
-  * [[ERROR_HANDLING_GUIDE]]
+* **System-Integration**
+  * [🗄️ UDS3 Adapter](integration/UDS3_INTEGRATION.md)
+  * [📊 ThemisDB Integration](integration/THEMIS_INTEGRATION.md)
+  * [🤖 Ollama/LLM](integration/OLLAMA_INTEGRATION.md)
+  * [📝 Office Add-In](integration/OFFICE_ADDON.md)
+  * [🔗 MCP-Server](integration/MCP_SERVER.md)
+
+---
+
+## 🚀 Deployment & Betrieb
+
+* [📖 Deployment-Guide](deployment/DEPLOYMENT_GUIDE.md)
+* [🐳 Docker Setup](deployment/DOCKER.md)
+* [☸️ Kubernetes](deployment/KUBERNETES.md)
+* [⚙️ Konfiguration](deployment/CONFIGURATION.md)
+* [📊 Monitoring](deployment/MONITORING.md)
+* [🔧 Troubleshooting](deployment/TROUBLESHOOTING.md)
+
+---
+
+## 🧪 Entwicklung
+
+* [💻 Dev-Environment](development/DEVELOPMENT.md)
+* [🧪 Testing-Guide](development/TESTING_GUIDE.md)
+* [🤝 Contributing](development/CONTRIBUTING.md)
+* [📝 Code-Style](development/CODE_STYLE.md)
+* [🐛 Debugging](development/DEBUGGING.md)
+
+---
+
+## 📊 Komponenten
+
+* [📁 Database Agent](components/DATABASE_AGENT.md)
+* [🔍 RAG-Service](components/RAG_SERVICE.md)
+* [📈 Re-Ranking System](components/RERANKING.md)
+* [🎯 Hypothesis Generation](components/HYPOTHESIS_AGENT.md)
+* [💬 Chat Persistence](components/CHAT_PERSISTENCE.md)
+
+---
+
+## 📋 Referenz
+
+* [📚 Glossar](reference/GLOSSAR.md)
+* [📖 Changelog](reference/CHANGELOG.md)
+* [🗺️ Roadmap](reference/ROADMAP.md)
+* [❌ Bekannte Probleme](reference/KNOWN_ISSUES.md)
+* [📌 FAQ](reference/FAQ.md)
   * [[QUICK_REFERENCE]]
 
 * Status & Reports

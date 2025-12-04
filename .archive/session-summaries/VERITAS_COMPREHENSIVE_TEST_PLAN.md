@@ -1,8 +1,8 @@
 # VERITAS Comprehensive Test Plan & Specification
 
-**Version:** 1.0  
-**Datum:** 2025-12-03  
-**Status:** Spezifikation für separaten PR  
+**Version:** 1.0
+**Datum:** 2025-12-03
+**Status:** Spezifikation für separaten PR
 **Geschätzter Aufwand:** 3-5 Tage (vollständige Implementierung)
 
 ---
@@ -178,16 +178,16 @@ from backend.services.rag_service import RAGService
 @pytest.mark.unit
 class TestRAGService:
     """Unit tests for RAG Service"""
-    
+
     @pytest.fixture
     def rag_service(self):
         return RAGService()
-    
+
     def test_initialization(self, rag_service):
         """Test RAG service initialization"""
         assert rag_service is not None
         assert hasattr(rag_service, 'retrieve')
-    
+
     @pytest.mark.asyncio
     async def test_retrieve_documents(self, rag_service):
         """Test document retrieval"""
@@ -195,19 +195,19 @@ class TestRAGService:
         results = await rag_service.retrieve(query, top_k=5)
         assert isinstance(results, list)
         assert len(results) <= 5
-    
+
     @pytest.mark.asyncio
     async def test_retrieve_with_filters(self, rag_service):
         """Test retrieval with metadata filters"""
         query = "Windenergie"
         filters = {"category": "1.1"}
         results = await rag_service.retrieve(
-            query, 
+            query,
             top_k=10,
             filters=filters
         )
         assert all(doc['metadata']['category'] == '1.1' for doc in results)
-    
+
     def test_invalid_query(self, rag_service):
         """Test handling of invalid queries"""
         with pytest.raises(ValueError):
@@ -244,12 +244,12 @@ from backend.app import app
 @pytest.mark.integration
 class TestDatabaseAPI:
     """Integration tests for Database API endpoints"""
-    
+
     @pytest.fixture
     async def client(self):
         async with AsyncClient(app=app, base_url="http://test") as ac:
             yield ac
-    
+
     @pytest.mark.asyncio
     async def test_query_endpoint(self, client):
         """Test database query endpoint"""
@@ -264,7 +264,7 @@ class TestDatabaseAPI:
         data = response.json()
         assert "results" in data
         assert len(data["results"]) <= 5
-    
+
     @pytest.mark.asyncio
     async def test_statistics_endpoint(self, client):
         """Test database statistics endpoint"""
@@ -273,7 +273,7 @@ class TestDatabaseAPI:
         stats = response.json()
         assert "total_records" in stats
         assert "tables" in stats
-    
+
     @pytest.mark.asyncio
     async def test_invalid_query(self, client):
         """Test handling of invalid SQL queries"""
@@ -309,19 +309,19 @@ import os
 @pytest.mark.benchmark
 class TestRAGServiceBenchmarks:
     """Performance benchmarks for RAG Service"""
-    
+
     @pytest.mark.asyncio
     async def test_rag_retrieval_throughput(self):
         """Benchmark: RAG retrieval throughput"""
         from backend.services.rag_service import RAGService
-        
+
         service = RAGService()
         queries = [f"Query {i}" for i in range(100)]
-        
+
         # Memory before
         process = psutil.Process(os.getpid())
         mem_before = process.memory_info().rss / 1024 / 1024  # MB
-        
+
         # Benchmark execution
         start = time.time()
         results = []
@@ -329,22 +329,22 @@ class TestRAGServiceBenchmarks:
             result = await service.retrieve(query, top_k=5)
             results.append(result)
         duration = time.time() - start
-        
+
         # Memory after
         mem_after = process.memory_info().rss / 1024 / 1024  # MB
-        
+
         # Metrics
         throughput = len(queries) / duration
         avg_latency = (duration / len(queries)) * 1000  # ms
         memory_delta = mem_after - mem_before
-        
+
         print(f"\n=== RAG Retrieval Benchmark ===")
         print(f"Queries: {len(queries)}")
         print(f"Duration: {duration:.2f}s")
         print(f"Throughput: {throughput:.2f} queries/s")
         print(f"Avg Latency: {avg_latency:.2f}ms")
         print(f"Memory Delta: {memory_delta:.2f} MB")
-        
+
         # Assertions
         assert throughput > 5.0, "RAG throughput should be > 5 queries/s"
         assert avg_latency < 200, "RAG latency should be < 200ms"
@@ -373,7 +373,7 @@ from httpx import AsyncClient
 @pytest.mark.e2e
 class TestCompleteQueryWorkflow:
     """End-to-end tests for complete query workflows"""
-    
+
     @pytest.mark.asyncio
     async def test_bimschg_query_to_result(self):
         """E2E: BImSchG query → RAG → Hypothesis → Result"""
@@ -388,11 +388,11 @@ class TestCompleteQueryWorkflow:
             )
             assert query_response.status_code == 200
             query_id = query_response.json()["query_id"]
-            
+
             # Step 2: Wait for RAG retrieval
             import asyncio
             await asyncio.sleep(2)
-            
+
             # Step 3: Check hypothesis generation
             hypothesis_response = await client.get(
                 f"/api/v3/query/{query_id}/hypothesis"
@@ -400,7 +400,7 @@ class TestCompleteQueryWorkflow:
             assert hypothesis_response.status_code == 200
             hypothesis = hypothesis_response.json()
             assert "hypothesis" in hypothesis
-            
+
             # Step 4: Get final result
             result_response = await client.get(
                 f"/api/v3/query/{query_id}/result"
@@ -547,7 +547,7 @@ markers =
 asyncio_mode = auto
 
 # Coverage configuration
-addopts = 
+addopts =
     --verbose
     --strict-markers
     --tb=short
@@ -628,30 +628,30 @@ jobs:
     strategy:
       matrix:
         python-version: [3.11, 3.12]
-    
+
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      
+
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
-      
+
       - name: Run unit tests
         run: pytest -v -m unit --cov=backend --junitxml=junit.xml
-      
+
       - name: Upload coverage
         uses: codecov/codecov-action@v3
         with:
           files: ./coverage.xml
           flags: unittests
           name: codecov-umbrella
-  
+
   integration-tests:
     name: Integration Tests
     runs-on: ubuntu-latest
@@ -666,45 +666,45 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-    
+
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      
+
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
-      
+
       - name: Run integration tests
         run: pytest -v -m integration --junitxml=junit-integration.xml
         env:
           DATABASE_URL: postgresql://postgres:test@localhost:5432/veritas_test
-  
+
   benchmarks:
     name: Performance Benchmarks
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      
+
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
-      
+
       - name: Run benchmarks
         run: pytest -v -m benchmark --benchmark-json=benchmark-results.json
-      
+
       - name: Upload benchmark results
         uses: actions/upload-artifact@v3
         with:
@@ -840,25 +840,25 @@ jobs:
 @pytest.mark.benchmark
 class TestCriticalOperationsBenchmarks:
     """Benchmarks for critical VERITAS operations"""
-    
+
     @pytest.mark.asyncio
     async def test_rag_retrieval_latency(self):
         """Benchmark: RAG retrieval latency (5 docs)"""
         # Target: < 200ms
         pass
-    
+
     @pytest.mark.asyncio
     async def test_query_execution_latency(self):
         """Benchmark: Complete query execution"""
         # Target: < 2s
         pass
-    
+
     @pytest.mark.asyncio
     async def test_hypothesis_generation_latency(self):
         """Benchmark: Hypothesis generation"""
         # Target: < 5s
         pass
-    
+
     @pytest.mark.asyncio
     async def test_database_query_latency(self):
         """Benchmark: Database query latency"""
@@ -903,38 +903,38 @@ Date: 2025-12-03
 class TestRAGService:
     """
     Unit tests for RAG Service core functionality
-    
+
     Setup:
     - In-memory ChromaDB instance
     - Mock embedding model
     - Sample document fixtures
-    
+
     Cleanup:
     - Clear ChromaDB collections
     - Reset mock responses
     """
-    
+
     @pytest.fixture
     def rag_service(self):
         """
         Create RAG service instance with test configuration
-        
+
         Returns:
             RAGService: Configured service instance
         """
         # Implementation
         pass
-    
+
     @pytest.mark.asyncio
     async def test_retrieve_with_filters(self, rag_service):
         """
         Test document retrieval with metadata filters
-        
+
         Scenario:
         1. Query for "Windenergie" with category filter
         2. Verify all results match filter criteria
         3. Verify result count <= top_k
-        
+
         Expected:
         - Returns list of documents
         - All documents have category='1.1'
@@ -1146,7 +1146,7 @@ def test_query_execution(rag_service, sample_query):
 def mock_llm_service(monkeypatch):
     async def mock_generate(prompt):
         return {"response": "Mocked LLM response"}
-    
+
     monkeypatch.setattr(
         "backend.services.llm_service.generate",
         mock_generate
@@ -1156,10 +1156,10 @@ def mock_llm_service(monkeypatch):
 @pytest.fixture
 def mock_database(monkeypatch):
     mock_results = [{"id": 1, "name": "Test"}]
-    
+
     async def mock_query(sql):
         return mock_results
-    
+
     monkeypatch.setattr(
         "backend.database.connection.execute",
         mock_query
@@ -1173,7 +1173,7 @@ def test_invalid_input_handling(rag_service):
     """Test proper error handling for invalid input"""
     with pytest.raises(ValueError, match="Query cannot be empty"):
         rag_service.retrieve("")
-    
+
     with pytest.raises(TypeError, match="top_k must be integer"):
         rag_service.retrieve("test", top_k="invalid")
 ```
