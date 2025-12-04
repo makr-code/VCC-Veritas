@@ -280,12 +280,12 @@ from benchmarks.benchmark_suite import BenchmarkRunner, BenchmarkCategory, Bench
 class CustomBenchmarks:
     def __init__(self):
         self.runner = BenchmarkRunner("CustomSystem", "1.0.0")
-    
+
     def benchmark_custom_feature(self):
         def my_test():
             # Your test implementation
             return result
-        
+
         self.runner.run_benchmark(
             my_test,
             "custom_feature_test",
@@ -293,7 +293,7 @@ class CustomBenchmarks:
             BenchmarkMetric.LATENCY_MS,
             iterations=10
         )
-    
+
     def save_results(self):
         self.runner.save_results("custom_results.json")
 ```
@@ -305,10 +305,10 @@ from benchmarks.benchmark_suite import BenchmarkRunner, CompetitiveBenchmark
 
 def create_competitor_results():
     runner = BenchmarkRunner("CustomCompetitor", "2.0.0")
-    
+
     # Add benchmarks
     runner.record_metric(125.5, "test_1", ...)
-    
+
     suite = runner.get_suite()
     return suite
 
@@ -380,5 +380,5 @@ For questions or issues:
 
 ---
 
-**Last Updated:** December 4, 2024  
+**Last Updated:** December 4, 2024
 **Version:** 1.0.0

@@ -1,8 +1,10 @@
 # VERITAS Dokumentation
 
 **Letzte Aktualisierung:** 4. Dezember 2025
-**Version:** 1.0
-**Status:** ✅ Neu strukturiert
+**Version:** 1.0.1
+**Status:** ✅ Neu strukturiert & Reorganisiert
+
+**Neu in Phase 14:** 📊 Benchmark Suite, 📁 Dokumentation reorganisiert, 📖 README.md für alle Verzeichnisse
 
 ---
 

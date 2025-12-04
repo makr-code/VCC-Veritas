@@ -1,7 +1,7 @@
 # VERITAS Benchmark Report
 
-**Generated:** 2025-12-04T08:23:51.486151  
-**System:** VERITAS v3.0.0  
+**Generated:** 2025-12-04T08:23:51.486151
+**System:** VERITAS v3.0.0
 **Python:** 3.13.6
 
 ## Hardware Information
@@ -1405,4 +1405,3 @@ Statistics:
 - Median: 114.06 ms
 - P95: 137.62 ms
 - P99: 137.62 ms
-

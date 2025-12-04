@@ -1,361 +1,276 @@
-# VERITAS Unified Backend - Quick Start
-## 🚀 Schnellstart für v4.0.0
+# VERITAS v3.19.0 - Quick Start Guide 🚀
+
+**Status:** ✅ PRODUCTION READY
+**Last Updated:** 11. Oktober 2025
 
 ---
 
-## Start Backend
+## 🎯 Schnellstart (2 Minuten)
 
-### Option 1: Via Start-Skript (Empfohlen)
-
+### 1. Backend starten
 ```powershell
+cd C:\VCC\veritas
 python start_backend.py
 ```
 
-### Option 2: Direkt
-
-```powershell
-python backend/app.py
+**Erwartete Ausgabe:**
+```
+⚙️ Starte VERITAS Backend API...
+🌐 API wird verfügbar unter: http://localhost:5000
+INFO: Uvicorn running on http://0.0.0.0:5000
 ```
 
-### Option 3: Mit Reload (Development)
-
+### 2. Frontend starten (neues Terminal)
 ```powershell
-cd backend
-python backend.py
-# Oder mit uvicorn:
-uvicorn backend:app --reload --host 0.0.0.0 --port 5000
+cd C:\VCC\veritas
+python start_frontend.py
 ```
+
+**Erwartete Ausgabe:**
+```
+🚀 Starte VERITAS Frontend...
+[Tkinter GUI öffnet sich]
+```
+
+### 3. Erste Query testen
+1. Im GUI-Fenster: Text eingeben
+2. Beispiel: **"Was ist das BImSchG?"**
+3. Button "Senden" klicken
+4. Warten (5-10 Sekunden)
+5. Antwort erscheint mit:
+   - 📝 Strukturierte Antwort
+   - 📊 Quellen (aus Neo4j: 1930 Dokumente)
+   - ⏱️ Antwortzeit & Metriken
+   - 👍👎💬 Feedback-Buttons
 
 ---
 
-## Endpoints
+## 🔧 System-Status prüfen
 
-### Root
-
-```bash
-GET http://localhost:5000/
+### Health Check (Backend)
+```powershell
+curl http://localhost:5000/api/feedback/health
 ```
 
-**Response:**
-```json
-{
-  "service": "VERITAS Unified Backend",
-  "version": "4.0.0",
-  "api": {"base": "/api", "version": "4.0.0"},
-  "documentation": {"swagger": "/docs", "redoc": "/redoc"},
-  "features": {
-    "unified_response": true,
-    "ieee_citations": true,
-    "multi_mode": true
-  }
-}
-```
-
----
-
-### Health Check
-
-```bash
-GET http://localhost:5000/api/system/health
-```
-
-**Response:**
+**Erwartete Antwort:**
 ```json
 {
   "status": "healthy",
-  "timestamp": "2025-10-19T14:30:00",
-  "components": {
-    "uds3": true,
-    "pipeline": true,
-    "streaming": false
-  }
+  "database": "connected",
+  "today_feedback": 0
 }
 ```
 
----
-
-### System Info
-
-```bash
-GET http://localhost:5000/api/system/info
-```
-
----
-
-## Query Endpoints
-
-### 1. Unified Query (Alle Modi)
-
-```bash
-POST http://localhost:5000/api/query
-Content-Type: application/json
-
-{
-  "query": "Was regelt das BImSchG?",
-  "mode": "rag",
-  "model": "llama3.2",
-  "temperature": 0.7,
-  "max_tokens": 2000
-}
-```
-
-**Modi:**
-- `"rag"` - RAG Query (Standard)
-- `"hybrid"` - Hybrid Search
-- `"streaming"` - Streaming Query
-- `"agent"` - Agent Query
-- `"ask"` - Simple Ask
-
----
-
-### 2. RAG Query
-
-```bash
-POST http://localhost:5000/api/query/rag
-Content-Type: application/json
-
-{
-  "query": "BImSchG Genehmigungsverfahren",
-  "model": "llama3.2"
-}
-```
-
----
-
-### 3. Simple Ask
-
-```bash
-POST http://localhost:5000/api/query/ask
-Content-Type: application/json
-
-{
-  "query": "Erkläre mir das BImSchG",
-  "model": "llama3.2"
-}
-```
-
----
-
-### 4. Hybrid Search
-
-```bash
-POST http://localhost:5000/api/query/hybrid
-Content-Type: application/json
-
-{
-  "query": "Immissionsschutz Anlagen",
-  "top_k": 10,
-  "bm25_weight": 0.5,
-  "dense_weight": 0.5,
-  "enable_reranking": true
-}
-```
-
----
-
-## Response Format
-
-**Alle Endpoints geben UnifiedResponse zurück:**
-
-```json
-{
-  "content": "Das BImSchG regelt... [1]\n\nGenehmigung... [2]",
-  "sources": [
-    {
-      "id": "1",
-      "title": "Bundes-Immissionsschutzgesetz",
-      "type": "document",
-      "authors": "Deutscher Bundestag",
-      "ieee_citation": "Deutscher Bundestag, 'Bundes-Immissionsschutzgesetz', BGBl. I S. 1193, 2024.",
-      "year": 2024,
-      "publisher": "Bundesanzeiger Verlag",
-      "similarity_score": 0.92,
-      "rerank_score": 0.95,
-      "quality_score": 0.90,
-      "impact": "High",
-      "relevance": "Very High",
-      "rechtsgebiet": "Umweltrecht"
-    },
-    {
-      "id": "2",
-      "title": "4. BImSchV",
-      "similarity_score": 0.88
-    }
-  ],
-  "metadata": {
-    "model": "llama3.2",
-    "mode": "rag",
-    "duration": 2.34,
-    "tokens_used": 456,
-    "sources_count": 2,
-    "agents_involved": ["document_retrieval", "legal_framework"]
-  },
-  "session_id": "sess_abc123",
-  "timestamp": "2025-10-19T14:30:00"
-}
-```
-
----
-
-## Agent Endpoints
-
-### Liste Agents
-
-```bash
-GET http://localhost:5000/api/agent/list
-```
-
-### Agent Capabilities
-
-```bash
-GET http://localhost:5000/api/agent/capabilities
-```
-
----
-
-## PowerShell Testing
-
-### Test Script
-
+### API Endpoints (14 verfügbar)
 ```powershell
-# Health Check
-Invoke-RestMethod -Uri "http://localhost:5000/api/system/health" -Method Get
-
-# RAG Query
-$body = @{
-    query = "Was regelt das BImSchG?"
-    mode = "rag"
-    model = "llama3.2"
-} | ConvertTo-Json
-
-Invoke-RestMethod -Uri "http://localhost:5000/api/query" `
-    -Method Post `
-    -ContentType "application/json" `
-    -Body $body
+curl http://localhost:5000/
 ```
+
+**Wichtigste Endpoints:**
+- `/v2/query` - Chat Query (Standard)
+- `/v2/query/stream` - Streaming Chat
+- `/uds3/query` - UDS3 Hybrid Search
+- `/api/feedback/submit` - Feedback senden
+- `/api/feedback/stats` - Statistiken
 
 ---
 
-## cURL Testing
+## 📊 Features im GUI
 
-```bash
-# Health
-curl http://localhost:5000/api/system/health
+### Chat-Interface
+- ✅ **Sprechblasen-Design** - User (rechts) vs Assistant (links)
+- ✅ **Strukturierte Antworten** - 6 Sections (Antwort, Details, Quellen, etc.)
+- ✅ **Metriken-Badges** - Confidence, Duration, Sources
 
-# Query
-curl -X POST http://localhost:5000/api/query \
-  -H "Content-Type: application/json" \
-  -d '{
-    "query": "Was regelt das BImSchG?",
-    "mode": "rag",
-    "model": "llama3.2"
-  }'
-```
+### LLM Parameter Controls
+- ✅ **4 Presets** - Präzise, Standard, Ausführlich, Kreativ
+- ✅ **Token Counter** - Echtzeit-Längen-Schätzung (💬/📝/⚠️)
+- ✅ **Antwortzeit-Prädiktion** - Modell-basierte Schätzung (⚡/⏱️/🐌)
+- ✅ **Parameter-Tuning** - Temperature (0.1-1.0), Tokens (100-2000), Top-p (0.1-1.0)
 
----
+### Feedback System
+- ✅ **3-Button Widget** - 👍 Hilfreich, 👎 Nicht hilfreich, 💬 Kommentar
+- ✅ **Backend-Integration** - SQLite-Persistierung
+- ✅ **Analytics** - Positive Ratio, Average Rating, Top Categories
 
-## Frontend Integration
+### Export-Funktionen
+- ✅ **Word-Export (.docx)** - Formatierte Chat-Historie mit Quellen
+- ✅ **Excel-Export (.xlsx)** - 3 Sheets (Messages, Statistiken, Quellen)
+- ✅ **Export-Dialog** - Zeitraum-Filter, Optionen (Metadata, Sources)
 
-### JavaScript/TypeScript
-
-```typescript
-const response = await fetch('http://localhost:5000/api/query', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    query: 'Was regelt das BImSchG?',
-    mode: 'rag',
-    model: 'llama3.2'
-  })
-});
-
-const data: UnifiedResponse = await response.json();
-
-// Content mit Citations
-console.log(data.content);  // "Das BImSchG... [1]"
-
-// IEEE Citations (35+ Felder)
-data.sources.forEach((source, idx) => {
-  console.log(`[${source.id}] ${source.title}`);
-  console.log(`   IEEE: ${source.ieee_citation}`);
-  console.log(`   Score: ${source.similarity_score}`);
-  console.log(`   Impact: ${source.impact}`);
-});
-
-// Metadata
-console.log(`Mode: ${data.metadata.mode}`);
-console.log(`Duration: ${data.metadata.duration}s`);
-console.log(`Agents: ${data.metadata.agents_involved}`);
-```
+### File Upload
+- ✅ **Drag & Drop** - 32 Dateiformate (PDF, DOCX, TXT, etc.)
+- ✅ **SHA256 Deduplication** - Automatische Duplikat-Erkennung
+- ✅ **Size Validation** - Max 50 MB pro Datei
 
 ---
 
-## Environment Variables
+## 🎓 Beispiel-Workflows
 
-```bash
-# Optional Configuration
-VERITAS_LOG_LEVEL=INFO          # DEBUG, INFO, WARNING, ERROR
-VERITAS_API_HOST=0.0.0.0        # Bind address
-VERITAS_API_PORT=5000           # Port
-VERITAS_API_RELOAD=false        # Auto-reload on code changes
-```
+### Workflow 1: Einfache Frage
+1. GUI öffnen
+2. Eingabe: **"Welche Grenzwerte gelten für Lärm?"**
+3. Senden
+4. Antwort lesen
+5. Feedback geben (👍)
+
+### Workflow 2: Dokument hochladen + Fragen
+1. PDF per Drag & Drop in Chat ziehen
+2. Warten (Upload läuft)
+3. Frage: **"Was steht in diesem Dokument über Emissionen?"**
+4. Senden
+5. Antwort mit Quellen aus neuem Dokument
+
+### Workflow 3: Export erstellen
+1. Mehrere Fragen stellen (3-5 Queries)
+2. Menü: **File → Export**
+3. Format wählen: **DOCX** oder **XLSX**
+4. Zeitraum: **All** oder **Last 7 days**
+5. Optionen: **✓ Include Metadata**, **✓ Include Sources**
+6. Export starten
+7. Datei öffnen (Word/Excel)
+
+### Workflow 4: LLM Parameter anpassen
+1. Komplexe Frage vorbereiten
+2. Preset wählen: **"Ausführlich"** (Temp=0.6, Tokens=1000)
+3. Token Counter prüfen: **~750 Wörter** (📝 Mittel)
+4. Antwortzeit-Schätzung: **~8-12s** (⏱️ Mittel)
+5. Senden
+6. Lange, detaillierte Antwort erhalten
 
 ---
 
-## Troubleshooting
+## 🔍 Debug & Troubleshooting
 
-### Backend startet nicht
-
+### Backend läuft nicht?
 ```powershell
-# Check Python Version
-python --version  # Should be 3.10+
+# Prozesse prüfen
+netstat -ano | findstr ":5000"
 
-# Check Dependencies
-pip install fastapi uvicorn pydantic
+# Port belegt? Prozess beenden
+taskkill /PID <PID> /F
 
-# Check Port
-netstat -ano | findstr :5000  # Port frei?
+# Backend neu starten
+python start_backend.py
 ```
 
-### UDS3 nicht verfügbar
+### Frontend zeigt keine Antworten?
+1. **Backend läuft?** → Health Check durchführen
+2. **Ollama läuft?** → `ollama list` in Terminal
+3. **Neo4j aktiv?** → Logs prüfen
+4. **Firewall blockiert?** → Port 5000 freigeben
 
-**Normal!** Backend läuft im **Demo Mode** mit Mock-Responses.
+### Lange Antwortzeiten (>20s)?
+- **Neo4j Indexierung** → Erste Query dauert länger (Cold Start)
+- **LLM warmup** → Erste Ollama-Anfrage dauert 10-15s
+- **Netzwerk-Latenz** → UDS3-Backends auf Remote-Server (192.168.178.94)
 
-```
-⚠️  UDS3 Demo Mode - Keine echten Datenbanken
-⚠️  Intelligent Pipeline Demo Mode
-```
-
-Mock-Responses enthalten trotzdem IEEE-konforme Sources (35+ Felder).
-
-### Keine Sources
-
-**Check:**
-1. UDS3 verfügbar? `GET /api/system/health`
-2. ChromaDB populated? Siehe UDS3 Docs
-3. Mock-Fallback aktiv? Logs checken
+### Keine Quellen in Antwort?
+- **Neo4j leer?** → `scripts/check_uds3_status.py` ausführen
+- **Graph Search disabled?** → Logs prüfen (warnings)
+- **Query zu spezifisch?** → Breitere Suchbegriffe verwenden
 
 ---
 
-## Documentation
+## 📁 Verzeichnis-Struktur
 
-- **Swagger UI:** http://localhost:5000/docs
-- **ReDoc:** http://localhost:5000/redoc
-- **Health:** http://localhost:5000/api/system/health
-- **Capabilities:** http://localhost:5000/api/system/capabilities
+```
+C:\VCC\veritas\
+├── backend/
+│   ├── api/
+│   │   ├── veritas_api_backend.py      # Main Backend (Port 5000)
+│   │   └── feedback_routes.py          # Feedback API (4 Endpoints)
+│   ├── agents/
+│   │   └── veritas_uds3_hybrid_agent.py # UDS3 Agent (299 LOC)
+│   └── services/
+├── frontend/
+│   ├── veritas_app.py                  # Main GUI (Tkinter)
+│   ├── ui/
+│   │   ├── veritas_ui_chat_formatter.py # Chat Design v2.0
+│   │   ├── veritas_ui_export_dialog.py  # Export Dialog
+│   │   └── veritas_ui_drag_drop.py      # Drag & Drop Handler
+│   └── services/
+│       ├── office_export.py             # Word/Excel Export
+│       └── feedback_api_client.py       # Feedback API Client
+├── docs/
+│   ├── PRODUCTION_DEPLOYMENT_COMPLETE.md # Deployment Report
+│   ├── UDS3_SEARCH_API_PRODUCTION_GUIDE.md # UDS3 Guide
+│   └── TESTING.md                       # Test Guide
+├── scripts/
+│   ├── check_uds3_status.py            # Backend Status Check
+│   └── test_uds3_search_api_integration.py # Integration Tests
+├── start_backend.py                     # Backend Launcher
+├── start_frontend.py                    # Frontend Launcher
+└── QUICK_START.md                       # This file
+```
 
 ---
 
-## Next Steps
+## 🎯 Nächste Schritte
 
-1. ✅ Backend starten
-2. ✅ Health Check erfolgreich
-3. ✅ Test Query durchführen
-4. ✅ Response-Format verifizieren
-5. ⏳ Frontend anpassen
-6. ⏳ ChromaDB mit Dokumenten füllen
-7. ⏳ Production Deployment
+### Sofort (Production Use)
+- ✅ Backend läuft auf Port 5000
+- ✅ Frontend läuft (Tkinter GUI)
+- ✅ Alle Features aktiv
+- ✅ Bereit für echte Queries!
+
+### Optional (Performance)
+- [ ] **ChromaDB Fix** (2-4h) - Remote API Issue beheben
+- [ ] **PostgreSQL API** (2-3h) - execute_sql() hinzufügen
+- [ ] **Caching** (1-2h) - Query-Enrichment cachen
+- [ ] **A/B Testing** (2-3h) - llama3 vs llama3.1
+
+### Optional (Features)
+- [ ] **SupervisorAgent** (3-4h) - Zentraler UDS3 Zugriff
+- [ ] **File Watcher** (4-6h) - Auto-Indexing
+- [ ] **Batch CLI** (6-8h) - Automation Tool
 
 ---
 
-**Status:** ✅ **Ready to Use!**
+## 📞 Support
+
+**Dokumentation:**
+- Deployment: `docs/PRODUCTION_DEPLOYMENT_COMPLETE.md`
+- UDS3 Guide: `docs/UDS3_SEARCH_API_PRODUCTION_GUIDE.md`
+- Testing: `docs/TESTING.md`
+- Feedback: `docs/FEEDBACK_SYSTEM.md`
+- Export: `docs/OFFICE_EXPORT.md`
+
+**Logs:**
+- Backend: Terminal mit `python start_backend.py`
+- Frontend: Terminal mit `python start_frontend.py`
+- UDS3: `data/veritas_auto_server.log`
+
+**Status Check:**
+```powershell
+# Backend Health
+curl http://localhost:5000/api/feedback/health
+
+# UDS3 Backends
+python scripts/check_uds3_status.py
+
+# Ollama Models
+ollama list
+```
+
+---
+
+## 🎉 Erfolg!
+
+**VERITAS v3.19.0 läuft jetzt!** 🚀
+
+Du hast erfolgreich deployed:
+- ✅ Backend (14 API Endpoints)
+- ✅ Frontend (8 Major Features)
+- ✅ UDS3 Integration (Neo4j: 1930 Dokumente)
+- ✅ Feedback System (SQLite + Analytics)
+- ✅ Export (Word/Excel)
+- ✅ Drag & Drop (32 Formate)
+
+**Viel Erfolg bei der Nutzung!** 🎯
+
+---
+
+**Version:** v3.19.0
+**Status:** ✅ PRODUCTION READY
+**Date:** 11. Oktober 2025

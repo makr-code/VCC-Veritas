@@ -45,11 +45,10 @@ This report compares VERITAS performance against leading RAG and LLM frameworks:
 ## VERITAS Key Advantages
 
 
-✅ **Faster Retrieval** - Optimized vector + keyword search (110ms vs 120-140ms)  
-✅ **Lower Latency** - Streamlined pipeline (630ms vs 650-750ms total)  
-✅ **Better Accuracy** - Specialized legal domain training (96-99% accuracy)  
-✅ **Superior Streaming** - Real-time SSE with 100% reliability  
-✅ **Domain Expertise** - Administrative law specialization (BImSchG, procedures)  
-✅ **Multi-turn Coherence** - Context preservation (94-97%)  
-✅ **Citation Quality** - IEEE compliance (98%+ accuracy)  
-
+✅ **Faster Retrieval** - Optimized vector + keyword search (110ms vs 120-140ms)
+✅ **Lower Latency** - Streamlined pipeline (630ms vs 650-750ms total)
+✅ **Better Accuracy** - Specialized legal domain training (96-99% accuracy)
+✅ **Superior Streaming** - Real-time SSE with 100% reliability
+✅ **Domain Expertise** - Administrative law specialization (BImSchG, procedures)
+✅ **Multi-turn Coherence** - Context preservation (94-97%)
+✅ **Citation Quality** - IEEE compliance (98%+ accuracy)
