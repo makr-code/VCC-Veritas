@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>VERITAS Benchmark Report</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 32px;
+        }
+        .header p {
+            margin: 5px 0 0 0;
+            opacity: 0.9;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .metric {
+            display: inline-block;
+            margin-right: 20px;
+            margin-bottom: 10px;
+        }
+        .metric-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+        }
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-bottom: 30px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .badge-pass {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .badge-fail {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .badge-error {
+            background-color: #f5c6cb;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>VERITAS Benchmark Report</h1>
+        <p>System: VERITAS v3.0.0</p>
+        <p>Generated: 2025-12-04T08:23:51.486151</p>
+    </div>
+
+    <div class="card">
+        <h2>Summary</h2>
+
+        <div>
+            <div class="metric">
+                <div class="metric-label">Total Benchmarks</div>
+                <div class="metric-value">138</div>
+            </div>
+            <div class="metric">
+                <div class="metric-label">Passed</div>
+                <div class="metric-value" style="color: #28a745;">138</div>
+            </div>
+            <div class="metric">
+                <div class="metric-label">Failed</div>
+                <div class="metric-value" style="color: #dc3545;">0</div>
+            </div>
+            <div class="metric">
+                <div class="metric-label">Pass Rate</div>
+                <div class="metric-value" style="color: #007bff;">100.0%</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Performance by Category</h2>
+        <div class="chart-container">
+            <canvas id="categoryChart"></canvas>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Tests</th>
+                    <th>Mean (ms)</th>
+                    <th>Median (ms)</th>
+                    <th>Min (ms)</th>
+                    <th>Max (ms)</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr>
+                    <td>Admin Law</td>
+                    <td>30</td>
+                    <td>95.70</td>
+                    <td>96.00</td>
+                    <td>92.00</td>
+                    <td>99.00</td>
+                </tr>
+
+                <tr>
+                    <td>Content Quality</td>
+                    <td>21</td>
+                    <td>96.22</td>
+                    <td>97.00</td>
+                    <td>77.57</td>
+                    <td>99.00</td>
+                </tr>
+
+                <tr>
+                    <td>End To End</td>
+                    <td>11</td>
+                    <td>145.71</td>
+                    <td>94.00</td>
+                    <td>91.00</td>
+                    <td>667.76</td>
+                </tr>
+
+                <tr>
+                    <td>Inference</td>
+                    <td>22</td>
+                    <td>136.65</td>
+                    <td>94.00</td>
+                    <td>90.00</td>
+                    <td>1019.64</td>
+                </tr>
+
+                <tr>
+                    <td>Multi Turn</td>
+                    <td>20</td>
+                    <td>93.50</td>
+                    <td>93.50</td>
+                    <td>90.00</td>
+                    <td>97.00</td>
+                </tr>
+
+                <tr>
+                    <td>Retrieval</td>
+                    <td>22</td>
+                    <td>93.31</td>
+                    <td>94.50</td>
+                    <td>58.24</td>
+                    <td>112.66</td>
+                </tr>
+
+                <tr>
+                    <td>Streaming</td>
+                    <td>12</td>
+                    <td>87.09</td>
+                    <td>100.00</td>
+                    <td>9.97</td>
+                    <td>100.00</td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h2>Detailed Results</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Test</th>
+                    <th>Metric</th>
+                    <th>Value</th>
+                    <th>Unit</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr>
+                    <td>vector_search_latency</td>
+                    <td>Latency Ms</td>
+                    <td>112.66</td>
+                    <td>ms</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>keyword_search_latency</td>
+                    <td>Latency Ms</td>
+                    <td>58.24</td>
+                    <td>ms</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>retrieval_recall_5_0</td>
+                    <td>Recall</td>
+                    <td>92.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>retrieval_recall_5_1</td>
+                    <td>Recall</td>
+                    <td>94.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>retrieval_recall_5_2</td>
+                    <td>Recall</td>
+                    <td>91.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>retrieval_recall_5_3</td>
+                    <td>Recall</td>
+                    <td>93.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>retrieval_recall_5_4</td>
+                    <td>Recall</td>
+                    <td>95.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>retrieval_recall_5_5</td>
+                    <td>Recall</td>
+                    <td>90.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>retrieval_recall_5_6</td>
+                    <td>Recall</td>
+                    <td>94.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>retrieval_recall_5_7</td>
+                    <td>Recall</td>
+                    <td>92.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>retrieval_recall_5_8</td>
+                    <td>Recall</td>
+                    <td>93.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>retrieval_recall_5_9</td>
+                    <td>Recall</td>
+                    <td>91.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>retrieval_precision_5_0</td>
+                    <td>Precision</td>
+                    <td>96.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>retrieval_precision_5_1</td>
+                    <td>Precision</td>
+                    <td>95.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>retrieval_precision_5_2</td>
+                    <td>Precision</td>
+                    <td>97.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>retrieval_precision_5_3</td>
+                    <td>Precision</td>
+                    <td>94.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>retrieval_precision_5_4</td>
+                    <td>Precision</td>
+                    <td>96.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>retrieval_precision_5_5</td>
+                    <td>Precision</td>
+                    <td>95.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>retrieval_precision_5_6</td>
+                    <td>Precision</td>
+                    <td>97.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>retrieval_precision_5_7</td>
+                    <td>Precision</td>
+                    <td>96.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>retrieval_precision_5_8</td>
+                    <td>Precision</td>
+                    <td>95.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>retrieval_precision_5_9</td>
+                    <td>Precision</td>
+                    <td>96.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>time_to_first_token</td>
+                    <td>Latency Ms</td>
+                    <td>116.66</td>
+                    <td>ms</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>total_generation_time</td>
+                    <td>Latency Ms</td>
+                    <td>1019.64</td>
+                    <td>ms</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>inference_accuracy_0</td>
+                    <td>Accuracy</td>
+                    <td>94.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>inference_accuracy_1</td>
+                    <td>Accuracy</td>
+                    <td>96.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>inference_accuracy_2</td>
+                    <td>Accuracy</td>
+                    <td>93.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>inference_accuracy_3</td>
+                    <td>Accuracy</td>
+                    <td>95.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>inference_accuracy_4</td>
+                    <td>Accuracy</td>
+                    <td>97.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>inference_accuracy_5</td>
+                    <td>Accuracy</td>
+                    <td>92.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>inference_accuracy_6</td>
+                    <td>Accuracy</td>
+                    <td>96.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>inference_accuracy_7</td>
+                    <td>Accuracy</td>
+                    <td>94.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>inference_accuracy_8</td>
+                    <td>Accuracy</td>
+                    <td>95.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>inference_accuracy_9</td>
+                    <td>Accuracy</td>
+                    <td>93.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>inference_coherence_0</td>
+                    <td>Coherence Score</td>
+                    <td>92.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>inference_coherence_1</td>
+                    <td>Coherence Score</td>
+                    <td>94.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>inference_coherence_2</td>
+                    <td>Coherence Score</td>
+                    <td>91.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>inference_coherence_3</td>
+                    <td>Coherence Score</td>
+                    <td>93.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>inference_coherence_4</td>
+                    <td>Coherence Score</td>
+                    <td>95.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>inference_coherence_5</td>
+                    <td>Coherence Score</td>
+                    <td>90.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>inference_coherence_6</td>
+                    <td>Coherence Score</td>
+                    <td>94.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>inference_coherence_7</td>
+                    <td>Coherence Score</td>
+                    <td>92.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>inference_coherence_8</td>
+                    <td>Coherence Score</td>
+                    <td>93.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>inference_coherence_9</td>
+                    <td>Coherence Score</td>
+                    <td>91.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>sse_connection_setup</td>
+                    <td>Latency Ms</td>
+                    <td>35.27</td>
+                    <td>ms</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>sse_event_emission</td>
+                    <td>Latency Ms</td>
+                    <td>9.97</td>
+                    <td>ms</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>sse_reliability_0</td>
+                    <td>Accuracy</td>
+                    <td>100.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>sse_reliability_1</td>
+                    <td>Accuracy</td>
+                    <td>100.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>sse_reliability_2</td>
+                    <td>Accuracy</td>
+                    <td>99.90</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+                <tr>
+                    <td>sse_reliability_3</td>
+                    <td>Accuracy</td>
+                    <td>100.00</td>
+                    <td>%</td>
+                    <td><span class="badge badge-pass">✓ Pass</span></td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Category chart
+        const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+        new Chart(categoryCtx, {
+            type: 'bar',
+            data: {
+                labels: [
+'Admin Law',
+'Content Quality',
+'End To End',
+'Inference',
+'Multi Turn',
+'Retrieval',
+'Streaming',
+
+                ],
+                datasets: [{
+                    label: 'Mean Latency (ms)',
+                    data: [
+95.70,
+96.22,
+145.71,
+136.65,
+93.50,
+93.31,
+87.09,
+
+                    ],
+                    backgroundColor: 'rgba(102, 126, 234, 0.6)',
+                    borderColor: 'rgba(102, 126, 234, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Latency (ms)'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
