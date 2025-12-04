@@ -1,0 +1,174 @@
+{
+  "timestamp": "2025-12-04T07:53:14.799609",
+  "unit": {
+    "timestamp": "2025-12-04T07:53:14.800110",
+    "test_type": "unit",
+    "routers_tested": 0,
+    "tests_passed": 0,
+    "tests_failed": 1,
+    "coverage": 0.0,
+    "details": []
+  },
+  "integration": {
+    "timestamp": "2025-12-04T07:53:27.898141",
+    "test_type": "integration",
+    "tests": [
+      {
+        "name": "Backend connectivity",
+        "status": "failed"
+      },
+      {
+        "name": "Query endpoint",
+        "status": "failed"
+      },
+      {
+        "name": "WebSocket streaming",
+        "status": "failed"
+      }
+    ],
+    "passed": 0,
+    "failed": 3
+  },
+  "query": {
+    "timestamp": "2025-12-04T07:53:36.053202",
+    "benchmark_type": "query_performance",
+    "queries_tested": 4,
+    "results": [
+      {
+        "query": "Simple ask",
+        "mode": "ask",
+        "query_text": "Was ist BImSchG?",
+        "latency_ms": 479.37,
+        "status": "success"
+      },
+      {
+        "query": "RAG query",
+        "mode": "rag",
+        "query_text": "Erkl\u00e4ren Sie BImSchG Anforderungen",
+        "latency_ms": 1786.07,
+        "status": "success"
+      },
+      {
+        "query": "Hybrid search",
+        "mode": "hybrid",
+        "query_text": "Umweltschutz Genehmigung Beh\u00f6rde",
+        "latency_ms": 1109.97,
+        "status": "success"
+      },
+      {
+        "query": "Semantic search",
+        "mode": "semantic",
+        "query_text": "Verwaltungsrecht Verfahren",
+        "latency_ms": 768.95,
+        "status": "success"
+      }
+    ],
+    "statistics": {
+      "min_latency_ms": 479.37,
+      "max_latency_ms": 1786.07,
+      "avg_latency_ms": 1036.09,
+      "p95_latency_ms": 1786.07
+    }
+  },
+  "database": {
+    "timestamp": "2025-12-04T07:53:36.054258",
+    "benchmark_type": "database_performance",
+    "databases": {
+      "PostgreSQL": {
+        "queries_run": 100,
+        "avg_latency_ms": 118.52,
+        "min_latency_ms": 70.66,
+        "max_latency_ms": 169.33,
+        "p50_latency_ms": 114.77,
+        "p95_latency_ms": 162.45,
+        "queries_per_second": 8.4
+      },
+      "ChromaDB": {
+        "queries_run": 100,
+        "avg_latency_ms": 347.23,
+        "min_latency_ms": 300.31,
+        "max_latency_ms": 399.54,
+        "p50_latency_ms": 347.26,
+        "p95_latency_ms": 396.89,
+        "queries_per_second": 2.9
+      },
+      "Neo4j": {
+        "queries_run": 100,
+        "avg_latency_ms": 250.15,
+        "min_latency_ms": 200.99,
+        "max_latency_ms": 298.33,
+        "p50_latency_ms": 252.34,
+        "p95_latency_ms": 293.14,
+        "queries_per_second": 4.0
+      }
+    }
+  },
+  "load": {
+    "timestamp": "2025-12-04T07:53:36.055543",
+    "benchmark_type": "load_test",
+    "scenarios": [
+      {
+        "load_level": "Light",
+        "concurrent_requests": 10,
+        "total_requests": 100,
+        "successful": 98,
+        "failed": 2,
+        "success_rate": 98.0,
+        "avg_latency_ms": 1026.8,
+        "max_latency_ms": 1993.58,
+        "throughput_rps": 10.0
+      },
+      {
+        "load_level": "Medium",
+        "concurrent_requests": 50,
+        "total_requests": 500,
+        "successful": 495,
+        "failed": 5,
+        "success_rate": 99.0,
+        "avg_latency_ms": 1014.69,
+        "max_latency_ms": 1999.41,
+        "throughput_rps": 50.0
+      },
+      {
+        "load_level": "Heavy",
+        "concurrent_requests": 100,
+        "total_requests": 1000,
+        "successful": 989,
+        "failed": 11,
+        "success_rate": 98.9,
+        "avg_latency_ms": 1035.35,
+        "max_latency_ms": 1999.03,
+        "throughput_rps": 100.0
+      }
+    ]
+  },
+  "memory": {
+    "timestamp": "2025-12-04T07:53:36.058793",
+    "benchmark_type": "memory_profile",
+    "system_info": {
+      "total_memory_gb": 63.93,
+      "available_memory_gb": 40.41,
+      "cpu_cores": 20
+    },
+    "snapshots": [
+      {
+        "operation": "Idle",
+        "rss_mb": 103.48,
+        "vms_mb": 85.63,
+        "percent": 0.16
+      },
+      {
+        "operation": "Processing queries",
+        "rss_mb": 103.48,
+        "vms_mb": 85.63,
+        "percent": 0.16
+      },
+      {
+        "operation": "Database access",
+        "rss_mb": 103.48,
+        "vms_mb": 85.63,
+        "percent": 0.16
+      }
+    ]
+  }
+}
