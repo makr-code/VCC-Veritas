@@ -1,33 +1,369 @@
-# VERITAS Authentication Guide
+# VERITAS API - Authentication Guide
 
-**Status:** ✅ COMPLETE - Production Ready
-**Date:** 22. Oktober 2025
 **Version:** 1.0.0
+**Last Updated:** 2025-10-08
+**Status:** Production Ready
 
 ---
 
-## 📋 Overview
+## Table of Contents
 
-VERITAS now implements **OAuth2 Password Flow with JWT tokens** and **Role-Based Access Control (RBAC)**.
-
-**Features:**
-- ✅ OAuth2 password flow (RFC 6749)
-- ✅ JWT tokens with HS256 signing (RFC 7519)
-- ✅ Role-based access control (4 roles)
-- ✅ Bcrypt password hashing
-- ✅ Development mode support
-- ✅ 100% test coverage (10/10 tests passed)
+1. [Overview](#overview)
+2. [Authentication Methods](#authentication-methods)
+3. [JWT Token Authentication](#jwt-token-authentication)
+4. [API Key Authentication](#api-key-authentication)
+5. [OAuth 2.0 Integration](#oauth-20-integration)
+6. [Role-Based Access Control (RBAC)](#role-based-access-control-rbac)
+7. [Code Examples](#code-examples)
+8. [Security Best Practices](#security-best-practices)
+9. [Troubleshooting](#troubleshooting)
 
 ---
 
-## 🔐 Authentication Endpoints
+## Overview
 
-### 1. POST /auth/token - Login
+The VERITAS API supports three authentication methods:
+
+1. **JWT (JSON Web Tokens)** - Primary method for user authentication
+2. **API Keys** - For service-to-service authentication
+3. **OAuth 2.0** - For third-party integrations
+
+All authenticated requests must include credentials in the request headers. Unauthenticated requests are rate-limited to 100 requests per minute.
+
+---
+
+## Authentication Methods
+
+### Comparison
+
+| Method | Use Case | Expiration | Renewal |
+|--------|----------|------------|---------|
+| **JWT** | User authentication | 1 hour (access), 30 days (refresh) | Automatic via refresh token |
+| **API Key** | Service-to-service | 1 year (configurable) | Manual regeneration |
+| **OAuth 2.0** | Third-party apps | Varies by flow | Token refresh endpoint |
+
+---
+
+## JWT Token Authentication
+
+### How It Works
+
+1. User logs in with credentials (username/email + password)
+2. Server validates credentials and returns JWT tokens
+3. Client includes access token in subsequent requests
+4. When access token expires, use refresh token to get new tokens
+5. When refresh token expires, user must log in again
+
+### Token Structure
+
+**Access Token:**
+```json
+{
+  "alg": "HS256",
+  "typ": "JWT"
+}
+{
+  "sub": "user@example.com",
+  "user_id": "user_123",
+  "role": "user",
+  "permissions": ["read", "write", "agents:execute"],
+  "exp": 1728396000,
+  "iat": 1728392400,
+  "jti": "token_abc123"
+}
+```
+
+**Refresh Token:**
+```json
+{
+  "alg": "HS256",
+  "typ": "JWT"
+}
+{
+  "sub": "user@example.com",
+  "user_id": "user_123",
+  "type": "refresh",
+  "exp": 1730988000,
+  "iat": 1728392400,
+  "jti": "refresh_xyz789"
+}
+```
+
+### Login Endpoint
+
+**POST** `/auth/login`
 
 **Request:**
-```bash
-curl -X POST http://localhost:5000/auth/token \
-  -d "username=admin&password=admin123"
+```json
+{
+  "username": "user@example.com",
+  "password": "your-secure-password"
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "bearer",
+  "expires_in": 3600,
+  "user": {
+    "id": "user_123",
+    "username": "user@example.com",
+    "email": "user@example.com",
+    "role": "user",
+    "permissions": ["read", "write", "agents:execute"],
+    "created_at": "2025-01-01T00:00:00Z"
+  }
+}
+```
+
+**Error Response (401 Unauthorized):**
+```json
+{
+  "error": {
+    "code": "AUTHENTICATION_FAILED",
+    "message": "Invalid username or password",
+    "timestamp": "2025-10-08T14:30:00Z",
+    "request_id": "req_abc123"
+  }
+}
+```
+
+### Using Access Tokens
+
+Include the access token in the `Authorization` header:
+
+```http
+GET /agents/status HTTP/1.1
+Host: api.veritas.example.com
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+### Refresh Tokens
+
+**POST** `/auth/refresh`
+
+**Request:**
+```json
+{
+  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "bearer",
+  "expires_in": 3600
+}
+```
+
+### Logout
+
+**POST** `/auth/logout`
+
+**Headers:**
+```http
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Response (200 OK):**
+```json
+{
+  "message": "Successfully logged out",
+  "timestamp": "2025-10-08T14:30:00Z"
+}
+```
+
+---
+
+## API Key Authentication
+
+### Overview
+
+API keys are designed for:
+- Service-to-service authentication
+- Automated scripts and cron jobs
+- Long-lived integrations
+- Applications without interactive users
+
+### Creating API Keys
+
+**POST** `/auth/api-keys`
+
+**Headers:**
+```http
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+**Request:**
+```json
+{
+  "name": "Production Server Integration",
+  "description": "API key for production backend service",
+  "permissions": ["read", "write", "agents:execute"],
+  "expires_in_days": 365
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "api_key": "vrt_live_abc123xyz789...",
+  "key_id": "key_001",
+  "name": "Production Server Integration",
+  "permissions": ["read", "write", "agents:execute"],
+  "created_at": "2025-10-08T14:30:00Z",
+  "expires_at": "2026-10-08T14:30:00Z",
+  "last_used": null
+}
+```
+
+⚠️ **Important:** The full API key is only shown once at creation time. Store it securely!
+
+### Using API Keys
+
+Include the API key in the `X-API-Key` header:
+
+```http
+GET /agents/status HTTP/1.1
+Host: api.veritas.example.com
+X-API-Key: vrt_live_abc123xyz789...
+```
+
+### Managing API Keys
+
+**List API Keys:**
+```http
+GET /auth/api-keys
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+**Response:**
+```json
+{
+  "api_keys": [
+    {
+      "key_id": "key_001",
+      "name": "Production Server Integration",
+      "permissions": ["read", "write", "agents:execute"],
+      "created_at": "2025-10-08T14:30:00Z",
+      "expires_at": "2026-10-08T14:30:00Z",
+      "last_used": "2025-10-08T15:45:00Z"
+    }
+  ],
+  "total": 1
+}
+```
+
+**Revoke API Key:**
+```http
+DELETE /auth/api-keys/{key_id}
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+**Response:**
+```json
+{
+  "message": "API key revoked successfully",
+  "key_id": "key_001"
+}
+```
+
+### API Key Security
+
+- **Prefix:** All API keys start with `vrt_live_` (production) or `vrt_test_` (testing)
+- **Storage:** Keys are hashed (SHA-256) before storage
+- **Rotation:** Recommended rotation every 90 days
+- **Scoping:** Keys can be scoped to specific permissions
+- **Monitoring:** All API key usage is logged and audited
+
+---
+
+## OAuth 2.0 Integration
+
+### Overview
+
+OAuth 2.0 is used for third-party application integrations. VERITAS supports the **Authorization Code Flow** with PKCE.
+
+### Authorization Code Flow
+
+#### Step 1: Authorization Request
+
+Redirect user to authorization endpoint:
+
+```http
+GET /oauth/authorize?
+  response_type=code&
+  client_id=YOUR_CLIENT_ID&
+  redirect_uri=https://yourapp.com/callback&
+  scope=read write agents:execute&
+  state=random_state_string&
+  code_challenge=BASE64URL(SHA256(code_verifier))&
+  code_challenge_method=S256
+```
+
+**Parameters:**
+- `response_type`: Always `code`
+- `client_id`: Your application's client ID
+- `redirect_uri`: Where to redirect after authorization
+- `scope`: Space-separated list of requested permissions
+- `state`: Random string to prevent CSRF attacks
+- `code_challenge`: SHA-256 hash of code verifier (PKCE)
+- `code_challenge_method`: Always `S256`
+
+#### Step 2: User Authorization
+
+User logs in and authorizes your application. They are redirected to:
+
+```
+https://yourapp.com/callback?
+  code=AUTH_CODE&
+  state=random_state_string
+```
+
+#### Step 3: Token Exchange
+
+Exchange authorization code for access token:
+
+**POST** `/oauth/token`
+
+**Request:**
+```http
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=authorization_code&
+code=AUTH_CODE&
+client_id=YOUR_CLIENT_ID&
+redirect_uri=https://yourapp.com/callback&
+code_verifier=ORIGINAL_CODE_VERIFIER
+```
+
+**Response:**
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "bearer",
+  "expires_in": 3600,
+  "scope": "read write agents:execute"
+}
+```
+
+#### Step 4: Refresh Token
+
+**POST** `/oauth/refresh`
+
+**Request:**
+```http
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=refresh_token&
+refresh_token=REFRESH_TOKEN&
+client_id=YOUR_CLIENT_ID
 ```
 
 **Response:**
@@ -35,410 +371,538 @@ curl -X POST http://localhost:5000/auth/token \
 {
   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "token_type": "bearer",
-  "expires_in": 1800
+  "expires_in": 3600
 }
 ```
 
-### 2. GET /auth/me - Current User Info
+### Registering OAuth Applications
+
+**POST** `/oauth/apps`
+
+**Headers:**
+```http
+Authorization: Bearer YOUR_JWT_TOKEN
+```
 
 **Request:**
-```bash
-curl -H "Authorization: Bearer <token>" \
-  http://localhost:5000/auth/me
+```json
+{
+  "name": "My Application",
+  "redirect_uris": [
+    "https://myapp.com/callback",
+    "https://myapp.com/oauth/callback"
+  ],
+  "scopes": ["read", "write", "agents:execute"],
+  "description": "My awesome integration with VERITAS"
+}
 ```
 
 **Response:**
 ```json
 {
-  "username": "admin",
-  "full_name": "Admin User",
-  "email": "admin@veritas.local",
-  "disabled": false,
-  "roles": ["admin", "manager", "user"]
-}
-```
-
-### 3. GET /auth/status - Auth System Status
-
-**Request:**
-```bash
-curl http://localhost:5000/auth/status
-```
-
-**Response:**
-```json
-{
-  "enabled": true,
-  "method": "OAuth2 Password Flow with JWT tokens",
-  "algorithm": "HS256",
-  "token_expire_minutes": 30,
-  "rbac": {
-    "roles": ["admin", "manager", "user", "guest"],
-    "description": "Role-Based Access Control enabled"
-  }
+  "client_id": "app_abc123",
+  "client_secret": "secret_xyz789",
+  "name": "My Application",
+  "redirect_uris": ["https://myapp.com/callback"],
+  "scopes": ["read", "write", "agents:execute"],
+  "created_at": "2025-10-08T14:30:00Z"
 }
 ```
 
 ---
 
-## 👥 Default Users
+## Role-Based Access Control (RBAC)
 
-| Username | Password | Roles | Description |
-|----------|----------|-------|-------------|
-| `admin` | `admin123` | admin, manager, user | Full system access |
-| `user` | `user123` | user | Regular user access |
-| `guest` | `guest123` | guest | Read-only access |
+### Roles
 
-**⚠️ IMPORTANT:** Change passwords in production!
+| Role | Description | Default Permissions |
+|------|-------------|---------------------|
+| **admin** | Full system access | All permissions |
+| **manager** | Manage agents and quality | read, write, agents:*, quality:* |
+| **user** | Standard user | read, write, agents:execute |
+| **viewer** | Read-only access | read |
 
----
+### Permissions
 
-## 🎭 Roles & Permissions
+| Permission | Description | Required Role |
+|------------|-------------|---------------|
+| `read` | Read resources | All roles |
+| `write` | Create/update resources | user, manager, admin |
+| `delete` | Delete resources | manager, admin |
+| `agents:execute` | Execute agent plans | user, manager, admin |
+| `agents:manage` | Manage agent configurations | manager, admin |
+| `quality:read` | Read quality metrics | All roles |
+| `quality:write` | Update quality settings | manager, admin |
+| `monitoring:read` | Read monitoring data | All roles |
+| `monitoring:write` | Update monitoring configs | admin |
+| `users:manage` | Manage users | admin |
+| `system:admin` | System administration | admin |
 
-### Role Hierarchy
+### Permission Checking
 
-```
-admin     - Full system access (all operations)
-  ├─ manager  - User management + data operations
-  │   └─ user     - Standard data operations
-  │       └─ guest   - Read-only access
-```
-
-### Role Definitions
-
-- **admin:** System administration, user management, all operations
-- **manager:** User management, data modification, reports
-- **user:** Query data, create content, limited modifications
-- **guest:** Read-only access, view public data
-
----
-
-## 🔧 Configuration
-
-### Environment Variables (.env)
-
-```bash
-# JWT Configuration
-JWT_SECRET_KEY=ee3cbfc97fd32c0d9131eccd7bd83aa7314963def48446dd735e6c4605dfbe12
-JWT_ALGORITHM=HS256
-JWT_ACCESS_TOKEN_EXPIRE_MINUTES=30
-
-# Authentication Feature Flag
-ENABLE_AUTH=true  # Set to false for development mode
-```
-
-### Development Mode
-
-When `ENABLE_AUTH=false`:
-- All requests accepted without authentication
-- Returns a default `dev_admin` user with full permissions
-- Useful for testing and development
-
-### Production Mode
-
-When `ENABLE_AUTH=true`:
-- All protected endpoints require valid JWT token
-- Invalid/missing tokens return 401 Unauthorized
-- Role enforcement active
-
----
-
-## 🛡️ Protecting Endpoints
-
-### Using Dependencies
+Permissions are checked automatically for protected endpoints:
 
 ```python
-from fastapi import APIRouter, Depends
-from backend.security.auth import (
-    require_admin,
-    require_manager,
-    require_user,
-    require_guest,
-    User
-)
+from fastapi import Depends
+from backend.api.security import require_permission
 
-router = APIRouter()
-
-@router.get("/admin-only")
-async def admin_endpoint(user: User = Depends(require_admin)):
-    """Only accessible by admin role"""
-    return {"message": f"Hello admin {user.username}"}
-
-@router.get("/user-data")
-async def user_endpoint(user: User = Depends(require_user)):
-    """Accessible by admin, manager, and user roles"""
-    return {"message": f"Hello {user.username}"}
+@app.post("/agents/execute")
+async def execute_agents(
+    user: User = Depends(require_permission("agents:execute"))
+):
+    # Only users with agents:execute permission can access
+    ...
 ```
 
-### Available Dependencies
+### Custom Roles
 
-- `require_admin` - Requires admin role
-- `require_manager` - Requires admin or manager role
-- `require_user` - Requires admin, manager, or user role
-- `require_guest` - Requires any role (admin, manager, user, or guest)
-- `get_current_user` - Get current user (any authenticated user)
-- `get_optional_user` - Optional authentication (returns None if no token)
+Create custom roles via the API:
 
----
+**POST** `/auth/roles`
 
-## 🧪 Testing
-
-### Run Test Suite
-
-```bash
-python tests/test_auth.py
-```
-
-### Test Results (Latest Run)
-
-```
-Total Tests: 10
-Passed: 10
-Failed: 0
-Success Rate: 100.0%
-
-🎉 ALL TESTS PASSED!
-```
-
-### Manual Testing
-
-```bash
-# 1. Start backend
-python start_backend.py
-
-# 2. Test login
-curl -X POST http://localhost:5000/auth/token \
-  -d "username=admin&password=admin123"
-
-# 3. Save token
-export TOKEN="<access_token_from_step_2>"
-
-# 4. Test protected endpoint
-curl -H "Authorization: Bearer $TOKEN" \
-  http://localhost:5000/auth/me
-
-# 5. Test invalid credentials
-curl -X POST http://localhost:5000/auth/token \
-  -d "username=admin&password=wrongpassword"
-# Expected: 401 Unauthorized
-
-# 6. Test missing token
-curl http://localhost:5000/auth/me
-# Expected: 401 Unauthorized (if ENABLE_AUTH=true)
+**Request:**
+```json
+{
+  "name": "analyst",
+  "description": "Data analyst role",
+  "permissions": [
+    "read",
+    "agents:execute",
+    "quality:read",
+    "monitoring:read"
+  ]
+}
 ```
 
 ---
 
-## 📁 File Structure
+## Code Examples
 
-```
-backend/
-├── security/
-│   ├── __init__.py              # Package init (empty)
-│   └── auth.py                  # OAuth2/JWT implementation (300+ lines)
-│       ├── Role enum (4 roles)
-│       ├── User models
-│       ├── Password hashing (bcrypt)
-│       ├── JWT token creation/validation
-│       ├── RBAC dependencies
-│       └── Default user database
-│
-├── api/
-│   └── auth_endpoints.py        # Authentication endpoints (150+ lines)
-│       ├── POST /auth/token
-│       ├── GET /auth/me
-│       └── GET /auth/status
-│
-└── app.py                       # Main backend (auth router mounted)
+### Python
 
-tests/
-└── test_auth.py                 # Test suite (385 lines, 10 tests)
-
-.env                             # Environment configuration
-```
-
----
-
-## 🔐 Security Features
-
-### Password Security
-
-- **Hashing:** bcrypt with automatic salt
-- **Algorithm:** bcrypt with cost factor 12
-- **Storage:** Only hashed passwords stored
-- **Validation:** Constant-time comparison
-
-### Token Security
-
-- **Algorithm:** HS256 (HMAC-SHA256)
-- **Secret Key:** 256-bit random key
-- **Expiration:** 30 minutes (configurable)
-- **Claims:** username (sub), roles, exp, iat
-
-### Protection Mechanisms
-
-- **Invalid credentials:** 401 Unauthorized
-- **Missing token:** 401 Unauthorized
-- **Expired token:** 401 Unauthorized
-- **Invalid token:** 401 Unauthorized
-- **Insufficient permissions:** 403 Forbidden
-
----
-
-## 🚀 Next Steps (Phase 1 Remaining)
-
-### Task 3: HTTPS Enforcement (1 day)
-- Copy `tls.py` from Covina
-- Add HTTPS redirect middleware
-- Add HSTS headers
-- Test with PKI certificates
-
-### Task 4: Secrets Encryption (2-3 days)
-- Implement Windows DPAPI
-- Migrate .env to encrypted storage
-- Update backend to use SecretManager
-
-### Task 5: Connection Pooling (2-3 days)
-- Implement PostgreSQL connection pool
-- Expected: -50%+ latency, +50-80% throughput
-
-### Task 6: Basic Observability (2-3 days)
-- Add Prometheus metrics
-- Implement PII redaction
-- Mount /metrics endpoint
-
----
-
-## 📊 Implementation Summary
-
-**Time Investment:** ~4 hours
-**Lines of Code:** ~800 lines
-**Test Coverage:** 100% (10/10 tests)
-**Production Ready:** ✅ Yes
-**Security Rating:** 4.0/5
-
-**Created Files:**
-- `backend/security/auth.py` (300+ lines)
-- `backend/api/auth_endpoints.py` (150+ lines)
-- `tests/test_auth.py` (385 lines)
-- `.env` updated (JWT config)
-- `backend/app.py` updated (router mount)
-
-**Dependencies Added:**
-- `python-jose[cryptography]` (JWT handling)
-- `bcrypt` (password hashing)
-- `python-multipart` (OAuth2 forms)
-- `python-dotenv` (environment loading)
-
----
-
-## 📝 Usage Examples
-
-### Python Client Example
+#### Login and Execute Agent Plan
 
 ```python
 import requests
 
-# Login
-response = requests.post(
-    "http://localhost:5000/auth/token",
-    data={
-        "username": "admin",
-        "password": "admin123"
-    }
-)
-token = response.json()["access_token"]
+# Configuration
+API_BASE = "https://api.veritas.example.com"
+USERNAME = "user@example.com"
+PASSWORD = "your-password"
 
-# Make authenticated request
-headers = {"Authorization": f"Bearer {token}"}
-response = requests.get(
-    "http://localhost:5000/auth/me",
+# 1. Login
+login_response = requests.post(
+    f"{API_BASE}/auth/login",
+    json={"username": USERNAME, "password": PASSWORD}
+)
+login_response.raise_for_status()
+tokens = login_response.json()
+
+access_token = tokens["access_token"]
+refresh_token = tokens["refresh_token"]
+
+# 2. Create headers with token
+headers = {
+    "Authorization": f"Bearer {access_token}",
+    "Content-Type": "application/json"
+}
+
+# 3. Execute agent plan
+plan_request = {
+    "plan_id": "plan_001",
+    "agents": ["financial", "environmental"],
+    "query": "Analyze sustainability impact",
+    "streaming": False
+}
+
+execute_response = requests.post(
+    f"{API_BASE}/agents/execute",
+    json=plan_request,
     headers=headers
 )
-user = response.json()
-print(f"Logged in as: {user['username']}")
+execute_response.raise_for_status()
+result = execute_response.json()
+
+print(f"Plan Status: {result['status']}")
+print(f"Quality Score: {result['quality_score']}")
+
+# 4. Refresh token when needed
+def refresh_access_token(refresh_token):
+    response = requests.post(
+        f"{API_BASE}/auth/refresh",
+        json={"refresh_token": refresh_token}
+    )
+    response.raise_for_status()
+    return response.json()["access_token"]
 ```
 
-### JavaScript/TypeScript Example
+#### Using API Keys
 
-```typescript
-// Login
-const loginResponse = await fetch('http://localhost:5000/auth/token', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/x-www-form-urlencoded',
-  },
-  body: new URLSearchParams({
-    username: 'admin',
-    password: 'admin123',
-  }),
-});
-const { access_token } = await loginResponse.json();
+```python
+import requests
 
-// Make authenticated request
-const userResponse = await fetch('http://localhost:5000/auth/me', {
-  headers: {
-    'Authorization': `Bearer ${access_token}`,
-  },
-});
-const user = await userResponse.json();
-console.log(`Logged in as: ${user.username}`);
+API_BASE = "https://api.veritas.example.com"
+API_KEY = "vrt_live_abc123xyz789..."
+
+headers = {
+    "X-API-Key": API_KEY,
+    "Content-Type": "application/json"
+}
+
+# Execute agent plan with API key
+response = requests.post(
+    f"{API_BASE}/agents/execute",
+    json={
+        "plan_id": "plan_002",
+        "agents": ["social"],
+        "query": "Community impact analysis"
+    },
+    headers=headers
+)
+
+print(response.json())
+```
+
+### JavaScript/TypeScript
+
+#### Login and Token Management
+
+```javascript
+const API_BASE = 'https://api.veritas.example.com';
+
+class VeritasClient {
+  constructor() {
+    this.accessToken = null;
+    this.refreshToken = null;
+  }
+
+  async login(username, password) {
+    const response = await fetch(`${API_BASE}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Login failed: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    this.accessToken = data.access_token;
+    this.refreshToken = data.refresh_token;
+
+    return data.user;
+  }
+
+  async refreshAccessToken() {
+    const response = await fetch(`${API_BASE}/auth/refresh`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refresh_token: this.refreshToken })
+    });
+
+    if (!response.ok) {
+      throw new Error('Token refresh failed');
+    }
+
+    const data = await response.json();
+    this.accessToken = data.access_token;
+  }
+
+  async request(endpoint, options = {}) {
+    const headers = {
+      'Authorization': `Bearer ${this.accessToken}`,
+      'Content-Type': 'application/json',
+      ...options.headers
+    };
+
+    let response = await fetch(`${API_BASE}${endpoint}`, {
+      ...options,
+      headers
+    });
+
+    // Auto-refresh on 401
+    if (response.status === 401) {
+      await this.refreshAccessToken();
+      headers['Authorization'] = `Bearer ${this.accessToken}`;
+      response = await fetch(`${API_BASE}${endpoint}`, {
+        ...options,
+        headers
+      });
+    }
+
+    if (!response.ok) {
+      throw new Error(`Request failed: ${response.statusText}`);
+    }
+
+    return response.json();
+  }
+
+  async executeAgents(planRequest) {
+    return this.request('/agents/execute', {
+      method: 'POST',
+      body: JSON.stringify(planRequest)
+    });
+  }
+}
+
+// Usage
+const client = new VeritasClient();
+
+async function main() {
+  // Login
+  const user = await client.login('user@example.com', 'password');
+  console.log('Logged in as:', user.username);
+
+  // Execute agents
+  const result = await client.executeAgents({
+    plan_id: 'plan_003',
+    agents: ['financial', 'environmental'],
+    query: 'Sustainability analysis',
+    streaming: false
+  });
+
+  console.log('Execution result:', result);
+}
+
+main().catch(console.error);
+```
+
+### cURL
+
+#### Login
+
+```bash
+curl -X POST https://api.veritas.example.com/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "user@example.com",
+    "password": "your-password"
+  }'
+```
+
+#### Execute with JWT
+
+```bash
+# Save token to variable
+TOKEN="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+# Execute agent plan
+curl -X POST https://api.veritas.example.com/agents/execute \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "plan_id": "plan_004",
+    "agents": ["financial"],
+    "query": "Financial analysis"
+  }'
+```
+
+#### Execute with API Key
+
+```bash
+curl -X POST https://api.veritas.example.com/agents/execute \
+  -H "X-API-Key: vrt_live_abc123xyz789..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "plan_id": "plan_005",
+    "agents": ["social"],
+    "query": "Social impact"
+  }'
 ```
 
 ---
 
-## ⚠️ Important Notes
+## Security Best Practices
 
-### Production Deployment
+### 1. Token Storage
 
-1. **Change Default Passwords:**
-   - Update passwords in `backend/security/auth.py`
-   - Or migrate to database-backed user management
+**❌ Don't:**
+- Store tokens in localStorage (XSS vulnerable)
+- Include tokens in URL parameters
+- Log tokens to console or files
 
-2. **Secure JWT Secret:**
-   - Generate new secret: `python -c "import secrets; print(secrets.token_hex(32))"`
-   - Store in secure environment variable
-   - Never commit to version control
+**✅ Do:**
+- Use httpOnly cookies for web applications
+- Store in memory for single-page apps
+- Use secure storage (Keychain, Keystore) for mobile apps
 
-3. **Enable Authentication:**
-   - Set `ENABLE_AUTH=true` in production
-   - Never use development mode in production
+### 2. Token Rotation
 
-4. **HTTPS Only:**
-   - Complete Task 3 (HTTPS Enforcement)
-   - Never send JWT tokens over HTTP
+- Rotate access tokens every 1 hour
+- Rotate refresh tokens every 30 days
+- Rotate API keys every 90 days
 
-5. **Monitor & Rotate:**
-   - Implement token refresh mechanism
-   - Rotate JWT secret regularly
-   - Monitor failed login attempts
+### 3. HTTPS Only
 
-### Known Limitations
+- Always use HTTPS in production
+- Never send credentials over HTTP
+- Implement HSTS headers
 
-- **User Storage:** Currently in-memory (fake_users_db)
-  - Future: Migrate to PostgreSQL
+### 4. Rate Limiting
 
-- **Token Revocation:** Not implemented
-  - Future: Implement token blacklist
+Respect rate limits to avoid throttling:
+```python
+import time
 
-- **Refresh Tokens:** Not implemented
-  - Future: Add refresh token endpoint
+def make_request_with_retry(url, headers, max_retries=3):
+    for attempt in range(max_retries):
+        response = requests.get(url, headers=headers)
 
-- **Password Reset:** Not implemented
-  - Future: Add password reset flow
+        if response.status_code == 429:  # Rate limited
+            retry_after = int(response.headers.get('Retry-After', 60))
+            time.sleep(retry_after)
+            continue
+
+        return response
+
+    raise Exception("Max retries exceeded")
+```
+
+### 5. Secret Management
+
+- Never commit credentials to version control
+- Use environment variables or secret managers
+- Rotate secrets regularly
+
+```bash
+# .env file (never commit!)
+VERITAS_API_KEY=vrt_live_abc123...
+VERITAS_USERNAME=user@example.com
+VERITAS_PASSWORD=secure-password
+```
+
+### 6. Error Handling
+
+Don't expose sensitive information in error messages:
+
+```python
+try:
+    response = requests.post(API_URL, headers=headers)
+    response.raise_for_status()
+except requests.exceptions.HTTPError as e:
+    # Log full error internally
+    logger.error(f"API error: {e}")
+
+    # Return generic error to user
+    return {"error": "An error occurred"}
+```
 
 ---
 
-## 📚 References
+## Troubleshooting
 
-- [RFC 6749 - OAuth 2.0](https://tools.ietf.org/html/rfc6749)
-- [RFC 7519 - JSON Web Token (JWT)](https://tools.ietf.org/html/rfc7519)
-- [FastAPI Security](https://fastapi.tiangolo.com/tutorial/security/)
-- [Covina Security Audit Report](docs/SECURITY_OPERATIONS_AUDIT_REPORT.md)
-- [Security Phase 1 TODO](docs/SECURITY_PHASE1_TODO.md)
+### "Invalid token" (401 Unauthorized)
+
+**Possible causes:**
+1. Token expired
+2. Token malformed
+3. Invalid signature
+
+**Solution:**
+```python
+# Check token expiration
+import jwt
+
+try:
+    decoded = jwt.decode(
+        access_token,
+        options={"verify_signature": False}
+    )
+    print(f"Token expires at: {decoded['exp']}")
+except jwt.DecodeError:
+    print("Invalid token format")
+
+# Refresh token if expired
+if token_expired:
+    new_token = refresh_access_token(refresh_token)
+```
+
+### "Insufficient permissions" (403 Forbidden)
+
+**Possible causes:**
+1. User role doesn't have required permission
+2. API key doesn't have required scope
+
+**Solution:**
+```bash
+# Check current permissions
+curl https://api.veritas.example.com/auth/me \
+  -H "Authorization: Bearer $TOKEN"
+
+# Response shows your permissions
+{
+  "user_id": "user_123",
+  "role": "user",
+  "permissions": ["read", "write"]  # Missing "agents:execute"
+}
+```
+
+Contact admin to upgrade your role or create a new API key with required scopes.
+
+### "Rate limit exceeded" (429 Too Many Requests)
+
+**Solution:**
+```python
+import time
+
+# Implement exponential backoff
+def make_request_with_backoff(url, headers):
+    max_retries = 5
+    base_delay = 1
+
+    for attempt in range(max_retries):
+        response = requests.get(url, headers=headers)
+
+        if response.status_code != 429:
+            return response
+
+        # Exponential backoff
+        delay = base_delay * (2 ** attempt)
+        print(f"Rate limited. Waiting {delay}s...")
+        time.sleep(delay)
+
+    raise Exception("Max retries exceeded")
+```
+
+### Token Refresh Loop
+
+If you're stuck in a refresh loop:
+
+1. **Clear all stored tokens**
+2. **Logout and login again**
+3. **Check server time sync** (JWT exp/iat timing)
+
+```python
+# Force logout and re-login
+def reset_authentication():
+    # Clear tokens
+    access_token = None
+    refresh_token = None
+
+    # Login fresh
+    response = requests.post(
+        f"{API_BASE}/auth/login",
+        json={"username": USERNAME, "password": PASSWORD}
+    )
+
+    tokens = response.json()
+    return tokens["access_token"], tokens["refresh_token"]
+```
 
 ---
 
-**Author:** VERITAS Security Team
-**Last Updated:** 22. Oktober 2025
-**Status:** ✅ PRODUCTION READY
+## Support
+
+For authentication issues:
+
+- **Documentation**: https://docs.veritas.example.com/auth
+- **Status Page**: https://status.veritas.example.com
+- **Email**: security@veritas.example.com
+- **GitHub Issues**: https://github.com/veritas/framework/issues
+
+---
+
+**Last Updated:** 2025-10-08
+**Version:** 1.0.0
+**License:** MIT

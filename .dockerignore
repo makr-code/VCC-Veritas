@@ -1,46 +1,32 @@
-﻿# ========================================
-# Python & Virtual Environments
-# ========================================
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-pip-wheel-metadata/
-
-# Virtual Environments
-.venv/
-venv/
-ENV/
-env/
+# Docker Build Ignore Rules
+# This file prevents unnecessary files from being sent to the Docker build context
+# Reducing build context size improves build performance
 
 # ========================================
-# IDE & Editors
+# Version Control & Git
+# ========================================
+.git/
+.gitignore
+.gitattributes
+.github/
+
+# ========================================
+# Documentation & Markdown
+# ========================================
+*.md
+docs/
+CONTRIBUTING.md
+README.md
+DEVELOPMENT.md
+
+# ========================================
+# IDEs & Editors
 # ========================================
 .vscode/
 .idea/
-.vs/
 *.sublime-project
 *.sublime-workspace
 *.code-workspace
-*.swp
-*.swo
-*~
 
 # ========================================
 # OS Specific Files
@@ -51,87 +37,88 @@ desktop.ini
 .Thumbs.db
 
 # ========================================
-# Logs & Temporary Files
+# Python Development
 # ========================================
-*.log
-*.tmp
-*.temp
-*.cache
-logs/
-*.err.log
-*.orig
-*.bak
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+env/
 
 # ========================================
-# Database Files (Development Only)
+# Node / Frontend (if present)
 # ========================================
-*.db
-*.sqlite
-*.sqlite3
-data/*.sqlite
-data/*.db
+node_modules/
+npm-debug.log
+yarn-error.log
 
 # ========================================
-# Docker & Containerization
+# Local Development Files
 # ========================================
+.env
+.env.*
+.env.local
+.env.*.local
 docker-compose.override.yml
 docker-compose.debug.yml
 
 # ========================================
-# Test & Coverage Artifacts
+# Test & Coverage Reports
 # ========================================
-.pytest_cache/
-.mypy_cache/
-.tox/
-.ruff_cache/
 .coverage
-.coverage*
 coverage.xml
 htmlcov/
+.pytest_cache/
 pytest-debug.log
-.ipynb_checkpoints/
-
-# ========================================
-# Environment Variables & Secrets
-# ========================================
-.env
-.env.local
-.env.*.local
-.env.*
-data/secrets/
-data/backups/
-
-# ========================================
-# Build & Package Management
-# ========================================
-node_modules/
-*.tsbuildinfo
-
-# ========================================
-# Documentation Build Output
-# ========================================
-site/
-_build/
-docs/_build/
-
-# ========================================
-# Security & Dependency Scans
-# ========================================
 bandit_report.json
-bandit_report.txt
 bandit_rescan.txt
-pip-audit*.json
 
 # ========================================
-# Legacy/Deprecated
+# Build Artifacts
 # ========================================
-ca_storage/
-pki_storage/
-temp_ca.pem
-backups/pki-cleanup-*/
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+*~
 
 # ========================================
-# GitHub Actions & CI/CD
+# Database Files (Local Development)
 # ========================================
-.github/workflows/
-.github/act-secrets/
+*.db
+*.sqlite
+*.sqlite3
+
+# ========================================
+# Cache & Temporary
+# ========================================
+.cache/
+tmp/
+temp/
+
+# ========================================
+# CI/CD & Monitoring
+# ========================================
+.github/
+.gitlab-ci.yml
+azure-pipelines.yml
+Jenkins*
+
+# ========================================
+# Backup & Archive
+# ========================================
+*.tar
+*.tar.gz
+*.zip
+*.rar
+backups/
+*.backup

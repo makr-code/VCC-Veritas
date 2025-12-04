@@ -1,0 +1,136 @@
+{
+  "name": "VERITAS Documentation",
+  "repo": "https://github.com/makr-code/VCC-Veritas",
+  "homepage": "README.md",
+  "logo": "/_media/logo.png",
+  "logoBg": "#ffffff",
+  "logoHeight": 40,
+  "favicon": "/_media/favicon.ico",
+  
+  "theme": "dark",
+  "themeColor": "#3f51b5",
+  "coverpage": false,
+  "onlyCover": false,
+  "mergeNavbar": true,
+  "formatUpdated": "{yyyy}-{MM}-{dd} {HH}:{mm}",
+  "timeUpdated": true,
+  
+  "nav": [
+    {
+      "title": "🏠 Home",
+      "path": "/README.md"
+    },
+    {
+      "title": "📘 Getting Started",
+      "path": "/getting-started/"
+    },
+    {
+      "title": "🏗️ Architecture",
+      "path": "/architecture/"
+    },
+    {
+      "title": "🔌 API",
+      "path": "/api/"
+    },
+    {
+      "title": "🔗 Integration",
+      "path": "/integration/"
+    },
+    {
+      "title": "🚀 Deployment",
+      "path": "/deployment/"
+    },
+    {
+      "title": "🧪 Development",
+      "path": "/development/"
+    },
+    {
+      "title": "⚙️ Components",
+      "path": "/components/"
+    },
+    {
+      "title": "📚 Reference",
+      "path": "/reference/"
+    },
+    {
+      "title": "📖 Archive",
+      "path": "/.archive/README.md"
+    },
+    {
+      "title": "GitHub",
+      "path": "https://github.com/makr-code/VCC-Veritas",
+      "target": "_blank"
+    }
+  ],
+  
+  "subMaxLevel": 3,
+  "maxLevel": 4,
+  "sidebarDisplayLevel": 0,
+  "notFoundPage": "_404.md",
+  "routerMode": "hash",
+  "auto2top": true,
+  "topMargin": 40,
+  
+  "search": {
+    "maxAge": 86400000,
+    "paths": "auto",
+    "placeholder": "🔍 Durchsuchen...",
+    "noData": "Keine Ergebnisse!",
+    "depth": 3,
+    "hideOtherSidebarContent": false,
+    "namespace": "veritas-docs"
+  },
+  
+  "plugins": [
+    [
+      "search",
+      {
+        "maxAge": 86400000,
+        "paths": "auto",
+        "placeholder": "🔍 Suche",
+        "noData": "Keine Ergebnisse"
+      }
+    ],
+    [
+      "edit-on-github",
+      {
+        "repo": "makr-code/VCC-Veritas",
+        "tree": "main",
+        "branch": "main",
+        "label": "✏️ Edit on GitHub"
+      }
+    ],
+    [
+      "copy-code",
+      {
+        "buttonText": "Copy",
+        "errorText": "Error",
+        "successText": "✓"
+      }
+    ],
+    [
+      "zoom-image",
+      {
+        "margin": 16
+      }
+    ],
+    [
+      "page-toc",
+      {
+        "tocMaxLevel": 3,
+        "target": ".markdown-section"
+      }
+    ]
+  ],
+  
+  "markdown": {
+    "gfm": true,
+    "pedantic": false,
+    "breaks": true
+  },
+  
+  "mermaid": {
+    "theme": "dark",
+    "securityLevel": "loose"
+  }
+}

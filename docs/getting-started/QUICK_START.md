@@ -1,152 +1,361 @@
-# Quickstart Guide
-
-**Zielgruppe:** Neue Entwickler, Schneller Überblick
-**Dauer:** ~30 Minuten
-**Status:** ✅ Production Ready
+# VERITAS Unified Backend - Quick Start
+## 🚀 Schnellstart für v4.0.0
 
 ---
 
-## 🎯 Überblick
+## Start Backend
 
-VERITAS ist ein **AI-gestütztes Dokumentations- und Recherche-System** mit:
+### Option 1: Via Start-Skript (Empfohlen)
 
-- **Hybrid Search:** Vector (ChromaDB) + Keyword (BM25) + Graph (Neo4j)
-- **Multi-Agent RAG:** Intelligente Dokumentenanalyse mit LLM
-- **Office Integration:** Word Add-In für direkte Recherche
-- **Real-time Streaming:** Server-Sent Events für Live-Responses
-
----
-
-## ⚡ 5-Minuten Setup
-
-### 1. Repository klonen
-```bash
-git clone https://github.com/makr-code/VCC-Veritas.git
-cd veritas
-```
-
-### 2. Python Environment
-```bash
-python -m venv .venv
-.venv\Scripts\activate          # Windows
-source .venv/bin/activate       # Linux/Mac
-```
-
-### 3. Dependencies installieren
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Backend starten
-```bash
+```powershell
 python start_backend.py
 ```
 
-Der Backend läuft dann auf `http://localhost:5000`
+### Option 2: Direkt
 
-### 5. Testen
+```powershell
+python backend/app.py
+```
+
+### Option 3: Mit Reload (Development)
+
+```powershell
+cd backend
+python backend.py
+# Oder mit uvicorn:
+uvicorn backend:app --reload --host 0.0.0.0 --port 5000
+```
+
+---
+
+## Endpoints
+
+### Root
+
 ```bash
-curl http://localhost:5000/api/system/health
+GET http://localhost:5000/
 ```
 
 **Response:**
 ```json
 {
-  "status": "healthy",
-  "version": "3.25.0",
-  "components": {
-    "database": "connected",
-    "llm": "ready",
-    "search": "initialized"
+  "service": "VERITAS Unified Backend",
+  "version": "4.0.0",
+  "api": {"base": "/api", "version": "4.0.0"},
+  "documentation": {"swagger": "/docs", "redoc": "/redoc"},
+  "features": {
+    "unified_response": true,
+    "ieee_citations": true,
+    "multi_mode": true
   }
 }
 ```
 
 ---
 
-## 🔍 Erste Query durchführen
+### Health Check
 
-### Über REST API
 ```bash
-curl -X POST http://localhost:5000/api/query \
-  -H "Content-Type: application/json" \
-  -d '{
-    "query": "Was wird in §15 BImSchG geregelt?",
-    "mode": "ask"
-  }'
+GET http://localhost:5000/api/system/health
 ```
 
-### Response
+**Response:**
 ```json
 {
-  "status": "success",
-  "answer": "...",
-  "sources": [
-    {
-      "title": "BImSchG §15",
-      "snippet": "...",
-      "relevance_score": 0.95
-    }
-  ]
+  "status": "healthy",
+  "timestamp": "2025-10-19T14:30:00",
+  "components": {
+    "uds3": true,
+    "pipeline": true,
+    "streaming": false
+  }
 }
 ```
 
 ---
 
-## 📂 Wichtige Verzeichnisse
+### System Info
 
-```
-veritas/
-├── backend/              # Backend-Code
-│   ├── api/             # API Endpoints
-│   ├── agents/          # Multi-Agent System
-│   ├── services/        # Business Logic
-│   └── models/          # Data Models
-├── frontend/            # Frontend (React)
-├── docs/                # Diese Dokumentation
-├── tests/               # Test Suite
-└── config/              # Konfiguration
+```bash
+GET http://localhost:5000/api/system/info
 ```
 
 ---
 
-## 🚀 Nächste Schritte
+## Query Endpoints
 
-1. **Installation:** [Installation Guide](INSTALLATION.md)
-2. **Erste Query:** [Erste Abfrage durchführen](FIRST_QUERY.md)
-3. **Probleme?** [Troubleshooting](TROUBLESHOOTING.md)
-4. **Entwicklung:** [Development Guide](../development/DEVELOPMENT.md)
+### 1. Unified Query (Alle Modi)
+
+```bash
+POST http://localhost:5000/api/query
+Content-Type: application/json
+
+{
+  "query": "Was regelt das BImSchG?",
+  "mode": "rag",
+  "model": "llama3.2",
+  "temperature": 0.7,
+  "max_tokens": 2000
+}
+```
+
+**Modi:**
+- `"rag"` - RAG Query (Standard)
+- `"hybrid"` - Hybrid Search
+- `"streaming"` - Streaming Query
+- `"agent"` - Agent Query
+- `"ask"` - Simple Ask
 
 ---
 
-## 📚 Dokumentation
+### 2. RAG Query
 
-- **[Systemübersicht](../architecture/OVERVIEW.md)** - Wie funktioniert VERITAS?
-- **[Backend-Architektur](../architecture/BACKEND_ARCHITECTURE.md)** - Backend-Details
-- **[API-Referenz](../api/API_REFERENCE.md)** - Alle Endpoints
-- **[Deployment](../deployment/DEPLOYMENT_GUIDE.md)** - Production Setup
+```bash
+POST http://localhost:5000/api/query/rag
+Content-Type: application/json
+
+{
+  "query": "BImSchG Genehmigungsverfahren",
+  "model": "llama3.2"
+}
+```
 
 ---
 
-## ⚙️ Häufige Probleme
+### 3. Simple Ask
+
+```bash
+POST http://localhost:5000/api/query/ask
+Content-Type: application/json
+
+{
+  "query": "Erkläre mir das BImSchG",
+  "model": "llama3.2"
+}
+```
+
+---
+
+### 4. Hybrid Search
+
+```bash
+POST http://localhost:5000/api/query/hybrid
+Content-Type: application/json
+
+{
+  "query": "Immissionsschutz Anlagen",
+  "top_k": 10,
+  "bm25_weight": 0.5,
+  "dense_weight": 0.5,
+  "enable_reranking": true
+}
+```
+
+---
+
+## Response Format
+
+**Alle Endpoints geben UnifiedResponse zurück:**
+
+```json
+{
+  "content": "Das BImSchG regelt... [1]\n\nGenehmigung... [2]",
+  "sources": [
+    {
+      "id": "1",
+      "title": "Bundes-Immissionsschutzgesetz",
+      "type": "document",
+      "authors": "Deutscher Bundestag",
+      "ieee_citation": "Deutscher Bundestag, 'Bundes-Immissionsschutzgesetz', BGBl. I S. 1193, 2024.",
+      "year": 2024,
+      "publisher": "Bundesanzeiger Verlag",
+      "similarity_score": 0.92,
+      "rerank_score": 0.95,
+      "quality_score": 0.90,
+      "impact": "High",
+      "relevance": "Very High",
+      "rechtsgebiet": "Umweltrecht"
+    },
+    {
+      "id": "2",
+      "title": "4. BImSchV",
+      "similarity_score": 0.88
+    }
+  ],
+  "metadata": {
+    "model": "llama3.2",
+    "mode": "rag",
+    "duration": 2.34,
+    "tokens_used": 456,
+    "sources_count": 2,
+    "agents_involved": ["document_retrieval", "legal_framework"]
+  },
+  "session_id": "sess_abc123",
+  "timestamp": "2025-10-19T14:30:00"
+}
+```
+
+---
+
+## Agent Endpoints
+
+### Liste Agents
+
+```bash
+GET http://localhost:5000/api/agent/list
+```
+
+### Agent Capabilities
+
+```bash
+GET http://localhost:5000/api/agent/capabilities
+```
+
+---
+
+## PowerShell Testing
+
+### Test Script
+
+```powershell
+# Health Check
+Invoke-RestMethod -Uri "http://localhost:5000/api/system/health" -Method Get
+
+# RAG Query
+$body = @{
+    query = "Was regelt das BImSchG?"
+    mode = "rag"
+    model = "llama3.2"
+} | ConvertTo-Json
+
+Invoke-RestMethod -Uri "http://localhost:5000/api/query" `
+    -Method Post `
+    -ContentType "application/json" `
+    -Body $body
+```
+
+---
+
+## cURL Testing
+
+```bash
+# Health
+curl http://localhost:5000/api/system/health
+
+# Query
+curl -X POST http://localhost:5000/api/query \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "Was regelt das BImSchG?",
+    "mode": "rag",
+    "model": "llama3.2"
+  }'
+```
+
+---
+
+## Frontend Integration
+
+### JavaScript/TypeScript
+
+```typescript
+const response = await fetch('http://localhost:5000/api/query', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    query: 'Was regelt das BImSchG?',
+    mode: 'rag',
+    model: 'llama3.2'
+  })
+});
+
+const data: UnifiedResponse = await response.json();
+
+// Content mit Citations
+console.log(data.content);  // "Das BImSchG... [1]"
+
+// IEEE Citations (35+ Felder)
+data.sources.forEach((source, idx) => {
+  console.log(`[${source.id}] ${source.title}`);
+  console.log(`   IEEE: ${source.ieee_citation}`);
+  console.log(`   Score: ${source.similarity_score}`);
+  console.log(`   Impact: ${source.impact}`);
+});
+
+// Metadata
+console.log(`Mode: ${data.metadata.mode}`);
+console.log(`Duration: ${data.metadata.duration}s`);
+console.log(`Agents: ${data.metadata.agents_involved}`);
+```
+
+---
+
+## Environment Variables
+
+```bash
+# Optional Configuration
+VERITAS_LOG_LEVEL=INFO          # DEBUG, INFO, WARNING, ERROR
+VERITAS_API_HOST=0.0.0.0        # Bind address
+VERITAS_API_PORT=5000           # Port
+VERITAS_API_RELOAD=false        # Auto-reload on code changes
+```
+
+---
+
+## Troubleshooting
 
 ### Backend startet nicht
-→ Siehe [Troubleshooting](TROUBLESHOOTING.md#backend-startet-nicht)
 
-### ChromaDB Connection Error
-→ Siehe [Troubleshooting](TROUBLESHOOTING.md#chromadb-fehler)
+```powershell
+# Check Python Version
+python --version  # Should be 3.10+
 
-### LLM nicht verfügbar
-→ Siehe [Troubleshooting](TROUBLESHOOTING.md#llm-nicht-verfügbar)
+# Check Dependencies
+pip install fastapi uvicorn pydantic
+
+# Check Port
+netstat -ano | findstr :5000  # Port frei?
+```
+
+### UDS3 nicht verfügbar
+
+**Normal!** Backend läuft im **Demo Mode** mit Mock-Responses.
+
+```
+⚠️  UDS3 Demo Mode - Keine echten Datenbanken
+⚠️  Intelligent Pipeline Demo Mode
+```
+
+Mock-Responses enthalten trotzdem IEEE-konforme Sources (35+ Felder).
+
+### Keine Sources
+
+**Check:**
+1. UDS3 verfügbar? `GET /api/system/health`
+2. ChromaDB populated? Siehe UDS3 Docs
+3. Mock-Fallback aktiv? Logs checken
 
 ---
 
-## 💡 Tipps
+## Documentation
 
-- **Logging aktivieren:** `export VERITAS_LOG_LEVEL=DEBUG`
-- **Custom Port:** `VERITAS_API_PORT=8000 python start_backend.py`
 - **Swagger UI:** http://localhost:5000/docs
+- **ReDoc:** http://localhost:5000/redoc
+- **Health:** http://localhost:5000/api/system/health
+- **Capabilities:** http://localhost:5000/api/system/capabilities
 
 ---
 
-**Bereit?** → [Installation Guide](INSTALLATION.md)
+## Next Steps
+
+1. ✅ Backend starten
+2. ✅ Health Check erfolgreich
+3. ✅ Test Query durchführen
+4. ✅ Response-Format verifizieren
+5. ⏳ Frontend anpassen
+6. ⏳ ChromaDB mit Dokumenten füllen
+7. ⏳ Production Deployment
+
+---
+
+**Status:** ✅ **Ready to Use!**
