@@ -72,6 +72,12 @@ data/*.sqlite
 data/*.db
 
 # ========================================
+# Data Directory (Exclude sample data, keep README)
+# ========================================
+data/*
+!data/README.md
+
+# ========================================
 # Docker & Containerization
 # ========================================
 docker-compose.override.yml
