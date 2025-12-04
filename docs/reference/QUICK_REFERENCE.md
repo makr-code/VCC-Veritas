@@ -1,7 +1,7 @@
 # VERITAS Documentation Quick Reference
 
 **Version:** 3.25.0
-**Last Updated:** 14. Oktober 2025
+**Last Updated:** 4. Dezember 2025
 
 ---
 
@@ -9,17 +9,16 @@
 
 ```bash
 # 1. Read project structure
-docs/PROJECT_STRUCTURE.md
+reference/PROJECT_STRUCTURE.md
 
 # 2. Setup deployment
-docs/DEPLOYMENT_GUIDE.md
+../deployment/DEPLOYMENT_GUIDE.md
 
-# 3. Learn Phase 5 features (latest)
-docs/PHASE5_HYPOTHESIS_GENERATION.md
-docs/PHASE5_START_HERE.md
+# 3. Get started quickly
+../getting-started/QUICK_START.md
 
 # 4. API reference
-docs/API_REFERENCE.md
+../api/API_REFERENCE.md
 ```
 
 ---
@@ -30,11 +29,11 @@ docs/API_REFERENCE.md
 
 | Priority | Document | Purpose |
 |----------|----------|---------|
-| 🔥 **HIGH** | [PHASE5_HYPOTHESIS_GENERATION.md](PHASE5_HYPOTHESIS_GENERATION.md) | Latest features (v5.0) |
-| 🔥 **HIGH** | [PHASE4_RAG_INTEGRATION.md](PHASE4_RAG_INTEGRATION.md) | RAG + Enhanced features |
-| ⚡ **MEDIUM** | [API_REFERENCE.md](API_REFERENCE.md) | Complete API docs |
-| ⚡ **MEDIUM** | [STATUS_REPORT.md](STATUS_REPORT.md) | Project status |
-| 📖 **INFO** | [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) | File organization |
+| 🔥 **HIGH** | [Getting Started](../getting-started/QUICK_START.md) | 30-minute setup |
+| 🔥 **HIGH** | [API Reference](../api/API_REFERENCE.md) | Complete API docs |
+| ⚡ **MEDIUM** | [Architecture Overview](../architecture/OVERVIEW.md) | System design |
+| ⚡ **MEDIUM** | [Deployment Guide](../deployment/DEPLOYMENT_GUIDE.md) | Production setup |
+| 📖 **INFO** | [Project Structure](PROJECT_STRUCTURE.md) | File organization |
 
 ---
 
@@ -46,8 +45,9 @@ docs/API_REFERENCE.md
 # Run all tests
 python -m pytest tests/ -v
 
-# Run Phase 5 tests only
-python -m pytest tests/test_hypothesis_service.py -v
+# Run integration tests
+python -m pytest tests/integration/ -v
+```
 python -m pytest tests/test_batch_search.py -v
 python -m pytest tests/test_reranker_service.py -v
 

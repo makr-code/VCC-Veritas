@@ -78,26 +78,16 @@
 * [📌 FAQ](reference/FAQ.md)
   * [[QUICK_REFERENCE]]
 
-* Status & Reports
-  * [[STATUS_REPORT]]
-  * [[PHASE4_EXECUTIVE_SUMMARY]]
-  * [[PHASE5_FINAL_COMPLETE_SUMMARY]]
+---
 
-<!-- AUTO:EXTRA_DOCS:BEGIN -->
-<!-- Dieser Bereich wird automatisch vom Generator befüllt. -->
-<!-- AUTO:EXTRA_DOCS:END -->
-<<<<<<< Updated upstream
-=======
-* [Startseite](/README.md)
+## 📚 Archiv
 
-* Schnellstart
-	* [Quick Start (aktuell)](QUICK_START_V7_REAL.md)
-	* [Projektstruktur](PROJECT_STRUCTURE.md)
-	* [Deployment Quickstart](DEPLOYMENT_QUICKSTART.md)
+Ältere Dokumentation, Status-Reports und veraltete Funktionen sind in `.archive/` verfügbar:
 
-* Architektur
-	* [System Overview](VERITAS_System_Overview.md)
-	* [Backend Architektur](BACKEND_ARCHITECTURE_ANALYSIS.md)
+* [Archive Index](.archive/README.md) - Dokumentation durchsuchen
+* [Phase Reports](.archive/phase-reports/) - Projektverlauf
+* [Session Summaries](.archive/session-summaries/) - Test & Evaluierung
+* [Old Versions](.archive/old-versions/) - Veraltete API-Versionen
 	* [Prozessbaum-Architektur](PROCESS_TREE_ARCHITECTURE.md)
 	* [Server-side Processing](SERVER_SIDE_PROCESSING_ARCHITECTURE.md)
 
