@@ -1,7 +1,7 @@
 # Geo Sub-Agent - OSM Karten & GeoInformationen
 
-**Erstellt:** 3. Dezember 2025  
-**Version:** 1.0.0  
+**Erstellt:** 3. Dezember 2025
+**Version:** 1.0.0
 **Status:** ✅ IMPLEMENTIERT
 
 ---
@@ -70,8 +70,8 @@ print(f"In Brandenburg: {in_bb}")
 
 ### 1. BImSchG-Anlagen
 
-**Datenbank:** `data/BImSchG.sqlite`  
-**Felder:** `ostwert`, `nordwert` (ETRS89 UTM Zone 33N)  
+**Datenbank:** `data/BImSchG.sqlite`
+**Felder:** `ostwert`, `nordwert` (ETRS89 UTM Zone 33N)
 **Anzahl:** ~4,062 Anlagen mit Koordinaten
 
 **Beispiel-Abfrage:**
@@ -105,8 +105,8 @@ geo_data = await agent.get_geo_data({
 
 ### 2. WKA-Anlagen (Windkraftanlagen)
 
-**Datenbank:** `data/wka.sqlite`  
-**Felder:** `rechts`, `hoch` (ETRS89 UTM Zone 33N)  
+**Datenbank:** `data/wka.sqlite`
+**Felder:** `rechts`, `hoch` (ETRS89 UTM Zone 33N)
 **Anzahl:** ~5,457 Anlagen mit Koordinaten
 
 **Beispiel-Abfrage:**
@@ -120,8 +120,8 @@ geo_data = await agent.get_geo_data({
 
 ### 3. ThemisDB Geo-Collections
 
-**Datenbank:** ThemisDB (Multi-Model)  
-**Collections:** Beliebige Geo-Collections  
+**Datenbank:** ThemisDB (Multi-Model)
+**Collections:** Beliebige Geo-Collections
 **Abfrage:** Via AQL oder Geo-Queries
 
 **Beispiel-Abfrage:**
@@ -376,12 +376,12 @@ pip install Pillow>=10.1.0  # Bildverarbeitung
 1. **pyproj** - Koordinaten-Transformation
    - ETRS89 UTM Zone 33N → WGS84
    - PROJ.4 Transformation-Engine
-   
+
 2. **Matplotlib** - Statische Karten
    - Scatter Plots für Marker
    - Anpassbare Achsen (Lat/Lon)
    - Legende und Labels
-   
+
 3. **Pillow (PIL)** - Bildverarbeitung
    - PNG-Speicherung
    - Base64-Encoding
@@ -541,9 +541,9 @@ map_result = await agent.generate_map(
 
 ---
 
-**Ersteller:** VERITAS Development Team  
-**Version:** 1.0.0  
-**Letzte Aktualisierung:** 3. Dezember 2025  
+**Ersteller:** VERITAS Development Team
+**Version:** 1.0.0
+**Letzte Aktualisierung:** 3. Dezember 2025
 **Status:** ✅ Implementiert und getestet
 
 **Commit:** `tbd`

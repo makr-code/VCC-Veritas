@@ -1,7 +1,7 @@
 # AI Image Generator - Bildgenerierung & Bildanalyse Integration
 
-**Erstellt:** 3. Dezember 2025  
-**Version:** 2.0.0  
+**Erstellt:** 3. Dezember 2025
+**Version:** 2.0.0
 **Status:** ✅ IMPLEMENTIERT
 
 ---
@@ -170,7 +170,7 @@ result = await generator.analyze_image(
 if result['success']:
     extracted_text = result['analysis']
     print(f"OCR Text: {extracted_text}")
-    
+
     # In Covina Ingestion einspeisen
     # → Chromadb Embedding
     # → PostgreSQL Metadaten
@@ -260,12 +260,12 @@ async def ingest_document_with_images(pdf_path: str):
     # 1. PDF → Text + Bilder extrahieren
     from pypdf import PdfReader
     reader = PdfReader(pdf_path)
-    
+
     # 2. AI Image Generator
     generator = AIImageGenerator(generator_type='swarmui')
-    
+
     all_content = []
-    
+
     for page_num, page in enumerate(reader.pages):
         # Text extrahieren
         text = page.extract_text()
@@ -274,7 +274,7 @@ async def ingest_document_with_images(pdf_path: str):
             'content': text,
             'page': page_num + 1
         })
-        
+
         # Bilder extrahieren
         if '/XObject' in page['/Resources']:
             for obj in page['/Resources']['/XObject'].values():
@@ -283,18 +283,18 @@ async def ingest_document_with_images(pdf_path: str):
                     image_data = obj._data
                     import base64
                     image_base64 = base64.b64encode(image_data).decode('utf-8')
-                    
+
                     # Bildanalyse: OCR + Caption
                     ocr_result = await generator.analyze_image(
                         image_base64=image_base64,
                         task='ocr'
                     )
-                    
+
                     caption_result = await generator.analyze_image(
                         image_base64=image_base64,
                         task='caption'
                     )
-                    
+
                     all_content.append({
                         'type': 'image',
                         'page': page_num + 1,
@@ -302,10 +302,10 @@ async def ingest_document_with_images(pdf_path: str):
                         'caption': caption_result['analysis'],
                         'image_base64': image_base64
                     })
-    
+
     # 3. In Chromadb einpflegen
     # ... Embedding + Speicherung
-    
+
     return all_content
 
 # Verwendung
@@ -370,12 +370,12 @@ from backend.agents.ai_image_generator import AIImageGenerator
 
 async def test_ocr():
     generator = AIImageGenerator(generator_type='swarmui')
-    
+
     result = await generator.analyze_image(
         image_path='/path/to/document.jpg',
         task='ocr'
     )
-    
+
     print(f"OCR: {result['analysis']}")
 
 asyncio.run(test_ocr())
@@ -501,9 +501,9 @@ result = await generator.analyze_image(
 
 ---
 
-**Ersteller:** VERITAS Development Team  
-**Version:** 2.0.0  
-**Letzte Aktualisierung:** 3. Dezember 2025  
+**Ersteller:** VERITAS Development Team
+**Version:** 2.0.0
+**Letzte Aktualisierung:** 3. Dezember 2025
 **Status:** ✅ Implementiert und getestet
 
 **SwarmUI als duales Werkzeug:**

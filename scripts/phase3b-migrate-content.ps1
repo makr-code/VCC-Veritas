@@ -85,7 +85,7 @@ function Migrate-File {
 
 # Execute migrations
 Write-Host ""
-Write-Host "=== Phase 3b: Content Migration ===" 
+Write-Host "=== Phase 3b: Content Migration ==="
 Write-Host ""
 
 $moved = 0
@@ -106,7 +106,7 @@ foreach ($migration in $migrations) {
 }
 
 Write-Host ""
-Write-Host "=== Summary ===" 
+Write-Host "=== Summary ==="
 Write-Host "Moved:    $moved"
 Write-Host "Skipped:  $skipped"
 Write-Host "Not Found: $notfound"

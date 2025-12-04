@@ -1,7 +1,7 @@
 # Polyglot Execution Plan Analysis System
 
-**Version:** 1.0  
-**Datum:** 3. Dezember 2025  
+**Version:** 1.0
+**Datum:** 3. Dezember 2025
 **Zweck:** Kosten-Nutzen-Analyse für effiziente Query-Ausführung
 
 ---
@@ -12,11 +12,11 @@ Das **Polyglot Execution Plan Analysis System** ermöglicht eine intelligente Ko
 
 ### Hauptfeatures
 
-✅ **Kosten-Nutzen-Analyse**: Von einfachen ASK-Anfragen bis wissenschaftlichen Ansätzen  
-✅ **Ressourcen-Analyse**: LLM, SLM, NLP, Vector Search, Graph Traversal  
-✅ **Parallelisierungs-Analyse**: Welche Schritte können parallel ausgeführt werden?  
-✅ **Budget-Constraints**: Respektiert Zeit-, Rechenleistungs- und Kosten-Limits  
-✅ **Multi-Strategie-Optimierung**: Speed, Cost, Quality, Balanced  
+✅ **Kosten-Nutzen-Analyse**: Von einfachen ASK-Anfragen bis wissenschaftlichen Ansätzen
+✅ **Ressourcen-Analyse**: LLM, SLM, NLP, Vector Search, Graph Traversal
+✅ **Parallelisierungs-Analyse**: Welche Schritte können parallel ausgeführt werden?
+✅ **Budget-Constraints**: Respektiert Zeit-, Rechenleistungs- und Kosten-Limits
+✅ **Multi-Strategie-Optimierung**: Speed, Cost, Quality, Balanced
 
 ---
 
@@ -60,7 +60,7 @@ Das **Polyglot Execution Plan Analysis System** ermöglicht eine intelligente Ko
 ## Query Approaches (Wissenschaftliche Abstufungen)
 
 ### 1. SIMPLE_ASK
-**Beschreibung**: Einfache Frage-Antwort  
+**Beschreibung**: Einfache Frage-Antwort
 **Beispiele**:
 - "Was ist BGB?"
 - "Definiere Vertragsrecht"
@@ -69,13 +69,13 @@ Das **Polyglot Execution Plan Analysis System** ermöglicht eine intelligente Ko
 - Vector Search (schnell, günstig)
 - SLM Small (Phi-3, Llama-7B)
 
-**Erwartete Qualität**: 60-70%  
+**Erwartete Qualität**: 60-70%
 **Durchschnittliche Kosten**: Niedrig (0.5-1.0)
 
 ---
 
 ### 2. RESEARCH_BASIC
-**Beschreibung**: Grundlegende Recherche  
+**Beschreibung**: Grundlegende Recherche
 **Beispiele**:
 - "Übersicht über Umweltschutzgesetze"
 - "Vergleich zwischen BGB und HGB"
@@ -85,13 +85,13 @@ Das **Polyglot Execution Plan Analysis System** ermöglicht eine intelligente Ko
 - Fulltext Search
 - SLM Small
 
-**Erwartete Qualität**: 70-80%  
+**Erwartete Qualität**: 70-80%
 **Durchschnittliche Kosten**: Mittel (1.0-2.5)
 
 ---
 
 ### 3. RESEARCH_DEEP
-**Beschreibung**: Tiefe Recherche mit Kontext  
+**Beschreibung**: Tiefe Recherche mit Kontext
 **Beispiele**:
 - "Detaillierte Analyse der Zusammenhänge zwischen Verwaltungsrecht und Umweltschutz"
 - "Entwicklung der Rechtsprechung zu DSGVO"
@@ -101,13 +101,13 @@ Das **Polyglot Execution Plan Analysis System** ermöglicht eine intelligente Ko
 - Graph Traversal (Kontext-Enrichment)
 - LLM Medium (GPT-3.5, Llama-70B)
 
-**Erwartete Qualität**: 80-90%  
+**Erwartete Qualität**: 80-90%
 **Durchschnittliche Kosten**: Hoch (3.0-5.0)
 
 ---
 
 ### 4. SCIENTIFIC
-**Beschreibung**: Wissenschaftlicher Ansatz mit Evidenz  
+**Beschreibung**: Wissenschaftlicher Ansatz mit Evidenz
 **Beispiele**:
 - "Welche wissenschaftlichen Studien gibt es zur Wirksamkeit von Klimaschutzmaßnahmen?"
 - "Meta-Analyse der Forschung zu Datenschutz-Auswirkungen"
@@ -118,13 +118,13 @@ Das **Polyglot Execution Plan Analysis System** ermöglicht eine intelligente Ko
 - Fulltext Search
 - LLM Large (GPT-4, Claude-3)
 
-**Erwartete Qualität**: 90-95%  
+**Erwartete Qualität**: 90-95%
 **Durchschnittliche Kosten**: Sehr hoch (7.0-15.0)
 
 ---
 
 ### 5. EXPERT_ANALYSIS
-**Beschreibung**: Experten-Level-Analyse  
+**Beschreibung**: Experten-Level-Analyse
 **Beispiele**:
 - "Umfassende juristische Analyse mit Präzedenzfällen"
 - "Technische Tiefenanalyse mit statistischer Auswertung"
@@ -135,7 +135,7 @@ Das **Polyglot Execution Plan Analysis System** ermöglicht eine intelligente Ko
 - LLM Large
 - NLP Traditional (für Statistiken)
 
-**Erwartete Qualität**: 95%+  
+**Erwartete Qualität**: 95%+
 **Durchschnittliche Kosten**: Extrem hoch (10.0-20.0+)
 
 ---
@@ -299,13 +299,13 @@ assert plan.total_cost.monetary_cost <= 1.0
 Das System analysiert automatisch, welche Schritte parallelisiert werden können:
 
 ### Parallelisierbare Ressourcen
-✅ Vector Search  
-✅ Fulltext Search  
-✅ Graph Traversal  
+✅ Vector Search
+✅ Fulltext Search
+✅ Graph Traversal
 
 ### Sequentielle Ressourcen
-❌ LLM (Large/Medium/Small) - Ergebnisse bauen aufeinander auf  
-❌ NLP Traditional - Benötigt Kontext aus vorherigen Schritten  
+❌ LLM (Large/Medium/Small) - Ergebnisse bauen aufeinander auf
+❌ NLP Traditional - Benötigt Kontext aus vorherigen Schritten
 
 ### Execution Modes
 
@@ -469,16 +469,16 @@ plan = optimizer.optimize_balanced(query)  # Ohne Vergleich
 
 Das Polyglot Execution Plan Analysis System bietet:
 
-✅ **Intelligente Kosten-Nutzen-Analyse**  
-✅ **Automatische Ressourcen-Empfehlung**  
-✅ **Parallelisierungs-Optimierung**  
-✅ **Budget-Constraints**  
-✅ **Multi-Strategie-Vergleich**  
-✅ **Erweiterbar für Custom Resources**  
+✅ **Intelligente Kosten-Nutzen-Analyse**
+✅ **Automatische Ressourcen-Empfehlung**
+✅ **Parallelisierungs-Optimierung**
+✅ **Budget-Constraints**
+✅ **Multi-Strategie-Vergleich**
+✅ **Erweiterbar für Custom Resources**
 
 ---
 
-**Entwickelt von:** VERITAS Backend Team  
-**Datum:** 3. Dezember 2025  
-**Version:** 1.0  
+**Entwickelt von:** VERITAS Backend Team
+**Datum:** 3. Dezember 2025
+**Version:** 1.0
 **Status:** ✅ Production-Ready

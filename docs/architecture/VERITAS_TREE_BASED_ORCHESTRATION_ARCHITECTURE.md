@@ -1,9 +1,9 @@
 # VERITAS Tree-Based Orchestration Architecture
 ## Hypothesis-Driven, Multi-Plan Query Execution with Interactive Refinement
 
-**Document Version**: 2.0  
-**Created**: 2025-12-03  
-**Status**: 🎯 Design Blueprint  
+**Document Version**: 2.0
+**Created**: 2025-12-03
+**Status**: 🎯 Design Blueprint
 **Inspiration**: Gemini Deep Search, GitHub Copilot Agents
 
 ---
@@ -348,7 +348,7 @@ ROOT (session_abc123)
       Status: COMPLETED, Quality: 9.2/10
       Cost: Predicted 8.0 CU, Actual 7.5 CU
       Time: Predicted 4s, Actual 3.8s
-      
+
 FINAL OVERALL METRICS:
 ═══════════════════════════════════════════════════════════
 Time:    Total 21.2s / Budget 30s = 71% utilization ✅
@@ -397,7 +397,7 @@ async def query_endpoint(
 ) -> EventSourceResponse:
     """
     Main query endpoint with SSE streaming.
-    
+
     Returns SSE stream with:
     - analysis_complete
     - plan_selected
@@ -406,32 +406,32 @@ async def query_endpoint(
     """
     session_id = str(uuid4())
     sse_handler = SSEHandler(session_id)
-    
+
     background_tasks.add_task(
         orchestrate_query,
         request=request,
         session_id=session_id,
         sse_handler=sse_handler
     )
-    
+
     return EventSourceResponse(sse_handler.stream_events())
 
 @app.post("/query/refine")
 async def refine_query(refinement: RefinementRequest):
     """
     Handle user refinement during execution.
-    
+
     Adds new sub-queries to existing execution tree.
     """
     session = session_manager.get_session(refinement.session_id)
     tree = session.execution_tree
-    
+
     new_nodes = await tree_manager.handle_user_refinement(
         tree=tree,
         refinement_query=refinement.query,
         integrate_into_current=refinement.integrate
     )
-    
+
     return {"status": "accepted", "new_steps": len(new_nodes)}
 ```
 
@@ -460,7 +460,7 @@ class TreeNode:
     status: str                         # pending, running, completed, pruned
     result: Optional[Any] = None
     quality_score: Optional[float] = None
-    
+
     # Cost-Benefit Tracking (Per-Step)
     predicted_cost: float = 0.0         # Predicted cost before execution
     actual_cost: float = 0.0            # Actual cost after execution
@@ -468,7 +468,7 @@ class TreeNode:
     actual_time: float = 0.0            # Actual time (seconds)
     cost_variance: float = 0.0          # (actual - predicted) / predicted
     roi: float = 0.0                    # quality_improvement / actual_cost
-    
+
     # Pruning Information
     pruned: bool = False
     prune_reason: Optional[str] = None  # e.g., "insufficient_roi", "time_budget_exceeded"
@@ -481,7 +481,7 @@ class Branch:
     leaf_nodes: List[str]
     importance: float = 1.0             # Weight for overall calculation
     current_quality: float = 0.0
-    
+
     # Branch-Level Cost-Benefit
     branch_predicted_cost: float = 0.0
     branch_actual_cost: float = 0.0
@@ -500,15 +500,15 @@ class ExecutionTree:
     branches: Dict[str, Branch]
     execution_plan: Optional['ExecutionPlan']
     status: str                         # running, completed
-    
+
     # Overall Execution Metrics
     overall_metrics: 'OverallExecutionMetrics'
-    
+
     # Budget Constraints
     time_budget: float                  # Maximum allowed time (seconds)
     cost_budget: float                  # Maximum allowed cost (CU)
     quality_target: float               # Minimum acceptable quality (0-10)
-    
+
     # Timestamps
     start_time: float
     end_time: Optional[float] = None
@@ -526,8 +526,8 @@ Every plan includes:
 
 Plans are ranked using weighted scoring:
 ```
-Score = w1 * (1 - normalized_cost) 
-      + w2 * (1 - normalized_time) 
+Score = w1 * (1 - normalized_cost)
+      + w2 * (1 - normalized_time)
       + w3 * normalized_quality
       + w4 * success_probability
 ```
@@ -551,7 +551,7 @@ For each completed step in a branch:
    actual_cost = sum(step.resource_costs for step in branch.completed_steps)
    predicted_cost = branch.initial_plan.predicted_cost
    cost_variance = (actual_cost - predicted_cost) / predicted_cost
-   
+
    # If cost overrun > 20%, evaluate continuation
    if cost_variance > 0.20:
        should_continue = evaluate_branch_viability(branch)
@@ -563,9 +563,9 @@ For each completed step in a branch:
    remaining_budget = total_budget - actual_cost
    remaining_steps_estimated_cost = estimate_remaining_cost(branch)
    expected_quality_improvement = estimate_quality_gain(branch)
-   
+
    roi = expected_quality_improvement / remaining_steps_estimated_cost
-   
+
    # Prune if ROI < threshold
    if roi < min_roi_threshold:
        prune_branch(branch, reason="insufficient_roi")
@@ -576,7 +576,7 @@ For each completed step in a branch:
    # Is quality improving with each step?
    quality_scores = [step.quality_score for step in branch.completed_steps]
    quality_trend = calculate_trend(quality_scores)
-   
+
    # If quality is declining or stagnant, reconsider
    if quality_trend <= 0 and len(quality_scores) >= 2:
        evaluate_alternative_approach(branch)
@@ -587,7 +587,7 @@ For each completed step in a branch:
    elapsed_time = current_time - branch.start_time
    predicted_remaining_time = estimate_remaining_time(branch)
    total_projected_time = elapsed_time + predicted_remaining_time
-   
+
    # Prune if we'll exceed time budget
    if total_projected_time > time_budget:
        prune_branch(branch, reason="time_budget_exceeded")
@@ -620,36 +620,36 @@ For each completed step in a branch:
 @dataclass
 class OverallExecutionMetrics:
     """Real-time tracking of overall execution performance"""
-    
+
     # Time Metrics
     total_elapsed_time: float                    # Seconds since start
     predicted_remaining_time: float              # Estimated time to completion
     time_budget_remaining: float                 # time_budget - total_elapsed_time
     time_utilization: float                      # total_elapsed_time / time_budget
-    
+
     # Cost Metrics
     total_cost_accrued: float                    # CU (Cost Units), sum across all branches
     predicted_remaining_cost: float              # Estimated cost to completion
     cost_budget_remaining: float                 # cost_budget - total_cost_accrued
     cost_utilization: float                      # total_cost_accrued / cost_budget
-    
+
     # Quality Metrics
     weighted_average_quality: float              # Weighted by branch importance
     best_branch_quality: float                   # Highest quality achieved so far
     quality_variance: float                      # Consistency across branches
-    
+
     # Efficiency Metrics
     cost_per_quality_point: float                # total_cost / weighted_average_quality
     time_per_quality_point: float                # total_elapsed_time / weighted_average_quality
     overall_roi: float                           # quality / (cost + time_penalty)
-    
+
     # Progress Metrics
     completed_steps: int                         # Total steps completed
     active_steps: int                            # Currently executing
     pending_steps: int                           # Not yet started
     pruned_steps: int                            # Terminated early
     completion_percentage: float                 # Based on critical path
-    
+
     # Forecast Metrics
     will_finish_on_time: bool                    # Projected vs time budget
     will_finish_on_budget: bool                  # Projected vs cost budget
@@ -671,25 +671,25 @@ def update_overall_metrics_after_step(
     Updates integrated overall cost-benefit metrics after each step.
     This ensures we always have a current view of execution health.
     """
-    
+
     # 1. Update time metrics
     overall_metrics.total_elapsed_time = time.time() - execution_start_time
     overall_metrics.predicted_remaining_time = estimate_remaining_time_all_branches()
     overall_metrics.time_budget_remaining = time_budget - overall_metrics.total_elapsed_time
     overall_metrics.time_utilization = overall_metrics.total_elapsed_time / time_budget
-    
+
     # 2. Update cost metrics
     overall_metrics.total_cost_accrued += step.actual_cost
     overall_metrics.predicted_remaining_cost = estimate_remaining_cost_all_branches()
     overall_metrics.cost_budget_remaining = cost_budget - overall_metrics.total_cost_accrued
     overall_metrics.cost_utilization = overall_metrics.total_cost_accrued / cost_budget
-    
+
     # 3. Update quality metrics (weighted by branch importance)
     branch_qualities = [(b.importance, b.current_quality) for b in active_branches]
     overall_metrics.weighted_average_quality = weighted_average(branch_qualities)
     overall_metrics.best_branch_quality = max(b.current_quality for b in active_branches)
     overall_metrics.quality_variance = variance([b.current_quality for b in active_branches])
-    
+
     # 4. Calculate efficiency metrics
     if overall_metrics.weighted_average_quality > 0:
         overall_metrics.cost_per_quality_point = (
@@ -698,37 +698,37 @@ def update_overall_metrics_after_step(
         overall_metrics.time_per_quality_point = (
             overall_metrics.total_elapsed_time / overall_metrics.weighted_average_quality
         )
-    
+
     # 5. Calculate overall ROI
     time_penalty = overall_metrics.total_elapsed_time / 60  # Penalty for long execution
     overall_metrics.overall_roi = overall_metrics.weighted_average_quality / (
         overall_metrics.total_cost_accrued + time_penalty
     )
-    
+
     # 6. Update progress metrics
     overall_metrics.completed_steps = count_completed_steps()
     overall_metrics.active_steps = count_active_steps()
     overall_metrics.pending_steps = count_pending_steps()
     overall_metrics.completion_percentage = calculate_completion_percentage()
-    
+
     # 7. Forecast future completion
     overall_metrics.will_finish_on_time = (
-        overall_metrics.total_elapsed_time + overall_metrics.predicted_remaining_time 
+        overall_metrics.total_elapsed_time + overall_metrics.predicted_remaining_time
         <= time_budget
     )
     overall_metrics.will_finish_on_budget = (
-        overall_metrics.total_cost_accrued + overall_metrics.predicted_remaining_cost 
+        overall_metrics.total_cost_accrued + overall_metrics.predicted_remaining_cost
         <= cost_budget
     )
     overall_metrics.will_achieve_quality_target = (
         overall_metrics.weighted_average_quality >= quality_target
     )
-    
+
     # 8. Confidence in forecast (based on historical variance)
     overall_metrics.confidence_in_forecast = calculate_forecast_confidence(
         historical_predictions, actual_outcomes
     )
-    
+
     return overall_metrics
 ```
 
@@ -743,28 +743,28 @@ def evaluate_overall_execution_health(
     """
     Evaluates overall execution health and makes global decisions.
     """
-    
+
     # Critical failure conditions
     if overall_metrics.cost_utilization > 0.90 and not overall_metrics.will_finish_on_budget:
         return ExecutionDecision.TERMINATE_ALL("Cost budget nearly exhausted")
-    
+
     if overall_metrics.time_utilization > 0.90 and not overall_metrics.will_finish_on_time:
         return ExecutionDecision.ACCELERATE_ALL("Time budget critical")
-    
+
     # Low ROI across all branches
     if overall_metrics.overall_roi < 1.5 and overall_metrics.completion_percentage < 0.5:
         return ExecutionDecision.PIVOT_STRATEGY("Overall ROI insufficient")
-    
+
     # Quality concerns
     if overall_metrics.weighted_average_quality < 5.0 and overall_metrics.completion_percentage > 0.7:
         return ExecutionDecision.ADD_QUALITY_STEPS("Quality below acceptable threshold")
-    
+
     # All good - continue execution
-    if (overall_metrics.will_finish_on_time and 
+    if (overall_metrics.will_finish_on_time and
         overall_metrics.will_finish_on_budget and
         overall_metrics.will_achieve_quality_target):
         return ExecutionDecision.CONTINUE("On track to meet all targets")
-    
+
     # Need optimization
     return ExecutionDecision.OPTIMIZE_EXECUTION("Adjust branch priorities")
 ```
@@ -803,7 +803,7 @@ This provides **full transparency** to users about execution progress and resour
 
 ## 6.3 Resource Caps and Content Sufficiency Evaluation
 
-**Critical Requirements**: 
+**Critical Requirements**:
 1. When have we gathered **enough resources** (documents, data points)?
 2. When has **enough time** elapsed to justify stopping?
 3. How do we quantify if the content is **sufficient for a quality answer**?
@@ -874,33 +874,33 @@ The system implements **5 types of caps** that can trigger termination:
 @dataclass
 class ExecutionCaps:
     """Multi-dimensional caps for execution termination"""
-    
+
     # Time Caps
     max_total_time: float = 30.0           # Hard limit: total execution time (seconds)
     soft_time_threshold: float = 0.80       # Soft limit: 80% of time budget
-    
+
     # Cost Caps (in dimensionless Cost Units)
     max_total_cost_units: float = 50.0     # Hard limit: total cost (CU)
     soft_cost_threshold: float = 0.85       # Soft limit: 85% of cost budget
     baseline_cost_unit: float = 1.0         # Reference operation cost
-    
+
     # Optional: Monetary conversion (environment-specific)
     cu_to_currency_rate: float = 0.01      # 1 CU = 1.0 CU (configurable)
     currency: str = "EUR"                   # Currency for display only
-    
+
     # Resource Quantity Caps
     max_documents_retrieved: int = 100      # Hard limit: total documents
     min_documents_for_answer: int = 5       # Minimum viable documents
     optimal_documents_range: tuple = (15, 30)  # Sweet spot for quality
-    
+
     max_api_calls: int = 50                 # Hard limit: external API calls
     max_llm_invocations: int = 10           # Hard limit: LLM calls
-    
+
     # Quality Caps (Termination Conditions)
     target_quality_score: float = 8.5       # If achieved, can terminate early
     min_acceptable_quality: float = 6.0     # Below this, must continue
     quality_plateau_threshold: float = 0.1  # If improvement < 0.1 over 3 steps
-    
+
     # Content Sufficiency Caps
     min_evidence_coverage: float = 0.70     # 70% of query aspects must be covered
     min_source_diversity: int = 3           # Minimum different source types
@@ -914,7 +914,7 @@ class ExecutionCaps:
 ```python
 class ResourceCapEvaluator:
     """Evaluates whether we've gathered enough resources"""
-    
+
     def should_stop_gathering(
         self,
         current_state: ExecutionState,
@@ -923,30 +923,30 @@ class ResourceCapEvaluator:
         """
         Returns (should_stop, reason)
         """
-        
+
         # 1. HARD CAPS - Must stop
         if current_state.total_documents >= caps.max_documents_retrieved:
             return (True, "max_documents_reached")
-        
+
         if current_state.total_api_calls >= caps.max_api_calls:
             return (True, "max_api_calls_reached")
-        
+
         if current_state.total_time >= caps.max_total_time:
             return (True, "max_time_exceeded")
-        
+
         if current_state.total_cost_units >= caps.max_total_cost_units:
             return (True, "max_cost_exceeded")
-        
+
         # 2. OPTIMAL RANGE - Can stop if quality is good
         docs_in_optimal_range = (
-            caps.optimal_documents_range[0] 
-            <= current_state.total_documents 
+            caps.optimal_documents_range[0]
+            <= current_state.total_documents
             <= caps.optimal_documents_range[1]
         )
-        
+
         if docs_in_optimal_range and current_state.quality_score >= caps.target_quality_score:
             return (True, "optimal_documents_with_quality_target")
-        
+
         # 3. SOFT CAPS - Consider stopping
         soft_time_reached = current_state.total_time >= (
             caps.max_total_time * caps.soft_time_threshold
@@ -954,26 +954,26 @@ class ResourceCapEvaluator:
         soft_cost_reached = current_state.total_cost >= (
             caps.max_total_cost * caps.soft_cost_threshold
         )
-        
+
         if soft_time_reached and soft_cost_reached:
             # Check if we have minimum viable content
             has_min_docs = current_state.total_documents >= caps.min_documents_for_answer
             has_min_quality = current_state.quality_score >= caps.min_acceptable_quality
-            
+
             if has_min_docs and has_min_quality:
                 return (True, "soft_caps_reached_with_viable_content")
-        
+
         # 4. DIMINISHING RETURNS - Stop if not improving
         if self._is_quality_plateauing(current_state, caps):
             return (True, "quality_plateau_reached")
-        
+
         # 5. CONTENT SUFFICIENCY - Check if we have enough
         if self._is_content_sufficient(current_state, caps):
             return (True, "content_sufficiency_achieved")
-        
+
         # Continue gathering
         return (False, "continue_gathering")
-    
+
     def _is_quality_plateauing(
         self,
         current_state: ExecutionState,
@@ -982,12 +982,12 @@ class ResourceCapEvaluator:
         """Check if quality has stopped improving"""
         if len(current_state.quality_history) < 3:
             return False
-        
+
         recent_qualities = current_state.quality_history[-3:]
         max_improvement = max(recent_qualities) - min(recent_qualities)
-        
+
         return max_improvement < caps.quality_plateau_threshold
-    
+
     def _is_content_sufficient(
         self,
         current_state: ExecutionState,
@@ -1010,7 +1010,7 @@ class ContentSufficiencyEvaluator:
     Quantifies whether gathered content is sufficient for a quality answer.
     Uses multiple dimensions to calculate a Content Sufficiency Score (0-1).
     """
-    
+
     def evaluate(
         self,
         current_state: ExecutionState,
@@ -1021,14 +1021,14 @@ class ContentSufficiencyEvaluator:
         """
         css = self.calculate_content_sufficiency_score(current_state)
         return css >= 0.75  # 75% sufficiency threshold
-    
+
     def calculate_content_sufficiency_score(
         self,
         current_state: ExecutionState
     ) -> float:
         """
         Calculates Content Sufficiency Score (CSS) using 6 dimensions.
-        
+
         CSS = weighted average of:
         1. Evidence Coverage (30%)
         2. Source Diversity (15%)
@@ -1037,25 +1037,25 @@ class ContentSufficiencyEvaluator:
         5. Confidence Level (15%)
         6. Completeness (5%)
         """
-        
+
         # 1. Evidence Coverage (30%) - How much of the query is addressed?
         evidence_coverage = self._calculate_evidence_coverage(current_state)
-        
+
         # 2. Source Diversity (15%) - Multiple independent sources?
         source_diversity = self._calculate_source_diversity(current_state)
-        
+
         # 3. Document Quality (20%) - Are documents authoritative?
         doc_quality = self._calculate_document_quality(current_state)
-        
+
         # 4. Information Density (15%) - Rich, detailed information?
         info_density = self._calculate_information_density(current_state)
-        
+
         # 5. Confidence Level (15%) - System confidence in answer
         confidence = current_state.confidence_score
-        
+
         # 6. Completeness (5%) - All query aspects covered?
         completeness = self._calculate_completeness(current_state)
-        
+
         # Weighted average
         css = (
             0.30 * evidence_coverage +
@@ -1065,17 +1065,17 @@ class ContentSufficiencyEvaluator:
             0.15 * confidence +
             0.05 * completeness
         )
-        
+
         return css
-    
+
     def _calculate_evidence_coverage(self, state: ExecutionState) -> float:
         """
         Evidence Coverage: How many query aspects have supporting evidence?
-        
+
         Returns: 0-1 score
         """
         query_aspects = state.query_decomposition.aspects  # e.g., ["legal requirements", "documents needed", "deadlines"]
-        
+
         covered_aspects = []
         for aspect in query_aspects:
             # Check if we have documents that address this aspect
@@ -1085,14 +1085,14 @@ class ContentSufficiencyEvaluator:
             )
             if has_evidence:
                 covered_aspects.append(aspect)
-        
+
         coverage_ratio = len(covered_aspects) / len(query_aspects) if query_aspects else 0
         return coverage_ratio
-    
+
     def _calculate_source_diversity(self, state: ExecutionState) -> float:
         """
         Source Diversity: Variety of independent sources.
-        
+
         High diversity (0.9-1.0): 5+ different source types, 10+ unique sources
         Medium diversity (0.6-0.8): 3-4 source types, 5-9 unique sources
         Low diversity (0.3-0.5): 1-2 source types, 2-4 unique sources
@@ -1100,21 +1100,21 @@ class ContentSufficiencyEvaluator:
         # Count source types (legal_db, api, web, graph, etc.)
         source_types = set(doc.source_type for doc in state.retrieved_documents)
         num_source_types = len(source_types)
-        
+
         # Count unique sources (domains, databases, etc.)
         unique_sources = set(doc.source_id for doc in state.retrieved_documents)
         num_unique_sources = len(unique_sources)
-        
+
         # Score based on counts
         type_score = min(num_source_types / 5.0, 1.0)  # 5 types = perfect
         source_score = min(num_unique_sources / 10.0, 1.0)  # 10 sources = perfect
-        
+
         return (type_score + source_score) / 2
-    
+
     def _calculate_document_quality(self, state: ExecutionState) -> float:
         """
         Document Quality: Average quality/authority of retrieved documents.
-        
+
         Uses:
         - Relevance scores from retrieval
         - Authority scores (e.g., official legal sources > blog posts)
@@ -1122,14 +1122,14 @@ class ContentSufficiencyEvaluator:
         """
         if not state.retrieved_documents:
             return 0.0
-        
+
         quality_scores = []
         for doc in state.retrieved_documents:
             # Combine multiple quality signals
             relevance = doc.relevance_score  # From vector/graph search
             authority = self._get_authority_score(doc)  # Source authority
             rerank_score = doc.rerank_score if hasattr(doc, 'rerank_score') else 0.5
-            
+
             # Weighted average
             doc_quality = (
                 0.40 * relevance +
@@ -1137,74 +1137,74 @@ class ContentSufficiencyEvaluator:
                 0.30 * rerank_score
             )
             quality_scores.append(doc_quality)
-        
+
         return sum(quality_scores) / len(quality_scores)
-    
+
     def _calculate_information_density(self, state: ExecutionState) -> float:
         """
         Information Density: How much useful information per document?
-        
+
         High density: Long documents with detailed information
         Low density: Short snippets with little detail
         """
         if not state.retrieved_documents:
             return 0.0
-        
+
         density_scores = []
         for doc in state.retrieved_documents:
             # Length score (longer = more detailed, up to a point)
             length_score = min(len(doc.content) / 2000, 1.0)  # 2000 chars = ideal
-            
+
             # Entity count (more entities = more information)
             entity_count = len(doc.entities) if hasattr(doc, 'entities') else 0
             entity_score = min(entity_count / 10, 1.0)  # 10 entities = good
-            
+
             # Citation count (cited sources = authoritative)
             citation_count = len(doc.citations) if hasattr(doc, 'citations') else 0
             citation_score = min(citation_count / 5, 1.0)  # 5 citations = good
-            
+
             density = (length_score + entity_score + citation_score) / 3
             density_scores.append(density)
-        
+
         return sum(density_scores) / len(density_scores)
-    
+
     def _calculate_completeness(self, state: ExecutionState) -> float:
         """
         Completeness: Are all parts of the query addressed?
-        
+
         Uses LLM to evaluate if gathered content can answer the full query.
         """
         # Quick check: minimum documents
         if state.total_documents < 5:
             return 0.3  # Likely incomplete
-        
+
         # LLM-based evaluation (cached for efficiency)
         prompt = f"""
         Query: {state.original_query}
-        
+
         Retrieved Documents: {len(state.retrieved_documents)} documents
         Document Summaries: {self._get_document_summaries(state)}
-        
+
         Question: Can the retrieved documents fully answer the query?
-        
+
         Consider:
         1. Are all aspects of the query addressed?
         2. Is there sufficient detail for each aspect?
         3. Are there any obvious gaps?
-        
+
         Respond with a completeness score (0-1) and brief explanation.
         Format: {{"score": 0.85, "explanation": "..."}}
         """
-        
+
         # Call LLM (use small model for efficiency)
         llm_response = call_llm_for_completeness_check(prompt, model="small")
-        
+
         return llm_response.get("score", 0.5)
-    
+
     def _get_authority_score(self, doc: Document) -> float:
         """
         Authority score based on source type.
-        
+
         Official legal databases: 1.0
         Government websites: 0.9
         Academic sources: 0.85
@@ -1235,10 +1235,10 @@ def evaluate_continuation_decision(
 ) -> ContinuationDecision:
     """
     Comprehensive evaluation of whether to continue or terminate.
-    
+
     Called after EVERY step completion.
     """
-    
+
     # 1. Check Hard Caps (Must Stop)
     should_stop, reason = ResourceCapEvaluator().should_stop_gathering(
         current_state, caps
@@ -1249,12 +1249,12 @@ def evaluate_continuation_decision(
             reason=reason,
             confidence=1.0
         )
-    
+
     # 2. Check Content Sufficiency
     css = ContentSufficiencyEvaluator().calculate_content_sufficiency_score(
         current_state
     )
-    
+
     # High sufficiency + soft cap reached = terminate
     if css >= 0.85 and should_stop:
         return ContinuationDecision(
@@ -1263,7 +1263,7 @@ def evaluate_continuation_decision(
             confidence=0.9,
             css=css
         )
-    
+
     # Exceptional sufficiency = terminate even before caps
     if css >= 0.95:
         return ContinuationDecision(
@@ -1272,7 +1272,7 @@ def evaluate_continuation_decision(
             confidence=0.95,
             css=css
         )
-    
+
     # 3. Check if we're making progress
     if css < 0.40 and current_state.completed_steps >= 3:
         # Low sufficiency after 3 steps = need different approach
@@ -1282,7 +1282,7 @@ def evaluate_continuation_decision(
             confidence=0.7,
             css=css
         )
-    
+
     # 4. Continue with guidance
     if css < 0.60:
         # Need more content
@@ -1293,7 +1293,7 @@ def evaluate_continuation_decision(
             css=css,
             recommendation="prioritize_high_quality_sources"
         )
-    
+
     # Moderate sufficiency, continue optimistically
     return ContinuationDecision(
         action="CONTINUE",
@@ -1388,7 +1388,7 @@ User Refinement (t=16s): "Was ist mit Artenschutz?"
 
 Step 5 (t=22s, 47.0 CU): Environmental Agent → +9 docs, CSS=0.88
   ✅ TERMINATE: "high_content_sufficiency (0.88) + soft_time_reached"
-  
+
   Breakdown:
   - Evidence Coverage: 0.92 (all query aspects covered)
   - Source Diversity: 0.85 (4 source types, 8 unique sources)
@@ -1396,7 +1396,7 @@ Step 5 (t=22s, 47.0 CU): Environmental Agent → +9 docs, CSS=0.88
   - Information Density: 0.82 (detailed documents)
   - Confidence: 0.85 (high system confidence)
   - Completeness: 0.90 (LLM confirms all aspects addressed)
-  
+
   Final: 53 documents, 22s, 47.0 CU, Quality 9.1/10
 ```
 
@@ -1481,18 +1481,18 @@ Time: 8.2s, Cost: 47.0 CU, Quality: 9.2/10
 
 This **Tree-Based Orchestration Architecture** positions VERITAS as a world-class research system with:
 
-✅ **Hypothesis-driven** understanding  
-✅ **Multi-plan** cost-benefit evaluation  
-✅ **Tree execution** (parallel + sequential)  
-✅ **Interactive refinement** (Copilot Agents style)  
-✅ **Adaptive agents** (request more investigation)  
-✅ **Per-step cost-benefit verification** (no wasteful processes)  
-✅ **Integrated overall cost-benefit tracking** (real-time execution health)  
-✅ **Multi-dimensional resource caps** (time, cost, documents, quality) **NEW**  
-✅ **Content Sufficiency Score (CSS)** - 6-factor quantification **NEW**  
-✅ **Intelligent termination** (stops when sufficient, not just when budget exhausted)  
-✅ **Quality-based pruning** with ROI analysis  
-✅ **Token budgets** for cost control  
+✅ **Hypothesis-driven** understanding
+✅ **Multi-plan** cost-benefit evaluation
+✅ **Tree execution** (parallel + sequential)
+✅ **Interactive refinement** (Copilot Agents style)
+✅ **Adaptive agents** (request more investigation)
+✅ **Per-step cost-benefit verification** (no wasteful processes)
+✅ **Integrated overall cost-benefit tracking** (real-time execution health)
+✅ **Multi-dimensional resource caps** (time, cost, documents, quality) **NEW**
+✅ **Content Sufficiency Score (CSS)** - 6-factor quantification **NEW**
+✅ **Intelligent termination** (stops when sufficient, not just when budget exhausted)
+✅ **Quality-based pruning** with ROI analysis
+✅ **Token budgets** for cost control
 ✅ **Full transparency** via execution tree and real-time metrics
 
 ### Key Innovations

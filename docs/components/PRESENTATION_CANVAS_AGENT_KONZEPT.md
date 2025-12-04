@@ -1,8 +1,8 @@
 # Presentation Canvas Agent - Erweiterte Präsentations-Generierung
 
-**Erstellt:** 3. Dezember 2025  
-**Version:** 2.0.0  
-**Status:** 🟢 IMPLEMENTIERT  
+**Erstellt:** 3. Dezember 2025
+**Version:** 2.0.0
+**Status:** 🟢 IMPLEMENTIERT
 
 ---
 
@@ -324,13 +324,13 @@ Finale Präsentation
 async def _render_ai_image(self, element: Dict[str, Any]) -> Image.Image:
     """
     AI-Bild generieren (zukünftig)
-    
+
     Aktuell: Platzhalter
     Zukunft: Integration mit Stable Diffusion / DALL-E
     """
     ai_prompt = element.get('ai_prompt', '')
     properties = element.get('properties', {})
-    
+
     # TODO: Integration mit AI-Bildgenerator
     # if ai_generator_available:
     #     return await ai_generator.generate(
@@ -339,7 +339,7 @@ async def _render_ai_image(self, element: Dict[str, Any]) -> Image.Image:
     #         height=element['size']['height'],
     #         **properties
     #     )
-    
+
     # Aktuell: Platzhalter
     return self._create_placeholder_image(element)
 ```
@@ -646,7 +646,7 @@ AI_IMAGE_API_URL=http://localhost:7860
 
 ---
 
-**Ersteller:** VERITAS Development Team  
-**Version:** 2.0.0  
-**Letzte Aktualisierung:** 3. Dezember 2025  
+**Ersteller:** VERITAS Development Team
+**Version:** 2.0.0
+**Letzte Aktualisierung:** 3. Dezember 2025
 **Status:** ✅ Implementiert und getestet

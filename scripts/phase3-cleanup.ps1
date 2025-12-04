@@ -2,7 +2,7 @@
 # ==========================================
 # Archiviert 350+ veraltete Dateien in .archive/
 # Behält nur 70-80 essenzielle Dateien
-# 
+#
 # Usage:
 #   .\phase3-cleanup.ps1 -Mode analyze   # Nur zeigen
 #   .\phase3-cleanup.ps1 -Mode dryrun    # Dry-run Archivierung
@@ -118,7 +118,7 @@ function Write-Log {
 
 function Get-ArchiveCategory {
     param($FileName)
-    
+
     foreach ($category in $archivePatterns.Keys) {
         foreach ($pattern in $archivePatterns[$category]) {
             if ($FileName -like $pattern) {
@@ -131,26 +131,26 @@ function Get-ArchiveCategory {
 
 function Should-ArchiveFile {
     param($FileName)
-    
+
     # Check Blacklist
     foreach ($blackPattern in $neverArchive) {
         if ($FileName -like $blackPattern) {
             return $false
         }
     }
-    
+
     # Check Keep List
     foreach ($keepPattern in $keepPatterns) {
         if ($FileName -like $keepPattern) {
             return $false
         }
     }
-    
+
     # Check Archive Patterns
     if (Get-ArchiveCategory $FileName) {
         return $true
     }
-    
+
     return $false
 }
 
@@ -158,24 +158,24 @@ function Should-ArchiveFile {
 
 function Mode-Analyze {
     Write-Log "===== PHASE 3 ANALYSIS ====="
-    
-    $files = Get-ChildItem -Path $docsRoot -Filter "*.md" -File -Recurse | 
+
+    $files = Get-ChildItem -Path $docsRoot -Filter "*.md" -File -Recurse |
              Where-Object { $_.DirectoryName -eq $docsRoot }
-    
+
     Write-Log "Total Markdown files in docs/ root: $($files.Count)"
     Write-Log "  "
-    
+
     # Analyze by category
     $stats = @{
         'keep' = @()
         'archive' = @{}
         'orphaned' = @()
     }
-    
+
     foreach ($archiveCategory in $archivePatterns.Keys) {
         $stats.archive[$archiveCategory] = @()
     }
-    
+
     foreach ($file in $files) {
         if (Should-ArchiveFile $file.Name) {
             $category = Get-ArchiveCategory $file.Name
@@ -188,13 +188,13 @@ function Mode-Analyze {
             $stats.keep += $file.Name
         }
     }
-    
+
     # Report
     Write-Log "  "
     Write-Log "KEEP: $($stats.keep.Count) files"
     Write-Log "  $(($stats.keep | Select-Object -First 10) -join ', ')..."
     Write-Log "  "
-    
+
     Write-Log "ARCHIVE (by category):"
     foreach ($category in $archivePatterns.Keys) {
         $count = $stats.archive[$category].Count
@@ -211,12 +211,12 @@ function Mode-Analyze {
         }
     }
     Write-Log "  "
-    
+
     Write-Log "ORPHANED (not matched): $($stats.orphaned.Count) files"
     foreach ($orphan in $stats.orphaned | Select-Object -First 10) {
         Write-Log "  - $orphan"
     }
-    
+
     # Summary
     $totalArchive = ($stats.archive.Values | ForEach-Object { $_.Count } | Measure-Object -Sum).Sum
     Write-Log "  "
@@ -234,15 +234,15 @@ function Mode-DryRun {
     Write-Log "===== PHASE 3 DRY-RUN ====="
     Write-Log "(No files will be moved, just preview)"
     Write-Log "  "
-    
-    $files = Get-ChildItem -Path $docsRoot -Filter "*.md" -File -Recurse | 
+
+    $files = Get-ChildItem -Path $docsRoot -Filter "*.md" -File -Recurse |
              Where-Object { $_.DirectoryName -eq $docsRoot }
-    
+
     $archiveCount = 0
-    
+
     foreach ($category in $archivePatterns.Keys) {
         $categoryFiles = @()
-        
+
         foreach ($file in $files) {
             if (Should-ArchiveFile $file.Name) {
                 $fileCategory = Get-ArchiveCategory $file.Name
@@ -252,7 +252,7 @@ function Mode-DryRun {
                 }
             }
         }
-        
+
         if ($categoryFiles.Count -gt 0) {
             Write-Log "Would move to .archive/$category/ ($($categoryFiles.Count) files):"
             foreach ($f in $categoryFiles | Select-Object -First 5) {
@@ -264,7 +264,7 @@ function Mode-DryRun {
             Write-Log "  "
         }
     }
-    
+
     Write-Log "Total files to archive: $archiveCount"
 }
 
@@ -274,7 +274,7 @@ function Mode-Execute {
     Write-Log "===== PHASE 3 EXECUTE ====="
     Write-Log "WARNING: Archiving files now..."
     Write-Log "  "
-    
+
     # Ensure archive dirs exist
     foreach ($category in $archivePatterns.Keys) {
         $archiveDir = Join-Path $archiveRoot $category
@@ -283,32 +283,32 @@ function Mode-Execute {
             Write-Log "Created: $archiveDir"
         }
     }
-    
-    $files = Get-ChildItem -Path $docsRoot -Filter "*.md" -File -Recurse | 
+
+    $files = Get-ChildItem -Path $docsRoot -Filter "*.md" -File -Recurse |
              Where-Object { $_.DirectoryName -eq $docsRoot }
-    
+
     $movedCount = 0
-    
+
     foreach ($file in $files) {
         if (Should-ArchiveFile $file.Name) {
             $category = Get-ArchiveCategory $file.Name
             if ($category) {
                 $targetDir = Join-Path $archiveRoot $category
                 $targetPath = Join-Path $targetDir $file.Name
-                
+
                 Move-Item -Path $file.FullName -Destination $targetPath -Force
                 Write-Log "Moved: $($file.Name) → .archive/$category/"
                 $movedCount++
             }
         }
     }
-    
+
     Write-Log "  "
     Write-Log "=== EXECUTION COMPLETE ==="
     Write-Log "Files moved: $movedCount"
-    
+
     # Verify
-    $remaining = (Get-ChildItem -Path $docsRoot -Filter "*.md" -File -Recurse | 
+    $remaining = (Get-ChildItem -Path $docsRoot -Filter "*.md" -File -Recurse |
                   Where-Object { $_.DirectoryName -eq $docsRoot } | Measure-Object).Count
     Write-Log "Files remaining in docs/: $remaining"
 }
@@ -319,28 +319,28 @@ function Mode-Validate {
     Write-Log "===== PHASE 3 VALIDATE ====="
     Write-Log "Checking for broken internal links..."
     Write-Log "  "
-    
+
     $files = Get-ChildItem -Path $docsRoot -Filter "*.md" -File -Recurse
     $brokenLinks = @()
-    
+
     foreach ($file in $files) {
         # Find all markdown links: [text](path)
         $content = Get-Content -Path $file.FullName -Raw
         $linkPattern = '\[([^\]]*)\]\(([^\)]+)\)'
         $matches = [regex]::Matches($content, $linkPattern)
-        
+
         foreach ($match in $matches) {
             $linkPath = $match.Groups[2].Value
-            
+
             # Skip external links
             if ($linkPath -like 'http*' -or $linkPath -like '#*') {
                 continue
             }
-            
+
             # Resolve relative path
             $resolvedPath = Join-Path (Split-Path $file.FullName) $linkPath
             $resolvedPath = [System.IO.Path]::GetFullPath($resolvedPath)
-            
+
             if (!(Test-Path $resolvedPath)) {
                 $brokenLinks += @{
                     File = $file.FullName
@@ -350,7 +350,7 @@ function Mode-Validate {
             }
         }
     }
-    
+
     if ($brokenLinks.Count -eq 0) {
         Write-Log "✓ No broken links found!"
     } else {

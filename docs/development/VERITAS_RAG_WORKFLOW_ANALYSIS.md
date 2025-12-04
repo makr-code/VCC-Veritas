@@ -1,8 +1,8 @@
 # VERITAS RAG Workflow - Vollständige Analyse
 ## Retrieval-Augmented Generation Ablauf
 
-**Dokument-Version**: 1.0  
-**Erstellt**: 2025-12-03  
+**Dokument-Version**: 1.0
+**Erstellt**: 2025-12-03
 **Status**: ✅ Produktionsbereit
 
 ---
@@ -156,7 +156,7 @@ Content-Type: application/json
 async def process_query(request: UnifiedQueryRequest) -> UnifiedResponse:
     # 1. Session-ID generieren (falls nicht vorhanden)
     session_id = request.session_id or uuid.uuid4()
-    
+
     # 2. Mode-basiertes Routing
     if request.mode == QueryMode.RAG:
         result = await self._process_rag(request)
@@ -166,14 +166,14 @@ async def process_query(request: UnifiedQueryRequest) -> UnifiedResponse:
         result = await self._process_agent(request)
     elif request.mode == QueryMode.ASK:
         result = await self._process_ask(request)
-    
+
     # 3. Normalisierung zu UnifiedResponse
     response = UnifiedResponse(
         content=result["content"],
         sources=self._normalize_sources(result["sources"]),
         metadata=UnifiedResponseMetadata(...)
     )
-    
+
     return response
 ```
 
@@ -363,18 +363,18 @@ final_response = await self._synthesize_results(
 # """
 # Du bist ein Experte für Verwaltungsrecht. Synthes synthesiere die folgenden
 # Agent-Ergebnisse zu einer kohärenten Antwort:
-# 
+#
 # QUERY: {query}
-# 
+#
 # RECHTSRECHERCHE-AGENT:
 # {rechtsrecherche_result}
-# 
+#
 # BAURECHT-AGENT:
 # {baurecht_result}
-# 
+#
 # ENVIRONMENTAL-AGENT:
 # {environmental_result}
-# 
+#
 # Erstelle eine präzise, strukturierte Antwort mit:
 # 1. Zusammenfassung
 # 2. Rechtsgrundlagen (mit IEEE-Citations)
@@ -614,22 +614,22 @@ await pipeline.shutdown()
 async def execute(self, request: IntelligentPipelineRequest):
     # 1. Query Analysis
     analysis = await self._analyze_query(request.query_text)
-    
+
     # 2. Agent Selection
     agents = self._select_agents(analysis)
-    
+
     # 3. RAG Context
     rag_context = await self._get_rag_context(request.query_text)
-    
+
     # 4. Parallel Execution
     results = await self._execute_agents_parallel(agents, rag_context)
-    
+
     # 5. Aggregation
     final_response = await self._aggregate_results(results)
-    
+
     # 6. Quality Check
     validated = await self._validate_response(final_response)
-    
+
     return IntelligentPipelineResponse(...)
 ```
 
@@ -648,13 +648,13 @@ async def get_context(
 ) -> Dict[str, Any]:
     # 1. Embedding generieren
     query_embedding = await self.embedding_model.embed(query)
-    
+
     # 2. Vector Search
     vector_results = await self.uds3.vector_search(
         embedding=query_embedding,
         top_k=options.top_k
     )
-    
+
     # 3. Graph Traversal (optional)
     graph_results = []
     if options.enable_graph:
@@ -662,7 +662,7 @@ async def get_context(
             query=query,
             limit=options.top_k
         )
-    
+
     # 4. Relational Query (optional)
     relational_results = []
     if options.enable_relational:
@@ -670,7 +670,7 @@ async def get_context(
             query=self._build_sql_query(query),
             limit=options.top_k
         )
-    
+
     # 5. RRF Fusion
     combined = self._reciprocal_rank_fusion(
         vector_results,
@@ -678,7 +678,7 @@ async def get_context(
         relational_results,
         k=60
     )
-    
+
     return {
         "vector_results": vector_results,
         "graph_results": graph_results,
@@ -693,15 +693,15 @@ async def get_context(
 def _reciprocal_rank_fusion(results_lists, k=60):
     """
     RRF Formula: score(d) = Σ(1 / (k + rank_i(d)))
-    
+
     - k: Parameter (default 60, aus Lit.)
     - rank_i(d): Rang von Dokument d in Liste i
     """
     scores = defaultdict(float)
-    
+
     for rank, doc in enumerate(results_list, start=1):
         scores[doc.id] += 1 / (k + rank)
-    
+
     # Sortiere nach Score (descending)
     return sorted(scores.items(), key=lambda x: x[1], reverse=True)
 ```
@@ -725,20 +725,20 @@ async def rerank(
     - Relevance: Wie relevant ist die Source für die Query?
     - Informativeness: Wie informativ ist die Source?
     """
-    
+
     reranked = []
     for source in sources:
         # LLM Prompt
         prompt = f"""
         Query: {query}
-        
+
         Document:
         {source['content'][:500]}
-        
+
         Rate this document on two scales (0.0-1.0):
         1. Relevance: How relevant is it to the query?
         2. Informativeness: How informative is it?
-        
+
         Respond in JSON:
         {{
             "relevance": 0.0-1.0,
@@ -746,17 +746,17 @@ async def rerank(
             "reasoning": "Brief explanation"
         }}
         """
-        
+
         # LLM Call
         llm_response = await self.ollama_client.chat(
             model=self.model_name,
             messages=[{"role": "user", "content": prompt}],
             temperature=self.temperature
         )
-        
+
         # Parse JSON
         scores = json.loads(llm_response["message"]["content"])
-        
+
         # Combine Scores
         if scoring_mode == ScoringMode.COMBINED:
             final_score = (scores["relevance"] + scores["informativeness"]) / 2
@@ -764,7 +764,7 @@ async def rerank(
             final_score = scores["relevance"]
         else:
             final_score = scores["informativeness"]
-        
+
         reranked.append(RerankingResult(
             source=source,
             original_score=source.get("score", 0.0),
@@ -773,7 +773,7 @@ async def rerank(
             informativeness=scores["informativeness"],
             reasoning=scores["reasoning"]
         ))
-    
+
     # Sort by rerank_score
     return sorted(reranked, key=lambda x: x.rerank_score, reverse=True)
 ```
@@ -963,19 +963,19 @@ quality_metrics = {
 def calculate_quality_metrics(response, sources, query):
     # Coherence: LLM-basiert
     coherence = await llm_evaluate_coherence(response)
-    
+
     # Completeness: Keyword-Analyse
     completeness = check_query_terms_coverage(query, response)
-    
+
     # Accuracy: Fact-Checking via Cross-References
     accuracy = await verify_facts(response, sources)
-    
+
     # Relevance: Average Source Relevance
     relevance = np.mean([s.relevance_score for s in sources])
-    
+
     # Informativeness: Information Density
     informativeness = calculate_information_density(response)
-    
+
     return {
         "coherence": coherence,
         "completeness": completeness,
@@ -993,12 +993,12 @@ def calculate_quality_metrics(response, sources, query):
 if quality_score < 0.7:
     # Strategy 1: Retry mit höherer Temperature
     response = await retry_with_higher_temperature(query, temperature=0.5)
-    
+
     if quality_score < 0.7:
         # Strategy 2: Vereinfachte Query
         simplified_query = simplify_query(query)
         response = await process_query(simplified_query)
-        
+
         if quality_score < 0.7:
             # Strategy 3: Fallback zu Direct LLM (Ask Mode)
             response = await direct_llm_ask(query)
@@ -1278,20 +1278,20 @@ Error Response mit Hinweis für User
 
 ### 9.3 Stärken des Systems
 
-✅ **Modular**: Komponenten unabhängig austauschbar  
-✅ **Skalierbar**: Parallel Execution, Connection Pooling  
-✅ **Robust**: Multi-Level Error Handling, Graceful Degradation  
-✅ **Transparent**: LLM Commentary, Processing Metadata  
-✅ **Qualitätsgesichert**: Multi-Level Quality Gates  
-✅ **Flexibel**: Verschiedene Modi (RAG, Hybrid, Agent, Ask)  
+✅ **Modular**: Komponenten unabhängig austauschbar
+✅ **Skalierbar**: Parallel Execution, Connection Pooling
+✅ **Robust**: Multi-Level Error Handling, Graceful Degradation
+✅ **Transparent**: LLM Commentary, Processing Metadata
+✅ **Qualitätsgesichert**: Multi-Level Quality Gates
+✅ **Flexibel**: Verschiedene Modi (RAG, Hybrid, Agent, Ask)
 
 ### 9.4 Optimierungspotenzial
 
-🔧 **Caching erweitern**: Semantic Caching (ähnliche Queries)  
-🔧 **Agent-Priorisierung**: Dynamische Agent-Auswahl basierend auf Past Performance  
-🔧 **Adaptive Timeouts**: Längere Timeouts für komplexe Queries  
-🔧 **Query Rewriting**: Automatische Query-Verbesserung  
-🔧 **Feedback Loop**: User-Feedback zurück in Agent-Selektion  
+🔧 **Caching erweitern**: Semantic Caching (ähnliche Queries)
+🔧 **Agent-Priorisierung**: Dynamische Agent-Auswahl basierend auf Past Performance
+🔧 **Adaptive Timeouts**: Längere Timeouts für komplexe Queries
+🔧 **Query Rewriting**: Automatische Query-Verbesserung
+🔧 **Feedback Loop**: User-Feedback zurück in Agent-Selektion
 
 ---
 
@@ -1306,7 +1306,7 @@ Error Response mit Hinweis für User
 
 ---
 
-**Erstellt von**: VERITAS Development Team  
-**Letzte Aktualisierung**: 2025-12-03  
-**Version**: 1.0  
+**Erstellt von**: VERITAS Development Team
+**Letzte Aktualisierung**: 2025-12-03
+**Version**: 1.0
 **Status**: ✅ Produktionsbereit

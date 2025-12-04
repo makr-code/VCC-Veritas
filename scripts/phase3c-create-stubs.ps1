@@ -69,7 +69,7 @@ function Create-StubFile {
     $content = @"
 # $($Stub.title)
 
-**Status:** ⏳ Under Construction  
+**Status:** ⏳ Under Construction
 **Last Updated:** 4. Dezember 2025
 
 ---
@@ -95,7 +95,7 @@ This document is currently under construction. Content coming soon.
 
 # Main execution
 Write-Host ""
-Write-Host "=== Phase 3c: Creating Missing Stub Files ===" 
+Write-Host "=== Phase 3c: Creating Missing Stub Files ==="
 Write-Host ""
 
 $created = 0
@@ -110,7 +110,7 @@ foreach ($stub in $stubs) {
 }
 
 Write-Host ""
-Write-Host "=== Summary ===" 
+Write-Host "=== Summary ==="
 Write-Host "Created: $created"
 Write-Host "Skipped: $skipped"
 Write-Host "Total:   $($created + $skipped)"

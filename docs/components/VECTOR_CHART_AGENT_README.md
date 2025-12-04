@@ -419,11 +419,11 @@ python start_backend.py
 
 def _generate_chart(self, chart_type, data, intent):
     # ... existing types ...
-    
+
     elif chart_type == 'gantt':
         # Gantt-Chart für Projektplanung
         pass
-    
+
     elif chart_type == 'network':
         # Network-Graph für Neo4j-Daten
         pass
@@ -440,7 +440,7 @@ def _generate_chart(self, chart_type, data, intent):
 - Tkinter (Frontend-UI)
 - Ollama/vLLM (LLM für Intent Detection)
 
-**Version:** 1.0.0  
+**Version:** 1.0.0
 **Datum:** 3. Dezember 2025
 
 ---

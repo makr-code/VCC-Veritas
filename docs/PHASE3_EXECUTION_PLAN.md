@@ -1,7 +1,7 @@
 # Phase 3 Execution Plan: Aggressive Documentation Cleanup
 
-**Status:** Phase 3a Complete - Ready für Cleanup  
-**Daten-Punkte:** 406 Markdown-Dateien in docs/ (massiver Bloat!)  
+**Status:** Phase 3a Complete - Ready für Cleanup
+**Daten-Punkte:** 406 Markdown-Dateien in docs/ (massiver Bloat!)
 **Strategie:** Archiviere 350+ Dateien, behalte nur essenzielle
 
 ---
@@ -179,7 +179,7 @@ $archivePatterns = @{
 ./scripts/cleanup-docs.ps1 -Mode analyze
 ```
 
-**Output:** 
+**Output:**
 - Zeige Archivierungs-Kandidaten
 - Zeige Duplikate
 - Zeige fehlerhafte Links
@@ -346,4 +346,3 @@ docsify serve docs/
 ---
 
 **Bereit zur Ausführung?** → Starte mit `analyze` Dry-Run
-

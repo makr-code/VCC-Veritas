@@ -1,7 +1,7 @@
 # VCC-Veritas & ThemisDB - Dokumentation Cleanup Plan
 
-**Datum:** 4. Dezember 2025  
-**Status:** 🔴 In Planung  
+**Datum:** 4. Dezember 2025
+**Status:** 🔴 In Planung
 **Ziel:** Reduzierung Documentation Bloat von ~400 Dateien zu strukturierter, wartbarer Dokumentation
 
 ---
@@ -208,9 +208,9 @@ docs/
 ```markdown
 # VCC-Veritas: AI-Gestützte Dokumentation & Recherche
 
-**🚀 [Quickstart](docs/getting-started/QUICK_START.md)** | 
-**📖 [Dokumentation](docs/README.md)** | 
-**🔗 [API](docs/api/API_REFERENCE.md)** | 
+**🚀 [Quickstart](docs/getting-started/QUICK_START.md)** |
+**📖 [Dokumentation](docs/README.md)** |
+**🔗 [API](docs/api/API_REFERENCE.md)** |
 **🛠️ [Development](docs/development/DEVELOPMENT.md)**
 
 ## Features
@@ -479,6 +479,6 @@ KONZEPT_VQB_*.md
 
 ---
 
-**Versionierung:** v1.0  
-**Letzte Änderung:** 4. Dezember 2025  
+**Versionierung:** v1.0
+**Letzte Änderung:** 4. Dezember 2025
 **Gültig bis:** 31. Januar 2026 (dann Review)

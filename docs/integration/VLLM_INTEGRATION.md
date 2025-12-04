@@ -1,7 +1,7 @@
 # vLLM Integration für VERITAS
 
-**Version:** 1.0  
-**Datum:** 22. November 2025  
+**Version:** 1.0
+**Datum:** 22. November 2025
 **Status:** ✅ Production Ready
 
 ---
@@ -94,14 +94,14 @@ from backend.agents.veritas_llm_factory import get_llm_client
 async def main():
     # Client erstellen (nutzt vLLM wenn LLM_PROVIDER=vllm)
     client = await get_llm_client()
-    
+
     # Query ausführen
     response = await client.query_with_context(
         query="Was ist eine Baugenehmigung?",
         temperature=0.7,
         max_tokens=500
     )
-    
+
     print(response.response)
     await client.close()
 ```
@@ -267,7 +267,7 @@ if success:
         prompt="Erkläre das Baurecht",
         lora_adapter="clara-legal-v1"
     )
-    
+
     response = await client.generate_response(request)
     print(response.response)
 ```

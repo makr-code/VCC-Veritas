@@ -18,17 +18,17 @@ function Write-Log {
         [ValidateSet('INFO', 'WARN', 'ERROR', 'SUCCESS')]
         [string]$Level = 'INFO'
     )
-    
+
     $timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
     $logEntry = "[$timestamp] [$Level] $Message"
-    
+
     Write-Host $logEntry -ForegroundColor @{
         'INFO'    = 'Cyan'
         'WARN'    = 'Yellow'
         'ERROR'   = 'Red'
         'SUCCESS' = 'Green'
     }[$Level]
-    
+
     Add-Content -Path $LogFile -Value $logEntry
 }
 
@@ -38,9 +38,9 @@ function Write-Log {
 
 function Analyze-Documentation {
     Write-Log "🔍 Starte Dokumentation-Analyse..." "INFO"
-    
+
     $docs = Get-ChildItem -Path '.' -Filter '*.md' -Recurse
-    
+
     $categories = @{
         'phase_reports'     = @()
         'deployment_logs'   = @()
@@ -49,15 +49,15 @@ function Analyze-Documentation {
         'current_active'    = @()
         'duplicates'        = @()
     }
-    
+
     $filesByName = @{}
-    
+
     foreach ($file in $docs) {
         $name = $file.Name.ToLower()
         $fullPath = $file.FullName
         $age = (Get-Date) - $file.LastWriteTime
         $ageDays = [int]$age.TotalDays
-        
+
         # Kategorisierung
         if ($name -match '^phase\d+_|^phase_a\d+_') {
             $categories['phase_reports'] += @{
@@ -98,7 +98,7 @@ function Analyze-Documentation {
                 $filesByName[$baseName] = @()
             }
             $filesByName[$baseName] += $file
-            
+
             $categories['current_active'] += @{
                 Path   = $fullPath
                 Name   = $file.Name
@@ -107,7 +107,7 @@ function Analyze-Documentation {
             }
         }
     }
-    
+
     # Duplikate finden
     foreach ($baseName in $filesByName.Keys) {
         if ($filesByName[$baseName].Count -gt 1) {
@@ -122,7 +122,7 @@ function Analyze-Documentation {
             }
         }
     }
-    
+
     # Report
     Write-Log "📊 Analyse abgeschlossen:" "SUCCESS"
     Write-Log "  Phase Reports: $($categories['phase_reports'].Count)" "INFO"
@@ -131,7 +131,7 @@ function Analyze-Documentation {
     Write-Log "  Konzepte: $($categories['concepts'].Count)" "INFO"
     Write-Log "  Aktive Docs: $($categories['current_active'].Count)" "INFO"
     Write-Log "  Duplikate: $($categories['duplicates'].Count)" "INFO"
-    
+
     return $categories
 }
 
@@ -141,7 +141,7 @@ function Analyze-Documentation {
 
 function Create-ArchiveStructure {
     Write-Log "📦 Erstelle Archive-Struktur..." "INFO"
-    
+
     $archiveRoot = '.\.archive'
     $subDirs = @(
         'phase-reports',
@@ -151,7 +151,7 @@ function Create-ArchiveStructure {
         'obsolete-guides',
         'old-versions'
     )
-    
+
     if (-not (Test-Path $archiveRoot)) {
         if (-not $DryRun) {
             New-Item -ItemType Directory -Path $archiveRoot -Force | Out-Null
@@ -160,7 +160,7 @@ function Create-ArchiveStructure {
             Write-Log "🔄 [DRY-RUN] Würde Archive-Root erstellen: $archiveRoot" "INFO"
         }
     }
-    
+
     foreach ($subDir in $subDirs) {
         $path = Join-Path $archiveRoot $subDir
         if (-not (Test-Path $path)) {
@@ -172,7 +172,7 @@ function Create-ArchiveStructure {
             }
         }
     }
-    
+
     return $archiveRoot
 }
 
@@ -181,27 +181,27 @@ function Archive-Files {
         [hashtable]$Categories,
         [string]$ArchiveRoot
     )
-    
+
     Write-Log "🗂️  Starte Archivierung..." "INFO"
-    
+
     $archiveMappings = @{
         'phase_reports'     = 'phase-reports'
         'deployment_logs'   = 'deployment-logs'
         'session_summaries' = 'session-summaries'
         'concepts'          = 'concepts'
     }
-    
+
     foreach ($category in $archiveMappings.Keys) {
         $files = $Categories[$category]
         $targetDir = Join-Path $ArchiveRoot $archiveMappings[$category]
-        
+
         Write-Log "  Archiviere $($files.Count) Dateien aus '$category'..." "INFO"
-        
+
         foreach ($file in $files) {
             $sourcePath = $file.Path
             $fileName = $file.Name
             $targetPath = Join-Path $targetDir $fileName
-            
+
             if (-not $DryRun) {
                 Move-Item -Path $sourcePath -Destination $targetPath -Force
                 Write-Log "    ✅ Archiviert: $fileName" "SUCCESS"
@@ -210,7 +210,7 @@ function Archive-Files {
             }
         }
     }
-    
+
     Write-Log "✅ Archivierung abgeschlossen" "SUCCESS"
 }
 
@@ -220,20 +220,20 @@ function Archive-Files {
 
 function Remove-Obsolete {
     Write-Log "🗑️  Starte Bereinigung..." "INFO"
-    
+
     $toRemove = @(
         'DOCUMENTATION_*.md',  # Alte Dokumentations-Index
         'README_OLD.md',
         '*_TEMP.md',
         'TODO_REMOVE_*.md'
     )
-    
+
     foreach ($pattern in $toRemove) {
         $matches = Get-ChildItem -Path '.' -Filter $pattern -ErrorAction SilentlyContinue
-        
+
         foreach ($file in $matches) {
             Write-Log "  Kandidat zur Löschung: $($file.Name)" "WARN"
-            
+
             if (-not $DryRun) {
                 Remove-Item -Path $file.FullName -Force
                 Write-Log "    ✅ Gelöscht: $($file.Name)" "SUCCESS"
@@ -242,7 +242,7 @@ function Remove-Obsolete {
             }
         }
     }
-    
+
     Write-Log "✅ Bereinigung abgeschlossen" "SUCCESS"
 }
 
@@ -252,26 +252,26 @@ function Remove-Obsolete {
 
 function Validate-Documentation {
     Write-Log "🔗 Validiere Dokumentation..." "INFO"
-    
+
     $docs = Get-ChildItem -Path 'docs' -Filter '*.md' -Recurse
     $brokenLinks = @()
     $missingFiles = @()
-    
+
     foreach ($doc in $docs) {
         # Regex für Markdown-Links
         $content = Get-Content -Path $doc.FullName -Raw
         $linkPattern = '\[([^\]]+)\]\(([^)]+)\)'
         $matches = [regex]::Matches($content, $linkPattern)
-        
+
         foreach ($match in $matches) {
             $linkText = $match.Groups[1].Value
             $linkPath = $match.Groups[2].Value
-            
+
             # Nur lokale Links prüfen
             if (-not ($linkPath.StartsWith('http'))) {
                 $resolvedPath = Join-Path (Split-Path $doc.FullName) $linkPath
                 $resolvedPath = [IO.Path]::GetFullPath($resolvedPath)
-                
+
                 if (-not (Test-Path $resolvedPath)) {
                     $brokenLinks += @{
                         File = $doc.Name
@@ -282,7 +282,7 @@ function Validate-Documentation {
             }
         }
     }
-    
+
     if ($brokenLinks.Count -gt 0) {
         Write-Log "⚠️  $($brokenLinks.Count) defekte Links gefunden:" "WARN"
         foreach ($link in $brokenLinks) {
@@ -291,7 +291,7 @@ function Validate-Documentation {
     } else {
         Write-Log "✅ Alle Links sind gültig" "SUCCESS"
     }
-    
+
     return $brokenLinks
 }
 
@@ -301,9 +301,9 @@ function Validate-Documentation {
 
 function Generate-ArchiveIndex {
     param([string]$ArchiveRoot)
-    
+
     Write-Log "📝 Generiere Archive-Index..." "INFO"
-    
+
     $indexContent = @"
 # Dokumentations-Archiv
 
@@ -357,14 +357,14 @@ Dateien werden archiviert wenn:
 
 ## Kontakt
 
-Fragen zur Archivierung? 
+Fragen zur Archivierung?
 → Siehe `docs/CONTRIBUTING.md` für Kontakt-Informationen
 
 **Letzte Aktualisierung:** $(Get-Date -Format 'dd.MM.yyyy HH:mm:ss')
 "@
-    
+
     $indexPath = Join-Path $ArchiveRoot 'README.md'
-    
+
     if (-not $DryRun) {
         Set-Content -Path $indexPath -Value $indexContent
         Write-Log "✅ Archive-Index erstellt: README.md" "SUCCESS"
@@ -383,18 +383,18 @@ function Main {
     Write-Log "║    Mode: $($Mode.PadRight(48))║" "INFO"
     Write-Log "║    Dry-Run: $($DryRun.ToString().PadRight(45))║" "INFO"
     Write-Log "╚════════════════════════════════════════════════════════════╝" "INFO"
-    
+
     if ($DryRun) {
         Write-Log "🔄 DRY-RUN MODE: Keine Änderungen werden durchgeführt" "WARN"
     }
-    
+
     try {
         switch ($Mode) {
             'analyze' {
                 $categories = Analyze-Documentation
                 Write-Log "📄 Details in Logfile: $LogFile" "INFO"
             }
-            
+
             'archive' {
                 $categories = Analyze-Documentation
                 $archiveRoot = Create-ArchiveStructure
@@ -402,17 +402,17 @@ function Main {
                 Generate-ArchiveIndex -ArchiveRoot $archiveRoot
                 Write-Log "✅ Archivierung abgeschlossen" "SUCCESS"
             }
-            
+
             'cleanup' {
                 Remove-Obsolete
                 Write-Log "✅ Cleanup abgeschlossen" "SUCCESS"
             }
-            
+
             'validate' {
                 $brokenLinks = Validate-Documentation
                 Write-Log "✅ Validierung abgeschlossen" "SUCCESS"
             }
-            
+
             'full' {
                 Write-Log "🚀 Starte vollständiges Cleanup..." "INFO"
                 $categories = Analyze-Documentation
@@ -424,7 +424,7 @@ function Main {
                 Write-Log "✅✅✅ Vollständiges Cleanup abgeschlossen" "SUCCESS"
             }
         }
-        
+
         Write-Log "📄 Detaillierter Log: $LogFile" "INFO"
     }
     catch {

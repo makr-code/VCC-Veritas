@@ -55,19 +55,19 @@ $skipped = @()
 
 function Analyze-Files {
     Write-Host "`n📊 PHASE 4 CONSOLIDATION ANALYSIS`n" -ForegroundColor Cyan
-    
+
     $files = Get-ChildItem -Path $docsPath -File -Filter "*.md" | Where-Object {
         $_.Name -notin @("README.md", "_sidebar.md", "_navbar.md", "index.html", "QUICK_START.md")
     }
-    
+
     Write-Host "Found $($files.Count) files to consolidate`n" -ForegroundColor Yellow
-    
+
     $plan = @()
-    
+
     foreach ($file in $files) {
         $fileName = $file.Name
         $target = $null
-        
+
         # Check if already in a category
         $inCategory = Test-Path (Join-Path $docsPath "getting-started" $fileName) -or `
                       Test-Path (Join-Path $docsPath "api" $fileName) -or `
@@ -77,13 +77,13 @@ function Analyze-Files {
                       Test-Path (Join-Path $docsPath "development" $fileName) -or `
                       Test-Path (Join-Path $docsPath "components" $fileName) -or `
                       Test-Path (Join-Path $docsPath "reference" $fileName)
-        
+
         if ($inCategory) {
             $kept += $fileName
             $plan += @{name=$fileName; action="KEEP"; category="already-organized"}
             continue
         }
-        
+
         # Smart routing
         foreach ($category in $categories.GetEnumerator()) {
             foreach ($pattern in $category.Value) {
@@ -94,7 +94,7 @@ function Analyze-Files {
             }
             if ($target) { break }
         }
-        
+
         # If no category match, try archive routing
         if (-not $target) {
             foreach ($archCat in $archiveCategories) {
@@ -107,19 +107,19 @@ function Analyze-Files {
                 if ($target) { break }
             }
         }
-        
+
         # Default to reference if still no match
         if (-not $target) {
             $target = "reference"
         }
-        
+
         $plan += @{name=$fileName; action="MOVE"; category=$target}
         $moved += $fileName
     }
-    
+
     # Group by target
     $groupedByTarget = $plan | Group-Object -Property category
-    
+
     Write-Host "CONSOLIDATION PLAN:`n" -ForegroundColor Green
     foreach ($group in $groupedByTarget | Sort-Object -Property Name) {
         Write-Host "  📁 $($group.Name): $($group.Count) files"
@@ -127,37 +127,37 @@ function Analyze-Files {
             Write-Host "     - $($_.name)" -ForegroundColor DarkGray
         }
     }
-    
+
     Write-Host "`n📈 SUMMARY:`n" -ForegroundColor Cyan
     Write-Host "  To Move: $($moved.Count)" -ForegroundColor Yellow
     Write-Host "  To Keep: $($kept.Count)" -ForegroundColor Green
-    
+
     return $plan
 }
 
 function Execute-Consolidation {
     Write-Host "`n⚙️  EXECUTING CONSOLIDATION`n" -ForegroundColor Cyan
-    
+
     $plan = Analyze-Files
-    
+
     $moveCount = 0
     $skipCount = 0
-    
+
     foreach ($item in $plan) {
         if ($item.action -eq "KEEP") {
             continue
         }
-        
+
         $sourcePath = Join-Path $docsPath $item.name
         $targetDir = $item.category
         $targetPath = Join-Path $targetDir $item.name
-        
+
         # Create target directory if it doesn't exist
         $targetDirFull = Split-Path -Parent $targetPath
         if (-not (Test-Path $targetDirFull)) {
             New-Item -ItemType Directory -Path $targetDirFull -Force | Out-Null
         }
-        
+
         if (Test-Path $sourcePath) {
             Move-Item -Path $sourcePath -Destination $targetPath -Force
             Write-Host "✓ MOVED: $($item.name) → $targetDir" -ForegroundColor Green
@@ -167,21 +167,21 @@ function Execute-Consolidation {
             $skipCount++
         }
     }
-    
+
     Write-Host "`n📊 EXECUTION COMPLETE:`n" -ForegroundColor Cyan
     Write-Host "  Successfully Moved: $moveCount" -ForegroundColor Green
     Write-Host "  Errors: $skipCount" -ForegroundColor Red
-    
+
     return $moveCount, $skipCount
 }
 
 function Validate-Structure {
     Write-Host "`n✅ VALIDATING STRUCTURE`n" -ForegroundColor Cyan
-    
+
     $rootFiles = Get-ChildItem -Path $docsPath -File -Filter "*.md" | Where-Object {
         $_.Name -notin @("README.md", "_sidebar.md", "_navbar.md", "index.html")
     }
-    
+
     Write-Host "📁 ROOT FILES REMAINING:`n" -ForegroundColor Yellow
     if ($rootFiles.Count -gt 0) {
         $rootFiles | ForEach-Object {
@@ -191,18 +191,18 @@ function Validate-Structure {
     } else {
         Write-Host "  ✓ Root directory is clean!" -ForegroundColor Green
     }
-    
+
     # Check each category
     Write-Host "`n📊 CATEGORY DISTRIBUTION:`n" -ForegroundColor Cyan
     $categories.Keys | ForEach-Object {
         $count = (Get-ChildItem -Path (Join-Path $docsPath $_) -File -Filter "*.md" 2>/dev/null).Count
         Write-Host "  $($_): $count files" -ForegroundColor DarkGray
     }
-    
+
     # Archive check
     $archiveCount = (Get-ChildItem -Path (Join-Path $docsPath ".archive") -File -Recurse -Filter "*.md" 2>/dev/null).Count
     Write-Host "  .archive: $archiveCount files" -ForegroundColor DarkGray
-    
+
     Write-Host "`n✨ HEALTH CHECK:`n" -ForegroundColor Cyan
     Write-Host "  Root Files: $($rootFiles.Count) (target: <10)" -ForegroundColor $(if ($rootFiles.Count -lt 10) { "Green" } else { "Yellow" })
     Write-Host "  Categories: 8 (all present)" -ForegroundColor Green
@@ -254,16 +254,16 @@ EXAMPLE:
 
 # Main
 switch ($Mode) {
-    "analyze" { 
+    "analyze" {
         $null = Analyze-Files
     }
-    "execute" { 
+    "execute" {
         Execute-Consolidation
     }
-    "validate" { 
+    "validate" {
         Validate-Structure
     }
-    "help" { 
+    "help" {
         Show-Help
     }
 }

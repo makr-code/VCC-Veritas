@@ -1,6 +1,6 @@
 # Clara LoRA Adapter Integration - Quick Reference
 
-**Datum:** 22. November 2025  
+**Datum:** 22. November 2025
 **Version:** 1.0
 
 ---
@@ -88,10 +88,10 @@ await client.unload_lora_adapter("clara-legal-v1")
 def get_required_lora_adapter(domain: str) -> str:
     """
     Bestimmt welcher LoRA-Adapter für die Domain benötigt wird
-    
+
     Args:
         domain: Fachdomäne (z.B. "baurecht", "umweltrecht")
-        
+
     Returns:
         str: Adapter-Name
     """
@@ -101,7 +101,7 @@ def get_required_lora_adapter(domain: str) -> str:
         "verkehrsrecht": "clara-traffic-law-v1",
         "sozialrecht": "clara-social-law-v1"
     }
-    
+
     return adapter_mapping.get(domain, "clara-general-v1")
 
 # Verwendung
@@ -192,15 +192,15 @@ from backend.agents.veritas_vllm_client import VeritasVLLMClient
 async def test_clara_lora_loading():
     client = VeritasVLLMClient()
     await client.initialize()
-    
+
     # Test Laden
     success = await client.load_lora_adapter("test-adapter")
     assert success
-    
+
     # Test Auflisten
     adapters = client.list_loaded_lora_adapters()
     assert "test-adapter" in adapters
-    
+
     # Test Entladen
     success = await client.unload_lora_adapter("test-adapter")
     assert success
@@ -214,14 +214,14 @@ python3
 
 >>> from backend.agents.veritas_vllm_client import VeritasVLLMClient, VLLMRequest
 >>> import asyncio
->>> 
+>>>
 >>> async def test():
 ...     client = VeritasVLLMClient()
 ...     await client.initialize()
-...     
+...
 ...     # Adapter laden
 ...     await client.load_lora_adapter("clara-legal-v1")
-...     
+...
 ...     # Mit Adapter testen
 ...     request = VLLMRequest(
 ...         model="meta-llama/Meta-Llama-3-8B-Instruct",
@@ -230,9 +230,9 @@ python3
 ...     )
 ...     response = await client.generate_response(request)
 ...     print(response.response)
-...     
+...
 ...     await client.close()
->>> 
+>>>
 >>> asyncio.run(test())
 ```
 
@@ -265,19 +265,19 @@ python3
 # Zu implementieren in Clara-Komponente
 class ClaraLoRATrainer:
     """Trainiert LoRA-Adapter basierend auf Feedback"""
-    
+
     def collect_feedback(self, domain: str):
         """Sammelt Feedback für spezifische Domain"""
         pass
-    
+
     def prepare_training_data(self, feedback):
         """Bereitet Training-Daten vor"""
         pass
-    
+
     def train_lora_adapter(self, base_model, training_data):
         """Trainiert LoRA-Adapter"""
         pass
-    
+
     def save_adapter(self, adapter, path):
         """Speichert Adapter in VLLM_LORA_BASE_PATH"""
         pass
@@ -289,7 +289,7 @@ class ClaraLoRATrainer:
 # Zu implementieren
 class AdapterSelector:
     """Wählt passenden LoRA-Adapter basierend auf Query"""
-    
+
     def select_adapter(self, query: str, context: dict) -> str:
         """Bestimmt besten Adapter für Query"""
         # Analyze query
@@ -304,15 +304,15 @@ class AdapterSelector:
 # Zu implementieren
 class AdapterMonitor:
     """Überwacht Performance von LoRA-Adaptern"""
-    
+
     def track_adapter_usage(self, adapter_name: str):
         """Trackt Nutzung"""
         pass
-    
+
     def measure_quality(self, adapter_name: str, response: str):
         """Misst Qualität"""
         pass
-    
+
     def generate_report(self) -> dict:
         """Erstellt Performance-Report"""
         pass
@@ -341,5 +341,5 @@ class AdapterMonitor:
 
 ---
 
-**Status:** ✅ vLLM-Seite implementiert, Clara-Komponenten noch zu implementieren  
+**Status:** ✅ vLLM-Seite implementiert, Clara-Komponenten noch zu implementieren
 **Ready for:** Clara-Team kann jetzt mit LoRA-Adapter-Erstellung beginnen

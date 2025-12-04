@@ -6,7 +6,7 @@
   "logoBg": "#ffffff",
   "logoHeight": 40,
   "favicon": "/_media/favicon.ico",
-  
+
   "theme": "dark",
   "themeColor": "#3f51b5",
   "coverpage": false,
@@ -14,7 +14,7 @@
   "mergeNavbar": true,
   "formatUpdated": "{yyyy}-{MM}-{dd} {HH}:{mm}",
   "timeUpdated": true,
-  
+
   "nav": [
     {
       "title": "🏠 Home",
@@ -62,7 +62,7 @@
       "target": "_blank"
     }
   ],
-  
+
   "subMaxLevel": 3,
   "maxLevel": 4,
   "sidebarDisplayLevel": 0,
@@ -70,7 +70,7 @@
   "routerMode": "hash",
   "auto2top": true,
   "topMargin": 40,
-  
+
   "search": {
     "maxAge": 86400000,
     "paths": "auto",
@@ -80,7 +80,7 @@
     "hideOtherSidebarContent": false,
     "namespace": "veritas-docs"
   },
-  
+
   "plugins": [
     [
       "search",
@@ -122,13 +122,13 @@
       }
     ]
   ],
-  
+
   "markdown": {
     "gfm": true,
     "pedantic": false,
     "breaks": true
   },
-  
+
   "mermaid": {
     "theme": "dark",
     "securityLevel": "loose"

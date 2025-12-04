@@ -19,7 +19,7 @@ $routingRules = @{
 
 function Route-File {
     param($fileName)
-    
+
     foreach ($cat in $routingRules.GetEnumerator()) {
         foreach ($pattern in $cat.Value) {
             if ($fileName -match $pattern) {
@@ -27,7 +27,7 @@ function Route-File {
             }
         }
     }
-    
+
     # Special cases
     if ($fileName -match "EXPERIMENT|CONCEPT|FRAMEWORK|ROADMAP|STRATEGY|HYPOTHESIS") {
         return ".archive/concepts"
@@ -38,44 +38,44 @@ function Route-File {
     if ($fileName -match "LEGACY_|DEPRECATED|OLD_|V1|V2|V3_") {
         return ".archive/old-versions"
     }
-    
+
     return "reference"
 }
 
 function Analyze-Files {
     Write-Host "`n📊 PHASE 4 CONSOLIDATION ANALYSIS`n" -ForegroundColor Cyan
-    
+
     $files = Get-ChildItem -Path $docsPath -File -Filter "*.md" -ErrorAction SilentlyContinue
     $files = $files | Where-Object {
         $_.Name -notin @("README.md", "_sidebar.md", "_navbar.md", "index.html", "QUICK_START.md", "SUMMARY.md")
     }
-    
+
     Write-Host "Found $($files.Count) files to consolidate`n" -ForegroundColor Yellow
-    
+
     $distribution = @{}
-    
+
     foreach ($file in $files | Sort-Object Name) {
         $target = Route-File $file.Name
-        
+
         if (-not $distribution.ContainsKey($target)) {
             $distribution[$target] = @()
         }
-        
+
         $distribution[$target] += $file.Name
     }
-    
+
     # Display plan
     Write-Host "CONSOLIDATION PLAN:`n" -ForegroundColor Green
     $distribution.GetEnumerator() | Sort-Object -Property Key | ForEach-Object {
         $category = $_.Key
         $fileCount = $_.Value.Count
         Write-Host "  📁 $category`: $fileCount files" -ForegroundColor Cyan
-        
+
         $_.Value | Sort-Object | ForEach-Object {
             Write-Host "     - $_" -ForegroundColor DarkGray
         }
     }
-    
+
     $totalToMove = ($files | Measure-Object).Count
     Write-Host "`n📈 SUMMARY:`n" -ForegroundColor Green
     Write-Host "  Total Files: $totalToMove" -ForegroundColor Yellow
@@ -84,28 +84,28 @@ function Analyze-Files {
 
 function Execute-Consolidation {
     Write-Host "`n⚙️  EXECUTING CONSOLIDATION`n" -ForegroundColor Cyan
-    
+
     $files = Get-ChildItem -Path $docsPath -File -Filter "*.md" -ErrorAction SilentlyContinue
     $files = $files | Where-Object {
         $_.Name -notin @("README.md", "_sidebar.md", "_navbar.md", "index.html", "QUICK_START.md", "SUMMARY.md")
     }
-    
+
     $moveCount = 0
     $errorCount = 0
-    
+
     foreach ($file in $files | Sort-Object Name) {
         $target = Route-File $file.Name
         $targetDir = Join-Path $docsPath $target
-        
+
         if (-not (Test-Path $targetDir)) {
             New-Item -ItemType Directory -Path $targetDir -Force -ErrorAction SilentlyContinue | Out-Null
         }
-        
+
         $targetPath = Join-Path $targetDir $file.Name
         $sourcePath = $file.FullName
-        
+
         $moveSuccess = Move-Item -Path $sourcePath -Destination $targetPath -Force -ErrorAction SilentlyContinue -PassThru
-        
+
         if ($moveSuccess) {
             Write-Host "✓ $($file.Name) → $target" -ForegroundColor Green
             $moveCount++
@@ -114,7 +114,7 @@ function Execute-Consolidation {
             $errorCount++
         }
     }
-    
+
     Write-Host "`n📊 EXECUTION COMPLETE:`n" -ForegroundColor Cyan
     Write-Host "  Moved: $moveCount" -ForegroundColor Green
     Write-Host "  Errors: $errorCount" -ForegroundColor $(if ($errorCount -gt 0) { "Red" } else { "Green" })
@@ -122,26 +122,26 @@ function Execute-Consolidation {
 
 function Validate-Structure {
     Write-Host "`n✅ VALIDATING STRUCTURE`n" -ForegroundColor Cyan
-    
+
     $rootFiles = Get-ChildItem -Path $docsPath -File -Filter "*.md" -ErrorAction SilentlyContinue
     $rootFiles = $rootFiles | Where-Object {
         $_.Name -notin @("README.md", "_sidebar.md", "_navbar.md", "index.html")
     }
-    
+
     if ($rootFiles.Count -gt 0) {
         Write-Host "⚠️  $($rootFiles.Count) files remain in root:" -ForegroundColor Yellow
         $rootFiles | ForEach-Object { Write-Host "     - $($_.Name)" }
     } else {
         Write-Host "✅ Root directory is clean!" -ForegroundColor Green
     }
-    
+
     Write-Host "`n📁 CATEGORY DISTRIBUTION:`n" -ForegroundColor Cyan
     $categories = Get-ChildItem -Path $docsPath -Directory -ErrorAction SilentlyContinue
     foreach ($cat in $categories | Sort-Object Name) {
         $count = (Get-ChildItem -Path $cat.FullName -File -Filter "*.md" -ErrorAction SilentlyContinue | Measure-Object).Count
         Write-Host "  $($cat.Name): $count files" -ForegroundColor DarkGray
     }
-    
+
     $totalMd = (Get-ChildItem -Path $docsPath -File -Filter "*.md" -Recurse -ErrorAction SilentlyContinue | Measure-Object).Count
     Write-Host "`n  TOTAL: $totalMd Markdown files" -ForegroundColor Cyan
 }
