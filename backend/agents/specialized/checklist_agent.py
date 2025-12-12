@@ -70,8 +70,12 @@ class ChecklistAgent(BaseAgent):
             enable_monitoring=True
         )
         
-        # Initialize UDS3 for ThemisDB access
-        self.uds3 = get_uds3_client()
+        # Initialize UDS3 for ThemisDB access (optional - can be None for testing)
+        try:
+            self.uds3 = get_uds3_client()
+        except Exception as e:
+            logger.warning(f"UDS3 client not available: {e}. Agent will work in limited mode.")
+            self.uds3 = None
         
         # Store Ollama client
         self.ollama_client = ollama_client
@@ -290,15 +294,15 @@ class ChecklistAgent(BaseAgent):
         logger.info(f"Querying ThemisDB: '{query}' (domain={domain})")
         
         try:
-            # Use UDS3 semantic search if available
-            if not hasattr(self.uds3, 'semantic_search'):
+            # Check if UDS3 is available
+            if not self.uds3 or not hasattr(self.uds3, 'semantic_search'):
                 logger.warning("UDS3 semantic_search not available, using fallback")
                 return {
                     "status": "success",
                     "data": {"documents": [], "total_results": 0},
                     "confidence_score": 0.0,
                     "quality_score": 0.0,
-                    "sources": ["ThemisDB-Fallback"]
+                    "sources": ["ThemisDB-Unavailable"]
                 }
             
             # Query ThemisDB via UDS3
@@ -360,61 +364,8 @@ class ChecklistAgent(BaseAgent):
         logger.info(f"Querying regulations: '{query}'")
         
         try:
-            # Query UDS3 with regulation-specific domain
-            if hasattr(self.uds3, 'semantic_search'):
-                results = self.uds3.semantic_search(
-                    query=query,
-                    top_k=15,
-                    domain="legal"
-                )
-                
-                # Filter and categorize by regulation type
-                regulations = []
-                for i, result in enumerate(results):
-                    metadata = result.get("metadata", {})
-                    doc_type = metadata.get("type", "").lower()
-                    
-                    # Categorize regulation
-                    reg_type = "other"
-                    if "gesetz" in doc_type or "law" in doc_type:
-                        reg_type = "law"
-                    elif "verordnung" in doc_type or "ordinance" in doc_type:
-                        reg_type = "ordinance"
-                    elif "richtlinie" in doc_type or "guideline" in doc_type:
-                        reg_type = "guideline"
-                    elif "din" in doc_type or "iso" in doc_type or "en " in doc_type:
-                        reg_type = "standard"
-                    elif "urteil" in doc_type or "judgment" in doc_type:
-                        reg_type = "judgment"
-                    
-                    regulations.append({
-                        "id": result.get("id", f"reg_{i}"),
-                        "title": metadata.get("title", ""),
-                        "type": reg_type,
-                        "content": result.get("content", ""),
-                        "metadata": metadata,
-                        "relevance": result.get("score", 0.0),
-                        "source": metadata.get("source", "ThemisDB")
-                    })
-                
-                avg_score = (
-                    sum(r["relevance"] for r in regulations) / len(regulations)
-                    if regulations else 0.0
-                )
-                
-                return {
-                    "status": "success",
-                    "data": {
-                        "regulations": regulations,
-                        "total_results": len(regulations),
-                        "by_type": self._group_by_type(regulations)
-                    },
-                    "confidence_score": min(avg_score * 1.1, 1.0),
-                    "quality_score": avg_score,
-                    "sources": ["ThemisDB-Regulations"]
-                }
-            
-            else:
+            # Check if UDS3 is available
+            if not self.uds3 or not hasattr(self.uds3, 'semantic_search'):
                 logger.warning("UDS3 not available for regulation search")
                 return {
                     "status": "success",
@@ -423,6 +374,59 @@ class ChecklistAgent(BaseAgent):
                     "quality_score": 0.0,
                     "sources": []
                 }
+            
+            # Query UDS3 with regulation-specific domain
+            results = self.uds3.semantic_search(
+                query=query,
+                top_k=15,
+                domain="legal"
+            )
+            
+            # Filter and categorize by regulation type
+            regulations = []
+            for i, result in enumerate(results):
+                metadata = result.get("metadata", {})
+                doc_type = metadata.get("type", "").lower()
+                
+                # Categorize regulation
+                reg_type = "other"
+                if "gesetz" in doc_type or "law" in doc_type:
+                    reg_type = "law"
+                elif "verordnung" in doc_type or "ordinance" in doc_type:
+                    reg_type = "ordinance"
+                elif "richtlinie" in doc_type or "guideline" in doc_type:
+                    reg_type = "guideline"
+                elif "din" in doc_type or "iso" in doc_type or "en " in doc_type:
+                    reg_type = "standard"
+                elif "urteil" in doc_type or "judgment" in doc_type:
+                    reg_type = "judgment"
+                
+                regulations.append({
+                    "id": result.get("id", f"reg_{i}"),
+                    "title": metadata.get("title", ""),
+                    "type": reg_type,
+                    "content": result.get("content", ""),
+                    "metadata": metadata,
+                    "relevance": result.get("score", 0.0),
+                    "source": metadata.get("source", "ThemisDB")
+                })
+            
+            avg_score = (
+                sum(r["relevance"] for r in regulations) / len(regulations)
+                if regulations else 0.0
+            )
+            
+            return {
+                "status": "success",
+                "data": {
+                    "regulations": regulations,
+                    "total_results": len(regulations),
+                    "by_type": self._group_by_type(regulations)
+                },
+                "confidence_score": min(avg_score * 1.1, 1.0),
+                "quality_score": avg_score,
+                "sources": ["ThemisDB-Regulations"]
+            }
         
         except Exception as e:
             logger.error(f"Error querying regulations: {e}", exc_info=True)
