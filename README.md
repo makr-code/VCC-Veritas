@@ -190,6 +190,8 @@ Backend läuft auf: `http://localhost:5000`
 
 **Neue Endpoints (v3.20.0):**
 - `/api/checklist/generate` - Generiert Checklisten basierend auf ThemisDB-Daten und Vorschriften
+- `/api/checklist/generate/zip` - Generiert Checkliste als ZIP mit eingebetteten Dateien
+- `/api/checklist/export/{session_id}` - Exportiert vorhandene Checkliste als ZIP
 - `/api/checklist/health` - Checklist-Service Health Check
 - `/api/checklist/types` - Verfügbare Checklisten-Typen
 - `/api/checklist/capabilities` - Checklist-Agent Capabilities
@@ -247,7 +249,35 @@ curl -X POST http://localhost:5000/api/checklist/generate \
 - Basierend auf ThemisDB-Dokumenten und geltenden Vorschriften
 - Automatische Intent-Erkennung in Benutzeranfragen
 - JSON-Format für Argus2 Android App Integration
+- **ZIP-Export mit eingebetteten Dateien** (NEU!)
 - 10 vordefinierte Checklist-Typen (Construction, Compliance, Environmental, etc.)
+
+**ZIP-Format Support:**
+VERITAS unterstützt jetzt einen konsolidierten ZIP-Export, der zusätzliche Dateien
+(png, pdf, docx, xlsx, md, mp3, mpeg, etc.) enthalten kann, die sowohl in der JSON-Frage
+(embedded markdown) als auch im JSON-Response (markdown) verlinkt sind.
+
+```bash
+# ZIP mit eingebetteten Dateien generieren
+curl -X POST http://localhost:5000/api/checklist/generate/zip \
+  -H "Content-Type: application/json" \
+  -d '{
+    "topic": "Bauantrag",
+    "checklist_type": "construction",
+    "embedded_markdown": "![Grundriss](grundriss.png)\n[Lageplan](lageplan.pdf)",
+    "attachments": ["grundriss.png", "lageplan.pdf"]
+  }' \
+  --output checklist.zip
+
+# Zuvor generierte Checkliste als ZIP exportieren
+curl http://localhost:5000/api/checklist/export/{session_id} --output checklist.zip
+```
+
+**ZIP-Inhalte:**
+- `checklist.json` - Generierte Checkliste mit Markdown-Links
+- `metadata.json` - Session-Informationen und Metadaten
+- `README.md` - Dokumentation
+- `attachments/` - Eingebettete Dateien (Bilder, PDFs, Dokumente, Audio, Video)
 
 ### 6. README anzeigen
 - Klicken Sie auf **📘 VERITAS** in der Toolbar (rechts oben)

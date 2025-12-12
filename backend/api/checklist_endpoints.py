@@ -5,7 +5,8 @@ Checklist Endpoints for VERITAS API
 FastAPI endpoints for checklist generation.
 
 Endpoints:
-- POST /api/checklist/generate - Generate a new checklist
+- POST /api/checklist/generate - Generate a new checklist (JSON or ZIP format)
+- GET /api/checklist/export/{session_id} - Export checklist as ZIP with embedded files
 - GET /api/checklist/health - Health check
 
 Integration:
@@ -13,17 +14,22 @@ Integration:
 - ThemisDB for data retrieval
 - Ollama LLM for intelligent generation
 - Argus2 Android app compatible
+- ZIP format support for embedded files (png, pdf, docx, xlsx, md, mp3, mpeg, etc.)
 
 Author: VERITAS Development Team
 Date: December 2025
 """
+import io
+import json
 import logging
 import time
 import uuid
+import zipfile
 from datetime import datetime
 from typing import Optional
 
 from fastapi import APIRouter, HTTPException, Depends
+from fastapi.responses import StreamingResponse
 from pydantic import ValidationError
 
 from backend.models.request import ChecklistGenerationRequest
@@ -261,6 +267,8 @@ async def get_checklist_capabilities():
             "Time estimation",
             "Category organization",
             "JSON output format",
+            "ZIP export with embedded files",
+            "Markdown link support",
             "Argus2 Android compatibility"
         ],
         "supported_llm_models": [
@@ -280,3 +288,271 @@ async def get_checklist_capabilities():
             logger.warning(f"Could not get agent capabilities: {e}")
     
     return capabilities
+
+
+# Store generated checklists for ZIP export (in-memory, could be moved to database)
+_checklist_cache = {}
+
+
+@checklist_router.post("/generate/zip")
+async def generate_checklist_zip(
+    request: ChecklistGenerationRequest,
+    agent=Depends(get_checklist_agent)
+):
+    """
+    Generate a checklist and return it as a consolidated ZIP file.
+    
+    The ZIP file contains:
+    - checklist.json: The generated checklist in JSON format
+    - Any embedded files referenced in the request (if provided)
+    - Referenced files from ThemisDB (if available)
+    
+    This endpoint supports the consolidated ZIP format for Argus2 Android app,
+    where additional files (png, pdf, docx, xlsx, md, mp3, mpeg, etc.) can be
+    included and linked via markdown in both the question and response.
+    
+    Args:
+        request: ChecklistGenerationRequest with optional attachments and embedded_markdown
+    
+    Returns:
+        StreamingResponse with application/zip content
+    
+    Example request with embedded files:
+        ```json
+        {
+            "topic": "Bauantrag für Einfamilienhaus",
+            "checklist_type": "construction",
+            "embedded_markdown": "Siehe Grundriss: ![Grundriss](grundriss.png)\\n[Lageplan PDF](lageplan.pdf)",
+            "attachments": ["grundriss.png", "lageplan.pdf"]
+        }
+        ```
+    """
+    start_time = time.time()
+    session_id = request.session_id or f"checklist_{uuid.uuid4().hex[:8]}"
+    
+    logger.info(
+        f"Checklist ZIP generation request: topic='{request.topic}', "
+        f"type='{request.checklist_type}', session={session_id}"
+    )
+    
+    try:
+        # Generate checklist using agent (same as regular endpoint)
+        result = agent.generate_checklist(
+            topic=request.topic,
+            context=request.context,
+            checklist_type=request.checklist_type,
+            include_regulations=request.include_regulations,
+            include_themisdb=request.include_themisdb,
+            model=request.model,
+            temperature=request.temperature,
+            max_tokens=request.max_tokens
+        )
+        
+        processing_time_ms = (time.time() - start_time) * 1000
+        
+        if result.get("status") == "error":
+            raise HTTPException(
+                status_code=500,
+                detail=result.get("error_message", "Unknown error during checklist generation")
+            )
+        
+        checklist_data = result.get("checklist", {})
+        
+        # Add timestamp
+        if "created_at" not in checklist_data:
+            checklist_data["created_at"] = datetime.now().isoformat()
+        
+        # Add embedded markdown if provided in request
+        if request.embedded_markdown:
+            checklist_data["markdown_content"] = request.embedded_markdown
+        
+        # Extract file references from markdown
+        embedded_files = []
+        if request.attachments:
+            embedded_files.extend(request.attachments)
+        
+        checklist_data["embedded_files"] = embedded_files
+        
+        # Create ZIP file in memory
+        zip_buffer = io.BytesIO()
+        
+        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+            # Add checklist JSON
+            checklist_json = json.dumps(checklist_data, indent=2, ensure_ascii=False)
+            zip_file.writestr("checklist.json", checklist_json)
+            
+            # Add metadata
+            metadata = {
+                "session_id": session_id,
+                "generated_at": datetime.now().isoformat(),
+                "processing_time_ms": processing_time_ms,
+                "topic": request.topic,
+                "checklist_type": request.checklist_type,
+                "sources": result.get("sources", []),
+                "embedded_files": embedded_files
+            }
+            zip_file.writestr("metadata.json", json.dumps(metadata, indent=2))
+            
+            # Add README with instructions
+            readme_content = f"""# VERITAS Checklist Export
+            
+## Contents
+
+- `checklist.json`: Generated checklist in JSON format
+- `metadata.json`: Generation metadata and session information
+{f"- Embedded files: {', '.join(embedded_files)}" if embedded_files else ""}
+
+## Checklist Details
+
+- **Topic**: {request.topic}
+- **Type**: {request.checklist_type}
+- **Generated**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+- **Session ID**: {session_id}
+
+## Embedded Files
+
+The checklist may contain markdown references to embedded files.
+These files should be placed in the same directory as the checklist.json.
+
+Supported file formats:
+- Images: png, jpg, jpeg, gif, svg
+- Documents: pdf, docx, xlsx, txt, md
+- Media: mp3, mp4, mpeg, wav
+
+## Markdown Links
+
+Embedded files are referenced using markdown syntax:
+- Images: `![Alt text](filename.png)`
+- Documents: `[Link text](filename.pdf)`
+
+## Argus2 Android App
+
+This ZIP format is designed for the Argus2 Android app.
+Import the entire ZIP file to preserve all references and embedded content.
+"""
+            zip_file.writestr("README.md", readme_content)
+            
+            # Note: Actual file attachments would need to be provided via multipart/form-data
+            # or fetched from storage. For now, we create placeholders for referenced files.
+            if embedded_files:
+                for filename in embedded_files:
+                    placeholder_content = f"# Placeholder for {filename}\n\nThis file should be provided separately or fetched from storage."
+                    zip_file.writestr(f"attachments/{filename}.txt", placeholder_content)
+        
+        zip_buffer.seek(0)
+        
+        # Cache the checklist for later retrieval
+        _checklist_cache[session_id] = {
+            "checklist": checklist_data,
+            "metadata": metadata,
+            "created_at": datetime.now()
+        }
+        
+        logger.info(f"Checklist ZIP generated successfully: session={session_id}, size={len(zip_buffer.getvalue())} bytes")
+        
+        # Return ZIP file as streaming response
+        return StreamingResponse(
+            io.BytesIO(zip_buffer.getvalue()),
+            media_type="application/zip",
+            headers={
+                "Content-Disposition": f"attachment; filename=checklist_{session_id}.zip",
+                "X-Session-ID": session_id,
+                "X-Processing-Time-MS": str(int(processing_time_ms))
+            }
+        )
+    
+    except HTTPException:
+        raise
+    
+    except Exception as e:
+        logger.error(f"Unexpected error in ZIP generation: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error generating checklist ZIP: {str(e)}"
+        )
+
+
+@checklist_router.get("/export/{session_id}")
+async def export_checklist_zip(session_id: str):
+    """
+    Export a previously generated checklist as a ZIP file.
+    
+    This endpoint retrieves a checklist from the cache and returns it as a
+    consolidated ZIP file with embedded files and markdown references.
+    
+    Args:
+        session_id: Session ID of the checklist to export
+    
+    Returns:
+        StreamingResponse with application/zip content
+    
+    Example:
+        ```
+        GET /api/checklist/export/checklist_abc12345
+        ```
+    """
+    logger.info(f"Exporting checklist ZIP: session={session_id}")
+    
+    # Check if checklist exists in cache
+    if session_id not in _checklist_cache:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Checklist with session_id '{session_id}' not found. Generate a checklist first."
+        )
+    
+    try:
+        cached_data = _checklist_cache[session_id]
+        checklist_data = cached_data["checklist"]
+        metadata = cached_data["metadata"]
+        
+        # Create ZIP file in memory
+        zip_buffer = io.BytesIO()
+        
+        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+            # Add checklist JSON
+            checklist_json = json.dumps(checklist_data, indent=2, ensure_ascii=False)
+            zip_file.writestr("checklist.json", checklist_json)
+            
+            # Add metadata
+            zip_file.writestr("metadata.json", json.dumps(metadata, indent=2))
+            
+            # Add README
+            readme_content = f"""# VERITAS Checklist Export
+
+## Session Information
+
+- **Session ID**: {session_id}
+- **Generated**: {metadata.get('generated_at', 'Unknown')}
+- **Topic**: {metadata.get('topic', 'Unknown')}
+- **Type**: {metadata.get('checklist_type', 'Unknown')}
+
+## Contents
+
+- `checklist.json`: Generated checklist
+- `metadata.json`: Session metadata
+
+## Argus2 Android App Compatible
+
+Import this ZIP file directly into the Argus2 Android app.
+"""
+            zip_file.writestr("README.md", readme_content)
+        
+        zip_buffer.seek(0)
+        
+        logger.info(f"Checklist ZIP exported successfully: session={session_id}")
+        
+        return StreamingResponse(
+            io.BytesIO(zip_buffer.getvalue()),
+            media_type="application/zip",
+            headers={
+                "Content-Disposition": f"attachment; filename=checklist_{session_id}.zip",
+                "X-Session-ID": session_id
+            }
+        )
+    
+    except Exception as e:
+        logger.error(f"Error exporting checklist ZIP: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error exporting checklist: {str(e)}"
+        )

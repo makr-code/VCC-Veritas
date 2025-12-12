@@ -170,6 +170,17 @@ class ChecklistGenerationRequest(BaseModel):
         description="Additional metadata"
     )
     
+    # === ATTACHMENTS (for ZIP format) ===
+    attachments: Optional[List[str]] = Field(
+        None,
+        description="List of file references for ZIP format (e.g., ['file1.pdf', 'image.png'])"
+    )
+    
+    embedded_markdown: Optional[str] = Field(
+        None,
+        description="Markdown content with embedded file references (e.g., ![Image](file.png), [Document](doc.pdf))"
+    )
+    
     @validator('topic')
     def validate_topic(cls, v):
         """Validate topic is not empty"""

@@ -343,6 +343,17 @@ class ChecklistData(BaseModel):
     created_at: Optional[str] = Field(None, description="Creation timestamp")
     version: str = Field(default="1.0", description="Checklist version")
     
+    # === EMBEDDED FILES (for ZIP format) ===
+    embedded_files: Optional[List[str]] = Field(
+        None,
+        description="List of embedded file references in markdown (e.g., ['image.png', 'doc.pdf'])"
+    )
+    
+    markdown_content: Optional[str] = Field(
+        None,
+        description="Markdown content with embedded file links (e.g., ![Image](image.png), [PDF](doc.pdf))"
+    )
+    
     class Config:
         extra = "allow"
 
@@ -364,6 +375,12 @@ class ChecklistGenerationResponse(BaseModel):
     
     # === SESSION ===
     session_id: Optional[str] = Field(None, description="Session ID")
+    
+    # === ZIP EXPORT ===
+    zip_download_url: Optional[str] = Field(
+        None,
+        description="URL to download checklist as consolidated ZIP with embedded files"
+    )
     
     class Config:
         extra = "allow"
