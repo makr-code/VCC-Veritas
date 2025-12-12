@@ -190,7 +190,9 @@ Backend läuft auf: `http://localhost:5000`
 
 **Neue Endpoints (v3.20.0):**
 - `/api/checklist/generate` - Generiert Checklisten basierend auf ThemisDB-Daten und Vorschriften
+- `/api/checklist/generate/stream` - **SSE-Streaming** für Echtzeit-Fortschritt (NEU!)
 - `/api/checklist/generate/zip` - Generiert Checkliste als ZIP mit eingebetteten Dateien
+- `/api/checklist/upload` - **Datei-Upload zur Laufzeit** (NEU!)
 - `/api/checklist/export/{session_id}` - Exportiert vorhandene Checkliste als ZIP
 - `/api/checklist/health` - Checklist-Service Health Check
 - `/api/checklist/types` - Verfügbare Checklisten-Typen
@@ -249,8 +251,54 @@ curl -X POST http://localhost:5000/api/checklist/generate \
 - Basierend auf ThemisDB-Dokumenten und geltenden Vorschriften
 - Automatische Intent-Erkennung in Benutzeranfragen
 - JSON-Format für Argus2 Android App Integration
-- **ZIP-Export mit eingebetteten Dateien** (NEU!)
+- **ZIP-Export mit eingebetteten Dateien**
+- **SSE (Server-Sent Events) für Echtzeit-Fortschritt** (NEU!)
+- **MCP (Model Context Protocol) Support** (NEU!)
+- **Datei-Upload zur Laufzeit** (NEU!)
 - 10 vordefinierte Checklist-Typen (Construction, Compliance, Environmental, etc.)
+
+**SSE Streaming (Echtzeit-Fortschritt):**
+Mit Server-Sent Events können Sie den Generierungsprozess in Echtzeit verfolgen:
+
+```javascript
+// JavaScript/Frontend
+const source = new EventSource('/api/checklist/generate/stream?topic=Bauantrag&checklist_type=construction');
+
+source.addEventListener('progress', (e) => {
+  const data = JSON.parse(e.data);
+  console.log(`${data.percentage}%: ${data.message}`);
+});
+
+source.addEventListener('result', (e) => {
+  const checklist = JSON.parse(e.data);
+  console.log('Checkliste generiert:', checklist);
+});
+
+source.addEventListener('complete', (e) => {
+  console.log('Fertig!');
+  source.close();
+});
+```
+
+**Datei-Upload zur Laufzeit:**
+Während der Checklisten-Generierung können Dateien hochgeladen werden:
+
+```bash
+# 1. Session erstellen und Dateien hochladen
+curl -X POST http://localhost:5000/api/checklist/upload \
+  -F "session_id=checklist_abc12345" \
+  -F "files=@grundriss.png" \
+  -F "files=@lageplan.pdf"
+
+# 2. Checkliste mit hochgeladenen Dateien generieren
+curl -X POST http://localhost:5000/api/checklist/generate/zip \
+  -H "Content-Type: application/json" \
+  -d '{
+    "session_id": "checklist_abc12345",
+    "topic": "Bauantrag",
+    "checklist_type": "construction"
+  }' --output checklist.zip
+```
 
 **ZIP-Format Support:**
 VERITAS unterstützt jetzt einen konsolidierten ZIP-Export, der zusätzliche Dateien
