@@ -29,6 +29,7 @@ import asyncio
 import io
 import json
 import logging
+import re
 import time
 import uuid
 import zipfile
@@ -337,6 +338,26 @@ def _clean_cache():
             del _checklist_cache[key]
 
 
+def _clean_uploaded_files():
+    """Remove old uploaded files to prevent memory leaks."""
+    # Remove uploaded files for expired sessions
+    expired_sessions = [
+        key for key in _uploaded_files.keys()
+        if key not in _checklist_cache
+    ]
+    for key in expired_sessions:
+        del _uploaded_files[key]
+        logger.info(f"Cleaned up uploaded files for expired session: {key}")
+    
+    # Limit total uploaded files storage
+    if len(_uploaded_files) > _CACHE_MAX_SIZE:
+        # Remove oldest sessions (simple FIFO)
+        sessions_to_remove = list(_uploaded_files.keys())[:len(_uploaded_files) - _CACHE_MAX_SIZE]
+        for session_id in sessions_to_remove:
+            del _uploaded_files[session_id]
+            logger.info(f"Removed old uploaded files for session: {session_id}")
+
+
 @checklist_router.post("/generate/zip")
 async def generate_checklist_zip(
     request: ChecklistGenerationRequest,
@@ -380,6 +401,7 @@ async def generate_checklist_zip(
     
     # Clean cache before adding new entry
     _clean_cache()
+    _clean_uploaded_files()
     
     try:
         # Generate checklist using agent (same as regular endpoint)
@@ -653,7 +675,6 @@ async def upload_checklist_files(
         ```
     """
     # Validate session_id format
-    import re
     if not re.match(r'^checklist_[a-f0-9]{8}$', session_id):
         raise HTTPException(
             status_code=400,
@@ -861,7 +882,6 @@ async def generate_checklist_stream(
             }
             
             # Generate checklist (non-blocking)
-            import asyncio
             loop = asyncio.get_event_loop()
             result = await loop.run_in_executor(
                 None,
