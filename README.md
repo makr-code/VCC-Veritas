@@ -1,8 +1,22 @@
-# VERITAS - Verwaltungs-Informations- und Recherche-System
+# VERITAS - VCC Agentenbasiertes AI-Chat-System
 
 ## Version 3.19.0 ✅ PRODUCTION READY
 
-**VERITAS** ist ein modernes, KI-gestütztes Informationssystem für die öffentliche Verwaltung, das natürliche Sprachverarbeitung und RAG (Retrieval-Augmented Generation) kombiniert, um präzise Antworten auf Verwaltungsfragen zu liefern.
+**VERITAS** ist ein hochmodernes, **agentenbasiertes AI-Chat-System** mit intelligenter Multi-Agent-Orchestrierung. Das System kombiniert spezialisierte Domain-Agents, natürliche Sprachverarbeitung und RAG (Retrieval-Augmented Generation), um präzise, kontextbezogene Antworten auf komplexe Fragen zu liefern.
+
+### 🤖 Multi-Agent-Architektur
+
+VERITAS nutzt über **40 spezialisierte Agenten** in 10 Domänen, die durch einen intelligenten Orchestrator koordiniert werden:
+- **Environmental Agents**: Umweltschutz, Naturschutz, Boden-/Gewässerschutz, Emissionsmonitoring
+- **Construction Agents**: Baugenehmigungen, Baurecht, Compliance
+- **Weather Agents**: DWD-Integration, BrightSky, Wettervorhersagen
+- **Chemical Agents**: Chemikalien-Datenbanken, Stoffinformationen
+- **Social/Legal Agents**: Verwaltungsrecht, Rechtrecherche, Verwaltungsprozesse
+- **Immissionsschutz Agents**: BImSchG-Compliance, Genehmigungsverfahren
+- **Standards Agents**: DIN, VDI, ISO-Normen
+- **Traffic Agents**: Verkehrsrecht, Verkehrsplanung
+- **Financial Agents**: Finanzielle Bewertungen, Kostenanalysen
+- **Database/Wikipedia Agents**: Allgemeine Recherche und Datenbankzugriffe
 
 **🎉 Production Deployment Complete (11. Oktober 2025)**
 
@@ -32,20 +46,32 @@ curl http://localhost:5000/api/feedback/health
 
 ## 🌟 Hauptfunktionen
 
-### 🤖 Flexible LLM-Integration (NEU!)
+### 🤖 Intelligent Agent Orchestration
+- **40+ Spezialisierte Agenten**: Domain-spezifische Experten für verschiedene Fachbereiche
+- **Agent Orchestrator**: Intelligente Koordination mehrerer Agenten für komplexe Anfragen
+- **BaseAgent Framework**: Einheitliche Architektur mit Schema-basierter Planausführung
+- **Agent Registry**: Automatische Agent-Discovery basierend auf Capabilities
+- **Quality Gates**: Monitoring, Retry-Handling und Qualitätssicherung
+- **Parallel Processing**: Bis zu 3x Speedup durch parallele Agent-Ausführung
+- **Cost-Benefit-Optimierung**: Ressourcen-optimierte Agent-Auswahl
+
+### 🎯 Flexible LLM-Integration
 - **Multi-Provider-Support**: Ollama oder vLLM
 - **Automatischer Fallback**: Nahtloser Wechsel bei Ausfall
 - **Provider-agnostisch**: Gleiche API für alle Provider
 - **Performance-optimiert**: vLLM für Produktion (+200% Durchsatz)
 - **Einfacher Wechsel**: Via Umgebungsvariable `LLM_PROVIDER`
 
-### 💬 Intelligenter Chat (Chat Design v2.0)
+### 💬 Agentenbasierter Chat (Chat Design v2.0)
+- **Multi-Agent-Pipeline**: Intelligente Routing-Entscheidungen basierend auf Query-Analyse
+- **Agent-Koordination**: Orchestrator wählt optimale Agenten für die Anfrage
 - **Sprechblasen-Design**: User (rechts) vs Assistant (links)
 - **Strukturierte Antworten**: 6 Sections (Antwort, Details, Quellen, Rechtliche Hinweise, Nächste Schritte, Verwandte Themen)
 - **Dual-Prompt System**: Natural language responses (keine generischen Floskeln)
 - **UDS3 Hybrid Search**: Neo4j Graph Search (1,930 Dokumente) + Vector + Keyword
 - **Streaming-Antworten**: Echtzeit-Fortschrittsupdates während der Verarbeitung
 - **Raw Response Debug**: Collapsible debug view für LLM-Responses
+- **Agent-Feedback**: Transparente Anzeige welche Agenten an der Antwort beteiligt waren
 
 ### 🎛️ LLM Parameter UI Extensions
 - **4 Presets**: Präzise, Standard, Ausführlich, Kreativ (1-Klick)
@@ -86,7 +112,63 @@ curl http://localhost:5000/api/feedback/health
 
 ## 🏗️ Architektur
 
-### Frontend (Endanwender)
+### Multi-Agent-System Übersicht
+
+```
+┌────────────────────────────────────────────────────────────────┐
+│                    VERITAS Multi-Agent System                  │
+└────────────────────────────────────────────────────────────────┘
+                                │
+                                ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                        Frontend (Tkinter GUI)                   │
+│  • Tkinter GUI (Python 3.13)    • HTTP/HTTPS API-Client        │
+│  • Mehrfenster-Management       • Keine Datenbankzugriffe      │
+│  • Plattformunabhängig           • Chat & Streaming UI         │
+└─────────────────────────────────────────────────────────────────┘
+                                │ HTTP/HTTPS
+                                ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    Backend (FastAPI Server)                     │
+│                                                                 │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │            Agent Orchestrator (Query Router)             │  │
+│  │  • Query Analysis & Intent Detection                     │  │
+│  │  • Agent Selection (Cost-Benefit-Optimierung)           │  │
+│  │  • Pipeline Coordination                                 │  │
+│  │  • Parallel/Sequential Execution                         │  │
+│  └──────────────────────────────────────────────────────────┘  │
+│                           │                                     │
+│                           ▼                                     │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │              Agent Registry & Framework                  │  │
+│  │  • 40+ Spezialisierte Domain Agents                      │  │
+│  │  • BaseAgent Framework (Schema-based)                    │  │
+│  │  • Quality Gates & Monitoring                            │  │
+│  │  • Retry Handler & Error Recovery                        │  │
+│  └──────────────────────────────────────────────────────────┘  │
+│                           │                                     │
+│           ┌───────────────┴───────────────┐                    │
+│           ▼                               ▼                    │
+│  ┌─────────────────┐            ┌─────────────────┐           │
+│  │  Domain Agents  │            │  LLM Integration│           │
+│  │  10 Kategorien: │            │  • Ollama       │           │
+│  │  • Environmental│            │  • vLLM         │           │
+│  │  • Construction │            │  • Auto-Fallback│           │
+│  │  • Weather      │            └─────────────────┘           │
+│  │  • Chemical     │                     │                     │
+│  │  • Social/Legal │                     ▼                     │
+│  │  • Immission    │            ┌─────────────────┐           │
+│  │  • Standards    │            │   UDS3 Multi-DB │           │
+│  │  • Traffic      │            │  • Neo4j Graph  │           │
+│  │  • Financial    │            │  • ChromaDB     │           │
+│  │  • Database/Wiki│            │  • PostgreSQL   │           │
+│  └─────────────────┘            │  • Hybrid Search│           │
+│                                 └─────────────────┘           │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Frontend-Backend Architektur
 ```
 ┌─────────────────────────────────┐
 │   Tkinter GUI (Python 3.13)     │
@@ -99,23 +181,28 @@ curl http://localhost:5000/api/feedback/health
 ┌─────────────────────────────────┐
 │   FastAPI Backend (Server)      │
 │  - REST API Endpoints           │
+│  - Multi-Agent Orchestration    │
 │  - Ollama/vLLM LLM Integration  │
 │  - UDS3 Multi-DB                │
 │  - Streaming Services           │
-│  - Intelligent Agent Pipeline   │
 └─────────────────────────────────┘
 ```
 
 ### Komponenten
 
 #### **Frontend** (`frontend/`)
-- `veritas_app.py`: Haupt-GUI-Anwendung
+- `veritas_app.py`: Haupt-GUI-Anwendung (Tkinter)
 - `ui/`: UI-Komponenten und Widgets
 - `services/`: Streaming und Backend-Kommunikation
 
 #### **Backend** (`backend/`)
 - `api/`: FastAPI REST-Endpunkte
 - `agents/`: Intelligente Multi-Agent-Pipeline
+  - `framework/`: BaseAgent, QualityGate, StateMachine, Monitoring
+  - `orchestrator/`: Agent Orchestrator, Pipeline Manager
+  - `registry/`: Agent Registry, Capability Management
+  - `domain/`: 40+ Domain-spezifische Agenten (10 Kategorien)
+  - `specialized/`: Spezialisierte Utility-Agenten
 - `services/`: Business-Logik und Datenverarbeitung
 
 #### **Shared** (`shared/`)
@@ -207,9 +294,16 @@ python start_frontend.py
 
 ## 📖 Verwendung
 
-### 1. Frage-Modi
-- **Standard RAG**: Allgemeine Wissensfragen mit Dokumenten-Retrieval
-- **VPB Verwaltung**: Spezialmodus für Verwaltungsvorschriften
+### 1. Agentenbasierte Frage-Modi
+- **Multi-Agent RAG**: Komplexe Fragen werden automatisch an mehrere spezialisierte Agenten geroutet
+- **Single-Agent Queries**: Einfache Fragen werden direkt von einem passenden Agenten bearbeitet
+- **Agent Orchestration**: Der Orchestrator wählt basierend auf Query-Analyse die optimalen Agenten
+- **Domain-Spezifisch**: Spezialisierte Modi für Umwelt, Bau, Recht, Wetter, Chemie, etc.
+
+**Beispiele:**
+- "Was sind die Umweltauflagen für ein Bauvorhaben?" → Environmental + Construction Agents
+- "Wie ist das Wetter morgen in Berlin?" → Weather Agent
+- "Welche BImSchG-Vorschriften gelten für Windkraftanlagen?" → Immissionsschutz + Standards Agents
 
 ### 2. LLM-Modelle wählen
 - Klicken Sie auf das Dropdown-Menü
@@ -219,21 +313,27 @@ python start_frontend.py
 ### 3. Frage stellen
 - Geben Sie Ihre Frage in das Eingabefeld ein
 - Drücken Sie `Enter` oder klicken Sie auf "Senden"
-- Warten Sie auf die Streaming-Antwort
+- Der Agent Orchestrator analysiert die Anfrage und wählt die passenden Agenten
+- Warten Sie auf die Streaming-Antwort mit Echtzeit-Fortschritt
 
-### 4. Chat-Management
+### 4. Agent-Feedback verstehen
+- Im Chat sehen Sie, welche Agenten an der Antwort beteiligt waren
+- Quality Metrics zeigen die Zuverlässigkeit der Agenten
+- Debug-View zeigt den kompletten Agent-Pipeline-Prozess
+
+### 5. Chat-Management
 - **💾 Speichern**: Chat als JSON-Datei speichern
 - **📂 Laden**: Gespeicherten Chat wiederherstellen
 - **🗑️ Löschen**: Chat-Verlauf zurücksetzen
 - **➕ Neuer Chat**: Zusätzliches Fenster öffnen
 
-### 5. Checklisten-Generierung (NEU!)
-VERITAS kann automatisch Checklisten für Compliance- und Verwaltungsprozesse erstellen:
+### 6. Checklisten-Generierung (Agent-basiert)
+VERITAS nutzt spezialisierte Agents zur automatischen Checklisten-Erstellung:
 
-**Via Chat (Automatische Erkennung):**
-- "Erstelle eine Checkliste für Bauantrag"
-- "Checkliste für Umweltgenehmigung"
-- "Was muss ich beachten bei Bauvoranfrage"
+**Via Chat (Automatische Agent-Erkennung):**
+- "Erstelle eine Checkliste für Bauantrag" → Construction Agent
+- "Checkliste für Umweltgenehmigung" → Environmental Agent
+- "Was muss ich beachten bei Bauvoranfrage" → Construction + Legal Agents
 
 **Via API:**
 ```bash
@@ -248,8 +348,9 @@ curl -X POST http://localhost:5000/api/checklist/generate \
 ```
 
 **Features:**
+- Agent-basierte Checklisten-Generierung mit Domain-Experten
 - Basierend auf ThemisDB-Dokumenten und geltenden Vorschriften
-- Automatische Intent-Erkennung in Benutzeranfragen
+- Automatische Intent-Erkennung und Agent-Selektion
 - JSON-Format für Argus2 Android App Integration
 - **ZIP-Export mit eingebetteten Dateien**
 - **SSE (Server-Sent Events) für Echtzeit-Fortschritt** (NEU!)
@@ -327,7 +428,7 @@ curl http://localhost:5000/api/checklist/export/checklist_abc12345 --output chec
 - `README.md` - Dokumentation
 - `attachments/` - Eingebettete Dateien (Bilder, PDFs, Dokumente, Audio, Video)
 
-### 6. README anzeigen
+### 7. README anzeigen
 - Klicken Sie auf **📘 VERITAS** in der Toolbar (rechts oben)
 - Die README wird im Chat-Fenster angezeigt
 
@@ -339,12 +440,23 @@ curl http://localhost:5000/api/checklist/export/checklist_abc12345 --output chec
 ```python
 API_BASE_URL = "http://localhost:5000"
 OLLAMA_BASE_URL = "http://localhost:11434"
+
+# Agent System Configuration
+AGENT_ORCHESTRATOR_ENABLED = True
+MAX_PARALLEL_AGENTS = 3
+AGENT_TIMEOUT_SECONDS = 30
 ```
+
+### Agent Configuration (`backend/agents/`)
+- Agent Registry: Automatische Registrierung aller BaseAgent-Implementierungen
+- Quality Policy: Konfigurierbare Schwellwerte für Agent-Qualität
+- Cost-Benefit-Optimierung: YAML-basierte Ressourcen-Kosten (`themisdb/config/resource_costs.yaml`)
 
 ### Frontend
 - Automatische Backend-Erkennung
 - Session-Persistenz
 - Automatisches Speichern von Chats
+- Agent-Feedback-Anzeige
 
 ---
 
@@ -353,28 +465,67 @@ OLLAMA_BASE_URL = "http://localhost:11434"
 ### Projektstruktur
 ```
 veritas/
-├── frontend/           # GUI-Anwendung
-│   ├── veritas_app.py
-│   └── ui/
-├── backend/            # REST API
-│   ├── api/
-│   ├── agents/
-│   └── services/
-├── shared/             # Gemeinsame Komponenten
-├── uds3/               # Multi-DB System
-├── config/             # Konfiguration
-├── docs/               # Dokumentation
-└── tests/              # Unit-Tests
+├── frontend/                    # GUI-Anwendung (Tkinter)
+│   ├── veritas_app.py          # Haupt-GUI
+│   ├── ui/                     # UI-Komponenten
+│   └── services/               # Backend-Kommunikation
+├── backend/                     # FastAPI REST API & Agent System
+│   ├── api/                    # REST Endpoints
+│   ├── agents/                 # Multi-Agent System ⭐
+│   │   ├── framework/          # BaseAgent, QualityGate, StateMachine
+│   │   ├── orchestrator/       # Agent Orchestration & Pipeline
+│   │   ├── registry/           # Agent Registry & Discovery
+│   │   ├── domain/             # 40+ Domain-spezifische Agenten
+│   │   │   ├── environmental/  # Umwelt-Agenten
+│   │   │   ├── construction/   # Bau-Agenten
+│   │   │   ├── weather/        # Wetter-Agenten
+│   │   │   ├── chemical/       # Chemie-Agenten
+│   │   │   ├── social/         # Verwaltung/Recht-Agenten
+│   │   │   ├── immissionsschutz/ # BImSchG-Agenten
+│   │   │   ├── standards/      # DIN, VDI, ISO-Normen
+│   │   │   ├── traffic/        # Verkehrs-Agenten
+│   │   │   ├── financial/      # Finanz-Agenten
+│   │   │   ├── database/       # Datenbank-Agenten
+│   │   │   └── wikipedia/      # Wikipedia-Agenten
+│   │   ├── specialized/        # Spezialisierte Agenten
+│   │   └── themisdb/           # ThemisDB-Integration
+│   ├── services/               # Business-Logik
+│   └── app.py                  # Hauptanwendung
+├── shared/                      # Gemeinsame Komponenten
+│   ├── core/                   # Kernfunktionalität
+│   └── pipelines/              # Datenverarbeitungs-Pipelines
+├── uds3/                        # Multi-DB System (Neo4j, ChromaDB, PostgreSQL)
+├── config/                      # Konfiguration
+├── docs/                        # Dokumentation
+│   ├── CONSOLIDATED_AGENT_SYSTEM_DOCUMENTATION.md
+│   ├── AGENT_SYSTEM_QUICK_REFERENCE.md
+│   └── ...
+└── tests/                       # Unit-Tests & Integration-Tests
+    ├── agents/                 # Agent-Tests
+    └── ...
 ```
 
 ### Tests ausführen
 ```bash
+# Alle Tests
 pytest tests/
+
+# Nur Agent-Tests
+pytest tests/agents/
+
+# Spezifische Agent-Tests
+python backend/agents/test_orchestration_integration.py
+python backend/agents/test_agent_testserver_integration.py
 ```
 
 ### Backend-Tests
 ```bash
+# UDS3 Integration
 python test_uds3_integration.py
+
+# Agent Framework
+python backend/agents/framework/test_retry_integration.py
+python backend/agents/test_monitoring_integration.py
 ```
 
 ---
@@ -396,6 +547,12 @@ python test_uds3_integration.py
 - Laden Sie Modelle herunter: `ollama pull llama3`
 - Überprüfen Sie: `ollama list`
 
+### Agenten funktionieren nicht
+- Überprüfen Sie die Agent Registry: `http://localhost:5000/api/agents/registry`
+- Prüfen Sie Agent-Logs in `data/agent_framework.db`
+- Stellen Sie sicher, dass alle Agents korrekt registriert sind
+- Überprüfen Sie Quality Gates und Retry-Handler
+
 ### UDS3-Fehler (nur Backend)
 - UDS3 ist optional und nur im Backend erforderlich
 - Frontend funktioniert ohne UDS3
@@ -406,6 +563,11 @@ python test_uds3_integration.py
 ## 📚 Dokumentation
 
 - **API-Dokumentation**: `http://localhost:5000/docs` (wenn Backend läuft)
+- **Agent-System Dokumentation**: 
+  - `docs/CONSOLIDATED_AGENT_SYSTEM_DOCUMENTATION.md` - Vollständige Agent-Architektur
+  - `docs/AGENT_SYSTEM_QUICK_REFERENCE.md` - Schnellreferenz
+  - `docs/DOMAIN_AGENTS_DETAILED.md` - Domain-Agent Details
+  - `docs/BASEAGENT_QUICK_REFERENCE.md` - BaseAgent Framework
 - **Projekt-Dokumentation**: `docs/`
 - **UDS3-Dokumentation**: `uds3/README.md`
 - **Status-Reports**: `docs/STATUS_REPORT.md`
@@ -430,6 +592,16 @@ Contributions sind willkommen! Bitte:
 4. Push zum Branch
 5. Öffne einen Pull Request
 
+### Neue Agenten entwickeln
+Wenn Sie einen neuen Domain-Agent erstellen möchten:
+1. Verwenden Sie `BaseAgent` als Basis-Klasse
+2. Implementieren Sie `get_agent_type()`, `get_capabilities()` und `execute_step()`
+3. Registrieren Sie den Agent in der Agent Registry
+4. Fügen Sie Tests hinzu
+5. Dokumentieren Sie die Agent-Capabilities
+
+Siehe `docs/BASEAGENT_QUICK_REFERENCE.md` für Details.
+
 ---
 
 ## 📝 Lizenz
@@ -442,8 +614,10 @@ Contributions sind willkommen! Bitte:
 
 **VERITAS Development Team**
 - Frontend: Tkinter GUI, Multi-Window-Management
-- Backend: FastAPI, Ollama Integration
+- Backend: FastAPI, Multi-Agent Orchestration
+- Agent System: 40+ Domain-spezifische Agenten
 - UDS3: Multi-Database Distribution System
+- Integration: LLM-Provider, Streaming, Quality Gates
 
 ---
 
