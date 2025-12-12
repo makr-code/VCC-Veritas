@@ -291,3 +291,96 @@ class ErrorResponse(BaseModel):
     details: Optional[Dict[str, Any]] = Field(None, description="Error Details")
     timestamp: datetime = Field(default_factory=datetime.now)
     session_id: Optional[str] = Field(None, description="Session ID")
+
+
+class ChecklistItem(BaseModel):
+    """
+    Individual checklist item.
+    """
+    item_id: int = Field(..., description="Unique item ID within checklist")
+    title: str = Field(..., description="Item title")
+    description: str = Field(default="", description="Detailed description")
+    required: bool = Field(default=True, description="Whether this item is required")
+    legal_basis: Optional[str] = Field(None, description="Legal basis or regulation reference")
+    references: List[str] = Field(default_factory=list, description="References and sources")
+    priority: str = Field(default="medium", description="Priority level (high/medium/low)")
+    estimated_duration: Optional[str] = Field(None, description="Estimated time to complete")
+    completed: bool = Field(default=False, description="Completion status")
+    notes: Optional[str] = Field(None, description="Additional notes")
+    
+    class Config:
+        extra = "allow"
+
+
+class ChecklistCategory(BaseModel):
+    """
+    Category grouping checklist items.
+    """
+    category_name: str = Field(..., description="Category name")
+    description: Optional[str] = Field(None, description="Category description")
+    items: List[ChecklistItem] = Field(default_factory=list, description="Items in this category")
+    
+    class Config:
+        extra = "allow"
+
+
+class ChecklistData(BaseModel):
+    """
+    Complete checklist data structure.
+    
+    This is the main checklist JSON format returned by the ChecklistAgent.
+    Compatible with Argus2 Android app.
+    """
+    title: str = Field(..., description="Checklist title")
+    description: str = Field(default="", description="Checklist description")
+    checklist_type: str = Field(default="general", description="Type of checklist")
+    categories: List[ChecklistCategory] = Field(
+        default_factory=list,
+        description="Checklist categories with items"
+    )
+    notes: Optional[str] = Field(None, description="General notes and remarks")
+    references: List[str] = Field(default_factory=list, description="References and sources")
+    created_at: Optional[str] = Field(None, description="Creation timestamp")
+    version: str = Field(default="1.0", description="Checklist version")
+    
+    # === EMBEDDED FILES (for ZIP format) ===
+    embedded_files: Optional[List[str]] = Field(
+        None,
+        description="List of embedded file references in markdown (e.g., ['image.png', 'doc.pdf'])"
+    )
+    
+    markdown_content: Optional[str] = Field(
+        None,
+        description="Markdown content with embedded file links (e.g., ![Image](image.png), [PDF](doc.pdf))"
+    )
+    
+    class Config:
+        extra = "allow"
+
+
+class ChecklistGenerationResponse(BaseModel):
+    """
+    Response from checklist generation endpoint.
+    
+    Returns structured checklist data with metadata.
+    """
+    status: str = Field(..., description="Response status (success/error)")
+    checklist: Optional[ChecklistData] = Field(None, description="Generated checklist")
+    metadata: Optional[Dict[str, Any]] = Field(None, description="Generation metadata")
+    sources: List[str] = Field(default_factory=list, description="Data sources used")
+    error_message: Optional[str] = Field(None, description="Error message if status=error")
+    
+    # === TIMING ===
+    processing_time_ms: Optional[float] = Field(None, description="Processing time in milliseconds")
+    
+    # === SESSION ===
+    session_id: Optional[str] = Field(None, description="Session ID")
+    
+    # === ZIP EXPORT ===
+    zip_download_url: Optional[str] = Field(
+        None,
+        description="URL to download checklist as consolidated ZIP with embedded files"
+    )
+    
+    class Config:
+        extra = "allow"

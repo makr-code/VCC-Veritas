@@ -50,6 +50,15 @@ class NLPService:
 
         # Intent detection patterns
         self.intent_patterns = {
+            IntentType.CHECKLIST_GENERATION: [
+                r"\b(checkliste|checklist|prüfliste)\b",
+                r"\b(erstelle|generiere|mache)\s+(eine\s+)?(checkliste|checklist)\b",
+                r"\b(checkliste\s+für|checkliste\s+zu)\b",
+                r"\b(compliance\s+check|compliance\s+prüfung)\b",
+                r"\b(was\s+muss\s+ich\s+beachten|was\s+brauche\s+ich)\b",
+                r"\b(welche\s+schritte|welche\s+punkte)\b",
+                r"\b(ablauf|vorgehensweise|prüfpunkte)\b",
+            ],
             IntentType.FACT_RETRIEVAL: [
                 r"\b(was ist|was sind|wer ist|wer sind)\b",
                 r"\b(hauptsitz|adresse|standort|sitz)\b",

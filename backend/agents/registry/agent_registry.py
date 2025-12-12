@@ -34,6 +34,7 @@ class AgentDomain(Enum):
     ATMOSPHERIC = "atmospheric"  # Atmosphärische Analysen
     DATABASE = "database"  # Datenbank-Queries
     ADMINISTRATIVE = "administrative"  # Verwaltung (future)
+    CHECKLIST = "checklist"  # Checklisten-Generierung
 
 
 @dataclass
@@ -255,22 +256,57 @@ class AgentRegistry:
                     "query",
                     "abfrage",
                     "sql",
-                    "data",
-                    "daten",
+                    "data_retrieval",
+                    "datenabfrage",
                     "search",
                     "suche",
-                    "retrieval",
                 ],
                 class_reference=DatabaseAgent,
                 requires_db=True,
                 requires_api=False,
-                description="Datenbank-Queries: Direkte Datenbank-Abfragen",
+                description="Datenbank-Queries: SQL-Abfragen, Datensuche",
             )
             logger.info("  ✅ DatabaseAgent registered")
         except ImportError as e:
             logger.warning(f"  ⚠️ DatabaseAgent nicht verfügbar: {e}")
 
-        # 7. VERWALTUNGSRECHT AGENT (Production Agent)
+        # 7. CHECKLIST AGENT (NEW)
+        try:
+            from backend.agents.specialized.checklist_agent import ChecklistAgent
+
+            self._register_agent(
+                agent_id="ChecklistAgent",
+                domain=AgentDomain.CHECKLIST,
+                capabilities=[
+                    "checklist",
+                    "checkliste",
+                    "compliance_checklist",
+                    "compliance_checkliste",
+                    "administrative_checklist",
+                    "verwaltungs_checkliste",
+                    "approval_checklist",
+                    "genehmigungs_checkliste",
+                    "construction_checklist",
+                    "bau_checkliste",
+                    "process_checklist",
+                    "prozess_checkliste",
+                    "audit_checklist",
+                    "audit_checkliste",
+                    "safety_checklist",
+                    "sicherheits_checkliste",
+                    "quality_checklist",
+                    "qualitaets_checkliste",
+                ],
+                class_reference=ChecklistAgent,
+                requires_db=False,  # Uses UDS3 directly
+                requires_api=False,  # Ollama is optional
+                description="Checklisten-Generierung: Compliance, Bau, Verwaltung, basierend auf ThemisDB und Vorschriften",
+            )
+            logger.info("  ✅ ChecklistAgent registered")
+        except ImportError as e:
+            logger.warning(f"  ⚠️ ChecklistAgent nicht verfügbar: {e}")
+
+        # 8. VERWALTUNGSRECHT AGENT (Production Agent)
         try:
             from backend.agents.veritas_api_agent_verwaltungsrecht import VerwaltungsrechtAgent
 
