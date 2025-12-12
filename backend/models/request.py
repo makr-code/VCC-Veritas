@@ -180,13 +180,10 @@ class ChecklistGenerationRequest(BaseModel):
     @validator('checklist_type')
     def validate_checklist_type(cls, v):
         """Validate and normalize checklist type"""
-        allowed_types = [
-            "general", "compliance", "construction", "environmental",
-            "safety", "quality", "administrative", "approval",
-            "process", "audit"
-        ]
+        from backend.agents.specialized.checklist_constants import ALLOWED_CHECKLIST_TYPES
+        
         v_lower = v.lower().strip()
-        if v_lower not in allowed_types:
+        if v_lower not in ALLOWED_CHECKLIST_TYPES:
             # Allow custom types but log warning
             pass
         return v_lower

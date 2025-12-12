@@ -25,7 +25,15 @@ import logging
 from typing import Any, Dict, List, Optional
 
 from backend.agents.framework.base_agent import BaseAgent
-from backend.database.uds3_integration import get_uds3_client
+
+# Import constants
+from .checklist_constants import (
+    DEFAULT_FALLBACK_SOURCE,
+    DEFAULT_MODEL,
+    DEFAULT_TEMPERATURE,
+    DEFAULT_MAX_TOKENS,
+    ALLOWED_CHECKLIST_TYPES
+)
 
 logger = logging.getLogger(__name__)
 
@@ -72,18 +80,19 @@ class ChecklistAgent(BaseAgent):
         
         # Initialize UDS3 for ThemisDB access (optional - can be None for testing)
         try:
+            from backend.database.uds3_integration import get_uds3_client
             self.uds3 = get_uds3_client()
-        except Exception as e:
+        except (ImportError, RuntimeError, ConnectionError) as e:
             logger.warning(f"UDS3 client not available: {e}. Agent will work in limited mode.")
             self.uds3 = None
         
         # Store Ollama client
         self.ollama_client = ollama_client
         
-        # Default configuration
-        self.default_model = config.get("model", "llama3.2") if config else "llama3.2"
-        self.temperature = config.get("temperature", 0.3) if config else 0.3
-        self.max_tokens = config.get("max_tokens", 2000) if config else 2000
+        # Default configuration (using constants)
+        self.default_model = config.get("model", DEFAULT_MODEL) if config else DEFAULT_MODEL
+        self.temperature = config.get("temperature", DEFAULT_TEMPERATURE) if config else DEFAULT_TEMPERATURE
+        self.max_tokens = config.get("max_tokens", DEFAULT_MAX_TOKENS) if config else DEFAULT_MAX_TOKENS
         
         logger.info(
             f"ChecklistAgent initialized (model={self.default_model}, "
@@ -673,14 +682,14 @@ Antworte NUR mit dem JSON-Objekt, ohne zusätzlichen Text."""
                 raise ValueError("No JSON in response")
         
         except (json.JSONDecodeError, ValueError) as e:
-            logger.error(f"Error parsing LLM response: {e}")
+            logger.error(f"Error parsing LLM response: {e}. Expected JSON format but got: {text[:200]}...")
             # Return minimal structure
             return {
                 "title": "Generierte Checkliste",
-                "description": "Fehler beim Parsen der LLM-Antwort",
+                "description": f"Fehler beim Parsen der LLM-Antwort: {str(e)}",
                 "checklist_type": "general",
                 "categories": [],
-                "notes": f"Fehler: {str(e)}",
+                "notes": f"Die LLM-Antwort konnte nicht als JSON geparst werden. Erste 200 Zeichen: {text[:200]}...",
                 "references": []
             }
     
@@ -803,7 +812,7 @@ Antworte NUR mit dem JSON-Objekt, ohne zusätzlichen Text."""
         if regulations_data and regulations_data.get("regulations"):
             sources.append("ThemisDB-Regulations")
         
-        return sources or ["Template-Based"]
+        return sources or [DEFAULT_FALLBACK_SOURCE]
 
 
 def create_checklist_agent(

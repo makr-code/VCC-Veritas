@@ -188,6 +188,12 @@ python start_backend.py
 ```
 Backend läuft auf: `http://localhost:5000`
 
+**Neue Endpoints (v3.20.0):**
+- `/api/checklist/generate` - Generiert Checklisten basierend auf ThemisDB-Daten und Vorschriften
+- `/api/checklist/health` - Checklist-Service Health Check
+- `/api/checklist/types` - Verfügbare Checklisten-Typen
+- `/api/checklist/capabilities` - Checklist-Agent Capabilities
+
 #### Frontend starten:
 ```bash
 python start_frontend.py
@@ -217,7 +223,33 @@ python start_frontend.py
 - **🗑️ Löschen**: Chat-Verlauf zurücksetzen
 - **➕ Neuer Chat**: Zusätzliches Fenster öffnen
 
-### 5. README anzeigen
+### 5. Checklisten-Generierung (NEU!)
+VERITAS kann automatisch Checklisten für Compliance- und Verwaltungsprozesse erstellen:
+
+**Via Chat (Automatische Erkennung):**
+- "Erstelle eine Checkliste für Bauantrag"
+- "Checkliste für Umweltgenehmigung"
+- "Was muss ich beachten bei Bauvoranfrage"
+
+**Via API:**
+```bash
+curl -X POST http://localhost:5000/api/checklist/generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "topic": "Bauantrag für Einfamilienhaus",
+    "checklist_type": "construction",
+    "include_regulations": true,
+    "include_themisdb": true
+  }'
+```
+
+**Features:**
+- Basierend auf ThemisDB-Dokumenten und geltenden Vorschriften
+- Automatische Intent-Erkennung in Benutzeranfragen
+- JSON-Format für Argus2 Android App Integration
+- 10 vordefinierte Checklist-Typen (Construction, Compliance, Environmental, etc.)
+
+### 6. README anzeigen
 - Klicken Sie auf **📘 VERITAS** in der Toolbar (rechts oben)
 - Die README wird im Chat-Fenster angezeigt
 

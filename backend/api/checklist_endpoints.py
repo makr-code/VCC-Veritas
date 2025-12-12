@@ -222,59 +222,10 @@ async def get_checklist_types():
     Returns:
         List of supported checklist types with descriptions
     """
+    from backend.agents.specialized.checklist_constants import CHECKLIST_TYPES
+    
     return {
-        "checklist_types": [
-            {
-                "type": "general",
-                "name": "Allgemeine Checkliste",
-                "description": "Universelle Checkliste für verschiedene Zwecke"
-            },
-            {
-                "type": "compliance",
-                "name": "Compliance-Checkliste",
-                "description": "Prüfung der Vorschriftenkonformität"
-            },
-            {
-                "type": "construction",
-                "name": "Bau-Checkliste",
-                "description": "Bauanträge und Bauvorhaben"
-            },
-            {
-                "type": "environmental",
-                "name": "Umwelt-Checkliste",
-                "description": "Umweltrechtliche Anforderungen"
-            },
-            {
-                "type": "safety",
-                "name": "Sicherheits-Checkliste",
-                "description": "Sicherheitsanforderungen und -prüfungen"
-            },
-            {
-                "type": "quality",
-                "name": "Qualitäts-Checkliste",
-                "description": "Qualitätsmanagement und -sicherung"
-            },
-            {
-                "type": "administrative",
-                "name": "Verwaltungs-Checkliste",
-                "description": "Verwaltungsabläufe und -prozesse"
-            },
-            {
-                "type": "approval",
-                "name": "Genehmigungs-Checkliste",
-                "description": "Genehmigungsverfahren"
-            },
-            {
-                "type": "process",
-                "name": "Prozess-Checkliste",
-                "description": "Geschäftsprozesse und Workflows"
-            },
-            {
-                "type": "audit",
-                "name": "Audit-Checkliste",
-                "description": "Prüfungen und Audits"
-            }
-        ]
+        "checklist_types": CHECKLIST_TYPES
     }
 
 
