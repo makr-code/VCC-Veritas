@@ -68,6 +68,21 @@ from backend.api.veritas_phase5_integration import DEMO_CORPUS, initialize_phase
     logger.info("   UDS3 Strategy: %s", 'OK' if uds3_initialized else 'DEAKTIVIERT')
     logger.info("   Intelligent Pipeline: %s", 'OK' if pipeline_initialized else 'DEAKTIVIERT')
     logger.info("   Ollama Client: %s", 'OK' if ollama_client else 'DEAKTIVIERT')
+    
+    # Initialize ChecklistAgent if router is available
+    if _checklist_router_available:
+        try:
+            from backend.agents.specialized.checklist_agent import create_checklist_agent
+            checklist_agent = create_checklist_agent(
+                config={"model": "llama3.2", "temperature": 0.3, "max_tokens": 2000},
+                ollama_client=ollama_client if ollama_client else None
+            )
+            set_checklist_agent(checklist_agent)
+            set_ollama_client(ollama_client if ollama_client else None)
+            logger.info("   ChecklistAgent: OK")
+        except Exception as e:
+            logger.warning(f"   ChecklistAgent initialization failed: {e}")
+    
     logger.info(f"🎉 Backend erfolgreich gestartet - Bereit für Queries mit ECHTEN Daten (kein Mock-Modus)")
 
     yield  # Server läuft
@@ -132,6 +147,19 @@ try:
     logger.info("Feedback-Router integriert: /api/feedback/*")
 except ImportError as e:
     logger.warning("Feedback-Router nicht verfügbar: %s", e)
+
+# ✨ NEW v3.20.0: Checklist Generation Router
+try:
+    from backend.api.checklist_endpoints import checklist_router, set_checklist_agent, set_ollama_client
+    app.include_router(checklist_router)
+    logger.info("Checklist-Router integriert: /api/checklist/*")
+    
+    # Initialize ChecklistAgent (will be done in lifespan)
+    # We import the initialization functions here for later use
+    _checklist_router_available = True
+except ImportError as e:
+    logger.warning("Checklist-Router nicht verfügbar: %s", e)
+    _checklist_router_available = False
 
 # ===== CORE ENDPOINTS =====
 
