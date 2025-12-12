@@ -328,7 +328,6 @@ python start_frontend.py
 - **➕ Neuer Chat**: Zusätzliches Fenster öffnen
 
 ### 6. Checklisten-Generierung (Agent-basiert)
-### 6. Checklisten-Generierung (Agent-basiert)
 VERITAS nutzt spezialisierte Agents zur automatischen Checklisten-Erstellung:
 
 **Via Chat (Automatische Agent-Erkennung):**
@@ -483,7 +482,11 @@ veritas/
 │   │   │   ├── chemical/       # Chemie-Agenten
 │   │   │   ├── social/         # Verwaltung/Recht-Agenten
 │   │   │   ├── immissionsschutz/ # BImSchG-Agenten
-│   │   │   └── ...             # weitere Domänen
+│   │   │   ├── standards/      # DIN, VDI, ISO-Normen
+│   │   │   ├── traffic/        # Verkehrs-Agenten
+│   │   │   ├── financial/      # Finanz-Agenten
+│   │   │   ├── database/       # Datenbank-Agenten
+│   │   │   └── wikipedia/      # Wikipedia-Agenten
 │   │   ├── specialized/        # Spezialisierte Agenten
 │   │   └── themisdb/           # ThemisDB-Integration
 │   ├── services/               # Business-Logik
