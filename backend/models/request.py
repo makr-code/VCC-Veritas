@@ -98,6 +98,98 @@ class UnifiedQueryRequest(BaseModel):
         if not v or not v.strip():
             raise ValueError("Query cannot be empty")
         return v.strip()
+
+
+class ChecklistGenerationRequest(BaseModel):
+    """
+    Request model for checklist generation.
+    
+    Used by the ChecklistAgent for generating compliance and administrative checklists.
+    Supports Argus2 Android app integration.
+    """
+    
+    # === REQUIRED ===
+    topic: str = Field(
+        ...,
+        min_length=1,
+        max_length=500,
+        description="Topic or purpose of the checklist"
+    )
+    
+    # === OPTIONAL ===
+    context: Optional[str] = Field(
+        None,
+        max_length=2000,
+        description="Additional context information"
+    )
+    
+    checklist_type: str = Field(
+        default="general",
+        description="Type of checklist (general, compliance, construction, environmental, etc.)"
+    )
+    
+    include_regulations: bool = Field(
+        default=True,
+        description="Whether to include regulations from ThemisDB"
+    )
+    
+    include_themisdb: bool = Field(
+        default=True,
+        description="Whether to include documents from ThemisDB"
+    )
+    
+    # === LLM PARAMETERS ===
+    model: Optional[str] = Field(
+        None,
+        description="LLM Model to use (default: llama3.2)"
+    )
+    
+    temperature: Optional[float] = Field(
+        None,
+        ge=0.0,
+        le=2.0,
+        description="Temperature for LLM generation (default: 0.3)"
+    )
+    
+    max_tokens: Optional[int] = Field(
+        None,
+        ge=100,
+        le=8000,
+        description="Maximum tokens for LLM response (default: 2000)"
+    )
+    
+    # === SESSION ===
+    session_id: Optional[str] = Field(
+        None,
+        description="Session ID for tracking"
+    )
+    
+    # === METADATA ===
+    metadata: Optional[Dict[str, Any]] = Field(
+        None,
+        description="Additional metadata"
+    )
+    
+    @validator('topic')
+    def validate_topic(cls, v):
+        """Validate topic is not empty"""
+        if not v or not v.strip():
+            raise ValueError("Topic cannot be empty")
+        return v.strip()
+    
+    @validator('checklist_type')
+    def validate_checklist_type(cls, v):
+        """Validate and normalize checklist type"""
+        allowed_types = [
+            "general", "compliance", "construction", "environmental",
+            "safety", "quality", "administrative", "approval",
+            "process", "audit"
+        ]
+        v_lower = v.lower().strip()
+        if v_lower not in allowed_types:
+            # Allow custom types but log warning
+            pass
+        return v_lower
     
     class Config:
         extra = "allow"  # ✨ Erlaubt zusätzliche Felder (Frontend-Kompatibilität)
