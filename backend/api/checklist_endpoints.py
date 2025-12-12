@@ -291,7 +291,30 @@ async def get_checklist_capabilities():
 
 
 # Store generated checklists for ZIP export (in-memory, could be moved to database)
+# TODO: Implement cache expiration and size limits for production use
 _checklist_cache = {}
+_CACHE_MAX_SIZE = 1000  # Maximum number of cached checklists
+_CACHE_EXPIRY_SECONDS = 3600  # 1 hour expiry
+
+
+def _clean_cache():
+    """Remove expired entries from cache to prevent memory overflow."""
+    current_time = datetime.now()
+    expired_keys = [
+        key for key, value in _checklist_cache.items()
+        if (current_time - value["created_at"]).total_seconds() > _CACHE_EXPIRY_SECONDS
+    ]
+    for key in expired_keys:
+        del _checklist_cache[key]
+    
+    # If still too large, remove oldest entries
+    if len(_checklist_cache) > _CACHE_MAX_SIZE:
+        sorted_items = sorted(
+            _checklist_cache.items(),
+            key=lambda x: x[1]["created_at"]
+        )
+        for key, _ in sorted_items[:len(_checklist_cache) - _CACHE_MAX_SIZE]:
+            del _checklist_cache[key]
 
 
 @checklist_router.post("/generate/zip")
@@ -334,6 +357,9 @@ async def generate_checklist_zip(
         f"Checklist ZIP generation request: topic='{request.topic}', "
         f"type='{request.checklist_type}', session={session_id}"
     )
+    
+    # Clean cache before adding new entry
+    _clean_cache()
     
     try:
         # Generate checklist using agent (same as regular endpoint)
@@ -436,8 +462,9 @@ Import the entire ZIP file to preserve all references and embedded content.
             # or fetched from storage. For now, we create placeholders for referenced files.
             if embedded_files:
                 for filename in embedded_files:
+                    # Preserve original filename, just add .placeholder suffix for clarity
                     placeholder_content = f"# Placeholder for {filename}\n\nThis file should be provided separately or fetched from storage."
-                    zip_file.writestr(f"attachments/{filename}.txt", placeholder_content)
+                    zip_file.writestr(f"attachments/{filename}.placeholder", placeholder_content)
         
         zip_buffer.seek(0)
         
@@ -450,9 +477,10 @@ Import the entire ZIP file to preserve all references and embedded content.
         
         logger.info(f"Checklist ZIP generated successfully: session={session_id}, size={len(zip_buffer.getvalue())} bytes")
         
-        # Return ZIP file as streaming response
+        # Return ZIP file as streaming response (use zip_buffer directly, no extra copy)
+        zip_buffer.seek(0)
         return StreamingResponse(
-            io.BytesIO(zip_buffer.getvalue()),
+            zip_buffer,
             media_type="application/zip",
             headers={
                 "Content-Disposition": f"attachment; filename=checklist_{session_id}.zip",
@@ -481,7 +509,7 @@ async def export_checklist_zip(session_id: str):
     consolidated ZIP file with embedded files and markdown references.
     
     Args:
-        session_id: Session ID of the checklist to export
+        session_id: Session ID of the checklist to export (format: checklist_XXXXXXXX)
     
     Returns:
         StreamingResponse with application/zip content
@@ -491,6 +519,14 @@ async def export_checklist_zip(session_id: str):
         GET /api/checklist/export/checklist_abc12345
         ```
     """
+    # Validate session_id format to prevent path traversal
+    import re
+    if not re.match(r'^checklist_[a-f0-9]{8}$', session_id):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid session_id format. Expected format: checklist_XXXXXXXX (hex)"
+        )
+    
     logger.info(f"Exporting checklist ZIP: session={session_id}")
     
     # Check if checklist exists in cache
@@ -541,8 +577,9 @@ Import this ZIP file directly into the Argus2 Android app.
         
         logger.info(f"Checklist ZIP exported successfully: session={session_id}")
         
+        # Use zip_buffer directly, no extra copy
         return StreamingResponse(
-            io.BytesIO(zip_buffer.getvalue()),
+            zip_buffer,
             media_type="application/zip",
             headers={
                 "Content-Disposition": f"attachment; filename=checklist_{session_id}.zip",

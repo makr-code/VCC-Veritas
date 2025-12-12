@@ -270,7 +270,7 @@ curl -X POST http://localhost:5000/api/checklist/generate/zip \
   --output checklist.zip
 
 # Zuvor generierte Checkliste als ZIP exportieren
-curl http://localhost:5000/api/checklist/export/{session_id} --output checklist.zip
+curl http://localhost:5000/api/checklist/export/checklist_abc12345 --output checklist.zip
 ```
 
 **ZIP-Inhalte:**
