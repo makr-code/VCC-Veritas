@@ -23,6 +23,7 @@ class IntentType(Enum):
     DEFINITION = "definition"                   # "Was bedeutet DSGVO?"
     LOCATION_QUERY = "location_query"           # "Wo finde ich das Bürgerbüro?"
     CONTACT_QUERY = "contact_query"             # "Kontakt Bauamt München"
+    CHECKLIST_GENERATION = "checklist_generation"  # "Erstelle eine Checkliste für Bauantrag"
     UNKNOWN = "unknown"                         # Fallback
 
 
