@@ -1,0 +1,88 @@
+category: "email"
+name: "Email Composition"
+description: "Templates for composing various types of emails"
+
+structure:
+  formal_email:
+    greeting: "formal (Dear Mr./Ms. {name})"
+    body_paragraphs: 3-5
+    tone: "professional"
+    closing: "formal (Sincerely, Best regards)"
+    signature: true
+    
+  informal_email:
+    greeting: "casual (Hi {name}, Hello team)"
+    body_paragraphs: 1-3
+    tone: "friendly"
+    closing: "casual (Cheers, Thanks)"
+    signature: false
+    
+  meeting_request:
+    subject_format: "Meeting Request: {topic}"
+    purpose_statement: required
+    date_time_options: true
+    attendee_list: true
+    agenda: optional
+    
+  status_update:
+    summary_section: true
+    progress_highlights: true
+    challenges: optional
+    next_steps: true
+
+llm_example:
+  formal_email: |
+    Subject: Quarterly Business Review - Collaboration Opportunity
+    
+    Dear Ms. Schmidt,
+    
+    I hope this email finds you well. I am writing to explore potential collaboration opportunities between our organizations.
+    
+    Following our recent discussion at the industry conference, I believe there is significant synergy between our product lines. I would appreciate the opportunity to schedule a meeting to discuss this further.
+    
+    Would you be available for a call next week? I am flexible with timing and happy to work around your schedule.
+    
+    Thank you for your consideration. I look forward to hearing from you.
+    
+    Best regards,
+    [Your Name]
+    
+  meeting_request: |
+    Subject: Meeting Request: Q4 Planning Session
+    
+    Hi Team,
+    
+    I'd like to schedule our Q4 planning session to align on priorities and resource allocation.
+    
+    Proposed times:
+    - Tuesday, Oct 15 at 2:00 PM
+    - Wednesday, Oct 16 at 10:00 AM
+    - Thursday, Oct 17 at 3:00 PM
+    
+    Agenda:
+    1. Review Q3 results
+    2. Discuss Q4 goals
+    3. Resource planning
+    4. Q&A
+    
+    Duration: 90 minutes
+    Location: Conference Room B / Teams link
+    
+    Please let me know which time works best.
+    
+    Thanks,
+    [Your Name]
+
+formatting:
+  font: "Calibri"
+  font_size: 11
+  line_spacing: 1.15
+  use_html: true
+  include_signature: true
+
+quality_checks:
+  - "Subject line present and descriptive"
+  - "Greeting appropriate for recipient"
+  - "Clear call to action"
+  - "Professional tone maintained"
+  - "Spelling and grammar checked"

@@ -1,0 +1,312 @@
+# OneNote Intent Schema
+# Defines how to recognize and handle OneNote-related requests
+
+content_type: "onenote"
+priority: 0.76
+description: "Note creation, organization, and knowledge management in OneNote"
+
+# Keywords for intent detection
+keywords:
+  primary:
+    - "onenote"
+    - "notiz"
+    - "notizen"
+    - "note"
+    - "notes"
+    - "notizbuch"
+    - "notebook"
+    - "aufzeichnung"
+    - "dokumentieren"
+    - "festhalten"
+    
+  secondary:
+    - "abschnitt"
+    - "section"
+    - "seite"
+    - "page"
+    - "eintrag"
+    - "merken"
+    - "speichern"
+    - "sammeln"
+
+# Template categories for OneNote
+templates:
+  - id: "meeting_notes"
+    name: "Meeting Notes"
+    description: "Structured meeting notes with agenda, attendees, and action items"
+    keywords: ["meeting", "besprechung", "protokoll", "minutes"]
+    variations:
+      - id: "standup_notes"
+        name: "Daily Standup Notes"
+        description: "Quick daily team standup format"
+        use_cases: ["daily standups", "agile ceremonies"]
+        
+      - id: "formal_meeting_minutes"
+        name: "Formal Meeting Minutes"
+        description: "Official meeting protocol"
+        use_cases: ["board meetings", "official records"]
+        
+      - id: "brainstorming_session"
+        name: "Brainstorming Session"
+        description: "Creative session notes with ideas"
+        use_cases: ["ideation", "creative workshops"]
+        
+      - id: "project_meeting"
+        name: "Project Meeting"
+        description: "Project status and planning meeting"
+        use_cases: ["project updates", "planning sessions"]
+  
+  - id: "project_notes"
+    name: "Project Notes"
+    description: "Project documentation and tracking"
+    keywords: ["projekt", "project", "planung", "planning", "tracking"]
+    variations:
+      - id: "project_overview"
+        name: "Project Overview"
+        description: "High-level project summary"
+        use_cases: ["project kickoff", "executive summary"]
+        
+      - id: "task_tracking"
+        name: "Task Tracking"
+        description: "Track project tasks and progress"
+        use_cases: ["task management", "progress tracking"]
+        
+      - id: "milestone_tracker"
+        name: "Milestone Tracker"
+        description: "Track project milestones"
+        use_cases: ["milestone planning", "deadline tracking"]
+        
+      - id: "risk_log"
+        name: "Risk Log"
+        description: "Document project risks and mitigation"
+        use_cases: ["risk management", "issue tracking"]
+  
+  - id: "research_notes"
+    name: "Research Notes"
+    description: "Structured research and knowledge capture"
+    keywords: ["recherche", "research", "studie", "study", "analyse"]
+    variations:
+      - id: "literature_review"
+        name: "Literature Review"
+        description: "Review of articles and papers"
+        use_cases: ["academic research", "market research"]
+        
+      - id: "interview_notes"
+        name: "Interview Notes"
+        description: "User/stakeholder interview notes"
+        use_cases: ["user research", "requirements gathering"]
+        
+      - id: "competitive_analysis"
+        name: "Competitive Analysis"
+        description: "Competitor research and comparison"
+        use_cases: ["market analysis", "competitor tracking"]
+        
+      - id: "experiment_log"
+        name: "Experiment Log"
+        description: "Scientific or technical experiment tracking"
+        use_cases: ["lab work", "testing", "validation"]
+  
+  - id: "personal_notes"
+    name: "Personal Notes"
+    description: "Personal knowledge and learning notes"
+    keywords: ["persönlich", "personal", "lernen", "learn", "idee"]
+    variations:
+      - id: "quick_note"
+        name: "Quick Note"
+        description: "Fast capture of thoughts"
+        use_cases: ["quick capture", "reminders"]
+        
+      - id: "learning_notes"
+        name: "Learning Notes"
+        description: "Course or training notes"
+        use_cases: ["courses", "training", "education"]
+        
+      - id: "idea_collection"
+        name: "Idea Collection"
+        description: "Collection of ideas and inspiration"
+        use_cases: ["innovation", "creativity"]
+        
+      - id: "reference_material"
+        name: "Reference Material"
+        description: "Reference docs and resources"
+        use_cases: ["documentation", "knowledge base"]
+  
+  - id: "checklist"
+    name: "Checklist"
+    description: "Task lists and checklists"
+    keywords: ["checkliste", "checklist", "liste", "list", "todo"]
+    variations:
+      - id: "simple_checklist"
+        name: "Simple Checklist"
+        description: "Basic checkbox list"
+        use_cases: ["to-do lists", "task lists"]
+        
+      - id: "process_checklist"
+        name: "Process Checklist"
+        description: "Step-by-step process guide"
+        use_cases: ["procedures", "workflows", "SOPs"]
+        
+      - id: "inspection_checklist"
+        name: "Inspection Checklist"
+        description: "Quality or safety inspection"
+        use_cases: ["audits", "inspections", "reviews"]
+
+# LLM Solution Steps for OneNote operations
+llm_solution_steps:
+  meeting_notes:
+    - step: 1
+      action: "Analyze meeting context"
+      details: "Extract meeting type, date, attendees, agenda from request"
+      
+    - step: 2
+      action: "Select appropriate meeting notes template"
+      details: "Load template from OneNoteTemplateManager based on meeting type"
+      
+    - step: 3
+      action: "Structure note sections"
+      details: "Create sections for attendees, agenda, discussion, decisions, action items"
+      
+    - step: 4
+      action: "Populate note content"
+      details: "Fill in meeting details, format text, add tables if needed"
+      
+    - step: 5
+      action: "Create OneNote page"
+      details: "Use OneNote Agent to create formatted page in appropriate notebook/section"
+  
+  project_notes:
+    - step: 1
+      action: "Identify project details"
+      details: "Extract project name, phase, key information from request"
+      
+    - step: 2
+      action: "Select project template"
+      details: "Choose overview, task tracking, milestone, or risk template"
+      
+    - step: 3
+      action: "Structure project information"
+      details: "Organize into logical sections with headings and hierarchy"
+      
+    - step: 4
+      action: "Add tracking elements"
+      details: "Include tables, checklists, tags for tracking"
+      
+    - step: 5
+      action: "Create organized OneNote structure"
+      details: "Create notebook/section/page hierarchy for project"
+  
+  research_notes:
+    - step: 1
+      action: "Analyze research type"
+      details: "Determine if literature review, interview, analysis, or experiment"
+      
+    - step: 2
+      action: "Select research template"
+      details: "Load appropriate template with citation/source tracking"
+      
+    - step: 3
+      action: "Structure research content"
+      details: "Create sections for sources, findings, analysis, conclusions"
+      
+    - step: 4
+      action: "Format research data"
+      details: "Add tables, images, links, citations as needed"
+      
+    - step: 5
+      action: "Create research note page"
+      details: "Generate organized OneNote page with proper formatting"
+  
+  personal_notes:
+    - step: 1
+      action: "Classify note type"
+      details: "Determine if quick note, learning, idea, or reference"
+      
+    - step: 2
+      action: "Select personal template"
+      details: "Choose template that matches note purpose"
+      
+    - step: 3
+      action: "Capture content"
+      details: "Format text, add tags, links, and media"
+      
+    - step: 4
+      action: "Create OneNote entry"
+      details: "Create page in personal notebook"
+  
+  checklist:
+    - step: 1
+      action: "Extract checklist items"
+      details: "Parse list of tasks or steps from request"
+      
+    - step: 2
+      action: "Select checklist template"
+      details: "Choose simple, process, or inspection checklist"
+      
+    - step: 3
+      action: "Format checklist"
+      details: "Create checkbox list with proper structure"
+      
+    - step: 4
+      action: "Create checklist page"
+      details: "Generate interactive checklist in OneNote"
+
+# Agent routing configuration
+agent_routing:
+  primary_agent: "OneNoteAgent"
+  fallback_agents:
+    - "DocumentAgent"
+    - "KnowledgeBaseAgent"
+  
+  required_capabilities:
+    - "note_creation"
+    - "page_formatting"
+    - "notebook_organization"
+    - "tag_management"
+    - "multimedia_support"
+  
+  integration_points:
+    - "Microsoft Graph API"
+    - "OneNote API"
+
+# Quality assurance
+quality_checks:
+  structure:
+    - "Verify notebook/section/page hierarchy"
+    - "Ensure proper heading levels"
+    - "Check for logical content organization"
+  
+  content:
+    - "Validate formatting consistency"
+    - "Check for broken links"
+    - "Ensure multimedia elements are accessible"
+    - "Verify tags are appropriate"
+  
+  usability:
+    - "Ensure searchability with keywords"
+    - "Check for proper date/time stamps"
+    - "Validate checklist functionality"
+
+# Output formats
+output_formats:
+  - "HTML" # OneNote page HTML
+  - "DOCX" # Export to Word
+  - "PDF" # Export to PDF
+  - "ONE" # OneNote section file
+
+# Special features
+features:
+  - "Hierarchical organization (Notebook > Section > Page)"
+  - "Rich text formatting with multimedia"
+  - "Interactive checklists with checkboxes"
+  - "Tags for categorization and search"
+  - "Integration with Outlook (meeting notes)"
+  - "Ink annotations and drawings"
+  - "Audio/video recording"
+  - "Web clipping and screen captures"
+
+# Confidence thresholds
+confidence_thresholds:
+  high_confidence: 0.85
+  medium_confidence: 0.70
+  low_confidence: 0.50
+  minimum_confidence: 0.60

@@ -8,10 +8,12 @@ created: "2025-12-13"
 # Content type priorities (higher = checked first)
 content_type_priorities:
   presentation: 0.85
+  chart: 0.85
   table: 0.82
   word_document: 0.80
+  outlook: 0.78
   image: 0.78
-  chart: 0.85
+  onenote: 0.76
   map: 0.75
 
 # Global configuration

@@ -1,0 +1,113 @@
+category: "checklist"
+name: "Checklists"
+description: "Interactive checklist templates for various purposes"
+
+structure:
+  simple_checklist:
+    format: "checkbox_list"
+    grouping: "none"
+    priority: "optional"
+    
+  process_checklist:
+    format: "numbered_steps"
+    grouping: "by_phase"
+    dependencies: true
+    notes_per_step: true
+    
+  inspection_checklist:
+    format: "checkbox_with_status"
+    grouping: "by_category"
+    pass_fail: true
+    comments: true
+    signature: true
+
+llm_example:
+  simple_checklist: |
+    # Project Launch Checklist
+    
+    ## Pre-Launch
+    ☐ Final code review completed
+    ☐ All tests passing
+    ☐ Documentation updated
+    ☐ Security audit complete
+    
+    ## Launch Day
+    ☐ Database backup created
+    ☐ Deployment scripts ready
+    ☐ Rollback plan documented
+    ☐ Monitoring alerts configured
+    
+    ## Post-Launch
+    ☐ Monitor system performance
+    ☐ Check error logs
+    ☐ User feedback collected
+    ☐ Success metrics reviewed
+    
+  process_checklist: |
+    # Employee Onboarding Process
+    
+    ## Week 1: Setup
+    1. ☐ Create user accounts (IT, email, systems)
+       - Note: Submit IT ticket 2 days before start date
+    2. ☐ Assign workspace and equipment
+    3. ☐ Schedule orientation session
+    4. ☐ Provide welcome package
+    
+    ## Week 2-3: Training
+    5. ☐ Complete mandatory training modules
+    6. ☐ Shadow team members
+    7. ☐ Review company policies
+    8. ☐ Setup 1-on-1 with manager
+    
+    ## Week 4: Integration
+    9. ☐ Assign first project
+    10. ☐ Introduction to key stakeholders
+    11. ☐ 30-day check-in meeting
+    12. ☐ Collect feedback
+    
+  inspection_checklist: |
+    # Safety Inspection Checklist
+    
+    **Date:** _____________
+    **Inspector:** _____________
+    **Location:** _____________
+    
+    ## Fire Safety
+    ☐ Fire extinguishers accessible and charged [PASS/FAIL]
+    ☐ Exit signs illuminated [PASS/FAIL]
+    ☐ Fire doors not blocked [PASS/FAIL]
+    Comments: _______________________
+    
+    ## Electrical
+    ☐ No frayed cords or exposed wiring [PASS/FAIL]
+    ☐ Outlets not overloaded [PASS/FAIL]
+    ☐ Circuit breakers labeled [PASS/FAIL]
+    Comments: _______________________
+    
+    ## Emergency Equipment
+    ☐ First aid kit stocked [PASS/FAIL]
+    ☐ Emergency contacts posted [PASS/FAIL]
+    ☐ Evacuation plan visible [PASS/FAIL]
+    Comments: _______________________
+    
+    **Inspector Signature:** _____________
+    **Date:** _____________
+
+formatting:
+  checkbox_style: "interactive"
+  indentation: true
+  color_code_completed: true
+  show_progress_bar: true
+
+features:
+  enable_subtasks: true
+  enable_due_dates: true
+  enable_assignments: true
+  enable_priorities: true
+  enable_attachments: true
+
+quality_checks:
+  - "All items are actionable"
+  - "Clear completion criteria"
+  - "Logical ordering of items"
+  - "No duplicate items"
