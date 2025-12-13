@@ -1,0 +1,57 @@
+# Data Table Template - Simple data tables with formatting
+name: "data_table"
+category: "table"
+description: "Simple data tables for structured information display"
+version: "1.0.0"
+
+variations:
+  - id: "simple_data_table"
+    name: "Simple Data Table"
+    description: "Basic table with headers and data rows"
+    structure:
+      headers: true
+      footer: false
+      column_types: ["text", "number", "date", "text"]
+      formatting:
+        header_style: "bold"
+        alternate_rows: true
+        borders: "all"
+      
+  - id: "formatted_data_table"
+    name: "Formatted Data Table"
+    description: "Table with enhanced formatting and styling"
+    structure:
+      headers: true
+      footer: true
+      column_types: "dynamic"
+      formatting:
+        header_style: "bold_colored"
+        alternate_rows: true
+        borders: "all"
+        number_format: "#,##0.00"
+        date_format: "DD.MM.YYYY"
+
+llm_example:
+  prompt: "Create a table showing emission measurements for 5 facilities"
+  output:
+    template: "data_table"
+    variation: "formatted_data_table"
+    data:
+      headers: ["Facility", "SO2 (mg/m³)", "NOx (mg/m³)", "PM10 (mg/m³)", "Date"]
+      rows:
+        - ["Facility A", 45.2, 120.5, 15.3, "2025-01-15"]
+        - ["Facility B", 38.7, 95.2, 12.8, "2025-01-15"]
+        - ["Facility C", 52.1, 140.3, 18.9, "2025-01-15"]
+
+color_schemes:
+  professional:
+    header_bg: "#4472c4"
+    header_text: "#ffffff"
+    alt_row_bg: "#f2f2f2"
+  environmental:
+    header_bg: "#70ad47"
+    header_text: "#ffffff"
+    alt_row_bg: "#e2f0d9"
+
+version: "1.0.0"
+created: "2025-12-13"

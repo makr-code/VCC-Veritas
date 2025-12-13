@@ -1,0 +1,50 @@
+# Schedule Table Template - Timelines and schedules
+name: "schedule"
+category: "table"
+description: "Tables for schedules, timelines, and planning"
+version: "1.0.0"
+
+variations:
+  - id: "project_schedule"
+    name: "Project Schedule"
+    description: "Project timeline with tasks and dates"
+    structure:
+      columns: ["Task", "Start Date", "End Date", "Duration", "Status", "Responsible"]
+      formatting:
+        date_format: "DD.MM.YYYY"
+        duration_format: "days"
+        status_colors: true
+        header_style: "bold_colored"
+        
+  - id: "resource_allocation"
+    name: "Resource Allocation"
+    description: "Resource assignment over time"
+    structure:
+      columns: ["Resource", "Mon", "Tue", "Wed", "Thu", "Fri", "Total"]
+      formatting:
+        time_format: "hours"
+        total_column: true
+        capacity_warning: true  # Highlight over-allocation
+
+llm_example:
+  prompt: "Create a project schedule for BImSchG approval process"
+  output:
+    template: "schedule"
+    variation: "project_schedule"
+    data:
+      headers: ["Task", "Start Date", "End Date", "Duration (days)", "Status"]
+      rows:
+        - ["Application Submission", "01.02.2025", "05.02.2025", 5, "Completed"]
+        - ["Formal Review", "06.02.2025", "20.02.2025", 15, "In Progress"]
+        - ["Technical Assessment", "21.02.2025", "15.03.2025", 23, "Pending"]
+        - ["Public Hearing", "16.03.2025", "30.03.2025", 15, "Pending"]
+
+color_schemes:
+  status:
+    completed: "#70ad47"
+    in_progress: "#ffc000"
+    pending: "#d9d9d9"
+    delayed: "#ed7d31"
+
+version: "1.0.0"
+created: "2025-12-13"
