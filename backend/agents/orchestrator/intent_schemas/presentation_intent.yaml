@@ -1,0 +1,243 @@
+# Intent Recognition Schema for Presentations
+# This schema defines patterns, keywords, and templates for presentation-related requests
+
+content_type: "presentation"
+category: "visual_content"
+priority: 0.85
+
+# Intent patterns - used to detect presentation requests
+intent_patterns:
+  # Presentation creation keywords
+  presentation_creation:
+    keywords:
+      - "präsentation"
+      - "presentation"
+      - "powerpoint"
+      - "pptx"
+      - "slides"
+      - "folie"
+      - "folien"
+    confidence: 0.9
+    
+  # Diagram-specific keywords
+  diagram_request:
+    keywords:
+      - "diagramm"
+      - "diagram"
+      - "chart"
+      - "grafik"
+      - "visualisierung"
+      - "schaubild"
+    confidence: 0.85
+
+# Template mappings - keywords to template categories
+template_mappings:
+  list:
+    keywords:
+      - "liste"
+      - "list"
+      - "aufzählung"
+      - "punkte"
+      - "bullet"
+      - "benefits"
+      - "vorteile"
+      - "nachteile"
+      - "merkmale"
+    template_category: "list"
+    variations:
+      - "simple_list"
+      - "numbered_list"
+      - "two_column_list"
+    confidence: 0.85
+    
+  process:
+    keywords:
+      - "prozess"
+      - "process"
+      - "workflow"
+      - "ablauf"
+      - "schritte"
+      - "steps"
+      - "genehmigung"
+      - "approval"
+      - "verfahren"
+      - "procedure"
+    template_category: "process"
+    variations:
+      - "linear_process"
+      - "decision_process"
+      - "horizontal_process"
+    confidence: 0.9
+    
+  cycle:
+    keywords:
+      - "zyklus"
+      - "cycle"
+      - "pdca"
+      - "kreislauf"
+      - "kontinuierlich"
+      - "continuous"
+      - "lifecycle"
+      - "iterativ"
+    template_category: "cycle"
+    variations:
+      - "pdca_cycle"
+      - "circular_process"
+      - "lifecycle"
+    confidence: 0.88
+    
+  hierarchy:
+    keywords:
+      - "organigramm"
+      - "org chart"
+      - "hierarchie"
+      - "hierarchy"
+      - "struktur"
+      - "structure"
+      - "organisation"
+      - "organization"
+      - "baum"
+      - "tree"
+    template_category: "hierarchy"
+    variations:
+      - "org_chart"
+      - "tree_diagram"
+      - "breakdown_structure"
+    confidence: 0.9
+    
+  relationship:
+    keywords:
+      - "beziehung"
+      - "relationship"
+      - "venn"
+      - "netzwerk"
+      - "network"
+      - "stakeholder"
+      - "verbindung"
+      - "connection"
+      - "abhängigkeit"
+      - "dependency"
+    template_category: "relationship"
+    variations:
+      - "venn_diagram"
+      - "network_diagram"
+      - "stakeholder_map"
+      - "dependency_diagram"
+    confidence: 0.82
+    
+  matrix:
+    keywords:
+      - "matrix"
+      - "swot"
+      - "vergleich"
+      - "comparison"
+      - "2x2"
+      - "3x3"
+      - "quadrant"
+      - "grid"
+      - "tabelle"
+    template_category: "matrix"
+    variations:
+      - "two_by_two"
+      - "swot_matrix"
+      - "three_by_three"
+      - "comparison_table"
+    confidence: 0.87
+    
+  pyramid:
+    keywords:
+      - "pyramide"
+      - "pyramid"
+      - "ebenen"
+      - "layers"
+      - "schichten"
+      - "levels"
+      - "hierarchisch"
+      - "maslow"
+    template_category: "pyramid"
+    variations:
+      - "standard_pyramid"
+      - "inverted_pyramid"
+      - "maslow_hierarchy"
+    confidence: 0.83
+    
+  spiderweb:
+    keywords:
+      - "radar"
+      - "spider"
+      - "spinne"
+      - "bewertung"
+      - "assessment"
+      - "kompetenzen"
+      - "competency"
+      - "skills"
+      - "fähigkeiten"
+    template_category: "spiderweb"
+    variations:
+      - "radar_chart"
+      - "competency_web"
+      - "comparison_radar"
+    confidence: 0.85
+
+# LLM Solution Steps for presentations
+llm_solution_steps:
+  - step: 1
+    action: "analyze_request"
+    description: "Anforderung analysieren und Schlüsselwörter extrahieren"
+    outputs: ["keywords", "intent", "data_requirements"]
+    
+  - step: 2
+    action: "select_template"
+    description: "Template-Kategorie anhand Keywords auswählen"
+    inputs: ["keywords", "intent"]
+    outputs: ["template_category", "template_variation"]
+    uses: "PresentationTemplateManager"
+    
+  - step: 3
+    action: "extract_data"
+    description: "Datenstruktur aus Anfrage extrahieren"
+    inputs: ["request", "template"]
+    outputs: ["structured_data"]
+    
+  - step: 4
+    action: "generate_vdl"
+    description: "Visual Description Language (VDL) generieren"
+    inputs: ["template", "structured_data"]
+    outputs: ["vdl_specification"]
+    uses: "LLM with template examples"
+    
+  - step: 5
+    action: "create_presentation"
+    description: "Präsentation erstellen mit PresentationCanvasAgent"
+    inputs: ["vdl_specification"]
+    outputs: ["presentation_file", "slides"]
+    uses: "PresentationCanvasAgent"
+
+# Agent routing configuration
+agent_routing:
+  primary_agent: "PresentationCanvasAgent"
+  fallback_agent: "VectorChartAgent"
+  dependencies:
+    - "PresentationTemplateManager"
+    - "LLMService"
+  parallel_execution: false
+  
+# Quality checks
+quality_checks:
+  - check: "template_match_confidence"
+    threshold: 0.75
+    action_if_fail: "use_generic_template"
+    
+  - check: "data_completeness"
+    threshold: 0.8
+    action_if_fail: "request_clarification"
+    
+  - check: "vdl_validation"
+    threshold: 1.0
+    action_if_fail: "regenerate_vdl"
+
+# Metadata
+version: "1.0.0"
+created: "2025-12-13"
+updated: "2025-12-13"
+author: "VERITAS Orchestrator System"

@@ -1,0 +1,54 @@
+# Summary Table Template - Aggregated and summary data
+name: "summary"
+category: "table"
+description: "Tables with aggregations, totals, and summaries"
+version: "1.0.0"
+
+variations:
+  - id: "summary_statistics"
+    name: "Summary Statistics"
+    description: "Statistical summary with totals and averages"
+    structure:
+      headers: true
+      aggregation_rows: ["sum", "average", "min", "max"]
+      formatting:
+        header_style: "bold"
+        aggregation_style: "bold_colored"
+        number_format: "#,##0.00"
+        
+  - id: "grouped_summary"
+    name: "Grouped Summary"
+    description: "Summary grouped by categories"
+    structure:
+      headers: true
+      group_by: "category"
+      subtotals: true
+      grand_total: true
+      formatting:
+        group_header_style: "bold_indented"
+        subtotal_style: "bold"
+        grand_total_style: "bold_double_line"
+
+llm_example:
+  prompt: "Create a summary table of annual emissions by facility"
+  output:
+    template: "summary"
+    variation: "summary_statistics"
+    data:
+      headers: ["Metric", "Value", "Unit"]
+      rows:
+        - ["Total SO2", 1250.5, "tons/year"]
+        - ["Total NOx", 2340.8, "tons/year"]
+        - ["Total PM10", 450.2, "tons/year"]
+      aggregations:
+        sum: ["Total Emissions", 4041.5, "tons/year"]
+
+color_schemes:
+  financial:
+    header_bg: "#1f4788"
+    subtotal_bg: "#d9e2f3"
+    total_bg: "#4472c4"
+    total_text: "#ffffff"
+
+version: "1.0.0"
+created: "2025-12-13"

@@ -1,0 +1,139 @@
+# Intent Recognition Schema for Word Documents
+# This schema defines patterns and templates for Word document creation requests
+
+content_type: "word_document"
+category: "text_content"
+priority: 0.80
+
+# Intent patterns
+intent_patterns:
+  document_creation:
+    keywords:
+      - "dokument"
+      - "document"
+      - "word"
+      - "docx"
+      - "bericht"
+      - "report"
+      - "brief"
+      - "letter"
+      - "memo"
+    confidence: 0.9
+    
+  formatted_text:
+    keywords:
+      - "text"
+      - "schreiben"
+      - "verfassen"
+      - "erstellen"
+      - "write"
+      - "create"
+      - "format"
+      - "formatieren"
+    confidence: 0.75
+
+# Template mappings for document types
+template_mappings:
+  report:
+    keywords:
+      - "bericht"
+      - "report"
+      - "analyse"
+      - "analysis"
+      - "studie"
+      - "study"
+      - "gutachten"
+      - "assessment"
+    template_category: "report"
+    variations:
+      - "technical_report"
+      - "executive_summary"
+      - "research_report"
+    confidence: 0.88
+    
+  letter:
+    keywords:
+      - "brief"
+      - "letter"
+      - "anschreiben"
+      - "cover letter"
+      - "anfrage"
+      - "request"
+    template_category: "letter"
+    variations:
+      - "formal_letter"
+      - "business_letter"
+      - "cover_letter"
+    confidence: 0.85
+    
+  protocol:
+    keywords:
+      - "protokoll"
+      - "protocol"
+      - "minutes"
+      - "meeting"
+      - "besprechung"
+      - "sitzung"
+    template_category: "protocol"
+    variations:
+      - "meeting_minutes"
+      - "decision_protocol"
+    confidence: 0.87
+    
+  contract:
+    keywords:
+      - "vertrag"
+      - "contract"
+      - "vereinbarung"
+      - "agreement"
+      - "kontrakt"
+    template_category: "contract"
+    variations:
+      - "service_contract"
+      - "nda"
+      - "terms_conditions"
+    confidence: 0.90
+
+# LLM Solution Steps for documents
+llm_solution_steps:
+  - step: 1
+    action: "analyze_document_type"
+    description: "Dokumenttyp und Zweck identifizieren"
+    outputs: ["document_type", "purpose"]
+    
+  - step: 2
+    action: "select_template"
+    description: "Dokument-Template auswählen"
+    inputs: ["document_type"]
+    outputs: ["template"]
+    
+  - step: 3
+    action: "structure_content"
+    description: "Inhaltsstruktur definieren (Überschriften, Abschnitte)"
+    inputs: ["template", "requirements"]
+    outputs: ["document_structure"]
+    
+  - step: 4
+    action: "generate_content"
+    description: "Textinhalte generieren"
+    inputs: ["document_structure", "data"]
+    outputs: ["formatted_text"]
+    
+  - step: 5
+    action: "create_document"
+    description: "Word-Dokument erstellen"
+    inputs: ["formatted_text", "template"]
+    outputs: ["document_file"]
+
+# Agent routing
+agent_routing:
+  primary_agent: "WordDocumentAgent"
+  fallback_agent: "TextGenerationAgent"
+  dependencies:
+    - "DocumentTemplateManager"
+    - "LLMService"
+  parallel_execution: false
+
+version: "1.0.0"
+created: "2025-12-13"
+author: "VERITAS Orchestrator System"

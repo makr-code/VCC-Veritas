@@ -1,0 +1,79 @@
+category: "calendar"
+name: "Calendar Events"
+description: "Templates for various calendar event types"
+
+structure:
+  simple_appointment:
+    duration: "30-60 minutes"
+    attendees: 0
+    location: "optional"
+    reminder: "15 minutes before"
+    
+  meeting_with_attendees:
+    duration: "30-120 minutes"
+    attendees: "2+"
+    location: "required"
+    agenda: "recommended"
+    reminder: "15 minutes before"
+    recurrence: "optional"
+    
+  recurring_meeting:
+    duration: "30-90 minutes"
+    frequency: "daily|weekly|monthly"
+    end_date: "required"
+    attendees: "1+"
+    
+  all_day_event:
+    duration: "24 hours"
+    show_as: "free|busy|out_of_office"
+    reminder: "1 day before"
+
+llm_example:
+  simple_appointment:
+    subject: "Doctor's Appointment"
+    start: "2024-10-15 14:00"
+    end: "2024-10-15 15:00"
+    location: "Medical Center"
+    description: "Annual checkup"
+    
+  meeting_with_attendees:
+    subject: "Product Roadmap Review"
+    start: "2024-10-16 10:00"
+    end: "2024-10-16 11:30"
+    location: "Conference Room A"
+    attendees:
+      - "john@company.com"
+      - "sarah@company.com"
+      - "michael@company.com"
+    description: |
+      Agenda:
+      1. Review current roadmap (15 min)
+      2. Discuss upcoming features (30 min)
+      3. Prioritization exercise (30 min)
+      4. Next steps and action items (15 min)
+    
+  recurring_meeting:
+    subject: "Weekly Team Standup"
+    start: "2024-10-14 09:00"
+    end: "2024-10-14 09:30"
+    recurrence:
+      pattern: "weekly"
+      days: ["Monday", "Wednesday", "Friday"]
+      end_date: "2024-12-31"
+    attendees:
+      - "team@company.com"
+    description: "Quick sync on progress and blockers"
+
+formatting:
+  time_zone: "Europe/Berlin"
+  show_as: "busy"
+  importance: "normal"
+  allow_new_time_proposals: true
+  response_requested: true
+
+quality_checks:
+  - "Start time is in the future"
+  - "End time is after start time"
+  - "Duration is reasonable (< 4 hours for single meetings)"
+  - "All attendee emails are valid"
+  - "Location specified for in-person meetings"

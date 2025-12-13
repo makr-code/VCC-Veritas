@@ -1,0 +1,53 @@
+# Comparison Table Template - Side-by-side comparisons
+name: "comparison"
+category: "table"
+description: "Tables for comparing options, features, or alternatives"
+version: "1.0.0"
+
+variations:
+  - id: "feature_comparison"
+    name: "Feature Comparison"
+    description: "Compare features across multiple options"
+    structure:
+      layout: "feature_rows"  # Features in rows, options in columns
+      headers: true
+      highlight_differences: true
+      use_icons: true  # ✓ ✗ symbols
+      formatting:
+        header_style: "bold_centered"
+        borders: "grid"
+        
+  - id: "option_comparison"
+    name: "Option Comparison"
+    description: "Compare different options or alternatives"
+    structure:
+      layout: "option_columns"
+      headers: true
+      summary_row: true
+      rating_system: "stars"  # or "numeric" or "traffic_light"
+      formatting:
+        header_style: "bold_colored"
+        borders: "all"
+
+llm_example:
+  prompt: "Compare three renewable energy options: solar, wind, hydro"
+  output:
+    template: "comparison"
+    variation: "feature_comparison"
+    data:
+      headers: ["Feature", "Solar", "Wind", "Hydro"]
+      rows:
+        - ["Initial Cost", "Medium", "High", "Very High"]
+        - ["Running Cost", "Low", "Low", "Low"]
+        - ["Efficiency", "15-20%", "35-45%", "90%"]
+        - ["Location Dependent", "✓", "✓", "✓"]
+        - ["Weather Dependent", "✓", "✓", "✗"]
+
+color_schemes:
+  standard:
+    header_bg: "#4472c4"
+    best_option: "#70ad47"
+    worst_option: "#ed7d31"
+
+version: "1.0.0"
+created: "2025-12-13"

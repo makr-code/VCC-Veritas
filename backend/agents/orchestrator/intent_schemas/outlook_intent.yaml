@@ -1,0 +1,250 @@
+# Outlook Intent Schema
+# Defines how to recognize and handle Outlook-related requests
+
+content_type: "outlook"
+priority: 0.78
+description: "Email composition, calendar management, and task creation in Outlook"
+
+# Keywords for intent detection
+keywords:
+  primary:
+    - "outlook"
+    - "email"
+    - "e-mail"
+    - "mail"
+    - "nachricht"
+    - "termin"
+    - "kalendar"
+    - "besprechung"
+    - "meeting"
+    - "aufgabe"
+    - "task"
+    
+  secondary:
+    - "senden"
+    - "verschicken"
+    - "versenden"
+    - "schreiben"
+    - "antworten"
+    - "weiterleiten"
+    - "einladen"
+    - "planen"
+    - "erstellen"
+
+# Template categories for Outlook
+templates:
+  - id: "email_compose"
+    name: "Email Composition"
+    description: "Compose and send emails"
+    keywords: ["email", "mail", "nachricht", "schreiben", "senden"]
+    variations:
+      - id: "formal_email"
+        name: "Formal Email"
+        description: "Professional business email"
+        use_cases: ["business correspondence", "official communication"]
+        
+      - id: "informal_email"
+        name: "Informal Email"
+        description: "Casual email to colleagues"
+        use_cases: ["team communication", "quick updates"]
+        
+      - id: "meeting_request_email"
+        name: "Meeting Request"
+        description: "Email to request a meeting"
+        use_cases: ["schedule meetings", "coordinate time"]
+        
+      - id: "status_update_email"
+        name: "Status Update"
+        description: "Project status update email"
+        use_cases: ["project updates", "progress reports"]
+        
+      - id: "reply_email"
+        name: "Reply Email"
+        description: "Reply to existing email"
+        use_cases: ["respond to requests", "answer questions"]
+  
+  - id: "calendar_event"
+    name: "Calendar Event"
+    description: "Create calendar appointments and meetings"
+    keywords: ["termin", "kalendar", "meeting", "besprechung", "einladen"]
+    variations:
+      - id: "simple_appointment"
+        name: "Simple Appointment"
+        description: "Basic calendar entry"
+        use_cases: ["personal appointments", "reminders"]
+        
+      - id: "meeting_with_attendees"
+        name: "Meeting with Attendees"
+        description: "Meeting invitation with participants"
+        use_cases: ["team meetings", "client meetings"]
+        
+      - id: "recurring_meeting"
+        name: "Recurring Meeting"
+        description: "Regularly scheduled meeting"
+        use_cases: ["weekly standups", "monthly reviews"]
+        
+      - id: "all_day_event"
+        name: "All-Day Event"
+        description: "Full day calendar block"
+        use_cases: ["conferences", "vacation", "training"]
+  
+  - id: "task"
+    name: "Task"
+    description: "Create and manage Outlook tasks"
+    keywords: ["aufgabe", "task", "todo", "erledigen"]
+    variations:
+      - id: "simple_task"
+        name: "Simple Task"
+        description: "Basic task with due date"
+        use_cases: ["personal reminders", "action items"]
+        
+      - id: "task_with_reminder"
+        name: "Task with Reminder"
+        description: "Task with notification"
+        use_cases: ["important deadlines", "follow-ups"]
+        
+      - id: "delegated_task"
+        name: "Delegated Task"
+        description: "Task assigned to others"
+        use_cases: ["team coordination", "task delegation"]
+  
+  - id: "contact"
+    name: "Contact Management"
+    description: "Add and manage contacts"
+    keywords: ["kontakt", "contact", "adresse", "person"]
+    variations:
+      - id: "business_contact"
+        name: "Business Contact"
+        description: "Professional contact with company info"
+        use_cases: ["clients", "partners", "vendors"]
+        
+      - id: "personal_contact"
+        name: "Personal Contact"
+        description: "Personal contact details"
+        use_cases: ["colleagues", "friends", "family"]
+
+# LLM Solution Steps for Outlook operations
+llm_solution_steps:
+  email_compose:
+    - step: 1
+      action: "Analyze request and determine email type (formal, informal, reply, etc.)"
+      details: "Extract recipient(s), subject, and key message points from user request"
+      
+    - step: 2
+      action: "Select appropriate email template"
+      details: "Load template from OutlookTemplateManager based on formality and purpose"
+      
+    - step: 3
+      action: "Generate email content"
+      details: "Create subject line, greeting, body, and signature using LLM if needed"
+      
+    - step: 4
+      action: "Format email structure"
+      details: "Apply proper email formatting (HTML/plain text), add attachments if specified"
+      
+    - step: 5
+      action: "Send or save draft"
+      details: "Use Outlook Agent to send immediately or save as draft"
+  
+  calendar_event:
+    - step: 1
+      action: "Extract event details"
+      details: "Parse date/time, duration, location, attendees from request"
+      
+    - step: 2
+      action: "Select calendar template"
+      details: "Choose appointment, meeting, or all-day event template"
+      
+    - step: 3
+      action: "Generate event description"
+      details: "Create meeting agenda or event details if needed"
+      
+    - step: 4
+      action: "Configure attendees and resources"
+      details: "Add required/optional attendees, meeting rooms, equipment"
+      
+    - step: 5
+      action: "Create calendar event"
+      details: "Use Outlook Agent to create event and send invitations"
+  
+  task:
+    - step: 1
+      action: "Extract task details"
+      details: "Parse task name, due date, priority, category from request"
+      
+    - step: 2
+      action: "Select task template"
+      details: "Choose simple, reminder, or delegated task template"
+      
+    - step: 3
+      action: "Set task properties"
+      details: "Configure priority, reminder, recurrence, assignee"
+      
+    - step: 4
+      action: "Create task"
+      details: "Use Outlook Agent to create and optionally assign task"
+  
+  contact:
+    - step: 1
+      action: "Extract contact information"
+      details: "Parse name, email, phone, company, address from request"
+      
+    - step: 2
+      action: "Select contact template"
+      details: "Choose business or personal contact template"
+      
+    - step: 3
+      action: "Add contact to Outlook"
+      details: "Use Outlook Agent to create contact entry"
+
+# Agent routing configuration
+agent_routing:
+  primary_agent: "OutlookAgent"
+  fallback_agents:
+    - "EmailAgent"
+    - "CalendarAgent"
+  
+  required_capabilities:
+    - "email_composition"
+    - "calendar_management"
+    - "task_management"
+    - "contact_management"
+  
+  integration_points:
+    - "Microsoft Graph API"
+    - "Exchange Server"
+    - "SMTP/IMAP"
+
+# Quality assurance
+quality_checks:
+  email:
+    - "Verify recipient email format"
+    - "Check for sensitive information"
+    - "Validate subject line presence"
+    - "Ensure professional tone (if formal)"
+  
+  calendar:
+    - "Validate date/time format"
+    - "Check for scheduling conflicts"
+    - "Verify attendee email addresses"
+    - "Ensure meeting duration is reasonable"
+  
+  task:
+    - "Validate due date is in future"
+    - "Check priority level"
+    - "Ensure assignee exists (if delegated)"
+
+# Output formats
+output_formats:
+  - "MSG" # Outlook message file
+  - "ICS" # Calendar file
+  - "VCF" # Contact file
+  - "HTML" # Email HTML
+  - "EML" # Email file
+
+# Confidence thresholds
+confidence_thresholds:
+  high_confidence: 0.85
+  medium_confidence: 0.70
+  low_confidence: 0.50
+  minimum_confidence: 0.60

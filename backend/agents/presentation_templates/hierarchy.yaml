@@ -1,0 +1,102 @@
+# Hierarchy Template - Organizational and tree structures
+name: "hierarchy"
+category: "hierarchy"
+description: "Hierarchical structures including org charts and tree diagrams"
+version: "1.0.0"
+
+variations:
+  - id: "org_chart"
+    name: "Organization Chart"
+    description: "Standard organizational hierarchy"
+    structure:
+      layout: "content"
+      elements:
+        - type: "text"
+          role: "title"
+          position: {x: 50, y: 30}
+          size: {width: 700, height: 50}
+          properties:
+            font_size: 32
+            font_weight: "bold"
+        - type: "org_chart"
+          role: "hierarchy"
+          position: {x: 100, y: 100}
+          properties:
+            level_spacing: 100
+            node_spacing: 120
+            connector_type: "elbow"
+            auto_center: true
+    
+  - id: "tree_diagram"
+    name: "Tree Diagram"
+    description: "Generic tree structure with branches"
+    structure:
+      layout: "content"
+      elements:
+        - type: "text"
+          role: "title"
+          position: {x: 50, y: 30}
+          size: {width: 700, height: 50}
+        - type: "tree"
+          role: "tree_nodes"
+          position: {x: 100, y: 100}
+          properties:
+            orientation: "top_down"
+            level_spacing: 90
+            node_spacing: 100
+            connector_type: "straight"
+
+  - id: "breakdown_structure"
+    name: "Work Breakdown Structure (WBS)"
+    description: "Project breakdown hierarchy"
+    structure:
+      layout: "content"
+      elements:
+        - type: "text"
+          role: "title"
+          position: {x: 50, y: 30}
+          size: {width: 700, height: 50}
+        - type: "org_chart"
+          role: "wbs_levels"
+          position: {x: 100, y: 100}
+          properties:
+            level_spacing: 85
+            node_spacing: 110
+            connector_type: "straight"
+            show_ids: true
+
+# Node shape options
+node_shapes:
+  default: "rounded_rectangle"
+  executive: "rectangle"
+  department: "rounded_rectangle"
+  team: "oval"
+  individual: "rectangle"
+
+# LLM usage example
+llm_example:
+  prompt: "Create an org chart for environmental agency with 3 levels"
+  vdl_output:
+    use_native_shapes: true
+    slides:
+      - layout: "content"
+        template: "hierarchy"
+        template_variation: "org_chart"
+        data:
+          title: "Environmental Agency Structure"
+          levels:
+            - ["Director"]
+            - ["Environmental Protection", "Nature Conservation", "Water Management"]
+            - ["Air Quality", "Noise Control", "Flora", "Fauna", "Surface Water", "Groundwater"]
+
+color_schemes:
+  standard:
+    level_1: "#1f4788"
+    level_2: "#4472c4"
+    level_3: "#5b9bd5"
+    connectors: "#000000"
+  organizational:
+    executive: "#70ad47"
+    management: "#4472c4"
+    operational: "#ffc000"
+    connectors: "#666666"

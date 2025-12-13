@@ -1,0 +1,118 @@
+category: "meeting_notes"
+name: "Meeting Notes"
+description: "Structured templates for various meeting types"
+
+structure:
+  formal_meeting_minutes:
+    sections:
+      - header: "Meeting Details (date, time, location, attendees)"
+      - section: "Agenda Items"
+      - section: "Discussion Points"
+      - section: "Decisions Made"
+      - section: "Action Items (owner, due date)"
+      - footer: "Next Meeting Date"
+    
+  standup_notes:
+    format: "quick_capture"
+    sections:
+      - "Yesterday's Accomplishments"
+      - "Today's Plan"
+      - "Blockers/Impediments"
+    
+  project_meeting:
+    sections:
+      - "Project Status Update"
+      - "Milestones Review"
+      - "Issues and Risks"
+      - "Decisions"
+      - "Next Steps"
+    
+  brainstorming_session:
+    sections:
+      - "Session Goal"
+      - "Ideas Generated"
+      - "Themes/Categories"
+      - "Top Picks"
+      - "Follow-up Actions"
+
+llm_example:
+  formal_meeting_minutes: |
+    # Board Meeting Minutes
+    
+    **Date:** October 15, 2024
+    **Time:** 10:00 AM - 12:00 PM
+    **Location:** Executive Conference Room
+    
+    ## Attendees
+    - John Smith (Chair)
+    - Sarah Johnson
+    - Michael Chen
+    - Lisa Williams
+    
+    ## Agenda
+    1. Q3 Financial Review
+    2. Strategic Planning for Q4
+    3. New Product Launch Discussion
+    4. Any Other Business
+    
+    ## Discussion
+    
+    ### Q3 Financial Review
+    - Revenue exceeded targets by 12%
+    - Operating costs within budget
+    - Strong performance in European markets
+    
+    ### Strategic Planning
+    - Discussed expansion into Asian markets
+    - Reviewed competitive landscape
+    - Identified key partnerships
+    
+    ## Decisions
+    1. ✓ Approved Q4 budget allocation
+    2. ✓ Greenlit market research for Asia expansion
+    3. ✓ Selected vendor for new CRM system
+    
+    ## Action Items
+    - **Sarah:** Prepare detailed Asia market analysis (Due: Oct 30)
+    - **Michael:** Draft partnership proposals (Due: Oct 25)
+    - **Lisa:** Initiate CRM vendor negotiations (Due: Oct 20)
+    
+    **Next Meeting:** November 15, 2024 at 10:00 AM
+    
+  standup_notes: |
+    # Daily Standup - October 15, 2024
+    
+    ## Yesterday
+    - Completed user authentication module
+    - Fixed 3 critical bugs
+    - Code review for payment integration
+    
+    ## Today
+    - Implement password reset functionality
+    - Update API documentation
+    - Team planning meeting at 3 PM
+    
+    ## Blockers
+    - Waiting for design mockups from UX team
+    - Database migration script needs DBA approval
+
+formatting:
+  use_markdown: true
+  include_checkboxes: true
+  include_tags: true
+  color_coding:
+    decisions: "green"
+    action_items: "yellow"
+    blockers: "red"
+
+metadata:
+  auto_link_to_calendar: true
+  auto_notify_attendees: false
+  auto_create_tasks: true
+
+quality_checks:
+  - "Meeting date and time documented"
+  - "All attendees listed"
+  - "Action items have owners"
+  - "Action items have due dates"
+  - "Decisions clearly marked"

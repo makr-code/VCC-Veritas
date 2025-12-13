@@ -204,6 +204,35 @@ class AgentOrchestrator:
             "parallel": True,
             "depends_on": ["data_analysis"],  # Benötigt Geo-Daten
         },
+        # Office Agent Tasks (NEW - 2025-12-13)
+        "powerpoint_generation": {
+            "stage": "response_enhancement",
+            "capability": "powerpoint_generation",
+            "priority": 0.80,
+            "parallel": False,
+            "depends_on": ["content_synthesis"],
+        },
+        "excel_table_generation": {
+            "stage": "response_generation",
+            "capability": "excel_table_generation",
+            "priority": 0.82,
+            "parallel": True,
+            "depends_on": ["data_analysis", "database"],
+        },
+        "outlook_composition": {
+            "stage": "response_enhancement",
+            "capability": "outlook_composition",
+            "priority": 0.78,
+            "parallel": True,
+            "depends_on": [],
+        },
+        "onenote_documentation": {
+            "stage": "response_enhancement",
+            "capability": "onenote_documentation",
+            "priority": 0.76,
+            "parallel": True,
+            "depends_on": ["content_synthesis"],
+        },
     }
 
     def __init__(self, schema_dir: str = None, agent_coordinator=None, pipeline_manager=None):
@@ -269,6 +298,15 @@ class AgentOrchestrator:
                 self.database_agent = None
         else:
             self.database_agent = None
+
+        # Office Agents Integration (NEW - 2025-12-13)
+        try:
+            from backend.agents.orchestrator.office_agent_orchestrator_integration import get_office_orchestrator
+            self.office_orchestrator = get_office_orchestrator()
+            logger.info("✅ Office Agent Orchestrator initialisiert")
+        except Exception as e:
+            logger.warning(f"⚠️ Office Agent Orchestrator nicht verfügbar: {e}")
+            self.office_orchestrator = None
 
         # Monitoring
         self.orchestration_active = False
