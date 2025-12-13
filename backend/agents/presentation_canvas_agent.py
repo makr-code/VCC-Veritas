@@ -68,9 +68,32 @@ class VisualDescriptionLanguage:
     die vom LLM erzeugt und vom Canvas Agent interpretiert werden kann.
     """
     
-    ELEMENT_TYPES = ['text', 'shape', 'chart', 'image', 'icon', 'line', 'arrow']
+    ELEMENT_TYPES = [
+        'text', 'shape', 'chart', 'image', 'icon', 'line', 'arrow',
+        'connector', 'flowchart', 'org_chart', 'process_flow', 
+        'cycle_diagram', 'pyramid'
+    ]
     LAYOUT_TYPES = ['title_slide', 'content', 'two_column', 'chart', 'image', 'blank']
-    SHAPE_TYPES = ['rectangle', 'circle', 'triangle', 'arrow', 'star']
+    SHAPE_TYPES = [
+        # Basis-Formen
+        'rectangle', 'rounded_rectangle', 'oval', 'triangle',
+        'diamond', 'pentagon', 'hexagon', 'octagon',
+        
+        # Pfeile (häufig genutzte)
+        'right_arrow', 'left_arrow', 'up_arrow', 'down_arrow',
+        'left_right_arrow', 'circular_arrow', 'bent_arrow',
+        
+        # Flussdiagramm-Formen
+        'flowchart_process', 'flowchart_decision', 'flowchart_terminator',
+        'flowchart_data', 'flowchart_document', 'flowchart_database',
+        
+        # Callouts
+        'cloud_callout', 'oval_callout',
+        
+        # Sterne
+        'star_5_point', 'star_6_point'
+    ]
+    CONNECTOR_TYPES = ['straight', 'elbow', 'curve']
     
     @classmethod
     def validate(cls, vdl_spec: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
@@ -327,12 +350,13 @@ VDL-Format (JSON):
     "author": "Autor",
     "theme": "professional" | "minimal" | "colorful"
   },
+  "use_native_shapes": true,  // Nutze native PowerPoint-Shapes (editierbar)
   "slides": [
     {
       "layout": "title_slide" | "content" | "two_column" | "chart" | "image",
       "elements": [
         {
-          "type": "text" | "shape" | "chart" | "image" | "icon",
+          "type": "text" | "shape" | "connector" | "flowchart" | "org_chart" | "cycle_diagram" | "chart" | "image",
           "content": "Text oder Beschreibung",
           "position": {"x": int, "y": int},
           "size": {"width": int, "height": int},
@@ -350,15 +374,63 @@ VDL-Format (JSON):
 
 Elemente-Typen:
 - text: Textelemente (Titel, Inhalt, Listen)
-- shape: Formen (rectangle, circle, triangle, arrow)
+- shape: Formen (rectangle, rounded_rectangle, oval, triangle, diamond, pentagon, hexagon, octagon)
+- connector: Verbindungslinien (straight, elbow, curve)
+- flowchart: Flussdiagramm-Template mit steps-Array
+- org_chart: Organigramm-Template mit levels-Array
+- cycle_diagram: Zyklisches Diagramm-Template mit steps-Array
 - chart: Verweise auf Chart-Agent (chart_id oder chart_spec)
 - image: Platzhalter für Bilder (ai_generated oder file)
-- icon: Icons/Symbole
+
+Shape-Typen (häufig genutzt):
+- Basis: rectangle, rounded_rectangle, oval, triangle, diamond, pentagon, hexagon, octagon
+- Pfeile: right_arrow, left_arrow, up_arrow, down_arrow, left_right_arrow, circular_arrow, bent_arrow
+- Flowchart: flowchart_process, flowchart_decision, flowchart_terminator, flowchart_data, flowchart_document, flowchart_database
+- Callouts: cloud_callout, oval_callout
+- Sterne: star_5_point, star_6_point
+
+Diagram-Templates (verwende diese für komplexe Strukturen):
+1. flowchart:
+   {
+     "type": "flowchart",
+     "steps": [
+       {"shape": "flowchart_terminator", "text": "Start", "color": "#70ad47"},
+       {"shape": "flowchart_process", "text": "Schritt 1", "color": "#4472c4"},
+       {"shape": "flowchart_decision", "text": "Entscheidung?", "color": "#ed7d31"},
+       {"shape": "flowchart_terminator", "text": "Ende", "color": "#70ad47"}
+     ],
+     "position": {"x": 100, "y": 100}
+   }
+
+2. org_chart:
+   {
+     "type": "org_chart",
+     "levels": [
+       ["CEO"],
+       ["Manager 1", "Manager 2"],
+       ["Team A", "Team B", "Team C"]
+     ],
+     "position": {"x": 100, "y": 100}
+   }
+
+3. cycle_diagram:
+   {
+     "type": "cycle_diagram",
+     "steps": ["Plan", "Do", "Check", "Act"],
+     "position": {"x": 400, "y": 300}
+   }
 
 Koordinaten-System:
 - Canvas: 800x600 (Standard)
 - x: 0-800 (links nach rechts)
 - y: 0-600 (oben nach unten)
+
+Best Practices:
+- Nutze Templates (flowchart, org_chart, cycle_diagram) statt manuelle Shape-Positionierung
+- Verwende konsistente Farben (#4472c4 für primary, #70ad47 für success, #ed7d31 für warnings)
+- Lasse Platz zwischen Elementen (mind. 20px)
+- Zentriere wichtige Elemente
+- Nutze native_shapes für editierbare PowerPoint-Präsentationen
 
 Antworte NUR mit dem VDL-JSON, keine Erklärungen."""
 
@@ -452,6 +524,21 @@ Antworte NUR mit dem VDL-JSON, keine Erklärungen."""
         
         elif element_type == 'shape':
             self._render_shape(draw, element, pos, size, props)
+        
+        elif element_type == 'connector':
+            self._render_connector(draw, element)
+        
+        elif element_type == 'flowchart':
+            self._render_flowchart_template(draw, element)
+        
+        elif element_type == 'org_chart':
+            self._render_org_chart_template(draw, element)
+        
+        elif element_type == 'process_flow':
+            self._render_process_flow_template(draw, element)
+        
+        elif element_type == 'cycle_diagram':
+            self._render_cycle_diagram_template(draw, element)
         
         elif element_type == 'chart':
             # Platzhalter für Chart (wird via Chart-Agent erstellt)
@@ -558,6 +645,162 @@ Antworte NUR mit dem VDL-JSON, keine Erklärungen."""
         draw.text((x + 10, y + 10), f"[AI Image: {ai_prompt[:40]}]", fill='#ff9800', font=font)
         draw.text((x + 10, y + 30), "→ AI Image Generator", fill='#ffa726', font=font)
     
+    def _render_connector(self, draw: ImageDraw.Draw, element: Dict[str, Any]):
+        """Connector/Verbindungslinie rendern"""
+        connector_type = element.get('connector_type', 'straight')
+        start = element.get('start', {'x': 0, 'y': 0})
+        end = element.get('end', {'x': 100, 'y': 100})
+        props = element.get('properties', {})
+        
+        width = props.get('width', 2)
+        color = props.get('color', '#000000')
+        
+        if connector_type == 'straight':
+            draw.line(
+                [(start['x'], start['y']), (end['x'], end['y'])],
+                fill=color,
+                width=width
+            )
+        elif connector_type == 'elbow':
+            # L-förmige Verbindung (90° Winkel)
+            mid_x = start['x']
+            mid_y = end['y']
+            draw.line(
+                [(start['x'], start['y']), (mid_x, mid_y), (end['x'], end['y'])],
+                fill=color,
+                width=width
+            )
+    
+    def _render_flowchart_template(self, draw: ImageDraw.Draw, element: Dict[str, Any]):
+        """Flowchart-Diagramm aus Template rendern"""
+        steps = element.get('steps', [])
+        pos = element.get('position', {'x': 100, 'y': 100})
+        
+        y_spacing = 80
+        x_pos = pos['x']
+        start_y = pos['y']
+        
+        for idx, step in enumerate(steps):
+            y_pos = start_y + idx * y_spacing
+            
+            # Shape rendern
+            shape_element = {
+                'type': 'shape',
+                'shape': step.get('shape', 'rectangle'),
+                'content': step.get('text', ''),
+                'position': {'x': x_pos, 'y': y_pos},
+                'size': {'width': 150, 'height': 60},
+                'properties': {
+                    'fill_color': step.get('color', '#4472c4'),
+                    'border_color': '#000000',
+                    'border_width': 2
+                }
+            }
+            self._render_shape(draw, shape_element, 
+                             shape_element['position'], 
+                             shape_element['size'],
+                             shape_element['properties'])
+            
+            # Connector zum nächsten Schritt
+            if idx < len(steps) - 1:
+                self._render_connector(draw, {
+                    'connector_type': 'straight',
+                    'start': {'x': x_pos + 75, 'y': y_pos + 60},
+                    'end': {'x': x_pos + 75, 'y': y_pos + y_spacing},
+                    'properties': {'width': 2, 'color': '#000000'}
+                })
+    
+    def _render_org_chart_template(self, draw: ImageDraw.Draw, element: Dict[str, Any]):
+        """Organigramm aus Template rendern"""
+        levels = element.get('levels', [])
+        pos = element.get('position', {'x': 100, 'y': 100})
+        
+        y_spacing = 100
+        x_spacing = 120
+        
+        for level_idx, level in enumerate(levels):
+            y_pos = pos['y'] + level_idx * y_spacing
+            total_width = len(level) * x_spacing
+            start_x = pos['x'] + (600 - total_width) / 2  # Zentriert in 600px Breite
+            
+            for node_idx, node_text in enumerate(level):
+                x_pos = start_x + node_idx * x_spacing
+                
+                # Node rendern
+                shape_element = {
+                    'type': 'shape',
+                    'shape': 'rounded_rectangle',
+                    'content': node_text,
+                    'position': {'x': x_pos, 'y': y_pos},
+                    'size': {'width': 100, 'height': 50},
+                    'properties': {
+                        'fill_color': '#4472c4',
+                        'border_color': '#000000',
+                        'border_width': 2
+                    }
+                }
+                self._render_shape(draw, shape_element,
+                                 shape_element['position'],
+                                 shape_element['size'],
+                                 shape_element['properties'])
+                
+                # Connector zur vorherigen Ebene
+                if level_idx > 0:
+                    parent_idx = node_idx // 2
+                    prev_level_count = len(levels[level_idx - 1])
+                    prev_total_width = prev_level_count * x_spacing
+                    prev_start_x = pos['x'] + (600 - prev_total_width) / 2
+                    parent_x = prev_start_x + parent_idx * x_spacing
+                    
+                    self._render_connector(draw, {
+                        'connector_type': 'elbow',
+                        'start': {'x': parent_x + 50, 'y': y_pos - y_spacing + 50},
+                        'end': {'x': x_pos + 50, 'y': y_pos},
+                        'properties': {'width': 2, 'color': '#000000'}
+                    })
+    
+    def _render_process_flow_template(self, draw: ImageDraw.Draw, element: Dict[str, Any]):
+        """Prozessfluss-Diagramm rendern"""
+        # Ähnlich wie flowchart_template, aber mit spezifischen Process-Shapes
+        steps = element.get('steps', [])
+        self._render_flowchart_template(draw, element)
+    
+    def _render_cycle_diagram_template(self, draw: ImageDraw.Draw, element: Dict[str, Any]):
+        """Zyklisches Diagramm rendern"""
+        import math
+        
+        steps = element.get('steps', [])
+        pos = element.get('position', {'x': 400, 'y': 300})
+        
+        center_x = pos['x']
+        center_y = pos['y']
+        radius = 120
+        n = len(steps)
+        
+        for idx, step_text in enumerate(steps):
+            # Position auf dem Kreis berechnen
+            angle = (2 * math.pi * idx / n) - (math.pi / 2)  # Start oben
+            x = center_x + radius * math.cos(angle)
+            y = center_y + radius * math.sin(angle)
+            
+            # Shape rendern
+            shape_element = {
+                'type': 'shape',
+                'shape': 'oval',
+                'content': step_text,
+                'position': {'x': int(x - 40), 'y': int(y - 40)},
+                'size': {'width': 80, 'height': 80},
+                'properties': {
+                    'fill_color': '#4472c4',
+                    'border_color': '#000000',
+                    'border_width': 2
+                }
+            }
+            self._render_shape(draw, shape_element,
+                             shape_element['position'],
+                             shape_element['size'],
+                             shape_element['properties'])
+    
     def _create_pptx(
         self,
         vdl: Dict[str, Any],
@@ -578,15 +821,24 @@ Antworte NUR mit dem VDL-JSON, keine Erklärungen."""
             prs.core_properties.title = metadata.get('title', 'Präsentation')
             prs.core_properties.author = metadata.get('author', 'VERITAS Canvas Agent')
             
-            # Slides hinzufügen (als Bilder)
-            for slide_data in slides:
-                slide = prs.slides.add_slide(prs.slide_layouts[6])  # Blank
-                
-                # Slide-Bild einfügen
-                png_path = slide_data['png_path']
-                left = Inches(0)
-                top = Inches(0)
-                slide.shapes.add_picture(png_path, left, top, width=Inches(10))
+            # Option: Native Shapes vs. Bilder
+            use_native_shapes = vdl.get('use_native_shapes', False)
+            
+            if use_native_shapes:
+                # Native PowerPoint Shapes erstellen (direkt manipulierbar)
+                for slide_spec in vdl.get('slides', []):
+                    slide = prs.slides.add_slide(prs.slide_layouts[6])  # Blank
+                    self._add_native_shapes_to_slide(slide, slide_spec)
+            else:
+                # Slides als Bilder hinzufügen (Fallback)
+                for slide_data in slides:
+                    slide = prs.slides.add_slide(prs.slide_layouts[6])  # Blank
+                    
+                    # Slide-Bild einfügen
+                    png_path = slide_data['png_path']
+                    left = Inches(0)
+                    top = Inches(0)
+                    slide.shapes.add_picture(png_path, left, top, width=Inches(10))
             
             # Speichern
             timestamp = int(time.time() * 1000)
@@ -599,6 +851,150 @@ Antworte NUR mit dem VDL-JSON, keine Erklärungen."""
         except Exception as e:
             logger.error(f"PPTX-Erstellung fehlgeschlagen: {e}", exc_info=True)
             return None
+    
+    def _add_native_shapes_to_slide(self, slide, slide_spec: Dict[str, Any]):
+        """
+        Fügt native PowerPoint-Shapes zu einer Slide hinzu
+        
+        Diese Shapes sind editierbar in PowerPoint (nicht nur Bilder)
+        """
+        from pptx.enum.shapes import MSO_SHAPE, MSO_CONNECTOR
+        from pptx.enum.text import PP_ALIGN
+        
+        # Shape-Mapping: VDL-Namen -> MSO_SHAPE
+        shape_map = {
+            'rectangle': MSO_SHAPE.RECTANGLE,
+            'rounded_rectangle': MSO_SHAPE.ROUNDED_RECTANGLE,
+            'oval': MSO_SHAPE.OVAL,
+            'circle': MSO_SHAPE.OVAL,
+            'triangle': MSO_SHAPE.ISOSCELES_TRIANGLE,
+            'diamond': MSO_SHAPE.DIAMOND,
+            'pentagon': MSO_SHAPE.PENTAGON,
+            'hexagon': MSO_SHAPE.HEXAGON,
+            'octagon': MSO_SHAPE.OCTAGON,
+            
+            # Pfeile
+            'right_arrow': MSO_SHAPE.RIGHT_ARROW,
+            'left_arrow': MSO_SHAPE.LEFT_ARROW,
+            'up_arrow': MSO_SHAPE.UP_ARROW,
+            'down_arrow': MSO_SHAPE.DOWN_ARROW,
+            'left_right_arrow': MSO_SHAPE.LEFT_RIGHT_ARROW,
+            'circular_arrow': MSO_SHAPE.CIRCULAR_ARROW,
+            'bent_arrow': MSO_SHAPE.BENT_ARROW,
+            
+            # Flowchart
+            'flowchart_process': MSO_SHAPE.FLOWCHART_PROCESS,
+            'flowchart_decision': MSO_SHAPE.FLOWCHART_DECISION,
+            'flowchart_terminator': MSO_SHAPE.FLOWCHART_TERMINATOR,
+            'flowchart_data': MSO_SHAPE.FLOWCHART_DATA,
+            'flowchart_document': MSO_SHAPE.FLOWCHART_DOCUMENT,
+            'flowchart_database': MSO_SHAPE.FLOWCHART_DATABASE,
+            
+            # Callouts
+            'cloud_callout': MSO_SHAPE.CLOUD_CALLOUT,
+            'oval_callout': MSO_SHAPE.OVAL_CALLOUT,
+            
+            # Sterne
+            'star_5_point': MSO_SHAPE.STAR_5_POINT,
+            'star_6_point': MSO_SHAPE.STAR_6_POINT,
+        }
+        
+        for element in slide_spec.get('elements', []):
+            element_type = element.get('type')
+            
+            if element_type == 'text':
+                # Textbox hinzufügen
+                pos = element.get('position', {'x': 0, 'y': 0})
+                size = element.get('size', {'width': 400, 'height': 100})
+                props = element.get('properties', {})
+                
+                textbox = slide.shapes.add_textbox(
+                    Inches(pos['x'] / 100),
+                    Inches(pos['y'] / 100),
+                    Inches(size['width'] / 100),
+                    Inches(size['height'] / 100)
+                )
+                textbox.text = element.get('content', '')
+                
+                # Formatierung
+                if props.get('font_size'):
+                    textbox.text_frame.paragraphs[0].font.size = Pt(props['font_size'])
+                if props.get('color'):
+                    color_hex = props['color'].lstrip('#')
+                    r, g, b = tuple(int(color_hex[i:i+2], 16) for i in (0, 2, 4))
+                    textbox.text_frame.paragraphs[0].font.color.rgb = RGBColor(r, g, b)
+                if props.get('align'):
+                    align_map = {
+                        'left': PP_ALIGN.LEFT,
+                        'center': PP_ALIGN.CENTER,
+                        'right': PP_ALIGN.RIGHT
+                    }
+                    textbox.text_frame.paragraphs[0].alignment = align_map.get(props['align'], PP_ALIGN.LEFT)
+            
+            elif element_type == 'shape':
+                # Shape hinzufügen
+                shape_type = element.get('shape', 'rectangle')
+                pos = element.get('position', {'x': 0, 'y': 0})
+                size = element.get('size', {'width': 100, 'height': 100})
+                props = element.get('properties', {})
+                
+                if shape_type in shape_map:
+                    shape = slide.shapes.add_shape(
+                        shape_map[shape_type],
+                        Inches(pos['x'] / 100),
+                        Inches(pos['y'] / 100),
+                        Inches(size['width'] / 100),
+                        Inches(size['height'] / 100)
+                    )
+                    
+                    # Text in Shape
+                    if 'content' in element and element['content']:
+                        shape.text = element['content']
+                    
+                    # Füllfarbe
+                    if props.get('fill_color'):
+                        shape.fill.solid()
+                        color_hex = props['fill_color'].lstrip('#')
+                        r, g, b = tuple(int(color_hex[i:i+2], 16) for i in (0, 2, 4))
+                        shape.fill.fore_color.rgb = RGBColor(r, g, b)
+                    
+                    # Rahmen
+                    if props.get('border_color'):
+                        color_hex = props['border_color'].lstrip('#')
+                        r, g, b = tuple(int(color_hex[i:i+2], 16) for i in (0, 2, 4))
+                        shape.line.color.rgb = RGBColor(r, g, b)
+                    if props.get('border_width'):
+                        shape.line.width = Pt(props['border_width'])
+            
+            elif element_type == 'connector':
+                # Connector hinzufügen
+                connector_type = element.get('connector_type', 'straight')
+                start = element.get('start', {'x': 0, 'y': 0})
+                end = element.get('end', {'x': 100, 'y': 100})
+                
+                connector_map = {
+                    'straight': MSO_CONNECTOR.STRAIGHT,
+                    'elbow': MSO_CONNECTOR.ELBOW,
+                    'curve': MSO_CONNECTOR.CURVE
+                }
+                
+                connector = slide.shapes.add_connector(
+                    connector_map.get(connector_type, MSO_CONNECTOR.STRAIGHT),
+                    Inches(start['x'] / 100),
+                    Inches(start['y'] / 100),
+                    Inches(end['x'] / 100),
+                    Inches(end['y'] / 100)
+                )
+                
+                # Connector-Formatierung
+                props = element.get('properties', {})
+                if props.get('width'):
+                    connector.line.width = Pt(props['width'])
+                if props.get('color'):
+                    color_hex = props['color'].lstrip('#')
+                    r, g, b = tuple(int(color_hex[i:i+2], 16) for i in (0, 2, 4))
+                    connector.line.color.rgb = RGBColor(r, g, b)
+
 
 
 # Standalone-Test
