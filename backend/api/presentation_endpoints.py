@@ -80,16 +80,49 @@ async def generate_presentation(request: PresentationGenerateRequest):
     Der Agent nutzt LLM um eine Visual Description Language (VDL) zu generieren,
     die dann in Canvas-Elemente und PowerPoint-Slides umgesetzt wird.
     
+    **Neue Features (Dezember 2025):**
+    - ✅ 182+ verschiedene Formen (Shapes)
+    - ✅ 29 Pfeil-Typen (Arrows)
+    - ✅ 29 Flussdiagramm-Formen (Flowchart)
+    - ✅ Verbindungslinien (Connectors)
+    - ✅ Diagramm-Templates (Organigramm, Prozessflow, Zyklus)
+    - ✅ Native PowerPoint-Shapes (editierbar in PowerPoint!)
+    
     **VDL-Format:**
     - Strukturierte JSON-Beschreibung visueller Elemente
-    - Unterstützt: Text, Shapes, Charts, Images (AI-generiert)
+    - Unterstützt: Text, Shapes, Charts, Images (AI-generiert), Connectors, Diagrams
+    - Templates: flowchart, org_chart, cycle_diagram, pyramid
     - Canvas-Koordinaten: 800x600
     
-    **Beispiel:**
+    **Beispiel 1: Einfache Formen**
     
     ```json
     {
-        "prompt": "Erstelle eine Präsentation über Umweltgenehmigungen mit 2 Folien"
+        "prompt": "Erstelle eine Folie mit einem Rechteck, einem Kreis und einem Pfeil"
+    }
+    ```
+    
+    **Beispiel 2: Flussdiagramm (BImSchG-Prozess)**
+    
+    ```json
+    {
+        "prompt": "Erstelle ein Flussdiagramm für den BImSchG-Genehmigungsprozess mit 5 Schritten: Antragstellung, Formale Prüfung, Entscheidung, Fachliche Prüfung, Genehmigung"
+    }
+    ```
+    
+    **Beispiel 3: Organigramm**
+    
+    ```json
+    {
+        "prompt": "Erstelle ein Organigramm der Umweltbehörde mit 3 Ebenen: Leitung, Abteilungen (Immissionsschutz, Naturschutz, Gewässerschutz), Teams"
+    }
+    ```
+    
+    **Beispiel 4: Zyklisches Diagramm (PDCA)**
+    
+    ```json
+    {
+        "prompt": "Visualisiere den PDCA-Zyklus (Plan-Do-Check-Act) als kreisförmiges Diagramm"
     }
     ```
     
@@ -97,7 +130,23 @@ async def generate_presentation(request: PresentationGenerateRequest):
     ```json
     {
         "success": true,
-        "vdl": { ... },
+        "vdl": {
+            "use_native_shapes": true,
+            "slides": [
+                {
+                    "layout": "content",
+                    "elements": [
+                        {
+                            "type": "flowchart",
+                            "steps": [
+                                {"shape": "flowchart_terminator", "text": "Start"},
+                                {"shape": "flowchart_process", "text": "Schritt 1"}
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
         "slides": [
             {
                 "image_base64": "iVBORw0KGgo...",
@@ -106,9 +155,14 @@ async def generate_presentation(request: PresentationGenerateRequest):
             }
         ],
         "pptx_path": "/tmp/presentation_123.pptx",
-        "slide_count": 2
+        "slide_count": 1
     }
     ```
+    
+    **Wichtig:**
+    - Setze `use_native_shapes: true` in der VDL für editierbare PowerPoint-Shapes
+    - Nutze Template-basierte Diagramme (flowchart, org_chart, etc.) für beste Ergebnisse
+    - 182+ verschiedene Shapes verfügbar (siehe VDL-Dokumentation)
     """
     try:
         logger.info(f"Präsentations-Generierung angefordert: {request.prompt[:100]}")
@@ -260,7 +314,18 @@ async def health_check():
     {
         "status": "healthy",
         "agent_initialized": true,
-        "output_dir": "/tmp/veritas_presentations"
+        "output_dir": "/tmp/veritas_presentations",
+        "vdl_element_types": ["text", "shape", "connector", "flowchart", ...],
+        "vdl_layout_types": ["title_slide", "content", ...],
+        "capabilities": {
+            "total_shapes": 182,
+            "arrows": 29,
+            "flowchart_shapes": 29,
+            "connectors": 3,
+            "templates": ["flowchart", "org_chart", "cycle_diagram", "pyramid"],
+            "native_powerpoint_shapes": true,
+            "smartart_support": false
+        }
     }
     ```
     """
@@ -272,7 +337,19 @@ async def health_check():
             "agent_initialized": True,
             "output_dir": str(agent.output_dir),
             "vdl_element_types": VisualDescriptionLanguage.ELEMENT_TYPES,
-            "vdl_layout_types": VisualDescriptionLanguage.LAYOUT_TYPES
+            "vdl_layout_types": VisualDescriptionLanguage.LAYOUT_TYPES,
+            "vdl_shape_types": VisualDescriptionLanguage.SHAPE_TYPES,
+            "vdl_connector_types": VisualDescriptionLanguage.CONNECTOR_TYPES,
+            "capabilities": {
+                "total_shapes": 182,
+                "arrows": 29,
+                "flowchart_shapes": 29,
+                "connectors": len(VisualDescriptionLanguage.CONNECTOR_TYPES),
+                "templates": ["flowchart", "org_chart", "cycle_diagram", "pyramid"],
+                "native_powerpoint_shapes": True,
+                "smartart_support": False,
+                "description": "Shapes werden aus nativen PowerPoint-Objekten erstellt, kein natives SmartArt (wird nachgebaut)"
+            }
         }
     
     except Exception as e:
