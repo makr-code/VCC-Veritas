@@ -132,14 +132,12 @@ class OfficeAgentOrchestrator:
         try:
             logger.info(f"📊 Creating presentation: {template_category}")
             
-            # Use template-based approach
-            request_data = {
-                "template": template_category,
-                "query": query,
-                "context": context or {}
-            }
-            
-            result = await self.presentation_agent.generate_from_template(request_data)
+            # Call the actual PresentationCanvasAgent method
+            result = await self.presentation_agent.generate_presentation(
+                user_prompt=query,
+                context=context or {},
+                template_hint=template_category
+            )
             
             return {
                 "success": True,
@@ -212,7 +210,7 @@ class OfficeAgentOrchestrator:
                 "context": context or {}
             }
             
-            # Route to appropriate Outlook method
+            # Route to appropriate Outlook method based on existing methods
             if template_category == "email_compose":
                 result = await self.outlook_agent.compose_email(request_data)
             elif template_category == "calendar_event":
@@ -220,9 +218,10 @@ class OfficeAgentOrchestrator:
             elif template_category == "task_management":
                 result = await self.outlook_agent.create_task(request_data)
             elif template_category == "contact_management":
-                result = await self.outlook_agent.create_contact(request_data)
+                result = await self.outlook_agent.add_contact(request_data)
             else:
-                result = await self.outlook_agent.process_request(request_data)
+                # Default to compose_email for generic requests
+                result = await self.outlook_agent.compose_email(request_data)
             
             return {
                 "success": True,
@@ -256,18 +255,15 @@ class OfficeAgentOrchestrator:
                 "context": context or {}
             }
             
-            # Route to appropriate OneNote method
+            # Route to appropriate OneNote method based on existing methods
             if template_category == "meeting_notes":
                 result = await self.onenote_agent.create_meeting_notes(request_data)
             elif template_category == "project_notes":
                 result = await self.onenote_agent.create_project_notes(request_data)
             elif template_category == "checklist":
                 result = await self.onenote_agent.create_checklist(request_data)
-            elif template_category == "knowledge_base":
-                result = await self.onenote_agent.create_knowledge_article(request_data)
-            elif template_category == "research_notes":
-                result = await self.onenote_agent.create_research_notes(request_data)
             else:
+                # Default to create_note for other categories
                 result = await self.onenote_agent.create_note(request_data)
             
             return {

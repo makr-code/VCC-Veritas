@@ -141,16 +141,13 @@ async def generate_presentation(request: PresentationRequest):
     try:
         agent = PresentationCanvasAgent()
         
-        request_data = {
-            "query": request.query,
-            "template": request.template,
-            "variation": request.variation,
-            "slides": request.slides,
-            "use_native_shapes": request.use_native_shapes,
-            "context": request.context or {}
-        }
+        # Call the actual generate_presentation method
+        result = await agent.generate_presentation(
+            user_prompt=request.query,
+            context=request.context or {},
+            template_hint=request.template
+        )
         
-        result = await agent.generate_from_template(request_data)
         return result
     except Exception as e:
         logger.error(f"❌ Error generating presentation: {e}", exc_info=True)
@@ -268,7 +265,6 @@ async def compose_outlook_item(request: OutlookRequest):
         agent = OutlookAgent()
         
         request_data = {
-            "query": request.query,
             "template": request.template,
             "variation": request.variation,
             "data": request.data,
@@ -276,7 +272,7 @@ async def compose_outlook_item(request: OutlookRequest):
             "context": request.context or {}
         }
         
-        # Route based on template category
+        # Route based on template category - use existing methods
         if request.template == "email_compose":
             result = await agent.compose_email(request_data)
         elif request.template == "calendar_event":
@@ -284,9 +280,10 @@ async def compose_outlook_item(request: OutlookRequest):
         elif request.template == "task_management":
             result = await agent.create_task(request_data)
         elif request.template == "contact_management":
-            result = await agent.create_contact(request_data)
+            result = await agent.add_contact(request_data)
         else:
-            result = await agent.process_request(request_data)
+            # Default to email composition
+            result = await agent.compose_email(request_data)
         
         return result
     except Exception as e:
@@ -343,25 +340,21 @@ async def create_onenote_note(request: OneNoteRequest):
         agent = OneNoteAgent()
         
         request_data = {
-            "query": request.query,
             "template": request.template,
             "variation": request.variation,
             "data": request.data,
             "context": request.context or {}
         }
         
-        # Route based on template category
+        # Route based on template category - use existing methods
         if request.template == "meeting_notes":
             result = await agent.create_meeting_notes(request_data)
         elif request.template == "project_notes":
             result = await agent.create_project_notes(request_data)
         elif request.template == "checklist":
             result = await agent.create_checklist(request_data)
-        elif request.template == "knowledge_base":
-            result = await agent.create_knowledge_article(request_data)
-        elif request.template == "research_notes":
-            result = await agent.create_research_notes(request_data)
         else:
+            # Default to create_note for other categories
             result = await agent.create_note(request_data)
         
         return result
