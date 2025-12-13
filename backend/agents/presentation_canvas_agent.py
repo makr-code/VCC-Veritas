@@ -85,7 +85,7 @@ class VisualDescriptionLanguage:
         
         # Flussdiagramm-Formen
         'flowchart_process', 'flowchart_decision', 'flowchart_terminator',
-        'flowchart_data', 'flowchart_document', 'flowchart_database',
+        'flowchart_data', 'flowchart_document', 'flowchart_database',  # Note: database = magnetic_disk
         
         # Callouts
         'cloud_callout', 'oval_callout',
@@ -888,7 +888,7 @@ Antworte NUR mit dem VDL-JSON, keine Erklärungen."""
             'flowchart_terminator': MSO_SHAPE.FLOWCHART_TERMINATOR,
             'flowchart_data': MSO_SHAPE.FLOWCHART_DATA,
             'flowchart_document': MSO_SHAPE.FLOWCHART_DOCUMENT,
-            'flowchart_database': MSO_SHAPE.FLOWCHART_DATABASE,
+            'flowchart_database': MSO_SHAPE.FLOWCHART_MAGNETIC_DISK,  # Database representation
             
             # Callouts
             'cloud_callout': MSO_SHAPE.CLOUD_CALLOUT,
