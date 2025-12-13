@@ -1,0 +1,150 @@
+# Master Intent Schema Configuration
+# This file defines the overall intent recognition system configuration
+
+system_name: "VERITAS Intent Recognition System"
+version: "1.0.0"
+created: "2025-12-13"
+
+# Content type priorities (higher = checked first)
+content_type_priorities:
+  presentation: 0.85
+  table: 0.82
+  word_document: 0.80
+  image: 0.78
+  chart: 0.85
+  map: 0.75
+
+# Global configuration
+global_config:
+  # Minimum confidence threshold for intent matching
+  min_confidence_threshold: 0.75
+  
+  # Maximum number of intents to return
+  max_intents_returned: 3
+  
+  # Enable fuzzy keyword matching
+  fuzzy_matching: true
+  fuzzy_threshold: 0.8
+  
+  # Language support
+  supported_languages:
+    - "de"  # German
+    - "en"  # English
+  
+  # Default language if not detected
+  default_language: "de"
+
+# Intent resolution strategy
+resolution_strategy:
+  # How to handle multiple matching intents
+  multi_match_strategy: "highest_confidence"  # Options: highest_confidence, combined, ask_user
+  
+  # Fallback if no intent matches
+  fallback_strategy: "ask_user"  # Options: ask_user, use_default, reject
+  
+  # Default content type if uncertain
+  default_content_type: "text"
+
+# Schema loading configuration
+schema_config:
+  # Directory containing intent schemas
+  schema_directory: "backend/agents/orchestrator/intent_schemas"
+  
+  # Schema file pattern
+  schema_pattern: "*_intent.yaml"
+  
+  # Auto-reload schemas on change
+  auto_reload: true
+  
+  # Cache schemas in memory
+  use_cache: true
+
+# LLM Integration settings
+llm_config:
+  # Use LLM for ambiguous intent resolution
+  use_llm_resolution: true
+  
+  # LLM model for intent classification
+  intent_classification_model: "gpt-4"
+  
+  # Temperature for intent classification
+  temperature: 0.3
+  
+  # Max tokens for intent classification
+  max_tokens: 500
+
+# Agent routing configuration
+agent_routing:
+  # Enable dynamic agent selection
+  dynamic_routing: true
+  
+  # Agent selection strategy
+  selection_strategy: "capability_based"  # Options: capability_based, load_based, round_robin
+  
+  # Enable agent fallback chain
+  enable_fallback: true
+  
+  # Maximum fallback depth
+  max_fallback_depth: 2
+
+# Quality assurance
+quality_assurance:
+  # Enable quality checks before execution
+  enable_checks: true
+  
+  # Quality check types
+  checks:
+    - "confidence_threshold"
+    - "data_completeness"
+    - "template_availability"
+    - "agent_availability"
+  
+  # Action on quality check failure
+  failure_action: "retry_with_clarification"  # Options: retry_with_clarification, use_fallback, reject
+
+# Monitoring and logging
+monitoring:
+  # Log all intent recognitions
+  log_intent_recognition: true
+  
+  # Log agent routing decisions
+  log_routing_decisions: true
+  
+  # Track success/failure metrics
+  track_metrics: true
+  
+  # Metrics to track
+  metrics:
+    - "intent_accuracy"
+    - "resolution_time"
+    - "agent_success_rate"
+    - "user_satisfaction"
+
+# Extension points for future content types
+extension_points:
+  # Placeholder for video content
+  video:
+    enabled: false
+    schema_file: "video_intent.yaml"
+  
+  # Placeholder for audio content
+  audio:
+    enabled: false
+    schema_file: "audio_intent.yaml"
+  
+  # Placeholder for 3D models
+  three_d_model:
+    enabled: false
+    schema_file: "3d_model_intent.yaml"
+  
+  # Placeholder for code generation
+  code:
+    enabled: false
+    schema_file: "code_intent.yaml"
+
+# Metadata
+metadata:
+  author: "VERITAS Development Team"
+  maintainer: "orchestrator-team@veritas.ai"
+  documentation: "docs/orchestrator/intent_recognition.md"
+  last_updated: "2025-12-13"

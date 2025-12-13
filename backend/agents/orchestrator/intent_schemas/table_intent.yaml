@@ -1,0 +1,134 @@
+# Intent Recognition Schema for Tables
+# This schema defines patterns for table/spreadsheet creation requests
+
+content_type: "table"
+category: "structured_data"
+priority: 0.82
+
+# Intent patterns
+intent_patterns:
+  table_creation:
+    keywords:
+      - "tabelle"
+      - "table"
+      - "spreadsheet"
+      - "excel"
+      - "xlsx"
+      - "csv"
+      - "daten"
+      - "data"
+    confidence: 0.88
+    
+  data_analysis:
+    keywords:
+      - "analyse"
+      - "analysis"
+      - "auswertung"
+      - "evaluation"
+      - "statistik"
+      - "statistics"
+    confidence: 0.85
+
+# Template mappings
+template_mappings:
+  data_table:
+    keywords:
+      - "datentabelle"
+      - "data table"
+      - "übersicht"
+      - "overview"
+      - "auflistung"
+      - "listing"
+    template_category: "data_table"
+    variations:
+      - "simple_table"
+      - "formatted_table"
+      - "pivot_table"
+    confidence: 0.85
+    
+  comparison_table:
+    keywords:
+      - "vergleich"
+      - "comparison"
+      - "gegenüberstellung"
+      - "versus"
+      - "vs"
+    template_category: "comparison"
+    variations:
+      - "feature_comparison"
+      - "option_comparison"
+      - "benchmark_table"
+    confidence: 0.87
+    
+  summary_table:
+    keywords:
+      - "zusammenfassung"
+      - "summary"
+      - "aggregation"
+      - "total"
+      - "summe"
+    template_category: "summary"
+    variations:
+      - "summary_statistics"
+      - "aggregated_data"
+      - "totals_table"
+    confidence: 0.84
+    
+  schedule:
+    keywords:
+      - "zeitplan"
+      - "schedule"
+      - "timeline"
+      - "kalender"
+      - "calendar"
+      - "planung"
+    template_category: "schedule"
+    variations:
+      - "project_schedule"
+      - "resource_allocation"
+      - "gantt_table"
+    confidence: 0.86
+
+# LLM Solution Steps for tables
+llm_solution_steps:
+  - step: 1
+    action: "analyze_data_structure"
+    description: "Datenstruktur und Spalten identifizieren"
+    outputs: ["columns", "data_types"]
+    
+  - step: 2
+    action: "select_table_format"
+    description: "Tabellenformat und Template wählen"
+    inputs: ["data_structure", "purpose"]
+    outputs: ["table_template"]
+    
+  - step: 3
+    action: "extract_data"
+    description: "Daten aus Quellen extrahieren"
+    inputs: ["query", "database"]
+    outputs: ["raw_data"]
+    
+  - step: 4
+    action: "format_table"
+    description: "Tabelle formatieren und strukturieren"
+    inputs: ["raw_data", "table_template"]
+    outputs: ["formatted_table"]
+    
+  - step: 5
+    action: "create_file"
+    description: "Excel/CSV-Datei erstellen"
+    inputs: ["formatted_table"]
+    outputs: ["table_file"]
+
+# Agent routing
+agent_routing:
+  primary_agent: "TableGenerationAgent"
+  fallback_agent: "DataAnalysisAgent"
+  dependencies:
+    - "DatabaseAgent"
+    - "TableTemplateManager"
+  parallel_execution: false
+
+version: "1.0.0"
+created: "2025-12-13"
+author: "VERITAS Orchestrator System"

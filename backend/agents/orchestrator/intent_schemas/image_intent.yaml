@@ -1,0 +1,135 @@
+# Intent Recognition Schema for Images
+# This schema defines patterns for image generation/manipulation requests
+
+content_type: "image"
+category: "visual_content"
+priority: 0.78
+
+# Intent patterns
+intent_patterns:
+  image_generation:
+    keywords:
+      - "bild"
+      - "image"
+      - "grafik"
+      - "graphic"
+      - "illustration"
+      - "foto"
+      - "photo"
+      - "visualisierung"
+    confidence: 0.85
+    
+  ai_image:
+    keywords:
+      - "generieren"
+      - "generate"
+      - "erstellen"
+      - "create"
+      - "ai"
+      - "künstlich"
+      - "artificial"
+    confidence: 0.88
+
+# Template mappings
+template_mappings:
+  technical_diagram:
+    keywords:
+      - "technisch"
+      - "technical"
+      - "schematisch"
+      - "schematic"
+      - "blueprint"
+      - "bauplan"
+    template_category: "technical"
+    variations:
+      - "technical_drawing"
+      - "schematic_diagram"
+      - "blueprint"
+    confidence: 0.82
+    
+  infographic:
+    keywords:
+      - "infografik"
+      - "infographic"
+      - "datenvisualisierung"
+      - "data visualization"
+      - "informationsgrafik"
+    template_category: "infographic"
+    variations:
+      - "statistical_infographic"
+      - "process_infographic"
+      - "comparison_infographic"
+    confidence: 0.85
+    
+  illustration:
+    keywords:
+      - "illustration"
+      - "zeichnung"
+      - "drawing"
+      - "sketch"
+      - "skizze"
+      - "konzept"
+    template_category: "illustration"
+    variations:
+      - "concept_art"
+      - "technical_illustration"
+      - "explanatory_diagram"
+    confidence: 0.80
+    
+  photo_realistic:
+    keywords:
+      - "fotorealistisch"
+      - "photorealistic"
+      - "realistisch"
+      - "realistic"
+      - "foto"
+      - "photograph"
+    template_category: "realistic"
+    variations:
+      - "photorealistic_render"
+      - "realistic_scene"
+    confidence: 0.87
+
+# LLM Solution Steps for images
+llm_solution_steps:
+  - step: 1
+    action: "analyze_image_request"
+    description: "Bildanforderung analysieren (Stil, Inhalt, Zweck)"
+    outputs: ["image_type", "style", "content_description"]
+    
+  - step: 2
+    action: "select_generation_method"
+    description: "Generierungsmethode wählen (AI, Template, Manual)"
+    inputs: ["image_type", "requirements"]
+    outputs: ["generation_method"]
+    
+  - step: 3
+    action: "create_prompt"
+    description: "AI-Prompt oder Spezifikation erstellen"
+    inputs: ["content_description", "style"]
+    outputs: ["generation_prompt"]
+    
+  - step: 4
+    action: "generate_image"
+    description: "Bild generieren"
+    inputs: ["generation_prompt", "parameters"]
+    outputs: ["generated_image"]
+    
+  - step: 5
+    action: "post_process"
+    description: "Nachbearbeitung und Optimierung"
+    inputs: ["generated_image"]
+    outputs: ["final_image"]
+
+# Agent routing
+agent_routing:
+  primary_agent: "AIImageGeneratorAgent"
+  fallback_agent: "ImageProcessingAgent"
+  dependencies:
+    - "StableDiffusionService"
+    - "ImageTemplateManager"
+  parallel_execution: true
+
+version: "1.0.0"
+created: "2025-12-13"
+author: "VERITAS Orchestrator System"
