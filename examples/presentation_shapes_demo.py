@@ -1,16 +1,16 @@
 """
-Demonstration: PowerPoint-Präsentationen mit Diagrammen, Formen, Pfeilen und Connectors
+Demonstration: PowerPoint presentations with diagrams, shapes, arrows and connectors
 
-Dieses Beispiel zeigt, wie man den erweiterten PresentationCanvasAgent nutzt, um
-professionelle Präsentationen mit nativen PowerPoint-Shapes zu erstellen.
+This example shows how to use the enhanced PresentationCanvasAgent to create
+professional presentations with native PowerPoint shapes.
 
-Neue Funktionen (Dezember 2025):
-- ✅ 182+ verschiedene Formen (Shapes)
-- ✅ 29 Pfeil-Typen
-- ✅ 29 Flussdiagramm-Formen
-- ✅ Connectors (Verbindungslinien)
-- ✅ Diagram-Templates (Organigramm, Prozessflow, Zyklus)
-- ✅ Native PowerPoint-Shapes (editierbar in PowerPoint)
+New features (v2.0.0):
+- ✅ 182+ different shapes
+- ✅ 29 arrow types
+- ✅ 29 flowchart shapes
+- ✅ Connectors (connection lines)
+- ✅ Diagram templates (org chart, process flow, cycle)
+- ✅ Native PowerPoint shapes (editable in PowerPoint!)
 """
 
 import asyncio

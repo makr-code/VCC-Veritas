@@ -1,13 +1,13 @@
 """
-Tests für PresentationCanvasAgent mit Shapes, Diagrammen, Pfeilen und Connectors
+Tests for PresentationCanvasAgent with Shapes, Diagrams, Arrows and Connectors
 
-Testet:
-1. Basis-Shapes (Rechtecke, Kreise, etc.)
-2. Pfeile (verschiedene Typen)
-3. Flowchart-Diagramme
-4. Organigramme
-5. Zyklische Diagramme
-6. Native PowerPoint-Shapes
+Tests:
+1. Basic shapes (rectangles, circles, etc.)
+2. Arrows (various types)
+3. Flowchart diagrams
+4. Organization charts
+5. Cycle diagrams
+6. Native PowerPoint shapes
 7. Connectors
 """
 

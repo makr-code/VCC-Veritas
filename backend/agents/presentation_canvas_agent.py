@@ -29,6 +29,7 @@ import json
 import logging
 import base64
 import time
+import math
 from typing import Dict, Any, List, Optional, Tuple
 from io import BytesIO
 from pathlib import Path
@@ -888,7 +889,7 @@ Antworte NUR mit dem VDL-JSON, keine Erklärungen."""
             'flowchart_terminator': MSO_SHAPE.FLOWCHART_TERMINATOR,
             'flowchart_data': MSO_SHAPE.FLOWCHART_DATA,
             'flowchart_document': MSO_SHAPE.FLOWCHART_DOCUMENT,
-            'flowchart_database': MSO_SHAPE.FLOWCHART_MAGNETIC_DISK,  # Database representation
+            'flowchart_database': MSO_SHAPE.FLOWCHART_MAGNETIC_DISK,  # Note: Using magnetic disk shape as database representation
             
             # Callouts
             'cloud_callout': MSO_SHAPE.CLOUD_CALLOUT,
