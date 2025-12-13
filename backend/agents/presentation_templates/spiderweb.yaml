@@ -1,0 +1,126 @@
+# Spiderweb Template - Radar charts and multi-axis comparisons
+name: "spiderweb"
+category: "spiderweb"
+description: "Radar/spider charts for multi-dimensional comparisons"
+version: "1.0.0"
+
+variations:
+  - id: "radar_chart"
+    name: "Radar Chart"
+    description: "Multi-axis comparison (spider/radar chart)"
+    structure:
+      layout: "content"
+      elements:
+        - type: "text"
+          role: "title"
+          position: {x: 50, y: 30}
+          size: {width: 700, height: 50}
+          properties:
+            font_size: 32
+            font_weight: "bold"
+        - type: "radar"
+          role: "axes"
+          position: {x: 400, y: 320}
+          properties:
+            axis_count: "dynamic"
+            radius: 180
+            show_grid: true
+            grid_levels: 5
+            show_labels: true
+    
+  - id: "competency_web"
+    name: "Competency Web"
+    description: "Skill or competency assessment radar"
+    structure:
+      layout: "content"
+      elements:
+        - type: "text"
+          role: "title"
+          position: {x: 50, y: 30}
+          size: {width: 700, height: 50}
+        - type: "radar"
+          role: "competencies"
+          position: {x: 400, y: 320}
+          properties:
+            axis_count: "dynamic"
+            radius: 170
+            show_grid: true
+            grid_levels: 5
+            fill_area: true
+            fill_opacity: 0.3
+
+  - id: "comparison_radar"
+    name: "Multi-Series Radar"
+    description: "Compare multiple items on same radar"
+    structure:
+      layout: "content"
+      elements:
+        - type: "text"
+          role: "title"
+          position: {x: 50, y: 30}
+          size: {width: 700, height: 50}
+        - type: "radar"
+          role: "comparison"
+          position: {x: 400, y: 320}
+          properties:
+            axis_count: "dynamic"
+            radius: 160
+            show_grid: true
+            grid_levels: 5
+            series_count: "dynamic"
+            show_legend: true
+
+  - id: "star_rating"
+    name: "Star Rating Diagram"
+    description: "Visual rating across multiple criteria"
+    structure:
+      layout: "content"
+      elements:
+        - type: "text"
+          role: "title"
+          position: {x: 50, y: 30}
+          size: {width: 700, height: 50}
+        - type: "radar"
+          role: "ratings"
+          position: {x: 400, y: 320}
+          properties:
+            axis_count: "dynamic"
+            radius: 150
+            show_grid: true
+            grid_levels: 5
+            fill_area: true
+            max_value: 5
+
+# LLM usage example
+llm_example:
+  prompt: "Create a radar chart comparing environmental performance across 6 criteria"
+  vdl_output:
+    use_native_shapes: true
+    slides:
+      - layout: "content"
+        template: "spiderweb"
+        template_variation: "radar_chart"
+        data:
+          title: "Environmental Performance Assessment"
+          axes:
+            - "Air Quality"
+            - "Water Quality"
+            - "Waste Management"
+            - "Energy Efficiency"
+            - "Biodiversity"
+            - "Carbon Footprint"
+          values: [4.5, 4.0, 3.5, 4.2, 3.8, 4.0]
+          max_value: 5.0
+
+color_schemes:
+  standard:
+    grid: "#cccccc"
+    axis_labels: "#000000"
+    data_line: "#4472c4"
+    data_fill: "#4472c4"
+    fill_opacity: 0.3
+  comparison:
+    series_1: "#4472c4"
+    series_2: "#70ad47"
+    series_3: "#ffc000"
+    grid: "#e0e0e0"

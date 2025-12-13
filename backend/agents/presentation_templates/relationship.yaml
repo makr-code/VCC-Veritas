@@ -1,0 +1,112 @@
+# Relationship Template - Connections and dependencies between elements
+name: "relationship"
+category: "relationship"
+description: "Diagrams showing relationships, dependencies, and connections"
+version: "1.0.0"
+
+variations:
+  - id: "venn_diagram"
+    name: "Venn Diagram"
+    description: "Overlapping circles showing set relationships"
+    structure:
+      layout: "content"
+      elements:
+        - type: "text"
+          role: "title"
+          position: {x: 50, y: 30}
+          size: {width: 700, height: 50}
+          properties:
+            font_size: 32
+            font_weight: "bold"
+        - type: "venn"
+          role: "circles"
+          position: {x: 200, y: 150}
+          properties:
+            circle_count: 2
+            circle_radius: 120
+            overlap_percentage: 30
+            show_labels: true
+    
+  - id: "network_diagram"
+    name: "Network Diagram"
+    description: "Nodes connected in a network"
+    structure:
+      layout: "content"
+      elements:
+        - type: "text"
+          role: "title"
+          position: {x: 50, y: 30}
+          size: {width: 700, height: 50}
+        - type: "network"
+          role: "nodes"
+          position: {x: 100, y: 100}
+          properties:
+            layout_algorithm: "force_directed"
+            connector_type: "straight"
+            node_shape: "circle"
+            show_labels: true
+
+  - id: "stakeholder_map"
+    name: "Stakeholder Map"
+    description: "Stakeholder relationships and influence"
+    structure:
+      layout: "content"
+      elements:
+        - type: "text"
+          role: "title"
+          position: {x: 50, y: 30}
+          size: {width: 700, height: 50}
+        - type: "stakeholder_map"
+          role: "stakeholders"
+          position: {x: 400, y: 300}
+          properties:
+            center_element: "project"
+            radius_levels: [80, 160, 240]
+            connector_type: "straight"
+
+  - id: "dependency_diagram"
+    name: "Dependency Diagram"
+    description: "Shows dependencies between components"
+    structure:
+      layout: "content"
+      elements:
+        - type: "text"
+          role: "title"
+          position: {x: 50, y: 30}
+          size: {width: 700, height: 50}
+        - type: "dependency"
+          role: "components"
+          position: {x: 100, y: 100}
+          properties:
+            layout: "layered"
+            connector_type: "arrow"
+            show_dependency_type: true
+
+# LLM usage example
+llm_example:
+  prompt: "Create a Venn diagram showing overlap between environmental, social and economic sustainability"
+  vdl_output:
+    use_native_shapes: true
+    slides:
+      - layout: "content"
+        template: "relationship"
+        template_variation: "venn_diagram"
+        data:
+          title: "Sustainability Pillars"
+          circles:
+            - {label: "Environmental", color: "#70ad47"}
+            - {label: "Social", color: "#4472c4"}
+            - {label: "Economic", color: "#ffc000"}
+          intersection_label: "Sustainable Development"
+
+color_schemes:
+  standard:
+    primary: "#4472c4"
+    secondary: "#70ad47"
+    tertiary: "#ffc000"
+    connectors: "#666666"
+  contrast:
+    primary: "#e74c3c"
+    secondary: "#3498db"
+    tertiary: "#2ecc71"
+    connectors: "#95a5a6"

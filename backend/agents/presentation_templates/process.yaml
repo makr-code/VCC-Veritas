@@ -1,0 +1,108 @@
+# Process Template - Linear and branching process flows
+name: "process"
+category: "processes"
+description: "Process flow diagrams showing sequential steps and decision points"
+version: "1.0.0"
+
+variations:
+  - id: "linear_process"
+    name: "Linear Process Flow"
+    description: "Sequential process with automatic connectors"
+    structure:
+      layout: "content"
+      elements:
+        - type: "text"
+          role: "title"
+          position: {x: 50, y: 30}
+          size: {width: 700, height: 50}
+          properties:
+            font_size: 32
+            font_weight: "bold"
+        - type: "flowchart"
+          role: "process_steps"
+          position: {x: 275, y: 100}
+          properties:
+            orientation: "vertical"
+            step_spacing: 80
+            connector_type: "straight"
+            auto_layout: true
+    
+  - id: "decision_process"
+    name: "Process with Decisions"
+    description: "Process flow with decision points and branches"
+    structure:
+      layout: "content"
+      elements:
+        - type: "text"
+          role: "title"
+          position: {x: 50, y: 30}
+          size: {width: 700, height: 50}
+        - type: "flowchart"
+          role: "process_steps"
+          position: {x: 275, y: 100}
+          properties:
+            orientation: "vertical"
+            step_spacing: 80
+            connector_type: "straight"
+            allow_decisions: true
+            decision_branches: "horizontal"
+
+  - id: "horizontal_process"
+    name: "Horizontal Process Flow"
+    description: "Left-to-right process flow"
+    structure:
+      layout: "content"
+      elements:
+        - type: "text"
+          role: "title"
+          position: {x: 50, y: 30}
+          size: {width: 700, height: 50}
+        - type: "flowchart"
+          role: "process_steps"
+          position: {x: 50, y: 200}
+          properties:
+            orientation: "horizontal"
+            step_spacing: 100
+            connector_type: "straight"
+            auto_layout: true
+
+# Shape mappings for different step types
+step_types:
+  start: "flowchart_terminator"
+  end: "flowchart_terminator"
+  process: "flowchart_process"
+  decision: "flowchart_decision"
+  data: "flowchart_data"
+  document: "flowchart_document"
+  delay: "flowchart_delay"
+  manual: "flowchart_manual_input"
+
+# LLM usage example
+llm_example:
+  prompt: "Create a process flow for BImSchG approval with 5 steps including one decision point"
+  vdl_output:
+    use_native_shapes: true
+    slides:
+      - layout: "content"
+        template: "process"
+        template_variation: "decision_process"
+        data:
+          title: "BImSchG Approval Process"
+          steps:
+            - {type: "start", text: "Application Submitted", color: "#70ad47"}
+            - {type: "process", text: "Formal Review", color: "#4472c4"}
+            - {type: "decision", text: "Complete?", color: "#ed7d31"}
+            - {type: "process", text: "Technical Review", color: "#4472c4"}
+            - {type: "end", text: "Approval Granted", color: "#70ad47"}
+
+color_schemes:
+  standard:
+    start_end: "#70ad47"
+    process: "#4472c4"
+    decision: "#ed7d31"
+    data: "#ffc000"
+  environmental:
+    start_end: "#277728"
+    process: "#4c9c4d"
+    decision: "#ff6600"
+    data: "#ffcc00"

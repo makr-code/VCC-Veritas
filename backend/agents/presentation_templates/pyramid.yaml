@@ -1,0 +1,117 @@
+# Pyramid Template - Hierarchical layers and foundations
+name: "pyramid"
+category: "pyramid"
+description: "Pyramid diagrams showing hierarchical levels or foundation structures"
+version: "1.0.0"
+
+variations:
+  - id: "standard_pyramid"
+    name: "Standard Pyramid"
+    description: "Classic pyramid with horizontal layers"
+    structure:
+      layout: "content"
+      elements:
+        - type: "text"
+          role: "title"
+          position: {x: 50, y: 30}
+          size: {width: 700, height: 50}
+          properties:
+            font_size: 32
+            font_weight: "bold"
+        - type: "pyramid"
+          role: "levels"
+          position: {x: 200, y: 120}
+          size: {width: 400, height: 420}
+          properties:
+            level_count: "dynamic"
+            orientation: "bottom_to_top"
+            show_labels: true
+    
+  - id: "inverted_pyramid"
+    name: "Inverted Pyramid"
+    description: "Upside-down pyramid (top-to-bottom hierarchy)"
+    structure:
+      layout: "content"
+      elements:
+        - type: "text"
+          role: "title"
+          position: {x: 50, y: 30}
+          size: {width: 700, height: 50}
+        - type: "pyramid"
+          role: "levels"
+          position: {x: 200, y: 120}
+          size: {width: 400, height: 420}
+          properties:
+            level_count: "dynamic"
+            orientation: "top_to_bottom"
+            show_labels: true
+
+  - id: "maslow_hierarchy"
+    name: "Maslow's Hierarchy"
+    description: "5-level needs pyramid"
+    structure:
+      layout: "content"
+      elements:
+        - type: "text"
+          role: "title"
+          position: {x: 50, y: 30}
+          size: {width: 700, height: 50}
+        - type: "pyramid"
+          role: "needs_levels"
+          position: {x: 200, y: 120}
+          size: {width: 400, height: 420}
+          properties:
+            level_count: 5
+            orientation: "bottom_to_top"
+            gradient_colors: true
+    preset_levels:
+      - "Self-Actualization"
+      - "Esteem"
+      - "Love/Belonging"
+      - "Safety"
+      - "Physiological"
+
+  - id: "food_pyramid"
+    name: "Food Pyramid"
+    description: "Nutritional guidance pyramid"
+    structure:
+      layout: "content"
+      elements:
+        - type: "text"
+          role: "title"
+          position: {x: 50, y: 30}
+          size: {width: 700, height: 50}
+        - type: "pyramid"
+          role: "food_groups"
+          position: {x: 200, y: 120}
+          size: {width: 400, height: 420}
+          properties:
+            level_count: "dynamic"
+            orientation: "bottom_to_top"
+            show_portions: true
+
+# LLM usage example
+llm_example:
+  prompt: "Create a pyramid showing organizational levels from employees to CEO"
+  vdl_output:
+    use_native_shapes: true
+    slides:
+      - layout: "content"
+        template: "pyramid"
+        template_variation: "standard_pyramid"
+        data:
+          title: "Organizational Pyramid"
+          levels:
+            - {label: "CEO", color: "#1f4788"}
+            - {label: "Senior Management", color: "#4472c4"}
+            - {label: "Middle Management", color: "#5b9bd5"}
+            - {label: "Team Leaders", color: "#9dc3e6"}
+            - {label: "Employees", color: "#c5e0f4"}
+
+color_schemes:
+  gradient_blue:
+    levels: ["#1f4788", "#4472c4", "#5b9bd5", "#9dc3e6", "#c5e0f4"]
+  gradient_green:
+    levels: ["#277728", "#4c9c4d", "#70ad47", "#9bbb59", "#c4d79b"]
+  rainbow:
+    levels: ["#e74c3c", "#f39c12", "#f1c40f", "#2ecc71", "#3498db"]

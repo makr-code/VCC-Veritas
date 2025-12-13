@@ -1,0 +1,122 @@
+# Matrix Template - Grid-based comparisons and categorizations
+name: "matrix"
+category: "matrix"
+description: "Grid layouts for comparisons, categorizations, and multi-dimensional analysis"
+version: "1.0.0"
+
+variations:
+  - id: "two_by_two"
+    name: "2x2 Matrix"
+    description: "Four-quadrant matrix (e.g., SWOT, Eisenhower, BCG)"
+    structure:
+      layout: "content"
+      elements:
+        - type: "text"
+          role: "title"
+          position: {x: 50, y: 30}
+          size: {width: 700, height: 50}
+          properties:
+            font_size: 32
+            font_weight: "bold"
+        - type: "matrix_2x2"
+          role: "quadrants"
+          position: {x: 150, y: 120}
+          size: {width: 500, height: 400}
+          properties:
+            show_axis_labels: true
+            show_gridlines: true
+            quadrant_labels: true
+    
+  - id: "swot_matrix"
+    name: "SWOT Analysis"
+    description: "Strengths, Weaknesses, Opportunities, Threats"
+    structure:
+      layout: "content"
+      elements:
+        - type: "text"
+          role: "title"
+          position: {x: 50, y: 30}
+          size: {width: 700, height: 50}
+        - type: "matrix_2x2"
+          role: "swot"
+          position: {x: 150, y: 120}
+          size: {width: 500, height: 400}
+          properties:
+            quadrant_labels: ["Strengths", "Weaknesses", "Opportunities", "Threats"]
+            quadrant_colors: ["#70ad47", "#ed7d31", "#4472c4", "#ffc000"]
+
+  - id: "three_by_three"
+    name: "3x3 Matrix"
+    description: "Nine-cell priority or risk matrix"
+    structure:
+      layout: "content"
+      elements:
+        - type: "text"
+          role: "title"
+          position: {x: 50, y: 30}
+          size: {width: 700, height: 50}
+        - type: "matrix_3x3"
+          role: "cells"
+          position: {x: 125, y: 120}
+          size: {width: 550, height: 450}
+          properties:
+            show_axis_labels: true
+            show_gridlines: true
+            cell_labels: true
+
+  - id: "comparison_table"
+    name: "Comparison Table"
+    description: "Structured comparison grid"
+    structure:
+      layout: "content"
+      elements:
+        - type: "text"
+          role: "title"
+          position: {x: 50, y: 30}
+          size: {width: 700, height: 50}
+        - type: "table"
+          role: "comparison"
+          position: {x: 75, y: 100}
+          size: {width: 650, height: 450}
+          properties:
+            columns: "dynamic"
+            rows: "dynamic"
+            show_header: true
+            alternate_row_colors: true
+
+# LLM usage example
+llm_example:
+  prompt: "Create a SWOT analysis for renewable energy project"
+  vdl_output:
+    use_native_shapes: true
+    slides:
+      - layout: "content"
+        template: "matrix"
+        template_variation: "swot_matrix"
+        data:
+          title: "Renewable Energy Project - SWOT Analysis"
+          quadrants:
+            strengths:
+              - "Sustainable energy source"
+              - "Government subsidies"
+              - "Growing market demand"
+            weaknesses:
+              - "High initial costs"
+              - "Weather dependent"
+            opportunities:
+              - "Technology improvements"
+              - "Carbon credit markets"
+            threats:
+              - "Regulatory changes"
+              - "Competition"
+
+color_schemes:
+  swot_standard:
+    strengths: "#70ad47"
+    weaknesses: "#ed7d31"
+    opportunities: "#4472c4"
+    threats: "#ffc000"
+  priority:
+    high: "#e74c3c"
+    medium: "#f39c12"
+    low: "#2ecc71"

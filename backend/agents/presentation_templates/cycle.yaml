@@ -1,0 +1,99 @@
+# Cycle Template - Circular and cyclical diagrams
+name: "cycle"
+category: "cycle"
+description: "Circular diagrams for continuous processes and cycles"
+version: "1.0.0"
+
+variations:
+  - id: "pdca_cycle"
+    name: "PDCA Cycle (Plan-Do-Check-Act)"
+    description: "4-step continuous improvement cycle"
+    structure:
+      layout: "content"
+      elements:
+        - type: "text"
+          role: "title"
+          position: {x: 50, y: 30}
+          size: {width: 700, height: 50}
+          properties:
+            font_size: 32
+            align: "center"
+        - type: "cycle_diagram"
+          role: "cycle_steps"
+          position: {x: 400, y: 300}
+          properties:
+            radius: 150
+            step_count: 4
+            rotation_start: -90  # Start at top
+            connector_style: "curve"
+            center_label: true
+    preset_steps:
+      - "Plan"
+      - "Do"
+      - "Check"
+      - "Act"
+    
+  - id: "circular_process"
+    name: "Circular Process"
+    description: "Generic circular process with customizable steps"
+    structure:
+      layout: "content"
+      elements:
+        - type: "text"
+          role: "title"
+          position: {x: 50, y: 30}
+          size: {width: 700, height: 50}
+        - type: "cycle_diagram"
+          role: "cycle_steps"
+          position: {x: 400, y: 300}
+          properties:
+            radius: 140
+            step_count: "dynamic"
+            rotation_start: -90
+            connector_style: "curve"
+
+  - id: "lifecycle"
+    name: "Lifecycle Diagram"
+    description: "Product or project lifecycle"
+    structure:
+      layout: "content"
+      elements:
+        - type: "text"
+          role: "title"
+          position: {x: 50, y: 30}
+          size: {width: 700, height: 50}
+        - type: "cycle_diagram"
+          role: "lifecycle_stages"
+          position: {x: 400, y: 300}
+          properties:
+            radius: 160
+            step_count: "dynamic"
+            rotation_start: -90
+            connector_style: "arrow"
+            show_phase_dividers: true
+
+# LLM usage example
+llm_example:
+  prompt: "Create a PDCA cycle for environmental management"
+  vdl_output:
+    use_native_shapes: true
+    slides:
+      - layout: "content"
+        template: "cycle"
+        template_variation: "pdca_cycle"
+        data:
+          title: "Environmental Management PDCA Cycle"
+          steps:
+            - "Plan Environmental Goals"
+            - "Implement Measures"
+            - "Monitor Results"
+            - "Adjust Strategy"
+
+color_schemes:
+  standard:
+    steps: "#4472c4"
+    connectors: "#000000"
+    center: "#f0f0f0"
+  rainbow:
+    steps: ["#4472c4", "#70ad47", "#ffc000", "#ed7d31"]
+    connectors: "#666666"

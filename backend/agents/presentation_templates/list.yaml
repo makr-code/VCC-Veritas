@@ -1,0 +1,108 @@
+# List Template - Simple bullet point lists with optional numbering
+name: "list"
+category: "list"
+description: "Simple list layout with bullet points or numbering"
+version: "1.0.0"
+
+# Template variations
+variations:
+  - id: "simple_list"
+    name: "Simple Bullet List"
+    description: "Basic bullet point list"
+    structure:
+      layout: "content"
+      elements:
+        - type: "text"
+          role: "title"
+          position: {x: 50, y: 30}
+          size: {width: 700, height: 50}
+          properties:
+            font_size: 32
+            font_weight: "bold"
+        - type: "list_container"
+          role: "items"
+          position: {x: 100, y: 100}
+          size: {width: 600, height: 400}
+          properties:
+            item_spacing: 40
+            bullet_style: "circle"
+            font_size: 20
+    
+  - id: "numbered_list"
+    name: "Numbered List"
+    description: "List with automatic numbering"
+    structure:
+      layout: "content"
+      elements:
+        - type: "text"
+          role: "title"
+          position: {x: 50, y: 30}
+          size: {width: 700, height: 50}
+          properties:
+            font_size: 32
+            font_weight: "bold"
+        - type: "list_container"
+          role: "items"
+          position: {x: 100, y: 100}
+          size: {width: 600, height: 400}
+          properties:
+            item_spacing: 40
+            bullet_style: "numbers"
+            font_size: 20
+
+  - id: "two_column_list"
+    name: "Two Column List"
+    description: "List split into two columns"
+    structure:
+      layout: "two_column"
+      elements:
+        - type: "text"
+          role: "title"
+          position: {x: 50, y: 30}
+          size: {width: 700, height: 50}
+          properties:
+            font_size: 32
+            font_weight: "bold"
+        - type: "list_container"
+          role: "left_items"
+          position: {x: 50, y: 100}
+          size: {width: 350, height: 400}
+          properties:
+            item_spacing: 35
+            bullet_style: "circle"
+        - type: "list_container"
+          role: "right_items"
+          position: {x: 420, y: 100}
+          size: {width: 350, height: 400}
+          properties:
+            item_spacing: 35
+            bullet_style: "circle"
+
+# Usage example for LLM
+llm_example:
+  prompt: "Create a list of 5 key benefits of renewable energy"
+  vdl_output:
+    use_native_shapes: true
+    slides:
+      - layout: "content"
+        template: "list"
+        template_variation: "simple_list"
+        data:
+          title: "Benefits of Renewable Energy"
+          items:
+            - "Reduces carbon emissions"
+            - "Sustainable and inexhaustible"
+            - "Lower operational costs"
+            - "Creates jobs in green sector"
+            - "Energy independence"
+
+# Color schemes
+color_schemes:
+  professional:
+    title: "#1f4788"
+    bullet: "#4472c4"
+    text: "#000000"
+  environmental:
+    title: "#277728"
+    bullet: "#70ad47"
+    text: "#333333"
